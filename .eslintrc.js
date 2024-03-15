@@ -1,4 +1,3 @@
-/*
 module.exports = {
   extends: 'erb',
   plugins: ['@typescript-eslint'],
@@ -33,4 +32,3 @@ module.exports = {
     },
   },
 };
-*/
