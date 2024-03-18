@@ -150,10 +150,13 @@ ipcMain.handle('fauna:getSimulationProjectsByOwner', async (e, args) => {
   return execQueryCustom(getSimulationProjectsByOwner, args[0], args[1]);
 }); */
 
-ipcMain.on('logout', () => {
-  // createLogoutWindow();
-  BrowserWindow.getAllWindows().forEach((win) =>
-    win.loadURL(resolveHtmlPath('index.html')),
-  );
-  // BrowserWindow.getFocusedWindow()?.loadURL(resolveHtmlPath('index.html'));
+ipcMain.on('logout', (e, args) => {
+  BrowserWindow.getAllWindows().forEach((win) => {
+    win
+      .loadURL(`https://${args[0]}/v2/logout`)
+      .then(() => {
+        win.loadURL(resolveHtmlPath('index.html'));
+      })
+      .catch((err) => console.log(err));
+  });
 });

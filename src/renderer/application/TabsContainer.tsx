@@ -26,7 +26,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
 
   const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
 
-  const { loginWithPopup, isAuthenticated, logout } = useAuth0();
+  const { loginWithPopup, isAuthenticated } = useAuth0();
 
   const [showCreateNewProjectModal, setShowCreateNewProjectModal] =
     useState(false);
@@ -134,15 +134,10 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
                 <div
                   className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer"
                   onClick={() => {
-                    logout({
-                      logoutParams: {
-                        returnTo:
-                          process.env.NODE_ENV === 'production'
-                            ? 'file://callback'
-                            : window.location.origin,
-                      },
-                    });
-                    // window.electron.ipcRenderer.sendMessage('logout', '')
+                    window.electron.ipcRenderer.sendMessage(
+                      'logout',
+                      [process.env.REACT_APP_AUTH0_DOMAIN],
+                    );
                   }}
                 >
                   <HiOutlineLogout className="w-[20px] h-[20px] mr-[10px] text-primaryColor" />
