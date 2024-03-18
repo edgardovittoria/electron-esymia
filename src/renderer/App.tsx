@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { usersStateSelector, useFaunaQuery } from 'cad-library';
 import { ImSpinner } from 'react-icons/im';
-import { useAuth0 } from '@auth0/auth0-react';
 import { TabsContainer } from './application/TabsContainer';
 import {
   setFolderOfElementsSharedWithUser,
@@ -17,7 +16,8 @@ import { SimulationTabsContentFactory } from './application/simulationTabsManage
 import {
   getFoldersByOwner,
   getSharedFolders,
-  getSharedSimulationProjects, getSimulationProjectsByOwner
+  getSharedSimulationProjects,
+  getSimulationProjectsByOwner,
 } from './faunadb/projectsFolderAPIs';
 import { tabSelectedSelector } from './store/tabsAndMenuItemsSlice';
 import {
@@ -26,7 +26,6 @@ import {
   faunaProjectHaveParentInFolderList,
 } from './faunadb/apiAuxiliaryFunctions';
 import { FaunaFolder, FaunaProject } from './model/FaunaModels';
-import { setTest, TestSelector } from './store/solverSlice';
 
 export default function App() {
   const dispatch = useDispatch();
