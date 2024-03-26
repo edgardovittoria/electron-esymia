@@ -71,7 +71,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
   return (
     <>
       <div
-        className="w-[15%] p-[15px] flex flex-col justify-between h-[180px] border-2 border-green-200 mr-6 mt-4 rounded-lg hover:cursor-pointer hover:border-secondaryColor shadow-xl"
+        className="flex py-2 flex-col border-2 border-green-200 rounded-lg hover:cursor-pointer hover:border-secondaryColor shadow-xl"
         key={project.name}
         ref={drag}
         onClick={() => {
@@ -90,7 +90,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
         </h5>
         <div>
           <img
-            className="w-[100%]"
+            className="w-[60%] md:w-[80%] mx-auto"
             alt="project_screenshot"
             src={
               project.screenshot ? project.screenshot : noResultsIconForProject

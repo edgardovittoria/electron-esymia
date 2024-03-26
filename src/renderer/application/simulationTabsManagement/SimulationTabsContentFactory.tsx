@@ -1,32 +1,42 @@
-import React, { useState } from "react";
-import { Physics } from "./tabs/physics/Physics";
-import { Results } from "./tabs/results/Results";
-import { Simulator } from "./tabs/simulator/Simulator";
-import { Modeler } from "./tabs/modeler/Modeler";
-import { useSelector } from "react-redux";
-import { selectedMenuItemSelector } from "../../store/tabsAndMenuItemsSlice";
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Physics } from './tabs/physics/Physics';
+import { Results } from './tabs/results/Results';
+import { Simulator } from './tabs/simulator/Simulator';
+import { Modeler } from './tabs/modeler/Modeler';
+import { selectedMenuItemSelector } from '../../store/tabsAndMenuItemsSlice';
+import { useWindowInnerWidth } from '../../hook/useWindowInnerWidth';
 
-
-
-interface SimulationTabsContentFactoryProps {
-}
+interface SimulationTabsContentFactoryProps {}
 
 export const SimulationTabsContentFactory: React.FC<
   SimulationTabsContentFactoryProps
-> = () => {  
-  const [selectedTabLeftPanel, setSelectedTabLeftPanel] = useState("Modeler");
-  const menuItemSelected = useSelector(selectedMenuItemSelector)
-  const [savedPortParameters, setSavedPortParameters] = useState(true)
+> = () => {
+  const [selectedTabLeftPanel, setSelectedTabLeftPanel] = useState('Modeler');
+  const menuItemSelected = useSelector(selectedMenuItemSelector);
+  const [savedPortParameters, setSavedPortParameters] = useState(true);
 
+  const windowInnerWidth = useWindowInnerWidth();
+
+  if (windowInnerWidth < 800) {
+    return (
+      <div className="flex flex-col justify-center items-center my-auto h-[80vh]">
+        <span className="font-bold">
+          Sorry this section is not available on mobile
+        </span>
+
+      </div>
+    );
+  }
   switch (menuItemSelected) {
-    case "Modeler":
+    case 'Modeler':
       return (
         <Modeler
           selectedTabLeftPanel={selectedTabLeftPanel}
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
         />
       );
-    case "Physics":
+    case 'Physics':
       return (
         <Physics
           selectedTabLeftPanel={selectedTabLeftPanel}
@@ -35,14 +45,14 @@ export const SimulationTabsContentFactory: React.FC<
           setSavedPortParameters={setSavedPortParameters}
         />
       );
-    case "Simulator":
+    case 'Simulator':
       return (
         <Simulator
           selectedTabLeftPanel={selectedTabLeftPanel}
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
         />
       );
-    case "Results":
+    case 'Results':
       return (
         <Results
           selectedTabLeftPanel={selectedTabLeftPanel}

@@ -210,8 +210,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "ESymIA",
+    "appId": "org.erb.EsymIA",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [

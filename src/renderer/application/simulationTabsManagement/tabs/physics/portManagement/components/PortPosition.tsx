@@ -22,11 +22,11 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 			selectedPort.category === "lumped" ? (
 				<div
 					className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}>
-					<h6>Port Position</h6>
+					<h6 className="xl:text-base text-[12px]">Port Position</h6>
 					<div className="mt-2">
-						<span>Input (X,Y,Z)</span>
-						<div className="flex justify-around mt-2">
-							<div className="w-[30%]">
+						<span className="xl:text-base text-[12px]">Input (X,Y,Z)</span>
+						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
+							<div className="lg:w-[30%] w-full">
 								<input
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
@@ -52,7 +52,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
-							<div className="w-[30%]">
+							<div className="lg:w-[30%] w-full">
 								<input
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
@@ -78,7 +78,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
-							<div className="w-[30%]">
+							<div className="lg:w-[30%] w-full">
 								<input
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
@@ -107,9 +107,9 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 						</div>
 					</div>
 					<div className="mt-2">
-						<span>Output (X,Y,Z)</span>
-						<div className="flex justify-around mt-2">
-							<div className="w-[30%]">
+						<span className="xl:text-base text-[12px]">Output (X,Y,Z)</span>
+						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
+							<div className="lg:w-[30%] w-full">
 								<input
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
@@ -135,7 +135,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
-							<div className="w-[30%]">
+							<div className="lg:w-[30%] w-full">
 								<input
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
@@ -161,7 +161,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
-							<div className="w-[30%]">
+							<div className="lg:w-[30%] w-full">
 								<input
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
@@ -193,11 +193,11 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 			) : (
 				<div
 					className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}>
-					<h6>Probe Position</h6>
+					<h6 className="xl:text-base text-[12px]">Probe Position</h6>
 					<div className="mt-2">
-						<span>Position (X,Y,Z)</span>
-						<div className="flex justify-around mt-2">
-							<div className="w-[30%]">
+						<span className="xl:text-base text-[12px]">Position (X,Y,Z)</span>
+						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
+							<div className="lg:w-[30%] w-full">
 								<input
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
@@ -221,7 +221,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
-							<div className="w-[30%]">
+							<div className="lg:w-[30%] w-full">
 								<input
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
@@ -245,7 +245,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 									onWheel={(e) => e.currentTarget.blur()}
 								/>
 							</div>
-							<div className="w-[30%]">
+							<div className="lg:w-[30%] w-full">
 								<input
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}

@@ -1,28 +1,28 @@
 import {GiAtom, GiAtomicSlashes, GiCubeforce} from "react-icons/gi";
 import {AiOutlineBarChart} from "react-icons/ai";
 
-const modelerTabTitle = <div className="flex">
+const modelerTabTitle = <div className="flex items-center">
     <div className="w-[25%]"><GiCubeforce color={'#00ae52'} style={{width: "25px", height: "25px"}}/></div>
     <div className="w-[65%]">Modeler</div>
 </div>
 
 
-const materialTabTitle = <div className="flex">
+const materialTabTitle = <div className="flex items-center">
     <div className="w-[25%]"><GiAtomicSlashes color={'#00ae52'} style={{width: "25px", height: "25px"}}/></div>
     <div className="w-[65%]">Materials</div>
 </div>
 
-const physicsTabTitle = <div className="flex">
+const physicsTabTitle = <div className="flex items-center">
     <div className="w-[25%]"><GiAtom color={'#00ae52'} style={{width: "25px", height: "25px"}}/></div>
     <div className="w-[65%]">Physics</div>
 </div>
 
-const simulatorTabTitle = <div className="flex">
+const simulatorTabTitle = <div className="flex items-center">
     <div className="w-[25%]"><GiAtomicSlashes color={'#00ae52'} style={{width: "25px", height: "25px"}}/></div>
     <div className="w-[65%]">Materials</div>
 </div>
 
-const resultsTabTitle = <div className="flex">
+const resultsTabTitle = <div className="flex items-center">
     <div className="w-[25%]"><AiOutlineBarChart color={'#00ae52'} style={{width: "25px", height: "25px"}}/></div>
     <div className="w-[65%]">Results</div>
 </div>

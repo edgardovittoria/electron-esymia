@@ -367,21 +367,21 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             {meshGenerated === "Generating" &&
                 <ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2`}/>}
             <div
-                className={`${(meshGenerated === "Generating" || selectedProject.simulation?.status === "Queued") && 'opacity-40'} flex-col absolute right-[2%] top-[160px] w-[22%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor`}>
+                className={`${(meshGenerated === "Generating" || selectedProject.simulation?.status === "Queued") && 'opacity-40'} flex-col absolute right-[2%] top-[160px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor`}>
                 <div className="flex">
                     <AiOutlineThunderbolt style={{width: "25px", height: "25px"}}/>
-                    <h5 className="ml-2">Meshing and Solving Info</h5>
+                    <h5 className="ml-2 text-[12px] xl:text-base">Meshing and Solving Info</h5>
                 </div>
                 <hr className="mt-1"/>
                 <div
-                    className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
+                    className={`mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
                 >
-                    <h6>Set quantum's dimensions</h6>
+                    <h6 className="xl:text-base text-[12px]">Set quantum&apos;s dimensions</h6>
                     <div className="mt-2">
-                        <span>X,Y,Z</span>
-                        <div className="flex justify-between mt-2">
+                        <span className="text-[12px] xl:text-base">X,Y,Z</span>
+                        <div className="flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2">
                             {quantumDimensions.map((quantumComponent, indexQuantumComponent) =>
-                                <div className="w-[30%]">
+                                <div className="xl:w-[30%] w-full">
                                     <input
                                         disabled={
                                             selectedProject.simulation?.status === "Completed" ||
@@ -425,50 +425,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                                     />
                                 </div>
                             )}
-                            {/* <div className="w-[30%]">
-                                <input
-                                    disabled={
-                                        selectedProject.simulation?.status === "Completed" ||
-                                        selectedProject.model?.components === undefined
-                                    }
-                                    min={0.0}
-                                    className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-                                    type="number"
-                                    step={0.000001}
-                                    value={quantumDimensions[1]}
-                                    onChange={(event) =>
-                                        dispatch(
-                                            setQuantum([
-                                                quantumDimensions[0],
-                                                parseFloat(event.target.value),
-                                                quantumDimensions[2],
-                                            ])
-                                        )
-                                    }
-                                />
-                            </div> */}
-                            {/* <div className="w-[30%]">
-                                <input
-                                    disabled={
-                                        selectedProject.simulation?.status === "Completed" ||
-                                        selectedProject.model?.components === undefined
-                                    }
-                                    min={0.0}
-                                    className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-                                    type="number"
-                                    step={0.000001}
-                                    value={quantumDimensions[2]}
-                                    onChange={(event) =>
-                                        dispatch(
-                                            setQuantum([
-                                                quantumDimensions[0],
-                                                quantumDimensions[1],
-                                                parseFloat(event.target.value),
-                                            ])
-                                        )
-                                    }
-                                />
-                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -492,7 +448,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                         {((meshGenerated === "Generated" && !meshApproved) || selectedProject.simulation?.status === "Failed") && (
                             <div className={`flex justify-between`}>
                                 <button
-                                    className="button buttonPrimary w-full"
+                                    className="button buttonPrimary w-full text-[12px] xl:text-base"
                                     disabled={!checkQuantumDimensionsValidity()}
                                     onClick={() => {
                                         dispatch(setMeshGenerated("Generating"));
@@ -508,11 +464,11 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     </div>
                 </div>
                 <div
-                    className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
+                    className={`mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
                 >
-                    <h6>Solver Iterations</h6>
+                    <h6 className="text-[12px] xl:text-base">Solver Iterations</h6>
                     <div className="mt-2">
-                        <span>Inner, Outer</span>
+                        <span className="text-[12px] xl:text-base">Inner, Outer</span>
                         <div className="flex justify-between mt-2">
                             <div className="w-[45%]">
                                 <input
@@ -550,9 +506,9 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     </div>
                 </div>
                 <div
-                    className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
+                    className={`mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}
                 >
-                    <h6>Convergence Threshold</h6>
+                    <h6 className="text-[12px] xl:text-base">Convergence Threshold</h6>
                     <div className="mt-2">
                         <div className="flex justify-between mt-2">
                             <div className="w-full">
@@ -575,19 +531,9 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                         </div>
                     </div>
                 </div>
-                {/*<button
-                    className={`w-full mt-3 button
-              ${(meshGenerated !== "Generated") ? 'bg-gray-300 text-gray-600 opacity-70' : 'buttonPrimary'}`}
-                    disabled={meshGenerated !== "Generated"}
-                    onClick={() => {
-                        exportToJsonFileThis(solverInputFrom(selectedProject, solverIterations, convergenceThreshold), selectedProject?.name + "_solverInput.json")
-                    }}
-                >
-                    Export Solver Input
-                </button>*/}
                 {selectedProject.simulation?.status === "Completed" ? (
                         <button
-                            className="button buttonPrimary w-[100%] mt-3"
+                            className="button buttonPrimary w-[100%] mt-3 text-[12px] xl:text-base"
                             onClick={() => {
                                 dispatch(selectMenuItem("Results"));
                             }}
@@ -597,7 +543,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                     ) :
                     <>
                         <button
-                            className={`w-full mt-3 button
+                            className={`w-full mt-3 button text-[12px] xl:text-base
               ${(meshGenerated !== "Generated") ? 'bg-gray-300 text-gray-600 opacity-70' : 'buttonPrimary'}`}
                             disabled={meshGenerated !== "Generated"}
                             onClick={() => {

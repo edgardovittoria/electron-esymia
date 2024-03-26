@@ -25,7 +25,7 @@ export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
 
     return (
         <>
-            < div className={`${(selectedProject.simulation?.status === 'Completed') && 'opacity-40'} absolute left-[20%] top-[160px]`}>
+            < div className={`${(selectedProject.simulation?.status === 'Completed') && 'opacity-40'}`}>
                 <Menu as="div" className="relative inline-block text-left">
                     <Menu.Button
                         disabled = {selectedProject.simulation?.status === 'Completed'}

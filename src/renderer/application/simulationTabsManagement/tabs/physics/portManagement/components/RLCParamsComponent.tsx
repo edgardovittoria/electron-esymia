@@ -18,9 +18,9 @@ export const RLCParamsComponent: React.FC<RLCParamsProps> = ({
 
   return (
     <div className="mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
-      <h6>RLC Params</h6>
+      <h6 className="lg:text-base text-[12px]">RLC Params</h6>
       <div className="mt-2">
-        <span>Resistance</span>
+        <span className="lg:text-base text-[12px]">Resistance</span>
         <input
           className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
           type="number"
@@ -44,7 +44,7 @@ export const RLCParamsComponent: React.FC<RLCParamsProps> = ({
         />
       </div>
       <div className="mt-2">
-        <span>Inductance</span>
+        <span className="lg:text-base text-[12px]">Inductance</span>
         <input
           className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
           type="number"
@@ -67,7 +67,7 @@ export const RLCParamsComponent: React.FC<RLCParamsProps> = ({
         />
       </div>
       <div className="mt-2">
-        <span>Capacitance</span>
+        <span className="lg:text-base text-[12px]">Capacitance</span>
         <input
           className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
           type="number"

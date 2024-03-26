@@ -160,7 +160,7 @@ export default function App() {
         <Route
           path="/"
           element={
-            <div className="bg-[#ececec]">
+            <div className="lg:h-[100vh] h-screen">
               {loginSpinner && (
                 <ImSpinner className="animate-spin w-12 h-12 absolute left-1/2 top-1/2" />
               )}

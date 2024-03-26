@@ -17,7 +17,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
   const menuItems = useSelector(menuItemsSelector);
   const menuItemSelected = useSelector(selectedMenuItemSelector);
   return (
-    <div className="flex justify-center h-[7vh]">
+    <div className="flex justify-center sticky">
       <ul className="relative flex items-center bg-white px-4 py-2 w-[96%] rounded-xl">
         {(menuItems as string[]).map((item) => (
           <li

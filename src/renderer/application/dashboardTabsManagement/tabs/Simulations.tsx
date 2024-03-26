@@ -40,13 +40,13 @@ export const Simulations: React.FC<SimulationsProps> = () => {
 
   getAllSimulation(mainFolder);
 
-  function showResultsIcon(id: string) {
+  /* function showResultsIcon(id: string) {
     document.getElementById(id)?.setAttribute('style', 'visibility: visible');
   }
 
   function hideResultsIcon(id: string) {
     document.getElementById(id)?.setAttribute('style', 'visibility: hidden');
-  }
+  } */
 
   function factoryStatusIcon(status: string) {
     switch (status) {
@@ -64,7 +64,7 @@ export const Simulations: React.FC<SimulationsProps> = () => {
   }
 
   return (
-    <div className="text-center p-[20px] box w-full flex flex-col">
+    <div className="text-center p-[20px] box w-full flex flex-col h-fit">
       <h5 className="text-left text-base p-2">Simulations</h5>
       {simulations.length > 0 ? (
         <div className="overflow-auto h-full w-full mt-5">
@@ -97,8 +97,6 @@ export const Simulations: React.FC<SimulationsProps> = () => {
                 return (
                   <tr
                     key={`${simulation.name}_${index}`}
-                    onMouseOver={() => showResultsIcon(index.toString())}
-                    onMouseOut={() => hideResultsIcon(index.toString())}
                     className="hover:bg-[#f1f1f1]"
                   >
                     <th scope="row" className="pl-8">
@@ -111,7 +109,6 @@ export const Simulations: React.FC<SimulationsProps> = () => {
                     <td
                       id={index.toString()}
                       className="py-4 hover:cursor-pointer"
-                      style={{ visibility: 'hidden' }}
                     >
                       <AiOutlineBarChart
                         color="#00ae52"

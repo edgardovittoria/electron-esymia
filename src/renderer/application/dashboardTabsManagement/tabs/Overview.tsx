@@ -18,10 +18,10 @@ export const Overview: React.FC<OverviewProps> = ({ setShowModal }) => {
   // const [cardMenuHovered, setCardMenuHovered] = useState(false);
 
   return (
-    <>
-      <div className="box w-[48.5%] h-1/2">
+    <div className="grid lg:grid-cols-2 grid-cols-1 w-full gap-7">
+      <div className="box">
         <div className="flex flex-row justify-between items-start p-2">
-          <h5 className="text-base">My Recent Projects</h5>
+          <h5 className="lg:text-base text-sm">My Recent Projects</h5>
           <button
             className="text-primaryColor text-sm bg-transparent border-none hover:underline hover:text-black"
             onClick={() => {
@@ -41,7 +41,7 @@ export const Overview: React.FC<OverviewProps> = ({ setShowModal }) => {
             />
             <p>No projects for now.</p>
             <button
-              className="button buttonPrimary"
+              className="button buttonPrimary text-sm mt-3"
               data-toggle="modal"
               data-target="#createNewProjectModal"
               onClick={() => {
@@ -52,7 +52,7 @@ export const Overview: React.FC<OverviewProps> = ({ setShowModal }) => {
             </button>
           </div>
         ) : (
-          <div className="p-[15px] overflow-scroll max-h-[250px]">
+          <div className="p-[15px] overflow-scroll max-h-[300px]">
             {projects.map((project) => {
               return (
                 <div
@@ -90,7 +90,7 @@ export const Overview: React.FC<OverviewProps> = ({ setShowModal }) => {
           </div>
         )}
       </div>
-      <div className="box w-[48.5%] relative h-1/2 bg-gradient-to-br from-primaryColor to-green-600 text-white">
+      <div className="box relative bg-gradient-to-br from-primaryColor to-green-600 text-white">
         <h5 className="text-base p-2">Your Plan</h5>
         <div className="pl-[20px]">
           <h2 className="mt-[10px]">
@@ -122,13 +122,12 @@ export const Overview: React.FC<OverviewProps> = ({ setShowModal }) => {
         </svg>
         <AiFillUnlock
           style={{ fill: 'url(#blue-gradient)' }}
-          size={280}
-          className="absolute right-0 bottom-[-40px]"
+          className="absolute right-0 bottom-0 sm:bottom-[-40px] sm:w-[280px] sm:h-[280px] w-[180px] h-[180px]"
         />
       </div>
-      <div className="mt-3 justify-between w-full h-1/2">
+      <div className="lg:col-span-2 justify-between w-full">
         <Simulations />
       </div>
-    </>
+    </div>
   );
 };

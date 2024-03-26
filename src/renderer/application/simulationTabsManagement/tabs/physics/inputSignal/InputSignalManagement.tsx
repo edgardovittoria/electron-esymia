@@ -11,12 +11,12 @@ export const InputSignalManagement: React.FC<InputSignalManagementProps> = (
 ) => {
     return(
         <>
-            <div className="flex absolute right-[2%] top-[650px] w-[22%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor">
+            <div className="flex absolute right-[2%] top-[650px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor">
                 <div className="col-6 text-start ps-0">
                     <h5 className="mb-0">Signals</h5>
                 </div>
             </div>
-            < div className="flex-col absolute right-[2%] top-[695px] w-[22%] rounded-tl rounded-tr bg-white p-[20px] shadow-2xl max-h-[200px] overflow-y-scroll overflow-x-hidden">
+            < div className="flex-col absolute right-[2%] top-[695px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[20px] shadow-2xl max-h-[200px] overflow-y-scroll overflow-x-hidden">
                 {children}
             </div>
         </>

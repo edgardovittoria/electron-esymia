@@ -43,3 +43,7 @@
     @apply block focus:drop-shadow-xl focus:border-[1px] focus:border-secondaryColor h-[35px]
   }
 }
+
+body{
+  background-color: #ececec;
+}

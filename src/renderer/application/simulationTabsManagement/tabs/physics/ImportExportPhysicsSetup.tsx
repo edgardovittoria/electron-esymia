@@ -27,7 +27,7 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
     };
     return (
         <>
-            <div className="tooltip absolute left-[28%] top-[160px]" data-tip="Import Physics">
+            <div className="tooltip" data-tip="Import Physics">
                 <button
                     disabled={selectedProject?.simulation?.status === "Completed"}
                     className={`bg-white rounded p-2 ${selectedProject?.simulation?.status === "Completed" && 'opacity-40'}`}
@@ -56,7 +56,7 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                     />
                 </button>
             </div>
-            <div className="tooltip absolute left-[30.5%] top-[160px]" data-tip="Export Physics">
+            <div className="tooltip" data-tip="Export Physics">
                 <button
                     disabled={
                         !(selectedProject &&

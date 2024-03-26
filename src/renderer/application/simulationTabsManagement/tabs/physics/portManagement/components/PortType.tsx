@@ -19,12 +19,12 @@ export const PortType: React.FC<PortTypeProps> = ({
 }) => {
 	return (
 		<div className="p-[10px] text-center border-[1px] border-secondaryColor bg-[#f6f6f6]">
-			<div className="w-100 text-start">
-				<h6>Port Type</h6>
+			<div className="w-100 xl:text-start text-center mb-2">
+				<h6 className="text-[12px] xl:text-base">Port Type</h6>
 			</div>
 			<button
 				disabled={disabled}
-				className={`${disabled && 'opacity-40'} button buttonPrimary mb-2 w-100`}
+				className={`${disabled && 'opacity-40'} button buttonPrimary mb-2 w-100 xl:text-base text-[12px]`}
 				onClick={() => setShow(true)}>
 				Choose the port type
 			</button>
