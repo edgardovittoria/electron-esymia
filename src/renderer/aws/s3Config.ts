@@ -9,8 +9,10 @@ export const s3Config = {
 };
 
 AWS.config.update({
-  accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY,
-  secretAccessKey: process.env.REACT_APP_AWS_SECRET_KEY,
+  credentials: {
+    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY as string,
+    secretAccessKey: process.env.REACT_APP_AWS_SECRET_KEY as string,
+  },
   httpOptions: {
     timeout: 900 * 1000,
     connectTimeout: 900 * 1000,
