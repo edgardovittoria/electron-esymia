@@ -4,7 +4,7 @@ import {MesherOutput} from "../MesherInputOutput";
 import {MyInstancedMesh} from "./components/MyInstancedMesh";
 import {ExternalGridsObject, Project} from "../../../../../model/esymiaModels";
 import {Bounds, useBounds} from "@react-three/drei";
-import {Brick} from "../MeshingSolvingInfo";
+import {Brick} from "../meshingSolvingInfo/MeshingSolvingInfo";
 import {useSelector} from "react-redux";
 import {meshGeneratedSelector} from "../../../../../store/projectSlice";
 

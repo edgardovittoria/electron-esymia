@@ -7,7 +7,7 @@ import {
   setMeshGenerated,
 } from '../../../../store/projectSlice';
 import { SimulatorLeftPanelTab } from './SimulatorLeftPanelTab';
-import { Brick, MeshingSolvingInfo } from './MeshingSolvingInfo';
+import { Brick, MeshingSolvingInfo } from './meshingSolvingInfo/MeshingSolvingInfo';
 import { CanvasBaseWithRedux } from '../../sharedElements/CanvasBaseWithRedux';
 import { MeshedElement } from './MeshedElement/MeshedElement';
 import { LeftPanel } from '../../sharedElements/LeftPanel';

@@ -2,7 +2,7 @@ import {
   ComponentEntity,
   exportToSTL,
   Material,
-  useFaunaQuery,
+  useFaunaQuery
 } from 'cad-library';
 import React, { useEffect, useState } from 'react';
 import { AiOutlineCheckCircle, AiOutlineThunderbolt } from 'react-icons/ai';
@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { ImSpinner } from 'react-icons/im';
 import useWebSocket from 'react-use-websocket';
-import { setSolverOutput } from '../../../../store/solverSlice';
+import { setSolverOutput } from '../../../../../store/solverSlice';
 import {
   deleteSimulation,
   meshGeneratedSelector,
@@ -20,19 +20,20 @@ import {
   setMeshGenerated,
   setQuantum,
   unsetMesh,
-  updateSimulation,
-} from '../../../../store/projectSlice';
-import { deleteFileS3, uploadFileS3 } from '../../../../aws/mesherAPIs';
-import { selectMenuItem } from '../../../../store/tabsAndMenuItemsSlice';
+  updateSimulation
+} from '../../../../../store/projectSlice';
+import { deleteFileS3, uploadFileS3 } from '../../../../../aws/mesherAPIs';
+import { selectMenuItem } from '../../../../../store/tabsAndMenuItemsSlice';
 import {
   ExternalGridsObject,
   Project,
   Simulation,
-  SolverOutput,
-} from '../../../../model/esymiaModels';
-import { getMaterialListFrom } from './Simulator';
-import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
+  SolverOutput
+} from '../../../../../model/esymiaModels';
+import { getMaterialListFrom } from '../Simulator';
+import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs';
+import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFunctions';
+import SimulationStatus from './components/SimulationStatus';
 
 interface MeshingSolvingInfoProps {
   selectedProject: Project;
@@ -41,10 +42,10 @@ interface MeshingSolvingInfoProps {
 }
 
 export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
-  selectedProject,
-  allMaterials,
-  externalGrids,
-}) => {
+                                                                        selectedProject,
+                                                                        allMaterials,
+                                                                        externalGrids
+                                                                      }) => {
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
   const quantumDimensions = selectedProject.meshData.quantum;
@@ -52,7 +53,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   const meshGenerated = useSelector(meshGeneratedSelector);
 
   const [solverIterations, setSolverIterations] = useState<[number, number]>([
-    100, 1,
+    100, 1
   ]);
   const [convergenceThreshold, setConvergenceThreshold] = useState(0.0001);
   const [frequenciesNumber, setFrequenciesNumber] = useState(0);
@@ -64,30 +65,31 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     ) {
       execQuery(
         updateProjectInFauna,
-        convertInFaunaProjectThis(selectedProject),
-      ).then(() => {});
+        convertInFaunaProjectThis(selectedProject)
+      ).then(() => {
+      });
     }
   }, [
     selectedProject.meshData.mesh,
     selectedProject.meshData.externalGrids,
-    selectedProject.simulation,
+    selectedProject.simulation
   ]);
 
   const solverInputFrom = (
     project: Project,
     solverIterations: [number, number],
-    convergenceThreshold: number,
+    convergenceThreshold: number
   ) => {
     const frequencyArray: number[] = [];
     if (project)
       project.signal?.signalValues.forEach((sv) =>
-        frequencyArray.push(sv.freq),
+        frequencyArray.push(sv.freq)
       );
     setFrequenciesNumber(frequencyArray.length);
     const signalsValuesArray: { Re: number; Im: number }[] = [];
     if (project)
       project.signal?.signalValues.forEach((sv) =>
-        signalsValuesArray.push(sv.signal),
+        signalsValuesArray.push(sv.signal)
       );
 
     return {
@@ -96,32 +98,32 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         ports: project.ports.filter((p) => p.category === 'port'),
         lumped_elements: project.ports.filter((p) => p.category === 'lumped'),
         materials: getMaterialListFrom(
-          project?.model?.components as ComponentEntity[],
+          project?.model?.components as ComponentEntity[]
         ),
         frequencies: frequencyArray,
         signals: signalsValuesArray,
         powerPort: project && project.signal?.powerPort,
-        unit: selectedProject.modelUnit,
+        unit: selectedProject.modelUnit
       },
       solverAlgoParams: {
         innerIteration: solverIterations[0],
         outerIteration: solverIterations[1],
-        convergenceThreshold,
-      },
+        convergenceThreshold
+      }
     };
   };
 
   function generateSTLListFromComponents(
     materialList: Material[],
-    components: ComponentEntity[],
+    components: ComponentEntity[]
   ) {
     const filteredComponents: ComponentEntity[][] = [];
 
     materialList.forEach((m) => {
       components &&
-        filteredComponents.push(
-          components.filter((c) => c.material?.name === m.name),
-        );
+      filteredComponents.push(
+        components.filter((c) => c.material?.name === m.name)
+      );
     });
 
     const STLList: { material: string; STL: string }[] = [];
@@ -130,7 +132,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       const STLToPush = exportToSTL(fc);
       STLList.push({
         material: fc[0].material?.name as string,
-        STL: STLToPush,
+        STL: STLToPush
       });
     });
     return STLList;
@@ -151,27 +153,26 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   const [computingLpx, setComputingLpx] = useState(false);
   const [iterations, setIterations] = useState(0);
 
-  useWebSocket(WS_URL, {
+  const { sendMessage } = useWebSocket(WS_URL, {
     onOpen: () => {
       console.log('WebSocket connection established.');
     },
     shouldReconnect: () => true,
     onMessage: (event) => {
-      if (event.data === 'test') {
-        console.log('message received');
-      }
       if (event.data === 'P Computing Completed') {
         setComputingP(true);
-      }
-      if (event.data === 'Lp Computing Completed') {
+      } else if (event.data === 'Lp Computing Completed') {
         setComputingLpx(true);
+      } else {
+        setIterations(event.data);
       }
-      setIterations(event.data);
     },
     onClose: () => {
       console.log('WebSocket connection closed.');
-    },
+    }
   });
+
+
 
   // Solver launch and get results
   useEffect(() => {
@@ -186,52 +187,36 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         solverAlgoParams: {
           innerIteration: solverIterations[0],
           outerIteration: solverIterations[1],
-          convergenceThreshold,
-        },
+          convergenceThreshold
+        }
       };
       dispatch(updateSimulation(simulation));
-      const file = new Blob([
-        JSON.stringify(
-          solverInputFrom(
-            selectedProject,
-            solverIterations,
-            convergenceThreshold,
-          ),
-        ),
-      ]);
-      const solverInputFile = new File([file], `mesh.json`, {
-        type: 'application/json',
-      });
-      /* uploadFileS3(solverInputFile).then(() => {
-
-            }) */
 
       // https://teemaserver.cloud/solving
-      console.log(
-        solverInputFrom(
-          selectedProject,
-          solverIterations,
-          convergenceThreshold,
-        ),
-      );
       axios
         .post(
           'http://127.0.0.1:8000/solving',
           solverInputFrom(
             selectedProject,
             solverIterations,
-            convergenceThreshold,
-          ),
+            convergenceThreshold
+          )
         )
         .then((res) => {
-          dispatch(setSolverOutput(res.data));
-          const simulationUpdated: Simulation = {
-            ...simulation,
-            results: res.data,
-            ended: Date.now().toString(),
-            status: 'Completed',
-          };
-          dispatch(updateSimulation(simulationUpdated));
+          console.log(res)
+          if(res.data === false){
+            dispatch(deleteSimulation());
+            dispatch(setMeshApproved(false));
+          }else{
+            dispatch(setSolverOutput(res.data));
+            const simulationUpdated: Simulation = {
+              ...simulation,
+              results: res.data,
+              ended: Date.now().toString(),
+              status: 'Completed'
+            };
+            dispatch(updateSimulation(simulationUpdated));
+          }
         })
         .catch((err) => {
           console.log(err);
@@ -241,48 +226,49 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         });
       setComputingP(false);
       setComputingLpx(false);
-      setComputingLpy(false);
-      setComputingLpz(false);
-      setDoingIterations(false);
+      setIterations(0)
     }
   }, [meshApproved]);
-
-  const saveMeshAndExternalGridsToS3 = async (
-    mesherOutput: any,
-    externalGrid: any,
-  ) => {
-    const blobFile = new Blob([JSON.stringify(mesherOutput)]);
-    const meshFile = new File([blobFile], `mesh.json`, {
-      type: 'application/json',
-    });
-
-    uploadFileS3(meshFile).then((res) => {
-      if (res) {
-        saveExternalGridsToS3(externalGrid)
-          .then((resExt) => {
-            dispatch(setMeshGenerated('Generated'));
-            dispatch(setMesh(res.key));
-          })
-          .catch((err) => {
-            console.log(err);
-            window.alert('Error while meshing, please try again');
-            dispatch(setMeshGenerated('Not Generated'));
-          });
-      }
-    });
-    return 'saved';
-  };
 
   const saveExternalGridsToS3 = async (externalGrids: any) => {
     const blobFile = new Blob([JSON.stringify(externalGrids)]);
     const meshFile = new File([blobFile], `mesh.json`, {
-      type: 'application/json',
+      type: 'application/json'
     });
     uploadFileS3(meshFile).then((res) => {
       if (res) {
         dispatch(setExternalGrids(res.key));
       }
     });
+    return 'saved';
+  };
+  const saveMeshAndExternalGridsToS3 = async (
+    mesherOutput: any,
+    externalGrid: any
+  ) => {
+    const blobFile = new Blob([JSON.stringify(mesherOutput)]);
+    const meshFile = new File([blobFile], `mesh.json`, {
+      type: 'application/json'
+    });
+
+    uploadFileS3(meshFile)
+      .then((res) => {
+        if (res) {
+          saveExternalGridsToS3(externalGrid)
+            .then(() => {
+              dispatch(setMeshGenerated('Generated'));
+              dispatch(setMesh(res.key));
+              return '';
+            })
+            .catch((err) => {
+              console.log(err);
+              window.alert('Error while meshing, please try again');
+              dispatch(setMeshGenerated('Not Generated'));
+            });
+        }
+        return '';
+      })
+      .catch((err) => console.log(err));
     return 'saved';
   };
 
@@ -293,8 +279,8 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         setQuantum([
           externalGrids.cell_size.cell_size_x * 1000,
           externalGrids.cell_size.cell_size_y * 1000,
-          externalGrids.cell_size.cell_size_z * 1000,
-        ]),
+          externalGrids.cell_size.cell_size_z * 1000
+        ])
       );
     }
   }, [externalGrids]);
@@ -309,7 +295,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
           components &&
           allMaterials &&
           generateSTLListFromComponents(allMaterials, components),
-        quantum: quantumDimensions,
+        quantum: quantumDimensions
       };
       // local meshing: http://127.0.0.1:8003/meshing
       // lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
@@ -319,17 +305,17 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
           if (res.data.x) {
             dispatch(setMeshGenerated('Not Generated'));
             alert(
-              `the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`,
+              `the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`
             );
           } else if (res.data.y) {
             dispatch(setMeshGenerated('Not Generated'));
             alert(
-              `the size of the quantum on y is too large compared to the size of the model on y. Please reduce the size of the quantum on y! y must be less than ${res.data.max_y}`,
+              `the size of the quantum on y is too large compared to the size of the model on y. Please reduce the size of the quantum on y! y must be less than ${res.data.max_y}`
             );
           } else if (res.data.z) {
             dispatch(setMeshGenerated('Not Generated'));
             alert(
-              `the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`,
+              `the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`
             );
           } else {
             const grids: any[] = [];
@@ -345,14 +331,16 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
               externalGrids: data,
               cell_size: res.data.cell_size,
               origin: res.data.origin,
-              n_cells: res.data.n_cells,
+              n_cells: res.data.n_cells
             };
             if (selectedProject.meshData.mesh) {
-              deleteFileS3(selectedProject.meshData.mesh).then(() => {});
+              deleteFileS3(selectedProject.meshData.mesh).then(() => {
+              });
             }
             if (selectedProject.meshData.externalGrids) {
               deleteFileS3(selectedProject.meshData.externalGrids).then(
-                () => {},
+                () => {
+                }
               );
             }
             const solverInput = {
@@ -360,12 +348,14 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
               ...solverInputFrom(
                 selectedProject,
                 solverIterations,
-                convergenceThreshold,
-              ),
+                convergenceThreshold
+              )
             };
-            saveMeshAndExternalGridsToS3(solverInput, extGrids).then(
-              (res) => {},
-            );
+            saveMeshAndExternalGridsToS3(solverInput, extGrids)
+              .then(() => {
+                return '';
+              })
+              .catch((err) => console.log(err));
           }
         })
         .catch((err) => {
@@ -382,37 +372,12 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   return (
     <>
       {selectedProject.simulation?.status === 'Queued' && (
-        <div className="absolute right-[42%] top-1/2 flex flex-col justify-center items-center bg-white p-8 rounded-xl">
-          <h5 className="mb-2">Computing P</h5>
-          <div className="flex flex-row justify-between items-center">
-            {computingP ? (
-              <div className="flex flex-row justify-between items-center">
-                <progress className="progress w-56 mr-4" value={1} max={1} />
-                <AiOutlineCheckCircle size="20px" className="text-green-500" />
-              </div>
-            ) : (
-              <progress className="progress w-56" />
-            )}
-          </div>
-          <h5 className="mb-2">Computing Lp</h5>
-          {computingLpx ? (
-            <div className="flex flex-row justify-between items-center">
-              <progress className="progress w-56 mr-4" value={1} max={1} />
-              <AiOutlineCheckCircle size="20px" className="text-green-500" />
-            </div>
-          ) : (
-            <progress className="progress w-56" value={0} max={1}/>
-          )}
-          <h5 className="mb-2">Doing Iterations</h5>
-          <progress
-            className="progress w-56"
-            value={iterations}
-            max={frequenciesNumber + 1}
-          />
-        </div>
+        <SimulationStatus computingP={computingP} setComputingP={setComputingP} computingLpx={computingLpx}
+                          setComputingLpx={setComputingLpx} iterations={iterations}
+                          frequenciesNumber={frequenciesNumber} sendMessage={sendMessage}/>
       )}
       {meshGenerated === 'Generating' && (
-        <ImSpinner className="animate-spin w-12 h-12 absolute left-1/2 top-1/2" />
+        <ImSpinner className='animate-spin w-12 h-12 absolute left-1/2 top-1/2' />
       )}
       <div
         className={`${
@@ -421,31 +386,31 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
           'opacity-40'
         } flex-col absolute right-[2%] top-[160px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor`}
       >
-        <div className="flex">
+        <div className='flex'>
           <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
-          <h5 className="ml-2 text-[12px] xl:text-base">
+          <h5 className='ml-2 text-[12px] xl:text-base'>
             Meshing and Solving Info
           </h5>
         </div>
-        <hr className="mt-1" />
-        <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
-          <h6 className="xl:text-base text-[12px]">
+        <hr className='mt-1' />
+        <div className='mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]'>
+          <h6 className='xl:text-base text-[12px]'>
             Set quantum&apos;s dimensions
           </h6>
-          <div className="mt-2">
-            <span className="text-[12px] xl:text-base">X,Y,Z</span>
-            <div className="flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2">
+          <div className='mt-2'>
+            <span className='text-[12px] xl:text-base'>X,Y,Z</span>
+            <div className='flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2'>
               {quantumDimensions.map(
                 (quantumComponent, indexQuantumComponent) => (
-                  <div className="xl:w-[30%] w-full">
+                  <div className='xl:w-[30%] w-full'>
                     <input
                       disabled={
                         selectedProject.simulation?.status === 'Completed' ||
                         selectedProject.model?.components === undefined
                       }
                       min={0.0}
-                      className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl"
-                      type="number"
+                      className='w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl'
+                      type='number'
                       step={0.000001}
                       value={quantumComponent}
                       onChange={(event) => {
@@ -454,36 +419,36 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                             setQuantum([
                               parseFloat(event.target.value),
                               quantumDimensions[1],
-                              quantumDimensions[2],
-                            ]),
+                              quantumDimensions[2]
+                            ])
                           );
                         } else if (indexQuantumComponent === 1) {
                           dispatch(
                             setQuantum([
                               quantumDimensions[0],
                               parseFloat(event.target.value),
-                              quantumDimensions[2],
-                            ]),
+                              quantumDimensions[2]
+                            ])
                           );
                         } else if (indexQuantumComponent === 2) {
                           dispatch(
                             setQuantum([
                               quantumDimensions[0],
                               quantumDimensions[1],
-                              parseFloat(event.target.value),
-                            ]),
+                              parseFloat(event.target.value)
+                            ])
                           );
                         }
                       }}
                     />
                   </div>
-                ),
+                )
               )}
             </div>
           </div>
         </div>
-        <div className="w-[100%] pt-4">
-          <div className="flex-column">
+        <div className='w-[100%] pt-4'>
+          <div className='flex-column'>
             {meshGenerated === 'Not Generated' && (
               <div>
                 <button
@@ -501,16 +466,16 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             )}
             {((meshGenerated === 'Generated' && !meshApproved) ||
               selectedProject.simulation?.status === 'Failed') && (
-              <div className="flex justify-between">
+              <div className='flex justify-between'>
                 <button
-                  className="button buttonPrimary w-full text-[12px] xl:text-base"
+                  className='button buttonPrimary w-full text-[12px] xl:text-base'
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
                     dispatch(setMeshGenerated('Generating'));
                     deleteFileS3(selectedProject.meshData.mesh as string).then(
                       () => {
                         dispatch(unsetMesh());
-                      },
+                      }
                     );
                   }}
                 >
@@ -520,55 +485,55 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             )}
           </div>
         </div>
-        <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
-          <h6 className="text-[12px] xl:text-base">Solver Iterations</h6>
-          <div className="mt-2">
-            <span className="text-[12px] xl:text-base">Inner, Outer</span>
-            <div className="flex justify-between mt-2">
-              <div className="w-[45%]">
+        <div className='mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]'>
+          <h6 className='text-[12px] xl:text-base'>Solver Iterations</h6>
+          <div className='mt-2'>
+            <span className='text-[12px] xl:text-base'>Inner, Outer</span>
+            <div className='flex justify-between mt-2'>
+              <div className='w-[45%]'>
                 <input
                   disabled={
                     selectedProject.simulation?.status === 'Completed' ||
                     meshGenerated !== 'Generated'
                   }
                   min={1}
-                  className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
-                  type="number"
+                  className='w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl'
+                  type='number'
                   step={1}
                   value={
                     selectedProject.simulation
                       ? selectedProject.simulation.solverAlgoParams
-                          .innerIteration
+                        .innerIteration
                       : solverIterations[0]
                   }
                   onChange={(event) => {
                     setSolverIterations([
                       parseInt(event.target.value),
-                      solverIterations[1],
+                      solverIterations[1]
                     ]);
                   }}
                 />
               </div>
-              <div className="w-[45%]">
+              <div className='w-[45%]'>
                 <input
                   disabled={
                     selectedProject.simulation?.status === 'Completed' ||
                     meshGenerated !== 'Generated'
                   }
                   min={1}
-                  className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
-                  type="number"
+                  className='w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl'
+                  type='number'
                   step={1}
                   value={
                     selectedProject.simulation
                       ? selectedProject.simulation.solverAlgoParams
-                          .outerIteration
+                        .outerIteration
                       : solverIterations[1]
                   }
                   onChange={(event) => {
                     setSolverIterations([
                       solverIterations[0],
-                      parseInt(event.target.value),
+                      parseInt(event.target.value)
                     ]);
                   }}
                 />
@@ -576,11 +541,11 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             </div>
           </div>
         </div>
-        <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
-          <h6 className="text-[12px] xl:text-base">Convergence Threshold</h6>
-          <div className="mt-2">
-            <div className="flex justify-between mt-2">
-              <div className="w-full">
+        <div className='mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]'>
+          <h6 className='text-[12px] xl:text-base'>Convergence Threshold</h6>
+          <div className='mt-2'>
+            <div className='flex justify-between mt-2'>
+              <div className='w-full'>
                 <input
                   disabled={
                     selectedProject.simulation?.status === 'Completed' ||
@@ -588,13 +553,13 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                   }
                   min={0.0000000001}
                   max={0.1}
-                  className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
-                  type="number"
+                  className='w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl'
+                  type='number'
                   step={0.0000000001}
                   value={
                     selectedProject.simulation
                       ? selectedProject.simulation.solverAlgoParams
-                          .convergenceThreshold
+                        .convergenceThreshold
                       : convergenceThreshold
                   }
                   onChange={(event) => {
@@ -607,7 +572,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         </div>
         {selectedProject.simulation?.status === 'Completed' ? (
           <button
-            className="button buttonPrimary w-[100%] mt-3 text-[12px] xl:text-base"
+            className='button buttonPrimary w-[100%] mt-3 text-[12px] xl:text-base'
             onClick={() => {
               dispatch(selectMenuItem('Results'));
             }}
@@ -618,10 +583,10 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
           <button
             className={`w-full mt-3 button text-[12px] xl:text-base
               ${
-                meshGenerated !== 'Generated'
-                  ? 'bg-gray-300 text-gray-600 opacity-70'
-                  : 'buttonPrimary'
-              }`}
+              meshGenerated !== 'Generated'
+                ? 'bg-gray-300 text-gray-600 opacity-70'
+                : 'buttonPrimary'
+            }`}
             disabled={meshGenerated !== 'Generated'}
             onClick={() => {
               dispatch(setMeshApproved(true));
@@ -650,7 +615,7 @@ function create_Grids_externals(grids: any[]) {
       y: number;
       z: number;
     },
-    totalMatrix: boolean[][][][],
+    totalMatrix: boolean[][][][]
   ): boolean => {
     const brickTouchesTheMainBoundingBox = (): boolean => {
       const Nx = totalMatrix[0].length;
@@ -689,7 +654,7 @@ function create_Grids_externals(grids: any[]) {
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x - 1,
         y: brickPosition.y,
-        z: brickPosition.z,
+        z: brickPosition.z
       })
     )
       return true;
@@ -697,7 +662,7 @@ function create_Grids_externals(grids: any[]) {
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x + 1,
         y: brickPosition.y,
-        z: brickPosition.z,
+        z: brickPosition.z
       })
     )
       return true;
@@ -705,7 +670,7 @@ function create_Grids_externals(grids: any[]) {
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x,
         y: brickPosition.y - 1,
-        z: brickPosition.z,
+        z: brickPosition.z
       })
     )
       return true;
@@ -713,7 +678,7 @@ function create_Grids_externals(grids: any[]) {
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x,
         y: brickPosition.y + 1,
-        z: brickPosition.z,
+        z: brickPosition.z
       })
     )
       return true;
@@ -721,7 +686,7 @@ function create_Grids_externals(grids: any[]) {
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x,
         y: brickPosition.y,
-        z: brickPosition.z - 1,
+        z: brickPosition.z - 1
       })
     )
       return true;
@@ -729,7 +694,7 @@ function create_Grids_externals(grids: any[]) {
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x,
         y: brickPosition.y,
-        z: brickPosition.z + 1,
+        z: brickPosition.z + 1
       })
     )
       return true;
@@ -750,15 +715,15 @@ function create_Grids_externals(grids: any[]) {
               {
                 x: cont1,
                 y: cont2,
-                z: cont3,
+                z: cont3
               },
-              grids,
+              grids
             )
           ) {
             OUTPUTgrids[material].push({
               x: cont1,
               y: cont2,
-              z: cont3,
+              z: cont3
             } as Brick);
           }
         }

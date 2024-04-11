@@ -1,5 +1,5 @@
 import { CanvasState, ComponentEntity, UsersState } from "cad-library"
-import {Brick} from "../application/simulationTabsManagement/tabs/simulator/MeshingSolvingInfo";
+import {Brick} from "../application/simulationTabsManagement/tabs/simulator/meshingSolvingInfo/MeshingSolvingInfo";
 
 export type Folder = {
     name: string,

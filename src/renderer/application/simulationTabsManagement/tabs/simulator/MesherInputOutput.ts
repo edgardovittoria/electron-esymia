@@ -1,4 +1,4 @@
-import {Brick} from "./MeshingSolvingInfo";
+import {Brick} from "./meshingSolvingInfo/MeshingSolvingInfo";
 
 export type MesherOutput = {
     n_materials: number,
