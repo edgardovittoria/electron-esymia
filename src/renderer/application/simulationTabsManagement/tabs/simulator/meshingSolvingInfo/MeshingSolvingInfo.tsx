@@ -323,6 +323,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
               grids.push(value);
             }
             const grids_external = create_Grids_externals(grids);
+
             const data = { ...res.data.mesher_matrices };
             Object.keys(res.data.mesher_matrices).forEach((k, index) => {
               data[k] = grids_external[index];
@@ -608,6 +609,7 @@ export interface Brick {
 
 function create_Grids_externals(grids: any[]) {
   const OUTPUTgrids: Brick[][] = [];
+  const booleanArray: boolean[] = []
 
   const isOnASurfaceTheBrickInThisPosition = (
     brickPosition: {
@@ -616,7 +618,7 @@ function create_Grids_externals(grids: any[]) {
       z: number;
     },
     totalMatrix: boolean[][][][]
-  ): boolean => {
+  ): boolean | string => {
     const brickTouchesTheMainBoundingBox = (): boolean => {
       const Nx = totalMatrix[0].length;
       const Ny = totalMatrix[0][0].length;
@@ -649,55 +651,73 @@ function create_Grids_externals(grids: any[]) {
     // condizione in cui il brick si trova già su una delle superfici estreme del modello, nel qual caso non servono altri controlli.
     if (brickTouchesTheMainBoundingBox()) return true;
 
-    // condizioni che verificano se le singole facce del brick sono libere. Ne basta almeno una libera.
     if (
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x - 1,
         y: brickPosition.y,
         z: brickPosition.z
+      }) && brickHasAdjacentBricksInThisPosition({
+        x: brickPosition.x + 1,
+        y: brickPosition.y,
+        z: brickPosition.z
       })
-    )
-      return true;
-    if (
+    ){
+
+    }else{
+      return "error";
+    }
+
+    // condizioni che verificano se le singole facce del brick sono libere. Ne basta almeno una libera.
+    (
+      !brickHasAdjacentBricksInThisPosition({
+        x: brickPosition.x - 1,
+        y: brickPosition.y,
+        z: brickPosition.z
+      })
+    ) ? booleanArray.push(false) : booleanArray.push(true);
+    (
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x + 1,
         y: brickPosition.y,
         z: brickPosition.z
       })
-    )
-      return true;
-    if (
+    ) ? booleanArray.push(false) : booleanArray.push(true);
+    (
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x,
         y: brickPosition.y - 1,
         z: brickPosition.z
       })
-    )
-      return true;
-    if (
+    ) ? booleanArray.push(false) : booleanArray.push(true);
+    (
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x,
         y: brickPosition.y + 1,
         z: brickPosition.z
       })
-    )
-      return true;
-    if (
+    ) ? booleanArray.push(false) : booleanArray.push(true);
+    (
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x,
         y: brickPosition.y,
         z: brickPosition.z - 1
       })
-    )
-      return true;
-    if (
+    ) ? booleanArray.push(false) : booleanArray.push(true);
+    (
       !brickHasAdjacentBricksInThisPosition({
         x: brickPosition.x,
         y: brickPosition.y,
         z: brickPosition.z + 1
       })
+    ) ? booleanArray.push(false) : booleanArray.push(true);
+
+    if(
+      (!booleanArray[0] && !booleanArray[1]) && (!booleanArray[2] && !booleanArray[3]) && (!booleanArray[4] && !booleanArray[15])
     )
-      return true;
+      return "error";
+    booleanArray.forEach(b => {
+      if(!b) return true
+    })
 
     // Se non ci sono facce libere il brick è intermente coperto da altri.
     return false;
@@ -709,6 +729,14 @@ function create_Grids_externals(grids: any[]) {
       for (let cont2 = 0; cont2 < grids[0][0].length; cont2++) {
         for (let cont3 = 0; cont3 < grids[0][0][0].length; cont3++) {
           // se il brick esiste e si affaccia su una superficie, lo aggiungiamo alla griglia
+          console.log(isOnASurfaceTheBrickInThisPosition(
+            {
+              x: cont1,
+              y: cont2,
+              z: cont3
+            },
+            grids
+          ))
           if (
             grids[material][cont1][cont2][cont3] &&
             isOnASurfaceTheBrickInThisPosition(
