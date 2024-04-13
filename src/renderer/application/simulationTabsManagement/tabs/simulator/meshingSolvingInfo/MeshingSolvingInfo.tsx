@@ -34,6 +34,7 @@ import { getMaterialListFrom } from '../Simulator';
 import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFunctions';
 import SimulationStatus from './components/SimulationStatus';
+import { create_Grids_externals } from './components/createGridsExternals';
 
 interface MeshingSolvingInfoProps {
   selectedProject: Project;
@@ -323,10 +324,16 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
               grids.push(value);
             }
             const grids_external = create_Grids_externals(grids);
-
-            const data = { ...res.data.mesher_matrices };
+            // Mettere check sulla validità della mesh in base al valore di grids_external.isValid
+            if(!grids_external.isValid){
+              window.alert('Error! Mesh not valid. Please adjust quantum dimensions.');
+              dispatch(setMeshGenerated('Not Generated'));
+              dispatch(unsetMesh());
+            }
+            else{
+              const data = { ...res.data.mesher_matrices };
             Object.keys(res.data.mesher_matrices).forEach((k, index) => {
-              data[k] = grids_external[index];
+              data[k] = grids_external.data[index];
             });
             const extGrids = {
               externalGrids: data,
@@ -357,6 +364,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 return '';
               })
               .catch((err) => console.log(err));
+            }
           }
         })
         .catch((err) => {
@@ -601,163 +609,3 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   );
 };
 
-export interface Brick {
-  x: number;
-  y: number;
-  z: number;
-}
-
-function create_Grids_externals(grids: any[]) {
-  const OUTPUTgrids: Brick[][] = [];
-  const booleanArray: boolean[] = []
-
-  const isOnASurfaceTheBrickInThisPosition = (
-    brickPosition: {
-      x: number;
-      y: number;
-      z: number;
-    },
-    totalMatrix: boolean[][][][]
-  ): boolean | string => {
-    const brickTouchesTheMainBoundingBox = (): boolean => {
-      const Nx = totalMatrix[0].length;
-      const Ny = totalMatrix[0][0].length;
-      const Nz = totalMatrix[0][0][0].length;
-      if (
-        brickPosition.x === 0 ||
-        brickPosition.x === Nx - 1 ||
-        brickPosition.y === 0 ||
-        brickPosition.y === Ny - 1 ||
-        brickPosition.z === 0 ||
-        brickPosition.z === Nz - 1
-      ) {
-        return true;
-      }
-      return false;
-    };
-    const brickHasAdjacentBricksInThisPosition = (position: {
-      x: number;
-      y: number;
-      z: number;
-    }): boolean => {
-      for (let material = 0; material < totalMatrix.length; material++) {
-        if (totalMatrix[material][position.x][position.y][position.z]) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    // condizione in cui il brick si trova già su una delle superfici estreme del modello, nel qual caso non servono altri controlli.
-    if (brickTouchesTheMainBoundingBox()) return true;
-
-    if (
-      !brickHasAdjacentBricksInThisPosition({
-        x: brickPosition.x - 1,
-        y: brickPosition.y,
-        z: brickPosition.z
-      }) && brickHasAdjacentBricksInThisPosition({
-        x: brickPosition.x + 1,
-        y: brickPosition.y,
-        z: brickPosition.z
-      })
-    ){
-
-    }else{
-      return "error";
-    }
-
-    // condizioni che verificano se le singole facce del brick sono libere. Ne basta almeno una libera.
-    (
-      !brickHasAdjacentBricksInThisPosition({
-        x: brickPosition.x - 1,
-        y: brickPosition.y,
-        z: brickPosition.z
-      })
-    ) ? booleanArray.push(false) : booleanArray.push(true);
-    (
-      !brickHasAdjacentBricksInThisPosition({
-        x: brickPosition.x + 1,
-        y: brickPosition.y,
-        z: brickPosition.z
-      })
-    ) ? booleanArray.push(false) : booleanArray.push(true);
-    (
-      !brickHasAdjacentBricksInThisPosition({
-        x: brickPosition.x,
-        y: brickPosition.y - 1,
-        z: brickPosition.z
-      })
-    ) ? booleanArray.push(false) : booleanArray.push(true);
-    (
-      !brickHasAdjacentBricksInThisPosition({
-        x: brickPosition.x,
-        y: brickPosition.y + 1,
-        z: brickPosition.z
-      })
-    ) ? booleanArray.push(false) : booleanArray.push(true);
-    (
-      !brickHasAdjacentBricksInThisPosition({
-        x: brickPosition.x,
-        y: brickPosition.y,
-        z: brickPosition.z - 1
-      })
-    ) ? booleanArray.push(false) : booleanArray.push(true);
-    (
-      !brickHasAdjacentBricksInThisPosition({
-        x: brickPosition.x,
-        y: brickPosition.y,
-        z: brickPosition.z + 1
-      })
-    ) ? booleanArray.push(false) : booleanArray.push(true);
-
-    if(
-      (!booleanArray[0] && !booleanArray[1]) && (!booleanArray[2] && !booleanArray[3]) && (!booleanArray[4] && !booleanArray[15])
-    )
-      return "error";
-    booleanArray.forEach(b => {
-      if(!b) return true
-    })
-
-    // Se non ci sono facce libere il brick è intermente coperto da altri.
-    return false;
-  };
-
-  for (let material = 0; material < grids.length; material++) {
-    OUTPUTgrids.push([]);
-    for (let cont1 = 0; cont1 < grids[0].length; cont1++) {
-      for (let cont2 = 0; cont2 < grids[0][0].length; cont2++) {
-        for (let cont3 = 0; cont3 < grids[0][0][0].length; cont3++) {
-          // se il brick esiste e si affaccia su una superficie, lo aggiungiamo alla griglia
-          console.log(isOnASurfaceTheBrickInThisPosition(
-            {
-              x: cont1,
-              y: cont2,
-              z: cont3
-            },
-            grids
-          ))
-          if (
-            grids[material][cont1][cont2][cont3] &&
-            isOnASurfaceTheBrickInThisPosition(
-              {
-                x: cont1,
-                y: cont2,
-                z: cont3
-              },
-              grids
-            )
-          ) {
-            OUTPUTgrids[material].push({
-              x: cont1,
-              y: cont2,
-              z: cont3
-            } as Brick);
-          }
-        }
-      }
-    }
-  }
-
-  return OUTPUTgrids;
-}
