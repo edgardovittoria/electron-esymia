@@ -204,7 +204,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
           )
         )
         .then((res) => {
-          console.log(res)
           if(res.data === false){
             dispatch(deleteSimulation());
             dispatch(setMeshApproved(false));
@@ -318,19 +317,17 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             alert(
               `the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`
             );
-          } else {
+          } else if (res.data.mesh_is_valid == false) {
+              window.alert('Error! Mesh not valid. Please adjust quantum dimensions.');
+              dispatch(setMeshGenerated('Not Generated'));
+              dispatch(unsetMesh());
+          }
+          else {
             const grids: any[] = [];
             for (const value of Object.values(res.data.mesher_matrices)) {
               grids.push(value);
             }
             const grids_external = create_Grids_externals(grids);
-            // Mettere check sulla validità della mesh in base al valore di grids_external.isValid
-            if(!grids_external.isValid){
-              window.alert('Error! Mesh not valid. Please adjust quantum dimensions.');
-              dispatch(setMeshGenerated('Not Generated'));
-              dispatch(unsetMesh());
-            }
-            else{
               const data = { ...res.data.mesher_matrices };
             Object.keys(res.data.mesher_matrices).forEach((k, index) => {
               data[k] = grids_external.data[index];
@@ -365,8 +362,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
               })
               .catch((err) => console.log(err));
             }
-          }
-        })
+          })
         .catch((err) => {
           if (err) {
             window.alert('Error while generating mesh, please try again');
