@@ -317,8 +317,8 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             alert(
               `the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`
             );
-          } else if (res.data.mesh_is_valid == false) {
-              window.alert('Error! Mesh not valid. Please adjust quantum dimensions.');
+          } else if (res.data.mesh_is_valid.valid == false) {
+              window.alert('Error! Mesh not valid. Please adjust quantum along ' + res.data.mesh_is_valid.axis + ' axis.');
               dispatch(setMeshGenerated('Not Generated'));
               dispatch(unsetMesh());
           }
