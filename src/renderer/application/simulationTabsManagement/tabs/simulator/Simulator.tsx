@@ -7,13 +7,12 @@ import {
   setMeshGenerated,
 } from '../../../../store/projectSlice';
 import { SimulatorLeftPanelTab } from './SimulatorLeftPanelTab';
-import { Brick, MeshingSolvingInfo } from './meshingSolvingInfo/MeshingSolvingInfo';
+import { MeshingSolvingInfo } from './meshingSolvingInfo/MeshingSolvingInfo';
 import { CanvasBaseWithRedux } from '../../sharedElements/CanvasBaseWithRedux';
 import { MeshedElement } from './MeshedElement/MeshedElement';
-import { LeftPanel } from '../../sharedElements/LeftPanel';
+import { MyPanel } from '../../sharedElements/MyPanel';
 import { Models } from '../../sharedElements/Models';
 import { ModelOutliner } from '../../sharedElements/ModelOutliner';
-import { MesherOutput } from './MesherInputOutput';
 import { s3 } from '../../../../aws/s3Config';
 import { ExternalGridsObject, Project } from '../../../../model/esymiaModels';
 import StatusBar from '../../sharedElements/StatusBar';
@@ -106,10 +105,11 @@ export const Simulator: React.FC<SimulatorProps> = ({
       )}
 
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
-      <LeftPanel
+      <MyPanel
         tabs={['Modeler', 'Simulator']}
         selectedTab={selectedTabLeftPanel}
         setSelectedTab={setSelectedTabLeftPanel}
+        className="absolute left-[2%] top-[160px] md:w-1/4 xl:w-1/5"
       >
         {selectedTabLeftPanel === 'Simulator' ? (
           <SimulatorLeftPanelTab
@@ -122,7 +122,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
             <ModelOutliner />
           </Models>
         )}
-      </LeftPanel>
+      </MyPanel>
       {/* <RightPanelSimulation> */}
       <MeshingSolvingInfo
         selectedProject={selectedProject as Project}

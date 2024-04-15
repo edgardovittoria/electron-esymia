@@ -18,7 +18,7 @@ export const DashboardTabsContentFactory: React.FC<
   switch (menuItemSelected) {
     case 'Overview':
       return (
-        <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] overflow-y-scroll lg:h-[72vh] h-[80vh]">
+        <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] lg:h-[72vh] h-[80vh]">
           <Overview setShowModal={setShowCreateNewProjectModal} />
           {/* <RightPanel /> */}
           {showCreateNewProjectModal && (
@@ -40,7 +40,7 @@ export const DashboardTabsContentFactory: React.FC<
     case 'Simulations':
       return (
         <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] overflow-y-scroll lg:h-[60vh] h-[80vh]">
-          <Simulations />
+          <Simulations maxH="max-h-[600px]"/>
           {/* <RightPanel /> */}
         </div>
       );

@@ -389,7 +389,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
           (meshGenerated === 'Generating' ||
             selectedProject.simulation?.status === 'Queued') &&
           'opacity-40'
-        } flex-col absolute right-[2%] top-[160px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor`}
+        } flex-col absolute right-[2%] top-[160px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl`}
       >
         <div className='flex'>
           <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />

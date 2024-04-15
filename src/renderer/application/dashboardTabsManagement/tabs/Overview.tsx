@@ -126,7 +126,7 @@ export const Overview: React.FC<OverviewProps> = ({ setShowModal }) => {
         />
       </div>
       <div className="lg:col-span-2 justify-between w-full">
-        <Simulations />
+        <Simulations maxH="max-h-[160px]"/>
       </div>
     </div>
   );

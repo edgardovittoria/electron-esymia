@@ -19,9 +19,11 @@ import {
 import { Folder, Simulation } from '../../../model/esymiaModels';
 import noresultfound from '../../../../../assets/noresultfound.png';
 
-interface SimulationsProps {}
+interface SimulationsProps {
+  maxH: string
+}
 
-export const Simulations: React.FC<SimulationsProps> = () => {
+export const Simulations: React.FC<SimulationsProps> = ({maxH}) => {
   const dispatch = useDispatch();
   const mainFolder = useSelector(mainFolderSelector);
   const projects = useSelector(projectsSelector);
@@ -67,7 +69,7 @@ export const Simulations: React.FC<SimulationsProps> = () => {
     <div className="text-center p-[20px] box w-full flex flex-col h-fit">
       <h5 className="text-left text-base p-2">Simulations</h5>
       {simulations.length > 0 ? (
-        <div className="overflow-auto h-full w-full mt-5">
+        <div className={`overflow-auto h-full ${maxH} w-full mt-5`}>
           <table className="table mt-4 w-full">
             <thead className="sticky top-0 bg-[#f4f4f4]">
               <tr>

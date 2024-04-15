@@ -1,6 +1,6 @@
 import {Materials} from "./Materials";
 import {CanvasBaseWithRedux} from "../../sharedElements/CanvasBaseWithRedux";
-import {LeftPanel} from "../../sharedElements/LeftPanel";
+import {MyPanel} from "../../sharedElements/MyPanel";
 import {Models} from "../../sharedElements/Models";
 import {ModelOutliner} from "../../sharedElements/ModelOutliner";
 import StatusBar from "../../sharedElements/StatusBar";
@@ -13,16 +13,17 @@ interface ModelerProps {
 export const Modeler: React.FC<ModelerProps> = (
     {selectedTabLeftPanel, setSelectedTabLeftPanel}
 ) => {
-    
+
 
     return (
         <div>
             <CanvasBaseWithRedux section="Modeler"/>
             <StatusBar/>
-            <LeftPanel
+            <MyPanel
                 tabs={["Modeler", "Materials"]}
                 selectedTab={selectedTabLeftPanel}
                 setSelectedTab={setSelectedTabLeftPanel}
+                className="absolute left-[2%] top-[160px] md:w-1/4 xl:w-1/5"
             >
                 {selectedTabLeftPanel === "Materials" ? (
                     <Materials/>
@@ -31,7 +32,7 @@ export const Modeler: React.FC<ModelerProps> = (
                         <ModelOutliner/>
                     </Models>
                 )}
-            </LeftPanel>
+            </MyPanel>
 
         </div>
     );

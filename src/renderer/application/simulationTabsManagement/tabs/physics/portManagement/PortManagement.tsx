@@ -25,7 +25,7 @@ export const PortManagement: React.FC<PortManagementProps> = ({
     <>
       {selectedPort ? (
         <>
-          <div className="flex items-center gap-2 absolute right-[2%] top-[160px] xl:w-[22%] w-[27%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl">
+          <div className="flex items-center gap-2 p-[5px]">
             <div className="col-1 pe-0 ps-0">
               <FaReact
                 color={portColor}
@@ -36,13 +36,11 @@ export const PortManagement: React.FC<PortManagementProps> = ({
               <h5 className="mb-0 xl:text-md text-sm">{selectedPort.name}</h5>
             </div>
           </div>
-          <div className="flex-col absolute right-[2%] top-[204px] xl:w-[22%] w-[27%] rounded-tl rounded-tr bg-white p-[20px] shadow-2xl max-h-[350px] overflow-y-scroll overflow-x-hidden">
+          <div className="flex-col p-[10px] max-h-[300px] overflow-y-scroll overflow-x-hidden">
             {children}
           </div>
           <div
-            className={`flex absolute right-[2%] ${
-              selectedPort.category === 'probe' ? 'top-[370px]' : 'top-[540px]'
-            } xl:w-[22%] w-[27%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl`}
+            className={`flex p-[10px]`}
           >
             <button
               type="button"
@@ -55,7 +53,7 @@ export const PortManagement: React.FC<PortManagementProps> = ({
           </div>
         </>
       ) : (
-        <div className="flex absolute right-[2%] top-[160px] xl:w-[22%] w-[27%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl border-b border-secondaryColor">
+        <div className="flex p-[10px]">
           <span>No Port Selected</span>
         </div>
       )}

@@ -21,7 +21,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
         <div>
           <>
             <div
-              className="flex mb-2 p-[5px] hover:cursor-pointer border-2 border-gray-200 rounded-xl"
+              className="flex mb-2 p-[5px] hover:cursor-pointer border-2 border-gray-200 rounded-xl gap-2"
               key={selectedProject.simulation.name}
             >
               <div className="w-[12%] flex items-center">
@@ -30,32 +30,10 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                   style={{ width: "20px", height: "20px" }}
                 />
               </div>
-              <div className="w-[90%] text-left">
+              <span className="w-[90%] text-left text-sm">
                 {selectedProject.simulation.name}
-              </div>
+              </span>
             </div>
-            {/*<>
-              {selectedProject.ports.map((port) => {
-
-                return (
-                    <>
-                      {port.category === "port" &&
-                          <div
-                              key={port.name}
-                              className={
-                                selectedPort === port.name
-                                    ? "w-[80%] ml-10 hover:cursor-pointer hover:bg-gray-200 bg-gray-200 p-1 rounded"
-                                    : "w-[80%] ml-10 hover:cursor-pointer hover:bg-gray-200 p-1 rounded"
-                              }
-                              onClick={() => setSelectedPort(port.name)}
-                          >
-                            {port.name}
-                          </div>
-                      }
-                    </>
-                );
-              })}
-            </>*/}
           </>
         </div>
       ) : (

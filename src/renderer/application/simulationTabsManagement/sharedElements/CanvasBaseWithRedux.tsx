@@ -57,7 +57,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                 <ReactReduxContext.Consumer>
                     {({store}) => (
                         <div className="flex flex-col">
-                            <Canvas style={{width: "1920px", height: "86vh"}}>
+                            <Canvas style={{width: "100vw", height: "84vh"}}>
                                 <Provider store={store}>
                                     <pointLight position={[100, 100, 100]} intensity={0.8}/>
                                     <hemisphereLight
@@ -106,7 +106,7 @@ export const CanvasBaseWithRedux: React.FC<CanvasBaseWithReduxProps> = ({
                     )}
                 </ReactReduxContext.Consumer>
             ) : (
-                <div className="absolute top-1/2 w-1/5 flex justify-between">
+                <div className="absolute top-1/2 flex justify-center gap-4">
                     <ImportCadProjectButton
                         className="button buttonPrimary flex items-center"
                         importAction={(importActionParamsObject) => {

@@ -28,7 +28,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
     const labels = pairs(ports.map(p => p.name))
 
     return (
-        <div className="mt-11 flex justify-between">
+        <div className="mt-8 flex justify-between">
             <div className="flex">
                 <div
                     className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${chartVisualizationMode === 'grid' ? 'border-[#0fb25b]' : ''}`}
@@ -44,7 +44,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
                 </div>
             </div>
             <div className="flex justify-center">
-                <select className="select select-success w-full max-w-xs h-[35px] min-h-[35px] mr-2"
+                <select className="select select-success w-full max-w-xs h-[35px] min-h-[35px] mr-2 text-sm"
                     onChange={(e) => setGraphToVisualize(e.currentTarget.value)}
                 >
                     <option selected>All Graph</option>

@@ -9,13 +9,15 @@ interface DashBoardProps {
   selectedTab: string;
   setSelectedTab: Function;
   children: ReactNode;
+  className?: string
 }
 
-export const LeftPanel: React.FC<DashBoardProps> = ({
+export const MyPanel: React.FC<DashBoardProps> = ({
   tabs,
   children,
   selectedTab,
   setSelectedTab,
+  className
 }) => {
   function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');
@@ -25,16 +27,16 @@ export const LeftPanel: React.FC<DashBoardProps> = ({
 
   useEffect(() => {
     setSelectedIndex(0);
-    setSelectedTab('Modeler');
+    (tabs[0] === 'Modeler') && setSelectedTab('Modeler');
     if (tabs[1] === 'Results') {
       setSelectedTab('Results');
     }
   }, [tabs[1]]);
 
   return (
-    <div className="absolute left-[2%] top-[160px] md:w-1/3 lg:w-1/4 xl:w-1/6">
+    <div className={className}>
       <Tab.Group selectedIndex={tabs[1] === 'Results' ? 1 : selectedIndex}>
-        <Tab.List className="flex rounded bg-gray-300">
+        <Tab.List className="flex bg-gray-300">
           {tabs.map((tab, index) => {
             return (
               <Tab
@@ -64,7 +66,7 @@ export const LeftPanel: React.FC<DashBoardProps> = ({
         </Tab.List>
         <Tab.Panels className="shadow-2xl">
           {tabs.map((tab, index) => (
-            <Tab.Panel key={index} className="rounded-b-xl bg-white p-3">
+            <Tab.Panel key={index} className="bg-white p-3">
               {children}
             </Tab.Panel>
           ))}

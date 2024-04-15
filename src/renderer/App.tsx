@@ -117,7 +117,7 @@ export default function App() {
       {loginSpinner && (
         <ImSpinner className="animate-spin w-12 h-12 absolute left-1/2 top-1/2" />
       )}
-      <div className={`${loginSpinner && 'opacity-40'}`}>
+      <div className={`${loginSpinner && 'opacity-40'} h-[100vh]`}>
         {memoizedTabsContainer}
         <MenuBar />
         {tabSelected === 'DASHBOARD' ? (

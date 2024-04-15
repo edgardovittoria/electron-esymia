@@ -24,10 +24,10 @@ import { RLCParamsComponent } from './portManagement/components/RLCParamsCompone
 import { ModalSelectPortType } from './portManagement/ModalSelectPortType';
 import { InputSignal } from './inputSignal/InputSignal';
 import { InputSignalManagement } from './inputSignal/InputSignalManagement';
-import { LeftPanel } from '../../sharedElements/LeftPanel';
+import { MyPanel } from '../../sharedElements/MyPanel';
 import { Models } from '../../sharedElements/Models';
 import { ModelOutliner } from '../../sharedElements/ModelOutliner';
-import { Probe, Project } from '../../../../model/esymiaModels';
+import { Port, Probe, Project } from '../../../../model/esymiaModels';
 import { ImportExportPhysicsSetup } from './ImportExportPhysicsSetup';
 import StatusBar from '../../sharedElements/StatusBar';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
@@ -56,6 +56,7 @@ export const Physics: React.FC<PhysicsProps> = ({
   >(undefined);
   const [inputPortPositioned, setInputPortPositioned] = useState(false);
   const mesh = useRef<THREE.Mesh[]>([]);
+  const [selectedTabRightPanel, setSelectedTabRightPanel] = useState<string>('Ports');
 
   const setMesh = (meshToSet: THREE.Mesh, index: number) => {
     if (meshToSet) {
@@ -148,6 +149,8 @@ export const Physics: React.FC<PhysicsProps> = ({
         setSelectedTabLeftPanel={setSelectedTabLeftPanel}
       />
       <PhysicsRightPanel
+        selectedTabRightPanel={selectedTabRightPanel}
+        setSelectedTabRightPanel={setSelectedTabRightPanel}
         savedPortParameters={savedPortParameters}
         setSavedPortParameters={setSavedPortParameters}
       />
@@ -288,54 +291,18 @@ const SurfaceAdvicesButton: FC<{
   );
 };
 
-const PhysicsRightPanel: FC<{
-  savedPortParameters: boolean;
-  setSavedPortParameters: Function;
+/* const PhysicsRight2Panel: FC<{
+
 }> = ({ savedPortParameters, setSavedPortParameters }) => {
-  const selectedProject = useSelector(selectedProjectSelector);
-  const selectedPort = findSelectedPort(selectedProject);
-  const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
+
   return (
     <>
       {selectedPort &&
       (selectedPort?.category === 'port' ||
         selectedPort?.category === 'lumped') ? (
         <>
-          <PortManagement
-            selectedPort={selectedPort}
-            savedPortParameters={savedPortParameters}
-            setSavedPortParameters={setSavedPortParameters}
-          >
-            <PortType
-              disabled={selectedProject?.simulation?.status === 'Completed'}
-              setShow={setShowModalSelectPortType}
-              selectedPort={selectedPort}
-            />
-            <PortPosition
-              selectedPort={selectedPort}
-              disabled={selectedProject?.simulation?.status === 'Completed'}
-              setSavedPortParameters={setSavedPortParameters}
-            />
-            <RLCParamsComponent
-              selectedPort={selectedPort}
-              disabled={selectedProject?.simulation?.status === 'Completed'}
-              setSavedPortParameters={setSavedPortParameters}
-            />
-            {selectedProject?.simulation?.status !== 'Completed' && (
-              <ModalSelectPortType
-                show={showModalSelectPortType}
-                setShow={setShowModalSelectPortType}
-                selectedPort={selectedPort}
-                setSavedPortParameters={setSavedPortParameters}
-              />
-            )}
-          </PortManagement>
-          <InputSignalManagement>
-            <InputSignal
-              disabled={selectedProject?.simulation?.status === 'Completed'}
-              selectedProject={selectedProject as Project}
-            />
-          </InputSignalManagement>
+
+
         </>
       ) : (
         <PortManagement
@@ -352,17 +319,18 @@ const PhysicsRightPanel: FC<{
       )}
     </>
   );
-};
+}; */
 
 const PhysicsLeftPanel: FC<{
   selectedTabLeftPanel: string;
   setSelectedTabLeftPanel: Function;
 }> = ({ selectedTabLeftPanel, setSelectedTabLeftPanel }) => {
   return (
-    <LeftPanel
+    <MyPanel
       tabs={['Modeler', 'Physics']}
       selectedTab={selectedTabLeftPanel}
       setSelectedTab={setSelectedTabLeftPanel}
+      className="absolute left-[2%] top-[160px] md:w-1/4 xl:w-1/5"
     >
       {selectedTabLeftPanel === 'Physics' ? (
         <PhysicsLeftPanelTab />
@@ -371,6 +339,65 @@ const PhysicsLeftPanel: FC<{
           <ModelOutliner />
         </Models>
       )}
-    </LeftPanel>
+    </MyPanel>
   );
 };
+
+const PhysicsRightPanel: FC<{
+  selectedTabRightPanel: string;
+  setSelectedTabRightPanel: Function;
+  savedPortParameters: boolean;
+  setSavedPortParameters: Function;
+}> = ({ selectedTabRightPanel, setSelectedTabRightPanel, savedPortParameters, setSavedPortParameters }) => {
+  const selectedProject = useSelector(selectedProjectSelector);
+  const selectedPort = findSelectedPort(selectedProject);
+  const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
+  return (
+    <MyPanel
+      tabs={['Ports', 'Signals']}
+      selectedTab={selectedTabRightPanel}
+      setSelectedTab={setSelectedTabRightPanel}
+      className="absolute right-[2%] top-[160px] w-1/4"
+    >
+      {selectedTabRightPanel === 'Ports' ? (
+        <PortManagement
+          selectedPort={selectedPort}
+          savedPortParameters={savedPortParameters}
+          setSavedPortParameters={setSavedPortParameters}
+        >
+          <PortType
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setShow={setShowModalSelectPortType}
+            selectedPort={selectedPort as Port}
+          />
+          <PortPosition
+            selectedPort={selectedPort as Port}
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setSavedPortParameters={setSavedPortParameters}
+          />
+          <RLCParamsComponent
+            selectedPort={selectedPort as Port}
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setSavedPortParameters={setSavedPortParameters}
+          />
+          {selectedProject?.simulation?.status !== 'Completed' && (
+            <ModalSelectPortType
+              show={showModalSelectPortType}
+              setShow={setShowModalSelectPortType}
+              selectedPort={selectedPort as Port}
+              setSavedPortParameters={setSavedPortParameters}
+            />
+          )}
+        </PortManagement>
+      ) : (
+        <InputSignalManagement>
+          <InputSignal
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            selectedProject={selectedProject as Project}
+          />
+        </InputSignalManagement>
+      )}
+    </MyPanel>
+  );
+};
+

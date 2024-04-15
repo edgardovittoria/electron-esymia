@@ -11,7 +11,7 @@ import {ChartsList} from "./ChartsList";
 import { ResultsLeftPanelTab } from "./ResultsLeftPanelTab";
 import { Models } from "../../sharedElements/Models";
 import { ModelOutliner } from "../../sharedElements/ModelOutliner";
-import { LeftPanel } from "../../sharedElements/LeftPanel";
+import { MyPanel } from "../../sharedElements/MyPanel";
 import { useFaunaQuery } from "cad-library";
 import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
 import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
@@ -40,12 +40,13 @@ export const Results: React.FC<ResultsProps> = ({
   const { execQuery } = useFaunaQuery();
 
   return (
-    <div className="flex h-[100vh]">
+    <div className="flex">
       <div className="w-[20%]">
-        <LeftPanel
+        <MyPanel
           tabs={["Modeler", "Results"]}
           selectedTab={selectedTabLeftPanel}
           setSelectedTab={setSelectedTabLeftPanel}
+          className="absolute left-[2%] top-[160px] w-1/6"
         >
           {selectedTabLeftPanel === "Results" ? (
             <ResultsLeftPanelTab
@@ -62,7 +63,7 @@ export const Results: React.FC<ResultsProps> = ({
           {(selectedProject?.simulation) &&
             <button
               type="button"
-              className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
+              className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60 text-sm"
               onClick={() => {
                 dispatch(deleteSimulation())
                 dispatch(setMeshApproved(false));
@@ -76,7 +77,7 @@ export const Results: React.FC<ResultsProps> = ({
             >
               REMOVE RESULTS
             </button>}
-        </LeftPanel>
+        </MyPanel>
       </div>
       <div className="w-[78%]">
         {selectedProject && selectedProject.simulation ? (
@@ -92,7 +93,7 @@ export const Results: React.FC<ResultsProps> = ({
                   setSelectedLabel={setSelectedLabel}
                 />
               )}
-              <div className={chartVisualizationMode === "full" ? "overflow-scroll grid grid-cols-1 gap-4 max-h-[800px]": "grid grid-cols-2 gap-4 overflow-scroll max-h-[800px]"}>
+              <div className={chartVisualizationMode === "full" ? "overflow-scroll grid grid-cols-1 gap-4 max-h-[77vh] pb-10": "grid grid-cols-2 gap-4 overflow-scroll max-h-[77vh] pb-10"}>
                 <ChartsList
                   scaleMode={chartsScaleMode}
                   graphToVisualize={graphToVisualize}
@@ -102,7 +103,7 @@ export const Results: React.FC<ResultsProps> = ({
             </>
         ) : (
           <div className="w-full text-center mt-80">
-            Launch a simulation and come back here to visulize the results.
+            Launch a simulation and come back here to visualize the results.
           </div>
         )}
       </div>

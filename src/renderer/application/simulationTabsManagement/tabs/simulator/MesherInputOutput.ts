@@ -1,4 +1,4 @@
-import {Brick} from "./meshingSolvingInfo/MeshingSolvingInfo";
+import { Brick } from './meshingSolvingInfo/components/createGridsExternals';
 
 export type MesherOutput = {
     n_materials: number,
