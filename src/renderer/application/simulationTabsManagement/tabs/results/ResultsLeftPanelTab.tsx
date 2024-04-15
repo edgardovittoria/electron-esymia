@@ -37,10 +37,10 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
           </>
         </div>
       ) : (
-        <div className="text-center">
-          <img src={noResultsIcon} className="mx-auto mt-[50px]" alt="No Results"/>
-          <h5>No results to view</h5>
-          <p className="mt-[50px]">
+        <div className="text-center lg:max-h-[250px] xl:max-h-fit overflow-y-scroll">
+          <img src={noResultsIcon} className="mx-auto mt-[50px] w-1/2" alt="No Results"/>
+          <h5 className="lg:text-sm xl:text-xl">No results to view</h5>
+          <p className="xl:mt-[50px] lg:mt-[20px] text-sm">
             Complete a study setup with CAD, materials, and physics, then
             Estimate and Run to generate results.
           </p>

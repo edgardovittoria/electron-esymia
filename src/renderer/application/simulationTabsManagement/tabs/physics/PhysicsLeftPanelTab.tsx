@@ -131,14 +131,14 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
           </ul>
         </div>
       ) : (
-        <div className="text-center">
+        <div className="text-center lg:max-h-[150px] xl:max-h-fit overflow-y-scroll">
           <img
             src={noPhysicsIcon}
-            className="mx-auto mt-[50px]"
+            className="mx-auto xl:mt-[50px] w-1/2"
             alt="No Physics"
           />
-          <h5>No Physics applied</h5>
-          <p className="mt-[50px]">
+          <h5 className="lg:text-sm xl:text-xl">No Physics applied</h5>
+          <p className="mt-[50px] text-sm">
             Select a tool from the Physics Toolbar and apply it to geometry in
             the 3D View.
           </p>

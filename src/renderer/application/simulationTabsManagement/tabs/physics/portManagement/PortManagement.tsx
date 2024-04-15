@@ -24,7 +24,7 @@ export const PortManagement: React.FC<PortManagementProps> = ({
   return (
     <>
       {selectedPort ? (
-        <>
+        <div className="overflow-y-scroll lg:max-h-[300px] xl:max-h-[600px]">
           <div className="flex items-center gap-2 p-[5px]">
             <div className="col-1 pe-0 ps-0">
               <FaReact
@@ -51,7 +51,7 @@ export const PortManagement: React.FC<PortManagementProps> = ({
               SAVE
             </button>
           </div>
-        </>
+        </div>
       ) : (
         <div className="flex p-[10px]">
           <span>No Port Selected</span>

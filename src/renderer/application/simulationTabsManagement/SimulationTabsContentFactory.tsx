@@ -18,9 +18,9 @@ export const SimulationTabsContentFactory: React.FC<
 
   const windowInnerWidth = useWindowInnerWidth();
 
-  if (windowInnerWidth < 1030) {
+  if (windowInnerWidth < 1024) {
     return (
-      <div className="flex flex-col justify-center items-center my-auto h-[80vh]">
+      <div className="flex flex-col justify-center items-center my-auto lg:h-[70vh] xl:h-[80vh]">
         <span className="font-bold">
           Sorry this section is not available on mobile
         </span>
