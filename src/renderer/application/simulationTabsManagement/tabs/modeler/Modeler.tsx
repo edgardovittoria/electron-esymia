@@ -1,9 +1,9 @@
 import {Materials} from "./Materials";
-import {CanvasBaseWithRedux} from "../../sharedElements/CanvasBaseWithRedux";
 import {MyPanel} from "../../sharedElements/MyPanel";
 import {Models} from "../../sharedElements/Models";
 import {ModelOutliner} from "../../sharedElements/ModelOutliner";
 import StatusBar from "../../sharedElements/StatusBar";
+import { CanvasModeler } from './CanvasModeler';
 
 interface ModelerProps {
     selectedTabLeftPanel: string;
@@ -17,7 +17,7 @@ export const Modeler: React.FC<ModelerProps> = (
 
     return (
         <div>
-            <CanvasBaseWithRedux section="Modeler"/>
+            <CanvasModeler/>
             <StatusBar/>
             <MyPanel
                 tabs={["Modeler", "Materials"]}

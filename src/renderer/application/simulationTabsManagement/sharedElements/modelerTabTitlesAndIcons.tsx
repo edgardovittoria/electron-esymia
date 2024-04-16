@@ -14,8 +14,10 @@ const materialTabTitle = <div className='flex items-center'>
 </div>;
 
 const physicsTabTitle = <div className='flex items-center'>
-  <div className='w-[25%]'><GiAtom color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
-  <div className='w-[65%]'>Physics</div>
+  <div className="flex flex-row items-center gap-2">
+    <div><GiAtom color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
+    <div>Physics</div>
+  </div>
 </div>;
 
 const simulatorTabTitle = <div className='flex items-center'>

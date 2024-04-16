@@ -1,7 +1,8 @@
 import {CircleGeometryAttributes, ComponentEntity, TransformationParams} from "cad-library";
 import {Port, Probe, RLCParams, TempLumped} from "../../../../../../model/esymiaModels";
+import { Vector3 } from 'three';
 
-export function getDefaultPort(key: number, size: number){
+export function getDefaultPort(key: number, size: number, position: Vector3){
     let port: Port = {
         name: "Port" + key,
         category: 'port',
@@ -10,18 +11,18 @@ export function getDefaultPort(key: number, size: number){
             type: "CIRCLE",
             keyComponent: 0,
             geometryAttributes: {
-                radius: size/100,
+                radius: size/50,
                 segments: 20,
             } as CircleGeometryAttributes,
             name: "inputPort" + key,
             orbitEnabled: false,
             transformationParams: {
-                position: [-2.5, 2.5, 0],
+                position: [position.x-2.5, position.y, position.z-5],
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
             previousTransformationParams: {
-                position: [-2.5, 2.5, 0],
+                position: [position.x-2.5, position.y, position.z-5],
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
@@ -32,25 +33,25 @@ export function getDefaultPort(key: number, size: number){
             type: "CIRCLE",
             keyComponent: 0,
             geometryAttributes: {
-                radius: size/100,
+                radius: size/50,
                 segments: 20,
             } as CircleGeometryAttributes,
             name: "outputPort" + key,
             orbitEnabled: false,
             transformationParams: {
-                position: [2.5, 2.5, 0],
+                position: [position.x+2.5, position.y, position.z-5],
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
             previousTransformationParams: {
-                position: [2.5, 2.5, 0],
+                position: [position.x+2.5, position.y, position.z-5],
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
             opacity: 1,
             transparency: false
         } as ComponentEntity,
-        isSelected: false,
+        isSelected: true,
         rlcParams: {} as RLCParams,
     }
     return port
@@ -65,7 +66,7 @@ export function getDefaultLumped(key: number, size: number){
             type: "CIRCLE",
             keyComponent: 0,
             geometryAttributes: {
-                radius: size/100,
+                radius: size/50,
                 segments: 20,
             } as CircleGeometryAttributes,
             name: "inputPort" + key,
@@ -87,7 +88,7 @@ export function getDefaultLumped(key: number, size: number){
             type: "CIRCLE",
             keyComponent: 0,
             geometryAttributes: {
-                radius: size/100,
+                radius: size/50,
                 segments: 20,
             } as CircleGeometryAttributes,
             name: "outputPort" + key,
@@ -105,7 +106,7 @@ export function getDefaultLumped(key: number, size: number){
             opacity: 1,
             transparency: false
         } as ComponentEntity,
-        isSelected: false,
+        isSelected: true,
         rlcParams: {} as RLCParams,
         value: 0
     }
@@ -123,7 +124,7 @@ export function getDefaultProbe(key: number, size: number){
                 type: "CIRCLE",
                 keyComponent: 0,
                 geometryAttributes: {
-                    radius: size/100,
+                    radius: size/50,
                     segments: 20,
                 } as CircleGeometryAttributes,
                 name: "inputPort" + key,
@@ -145,7 +146,7 @@ export function getDefaultProbe(key: number, size: number){
                 type: "CIRCLE",
                 keyComponent: 0,
                 geometryAttributes: {
-                    radius: size/100,
+                    radius: size/50,
                     segments: 20,
                 } as CircleGeometryAttributes,
                 name: "inputPort" + key,
@@ -167,7 +168,7 @@ export function getDefaultProbe(key: number, size: number){
                 type: "CIRCLE",
                 keyComponent: 0,
                 geometryAttributes: {
-                    radius: size/100,
+                    radius: size/50,
                     segments: 20,
                 } as CircleGeometryAttributes,
                 name: "inputPort" + key,
@@ -189,7 +190,7 @@ export function getDefaultProbe(key: number, size: number){
                 type: "CIRCLE",
                 keyComponent: 0,
                 geometryAttributes: {
-                    radius: size/100,
+                    radius: size/50,
                     segments: 20,
                 } as CircleGeometryAttributes,
                 name: "inputPort" + key,
@@ -211,7 +212,7 @@ export function getDefaultProbe(key: number, size: number){
                 type: "CIRCLE",
                 keyComponent: 0,
                 geometryAttributes: {
-                    radius: size/100,
+                    radius: size/50,
                     segments: 20,
                 } as CircleGeometryAttributes,
                 name: "inputPort" + key,
@@ -233,7 +234,7 @@ export function getDefaultProbe(key: number, size: number){
                 type: "CIRCLE",
                 keyComponent: 0,
                 geometryAttributes: {
-                    radius: size/100,
+                    radius: size/50,
                     segments: 20,
                 } as CircleGeometryAttributes,
                 name: "inputPort" + key,
@@ -255,7 +256,7 @@ export function getDefaultProbe(key: number, size: number){
                 type: "CIRCLE",
                 keyComponent: 0,
                 geometryAttributes: {
-                    radius: size/100,
+                    radius: size/50,
                     segments: 20,
                 } as CircleGeometryAttributes,
                 name: "inputPort" + key,
@@ -277,7 +278,7 @@ export function getDefaultProbe(key: number, size: number){
                 type: "CIRCLE",
                 keyComponent: 0,
                 geometryAttributes: {
-                    radius: size/100,
+                    radius: size/50,
                     segments: 20,
                 } as CircleGeometryAttributes,
                 name: "inputPort" + key,
@@ -299,7 +300,7 @@ export function getDefaultProbe(key: number, size: number){
                 type: "CIRCLE",
                 keyComponent: 0,
                 geometryAttributes: {
-                    radius: size/100,
+                    radius: size/50,
                     segments: 20,
                 } as CircleGeometryAttributes,
                 name: "inputPort" + key,

@@ -43,7 +43,11 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                         ? 'mt-[5px] rounded bg-gray-200 hover:bg-gray-200 hover:cursor-pointer hover:rounded px-1'
                         : 'mt-[5px] hover:bg-gray-200 hover:cursor-pointer hover:rounded'
                     }
-                    onClick={() => dispatch(selectPort(port.name))}
+                    onClick={() => {
+                      if(!selectedProject?.simulation?.results) {
+                        dispatch(selectPort(port.name))
+                      }
+                    }}
                   >
                     <div className="flex items-center">
                       <div className="w-[10%]">

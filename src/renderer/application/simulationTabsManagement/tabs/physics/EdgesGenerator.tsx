@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 import * as THREE from "three";
-import {meshFrom} from "cad-library";
+import { BufferGeometryAttributes, meshFrom } from 'cad-library';
 import {BufferGeometry, InstancedMesh, Material, Mesh, Object3D} from "three";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -14,7 +14,7 @@ export interface EdgesGeneratorProps {
     meshRef: React.MutableRefObject<THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>[]>,
     surfaceAdvices: boolean,
     inputPortPositioned: boolean,
-    setInputPortPositioned: Function
+    setInputPortPositioned: Function,
 }
 
 const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, surfaceAdvices, inputPortPositioned, setInputPortPositioned}) => {
@@ -32,16 +32,19 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, surfaceAdvices,
     let size = useSelector(boundingBoxDimensionSelector)
     const instancedMeshRef = useRef<InstancedMesh[]>([]);
     useEffect(() => {
+            // console.log(doubleClicked)
             let tempObject = new Object3D();
             group.children.forEach((c, index) => {
-                if (meshRef.current && selectedPort && meshRef.current.length !== 0 && surfaceAdvices) {
+                console.log(meshRef.current && meshRef.current.length !== 0 && surfaceAdvices)
+                if (meshRef.current && meshRef.current.length !== 0 && surfaceAdvices) {
                     ((meshRef.current[index] as Mesh).material as Material).opacity = 0.5
-                } else if ((meshRef.current && meshRef.current.length !== 0) && (!surfaceAdvices || !selectedPort )) {
+                } else if ((meshRef.current && meshRef.current.length !== 0) && (!surfaceAdvices)) {
                     ((meshRef.current[index] as Mesh).material as Material).opacity = 1
                 }
                 let j = 0;
-                let positionVertices = ((c as Mesh).geometry as BufferGeometry).attributes.position.array
-
+                // const geometry = (c as Mesh).geometry.clone().applyMatrix4((c as Mesh).matrix);
+                (c as Mesh).geometry.applyQuaternion((c as Mesh).quaternion)
+                let positionVertices = (c as Mesh).geometry.attributes.position.array
                 if (instancedMeshRef.current[index]) {
                     for (let i = 0; i < positionVertices.length; i++) {
                         if (i % 3 === 0) {
@@ -76,7 +79,7 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, surfaceAdvices,
                                         }
                                     }}
                                     position={c.position}
-                                    key={c.name}
+                                    key={c.id}
                                     //TODO: sistemare problemi derivanti dai tipi risultanti dalle operazioni binarie
                                     args={[null as any, null as any, ((c as Mesh).geometry as BufferGeometry).attributes.position.array.length / 3]}
                                     onDoubleClick={(e) => {
@@ -96,15 +99,14 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, surfaceAdvices,
                                                     position: [e.point.x, e.point.y, e.point.z],
                                                 })
                                             );
-                                            setInputPortPositioned(false)                                            
+                                            setInputPortPositioned(false)
                                         }
                                     }}
                                 >
-                                    <sphereGeometry args={[(size as number) / 100, 20, 20]}/>
+                                    <sphereGeometry args={[(size as number) / 150, 20, 20]}/>
                                     <meshPhongMaterial color={"black"}/>
                                 </instancedMesh>
                             }
-
                         </>
                     )
                 })

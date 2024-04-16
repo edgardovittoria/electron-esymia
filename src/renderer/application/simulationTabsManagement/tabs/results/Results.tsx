@@ -16,6 +16,7 @@ import { useFaunaQuery } from "cad-library";
 import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
 import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
 import {Project} from "../../../../model/esymiaModels";
+import { alertMessageStyle, comeBackToModelerMessage, emptyResultsMessage } from '../../../config/textMessages';
 
 interface ResultsProps {
   selectedTabLeftPanel: string;
@@ -102,8 +103,8 @@ export const Results: React.FC<ResultsProps> = ({
               </div>
             </>
         ) : (
-          <div className="w-full text-center mt-80">
-            Launch a simulation and come back here to visualize the results.
+          <div className="absolute top-1/2 flex justify-center w-[78%]">
+            <span className={alertMessageStyle}>{emptyResultsMessage}</span>
           </div>
         )}
       </div>

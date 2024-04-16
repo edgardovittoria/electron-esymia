@@ -11,12 +11,14 @@ import {
     setPortKey
 } from '../../../../../../store/projectSlice';
 import { Project } from '../../../../../../model/esymiaModels';
+import { Vector3 } from 'three';
 
 interface SelectPortsProps {
     selectedProject: Project,
+    cameraPosition: Vector3
 }
 
-export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
+export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, cameraPosition}) => {
 
     const dispatch = useDispatch()
 
@@ -57,7 +59,7 @@ export const SelectPorts: React.FC<SelectPortsProps> = ({selectedProject}) => {
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
-                                            let port = getDefaultPort((keyPort as number)+1, size as number)
+                                            let port = getDefaultPort((keyPort as number)+1, size as number, cameraPosition)
                                             dispatch(setPortKey((keyPort as number)+1))
                                             dispatch(addPorts(port))
                                         }}

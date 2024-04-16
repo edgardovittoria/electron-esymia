@@ -2,20 +2,18 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComponentEntity, Material } from 'cad-library';
 import {
-  meshGeneratedSelector,
   selectedProjectSelector,
   setMeshGenerated,
 } from '../../../../store/projectSlice';
 import { SimulatorLeftPanelTab } from './SimulatorLeftPanelTab';
 import { MeshingSolvingInfo } from './meshingSolvingInfo/MeshingSolvingInfo';
-import { CanvasBaseWithRedux } from '../../sharedElements/CanvasBaseWithRedux';
-import { MeshedElement } from './MeshedElement/MeshedElement';
 import { MyPanel } from '../../sharedElements/MyPanel';
 import { Models } from '../../sharedElements/Models';
 import { ModelOutliner } from '../../sharedElements/ModelOutliner';
 import { s3 } from '../../../../aws/s3Config';
 import { ExternalGridsObject, Project } from '../../../../model/esymiaModels';
 import StatusBar from '../../sharedElements/StatusBar';
+import { CanvasSimulator } from './CanvasSimulator';
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;
@@ -92,18 +90,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
     useState<string[]>(materialsNames);
   return (
     <>
-      {selectedProject && externalGrids ? (
-        <CanvasBaseWithRedux section="Simulator">
-          <MeshedElement
-            externalGrids={externalGrids}
-            selectedProject={selectedProject}
-            selectedMaterials={selectedMaterials}
-          />
-        </CanvasBaseWithRedux>
-      ) : (
-        <CanvasBaseWithRedux section="Simulator" />
-      )}
-
+      <CanvasSimulator externalGrids={externalGrids} selectedMaterials={selectedMaterials}/>
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
       <MyPanel
         tabs={['Modeler', 'Simulator']}
