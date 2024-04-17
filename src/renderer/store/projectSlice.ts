@@ -148,7 +148,7 @@ export const ProjectSlice = createSlice({
             }
         },
         updateSimulation(state: ProjectState, action: PayloadAction<Simulation>) {
-            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.associatedProject)
             if (selectedProject) selectedProject.simulation = action.payload;
         },
         deleteSimulation(state: ProjectState) {
@@ -329,6 +329,7 @@ const selectTabEffects = (state: ProjectState, tab: string) => {
 }
 
 export const projectsSelector = (state: { projects: ProjectState }) => takeAllProjectsIn(state.projects.projects)
+export const sharedProjectsSelector = (state: { projects: ProjectState }) => takeAllProjectsIn(state.projects.sharedElements)
 export const folderByIDSelector = (state: { projects: ProjectState }, id: string) => {
     return recursiveFindFolders(state.projects.projects, [] as Folder[]).filter(f => f.faunaDocumentId === id)[0]
 }
@@ -342,6 +343,7 @@ export const selectedProjectSelector = (state: { projects: ProjectState }) => {
     }
     return project
 }
+
 export const meshGeneratedSelector = (state: {projects: ProjectState}) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.meshData.meshGenerated
 export const screenshotSelector = (state: {projects: ProjectState}) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.screenshot
 export const simulationSelector = (state: { projects: ProjectState }) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.simulation;

@@ -13,12 +13,15 @@ import useWebSocket from 'react-use-websocket';
 import { setSolverOutput } from '../../../../../store/solverSlice';
 import {
   deleteSimulation,
+  findProjectByFaunaID,
   meshGeneratedSelector,
+  projectsSelector,
   setExternalGrids,
   setMesh,
   setMeshApproved,
   setMeshGenerated,
   setQuantum,
+  sharedProjectsSelector,
   unsetMesh,
   updateSimulation
 } from '../../../../../store/projectSlice';
@@ -58,6 +61,8 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   ]);
   const [convergenceThreshold, setConvergenceThreshold] = useState(0.0001);
   const [frequenciesNumber, setFrequenciesNumber] = useState(0);
+  const allProjects = useSelector(projectsSelector)
+  const allSharedProjects = useSelector(sharedProjectsSelector)
 
   useEffect(() => {
     if (
@@ -72,8 +77,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     }
   }, [
     selectedProject.meshData.mesh,
-    selectedProject.meshData.externalGrids,
-    selectedProject.simulation
+    selectedProject.meshData.externalGrids
   ]);
 
   const solverInputFrom = (
@@ -119,7 +123,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     components: ComponentEntity[]
   ) {
     const filteredComponents: ComponentEntity[][] = [];
-
     materialList.forEach((m) => {
       components &&
       filteredComponents.push(
@@ -208,7 +211,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             dispatch(deleteSimulation());
             dispatch(setMeshApproved(false));
           }else{
-            dispatch(setSolverOutput(res.data));
+            // dispatch(setSolverOutput(res.data));
             const simulationUpdated: Simulation = {
               ...simulation,
               results: res.data,
@@ -216,6 +219,11 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
               status: 'Completed'
             };
             dispatch(updateSimulation(simulationUpdated));
+            execQuery(
+              updateProjectInFauna,
+              convertInFaunaProjectThis(findProjectByFaunaID([...allProjects, ...allSharedProjects], simulationUpdated.associatedProject) as Project)
+            ).then(() => {
+            });
           }
         })
         .catch((err) => {
