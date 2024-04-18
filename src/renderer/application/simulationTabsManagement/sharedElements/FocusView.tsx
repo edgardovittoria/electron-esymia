@@ -4,9 +4,9 @@ import { useSelector } from "react-redux"
 import { selectedProjectSelector } from "../../../store/projectSlice"
 
 
-export const FocusView: FC<{children: ReactNode}> = ({ children }) => {
+export const FocusView: FC<{margin?:number, children: ReactNode}> = ({ margin, children }) => {
     return (
-        <Bounds fit clip observe margin={1.8}>
+        <Bounds fit clip observe margin={margin ? margin : 1.8}>
             <FocusViewCommonActions>
                 {children}
             </FocusViewCommonActions>
