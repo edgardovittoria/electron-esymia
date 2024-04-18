@@ -37,7 +37,6 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
       let selectedEntries: [string, Brick[]][] = Object.entries(externalGrids.externalGrids);
       let finalMaterialList: Material[] = [];
       if (externalGrids) {
-        console.log(externalGrids);
         /*if(selectedMaterials.length === 0){
             selectedEntries = []
         }else{

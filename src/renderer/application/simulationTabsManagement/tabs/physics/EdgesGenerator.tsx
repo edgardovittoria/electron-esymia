@@ -9,6 +9,7 @@ import {
     selectedProjectSelector,
     updatePortPosition
 } from "../../../../store/projectSlice";
+import uniqid from 'uniqid';
 
 export interface EdgesGeneratorProps {
     meshRef: React.MutableRefObject<THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>[]>,
@@ -35,7 +36,6 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, surfaceAdvices,
             // console.log(doubleClicked)
             let tempObject = new Object3D();
             group.children.forEach((c, index) => {
-                console.log(meshRef.current && meshRef.current.length !== 0 && surfaceAdvices)
                 if (meshRef.current && meshRef.current.length !== 0 && surfaceAdvices) {
                     ((meshRef.current[index] as Mesh).material as Material).opacity = 0.5
                 } else if ((meshRef.current && meshRef.current.length !== 0) && (!surfaceAdvices)) {
@@ -79,7 +79,7 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, surfaceAdvices,
                                         }
                                     }}
                                     position={c.position}
-                                    key={c.id}
+                                    key={uniqid()}
                                     //TODO: sistemare problemi derivanti dai tipi risultanti dalle operazioni binarie
                                     args={[null as any, null as any, ((c as Mesh).geometry as BufferGeometry).attributes.position.array.length / 3]}
                                     onDoubleClick={(e) => {

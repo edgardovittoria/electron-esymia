@@ -66,7 +66,6 @@ export const Physics: React.FC<PhysicsProps> = ({
 
   useEffect(() => {
     if(!boundingBoxDimension){
-      console.log('qui')
       const group = new THREE.Group();
       if (selectedProject && selectedProject.model.components) {
         selectedProject.model.components.forEach((c) => {

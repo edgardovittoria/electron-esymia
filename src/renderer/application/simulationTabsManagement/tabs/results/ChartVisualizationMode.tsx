@@ -46,8 +46,9 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
             <div className="flex justify-center">
                 <select className="select select-success w-full max-w-xs h-[35px] min-h-[35px] mr-2 text-sm"
                     onChange={(e) => setGraphToVisualize(e.currentTarget.value)}
+                        defaultValue={"All Graph"}
                 >
-                    <option selected>All Graph</option>
+                    <option>All Graph</option>
                     <option>Z</option>
                     <option>Y</option>
                     <option>S</option>

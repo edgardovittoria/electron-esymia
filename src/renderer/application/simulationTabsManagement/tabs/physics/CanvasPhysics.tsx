@@ -258,7 +258,6 @@ const PhysicsPortsControlsDrawer: FC<{ setSavedPortParameters: Function }> = ({
 const CanvasInfo: React.FC<{ setCameraPosition: Function }> = ({ setCameraPosition }) => {
   const { camera, controls } = useThree();
   useEffect(() => {
-    console.log(controls);
     setCameraPosition(camera.position);
   }, []);
   return <></>;

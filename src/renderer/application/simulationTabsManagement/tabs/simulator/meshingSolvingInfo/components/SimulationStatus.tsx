@@ -1,24 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import { deleteSimulation, setMeshApproved } from '../../../../../../store/projectSlice';
 import { useDispatch } from 'react-redux';
 import useWebSocket, { SendMessage } from 'react-use-websocket';
 
 export interface SimulationStatusProps {
-  computingP: boolean,
-  setComputingP: (v: boolean) => void,
-  computingLpx: boolean,
-  setComputingLpx: (v: boolean) => void,
-  iterations: number,
-  frequenciesNumber: number,
-  sendMessage: SendMessage
+  frequenciesNumber: number
 }
 
 const SimulationStatus: React.FC<SimulationStatusProps> = ({
-  computingP, setComputingP, computingLpx, setComputingLpx, iterations, frequenciesNumber, sendMessage
+  frequenciesNumber
                                                            }) => {
 
-  const dispatch = useDispatch();
+  const WS_URL = 'ws://localhost:8080';
+  const [computingP, setComputingP] = useState(false);
+  const [computingLpx, setComputingLpx] = useState(false);
+  const [iterations, setIterations] = useState(0);
+
+  const { sendMessage } = useWebSocket(WS_URL, {
+    onOpen: () => {
+      console.log('WebSocket connection established.');
+    },
+    shouldReconnect: () => true,
+    onMessage: (event) => {
+      if (event.data === 'P Computing Completed') {
+        setComputingP(true);
+      } else if (event.data === 'Lp Computing Completed') {
+        setComputingLpx(true);
+      } else {
+        setIterations(event.data);
+      }
+    },
+    onClose: () => {
+      console.log('WebSocket connection closed.');
+    }
+  });
 
   return (
     <div className='absolute right-[33%] w-1/3 top-1/3 flex flex-col justify-center items-center bg-white p-3 rounded'>

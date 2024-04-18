@@ -53,13 +53,12 @@ export const CanvasModeler: React.FC = () => {
                   {/* paint models */}
                   {selectedProject.model.components.map((component, index) => {
                     return (
-                      <FocusView>
+                      <FocusView key={uniqid()}>
                         <mesh
                           userData={{
                             keyComponent: component.keyComponent,
                             isSelected: false,
                           }}
-                          key={uniqid()}
                           position={component.transformationParams.position}
                           scale={component.transformationParams.scale}
                           rotation={component.transformationParams.rotation}

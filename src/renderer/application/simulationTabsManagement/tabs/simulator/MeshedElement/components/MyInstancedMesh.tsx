@@ -4,7 +4,7 @@ import {Material} from "cad-library";
 import {ExternalGridsObject} from "../../../../../../model/esymiaModels";
 import {useSelector} from "react-redux";
 import {meshGeneratedSelector} from "../../../../../../store/projectSlice";
-import {Brick} from "../../meshingSolvingInfo/MeshingSolvingInfo";
+import { Brick } from '../../meshingSolvingInfo/components/createGridsExternals';
 
 
 interface InstancedMeshProps {
@@ -26,7 +26,6 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
 
 
     useEffect(() => {
-        console.log("matrix")
         if (meshGenerated === "Generated") {
             let tempObject = new Object3D();
             Object.values(externalGrids.externalGrids).forEach((matrix:Brick[], index) => {

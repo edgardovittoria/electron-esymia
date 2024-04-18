@@ -38,6 +38,7 @@ import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs'
 import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFunctions';
 import SimulationStatus from './components/SimulationStatus';
 import { create_Grids_externals } from './components/createGridsExternals';
+import uniqid from 'uniqid';
 
 interface MeshingSolvingInfoProps {
   selectedProject: Project;
@@ -152,29 +153,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     return validity;
   }
 
-  const WS_URL = 'ws://localhost:8080';
-  const [computingP, setComputingP] = useState(false);
-  const [computingLpx, setComputingLpx] = useState(false);
-  const [iterations, setIterations] = useState(0);
-
-  const { sendMessage } = useWebSocket(WS_URL, {
-    onOpen: () => {
-      console.log('WebSocket connection established.');
-    },
-    shouldReconnect: () => true,
-    onMessage: (event) => {
-      if (event.data === 'P Computing Completed') {
-        setComputingP(true);
-      } else if (event.data === 'Lp Computing Completed') {
-        setComputingLpx(true);
-      } else {
-        setIterations(event.data);
-      }
-    },
-    onClose: () => {
-      console.log('WebSocket connection closed.');
-    }
-  });
 
 
 
@@ -232,9 +210,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
           dispatch(deleteSimulation());
           dispatch(setMeshApproved(false));
         });
-      setComputingP(false);
-      setComputingLpx(false);
-      setIterations(0)
     }
   }, [meshApproved]);
 
@@ -385,9 +360,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   return (
     <>
       {selectedProject.simulation?.status === 'Queued' && (
-        <SimulationStatus computingP={computingP} setComputingP={setComputingP} computingLpx={computingLpx}
-                          setComputingLpx={setComputingLpx} iterations={iterations}
-                          frequenciesNumber={frequenciesNumber} sendMessage={sendMessage}/>
+        <SimulationStatus frequenciesNumber={frequenciesNumber} />
       )}
       {meshGenerated === 'Generating' && (
         <ImSpinner className='animate-spin w-12 h-12 absolute left-1/2 top-1/2' />
@@ -415,7 +388,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             <div className='flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2'>
               {quantumDimensions.map(
                 (quantumComponent, indexQuantumComponent) => (
-                  <div className='xl:w-[30%] w-full'>
+                  <div className='xl:w-[30%] w-full' key={uniqid()}>
                     <input
                       disabled={
                         selectedProject.simulation?.status === 'Completed' ||
