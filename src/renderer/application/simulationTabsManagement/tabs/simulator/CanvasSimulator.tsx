@@ -57,7 +57,7 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
                   }):
                     <>
                       {externalGrids &&
-                      <FocusView margin={2}>
+                      <FocusView margin={1}>
                         <MeshedElement
                           externalGrids={externalGrids}
                           selectedProject={selectedProject}
