@@ -333,15 +333,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 }
               );
             }
-            const solverInput = {
-              ...res.data,
-              ...solverInputFrom(
-                selectedProject,
-                solverIterations,
-                convergenceThreshold
-              )
-            };
-            saveMeshAndExternalGridsToS3(solverInput, extGrids)
+            saveMeshAndExternalGridsToS3(res.data, extGrids)
               .then(() => {
                 return '';
               })
