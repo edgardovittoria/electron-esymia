@@ -68,6 +68,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
     return (
         <>
             <instancedMesh
+            frustumCulled={false}
                 ref={(el) => {
                     if (el) {
                         meshRef.current[index] = el;

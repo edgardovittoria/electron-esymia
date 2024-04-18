@@ -62,10 +62,9 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
   }, [externalGrids, meshGenerated]);
 
   return (
-    <Bounds fit margin={externalGrids.cell_size.cell_size_x * 9000}>
+    // <Bounds fit margin={externalGrids.cell_size.cell_size_x * 9000}>
       <group position={[-positions[0], -positions[1], -positions[2]]}> */
-        {externalGrids &&
-          mesherMatrices.map((matrix, index) => {
+        {mesherMatrices.map((matrix, index) => {
             return (
               <MyInstancedMesh
                 key={index}
@@ -76,6 +75,6 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
             );
           })}
       </group>
-    </Bounds>
+    // </Bounds>
   );
 };

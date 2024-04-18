@@ -38,7 +38,7 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
                   {/* paint models */}
                   {!mesherOutput ? selectedProject.model.components.map((component) => {
                     return (
-                      <FocusView key={uniqid()} margin={0.8}>
+                      <FocusView key={uniqid()}>
                         <mesh
                           userData={{
                             keyComponent: component.keyComponent,
@@ -57,7 +57,7 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
                   }):
                     <>
                       {externalGrids &&
-                      <FocusView>
+                      <FocusView margin={2}>
                         <MeshedElement
                           externalGrids={externalGrids}
                           selectedProject={selectedProject}
