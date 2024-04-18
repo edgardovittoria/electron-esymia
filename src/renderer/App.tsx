@@ -7,7 +7,7 @@ import { TabsContainer } from './application/TabsContainer';
 import {
   setFolderOfElementsSharedWithUser,
   setProjectsFolderToUser,
-  selectFolder,
+  selectFolder, activeSimulationsSelector
 } from './store/projectSlice';
 import { MenuBar } from './application/MenuBar';
 import { DashboardTabsContentFactory } from './application/dashboardTabsManagement/DashboardTabsContentFactory';
@@ -25,6 +25,9 @@ import {
   faunaProjectHaveParentInFolderList,
 } from './faunadb/apiAuxiliaryFunctions';
 import { FaunaFolder, FaunaProject } from './model/FaunaModels';
+import { numberOfActiveSimulationsSelector } from './store/solverSlice';
+import SimulationStatus
+  from './application/simulationTabsManagement/tabs/simulator/meshingSolvingInfo/components/SimulationStatus';
 
 
 export default function App() {
@@ -112,6 +115,14 @@ export default function App() {
     [user],
   );
 
+  const activeSimulations = useSelector(activeSimulationsSelector)
+  const [feedbackSimulationVisible, setFeedbackSimulationVisible] = useState<boolean>(false);
+  useEffect(() => {
+    if(activeSimulations.length > 0){
+      setFeedbackSimulationVisible(true)
+    }
+  }, [activeSimulations.length]);
+
   return (
     <div className="lg:h-[100vh] h-screen">
       {loginSpinner && (
@@ -120,11 +131,21 @@ export default function App() {
       <div className={`${loginSpinner && 'opacity-40'} h-[100vh]`}>
         {memoizedTabsContainer}
         <MenuBar />
+
         {tabSelected === 'DASHBOARD' ? (
           <DashboardTabsContentFactory />
         ) : (
           <SimulationTabsContentFactory />
         )}
+        {activeSimulations && activeSimulations.length > 0 && !feedbackSimulationVisible &&
+          <button className="absolute bottom-16 right-10 rounded-full p-4 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
+            onClick={() => setFeedbackSimulationVisible(true)}
+          >
+            SIM
+          </button>
+        }
+
+        {activeSimulations && activeSimulations.length > 0 && <SimulationStatus feedbackSimulationVisible={feedbackSimulationVisible} setFeedbackSimulationVisible={setFeedbackSimulationVisible} activeSimulations={activeSimulations}/>}
       </div>
     </div>
   );

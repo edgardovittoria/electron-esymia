@@ -372,3 +372,18 @@ export const folderByID = (state: ProjectState, folderID: string | undefined) =>
     }
     return undefined
 }
+
+export const activeSimulationsSelector = (state: { projects: ProjectState }) => {
+  let activeSimulations: { simulation: Simulation, freqNumber: number }[] = []
+  state.projects.projects.projectList.forEach(p => {
+    if(p.simulation && p.simulation.status === "Queued"){
+      activeSimulations.push({ simulation: p.simulation, freqNumber: p.signal?.signalValues.length as number })
+    }
+  })
+  state.projects.sharedElements.projectList.forEach(p => {
+    if(p.simulation && p.simulation.status === "Queued"){
+      activeSimulations.push({ simulation: p.simulation, freqNumber: p.signal?.signalValues.length as number })
+    }
+  })
+  return activeSimulations
+}

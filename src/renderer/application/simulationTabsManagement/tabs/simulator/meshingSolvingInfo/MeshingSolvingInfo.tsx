@@ -5,12 +5,11 @@ import {
   useFaunaQuery
 } from 'cad-library';
 import React, { useEffect, useState } from 'react';
-import { AiOutlineCheckCircle, AiOutlineThunderbolt } from 'react-icons/ai';
+import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { ImSpinner } from 'react-icons/im';
-import useWebSocket from 'react-use-websocket';
-import { setSolverOutput } from '../../../../../store/solverSlice';
+
 import {
   deleteSimulation,
   findProjectByFaunaID,
@@ -61,7 +60,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     100, 1
   ]);
   const [convergenceThreshold, setConvergenceThreshold] = useState(0.0001);
-  const [frequenciesNumber, setFrequenciesNumber] = useState(0);
   const allProjects = useSelector(projectsSelector)
   const allSharedProjects = useSelector(sharedProjectsSelector)
 
@@ -91,7 +89,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       project.signal?.signalValues.forEach((sv) =>
         frequencyArray.push(sv.freq)
       );
-    setFrequenciesNumber(frequencyArray.length);
     const signalsValuesArray: { Re: number; Im: number }[] = [];
     if (project)
       project.signal?.signalValues.forEach((sv) =>
@@ -199,7 +196,12 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             dispatch(updateSimulation(simulationUpdated));
             execQuery(
               updateProjectInFauna,
-              convertInFaunaProjectThis(findProjectByFaunaID([...allProjects, ...allSharedProjects], simulationUpdated.associatedProject) as Project)
+              convertInFaunaProjectThis(
+                {
+                  ...findProjectByFaunaID([...allProjects, ...allSharedProjects], simulationUpdated.associatedProject),
+                  simulation: simulationUpdated
+                } as Project
+              )
             ).then(() => {
             });
           }
@@ -359,9 +361,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
 
   return (
     <>
-      {selectedProject.simulation?.status === 'Queued' && (
-        <SimulationStatus frequenciesNumber={frequenciesNumber} />
-      )}
       {meshGenerated === 'Generating' && (
         <ImSpinner className='animate-spin w-12 h-12 absolute left-1/2 top-1/2' />
       )}
