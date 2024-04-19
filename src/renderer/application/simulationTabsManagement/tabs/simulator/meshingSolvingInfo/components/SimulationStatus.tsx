@@ -94,8 +94,8 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number}> =
         unit: selectedProject.modelUnit
       },
       solverAlgoParams: {
-        innerIteration: solverIterations[0],
-        outerIteration: solverIterations[1],
+        innerIteration: solverIterations[1],
+        outerIteration: solverIterations[0],
         convergenceThreshold
       }
     };

@@ -377,7 +377,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         <div className='mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]'>
           <h6 className='text-[12px] xl:text-base'>Solver Iterations</h6>
           <div className='mt-2'>
-            <span className='text-[12px] xl:text-base'>Inner, Outer</span>
+            <span className='text-[12px] xl:text-base'>Outer, Inner</span>
             <div className='flex justify-between mt-2'>
               <div className='w-[45%]'>
                 <input
