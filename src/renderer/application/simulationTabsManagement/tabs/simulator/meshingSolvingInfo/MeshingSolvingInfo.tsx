@@ -11,33 +11,28 @@ import axios from 'axios';
 import { ImSpinner } from 'react-icons/im';
 
 import {
-  deleteSimulation,
-  findProjectByFaunaID,
   meshGeneratedSelector,
-  projectsSelector,
   setExternalGrids,
   setMesh,
   setMeshApproved,
   setMeshGenerated,
   setQuantum,
-  sharedProjectsSelector,
-  unsetMesh,
-  updateSimulation
+  unsetMesh, updateSimulation
 } from '../../../../../store/projectSlice';
 import { deleteFileS3, uploadFileS3 } from '../../../../../aws/mesherAPIs';
 import { selectMenuItem } from '../../../../../store/tabsAndMenuItemsSlice';
 import {
   ExternalGridsObject,
-  Project,
-  Simulation,
-  SolverOutput
+  Project, Simulation, SolverOutput
 } from '../../../../../model/esymiaModels';
-import { getMaterialListFrom } from '../Simulator';
 import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFunctions';
-import SimulationStatus from './components/SimulationStatus';
 import { create_Grids_externals } from './components/createGridsExternals';
-import uniqid from 'uniqid';
+import {
+  convergenceTresholdSelector, setConvergenceTreshold,
+  setSolverIterations,
+  solverIterationsSelector
+} from '../../../../../store/solverSlice';
 
 interface MeshingSolvingInfoProps {
   selectedProject: Project;
@@ -55,13 +50,8 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   const quantumDimensions = selectedProject.meshData.quantum;
   const { meshApproved } = selectedProject.meshData;
   const meshGenerated = useSelector(meshGeneratedSelector);
-
-  const [solverIterations, setSolverIterations] = useState<[number, number]>([
-    100, 1
-  ]);
-  const [convergenceThreshold, setConvergenceThreshold] = useState(0.0001);
-  const allProjects = useSelector(projectsSelector)
-  const allSharedProjects = useSelector(sharedProjectsSelector)
+  const solverIterations = useSelector(solverIterationsSelector)
+  const convergenceThreshold = useSelector(convergenceTresholdSelector)
 
   useEffect(() => {
     if (
@@ -79,42 +69,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     selectedProject.meshData.externalGrids
   ]);
 
-  const solverInputFrom = (
-    project: Project,
-    solverIterations: [number, number],
-    convergenceThreshold: number
-  ) => {
-    const frequencyArray: number[] = [];
-    if (project)
-      project.signal?.signalValues.forEach((sv) =>
-        frequencyArray.push(sv.freq)
-      );
-    const signalsValuesArray: { Re: number; Im: number }[] = [];
-    if (project)
-      project.signal?.signalValues.forEach((sv) =>
-        signalsValuesArray.push(sv.signal)
-      );
 
-    return {
-      mesherFileId: project.meshData.mesh,
-      solverInput: {
-        ports: project.ports.filter((p) => p.category === 'port'),
-        lumped_elements: project.ports.filter((p) => p.category === 'lumped'),
-        materials: getMaterialListFrom(
-          project?.model?.components as ComponentEntity[]
-        ),
-        frequencies: frequencyArray,
-        signals: signalsValuesArray,
-        powerPort: project && project.signal?.powerPort,
-        unit: selectedProject.modelUnit
-      },
-      solverAlgoParams: {
-        innerIteration: solverIterations[0],
-        outerIteration: solverIterations[1],
-        convergenceThreshold
-      }
-    };
-  };
 
   function generateSTLListFromComponents(
     materialList: Material[],
@@ -150,70 +105,6 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
     return validity;
   }
 
-
-
-
-  // Solver launch and get results
-  useEffect(() => {
-    if (meshApproved && !selectedProject.simulation) {
-      const simulation: Simulation = {
-        name: `${selectedProject?.name} - sim`,
-        started: Date.now().toString(),
-        ended: '',
-        results: {} as SolverOutput,
-        status: 'Queued',
-        associatedProject: selectedProject?.faunaDocumentId as string,
-        solverAlgoParams: {
-          innerIteration: solverIterations[0],
-          outerIteration: solverIterations[1],
-          convergenceThreshold
-        }
-      };
-      dispatch(updateSimulation(simulation));
-
-      // https://teemaserver.cloud/solving
-      axios
-        .post(
-          'http://127.0.0.1:8000/solving',
-          solverInputFrom(
-            selectedProject,
-            solverIterations,
-            convergenceThreshold
-          )
-        )
-        .then((res) => {
-          if(res.data === false){
-            dispatch(deleteSimulation());
-            dispatch(setMeshApproved(false));
-          }else{
-            // dispatch(setSolverOutput(res.data));
-            const simulationUpdated: Simulation = {
-              ...simulation,
-              results: res.data,
-              ended: Date.now().toString(),
-              status: 'Completed'
-            };
-            dispatch(updateSimulation(simulationUpdated));
-            execQuery(
-              updateProjectInFauna,
-              convertInFaunaProjectThis(
-                {
-                  ...findProjectByFaunaID([...allProjects, ...allSharedProjects], simulationUpdated.associatedProject),
-                  simulation: simulationUpdated
-                } as Project
-              )
-            ).then(() => {
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          window.alert('Error while solving, please try again');
-          dispatch(deleteSimulation());
-          dispatch(setMeshApproved(false));
-        });
-    }
-  }, [meshApproved]);
 
   const saveExternalGridsToS3 = async (externalGrids: any) => {
     const blobFile = new Blob([JSON.stringify(externalGrids)]);
@@ -303,17 +194,16 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
               `the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`
             );
           } else if (res.data.mesh_is_valid.valid == false) {
-              window.alert('Error! Mesh not valid. Please adjust quantum along ' + res.data.mesh_is_valid.axis + ' axis.');
-              dispatch(setMeshGenerated('Not Generated'));
-              dispatch(unsetMesh());
-          }
-          else {
+            window.alert('Error! Mesh not valid. Please adjust quantum along ' + res.data.mesh_is_valid.axis + ' axis.');
+            dispatch(setMeshGenerated('Not Generated'));
+            dispatch(unsetMesh());
+          } else {
             const grids: any[] = [];
             for (const value of Object.values(res.data.mesher_matrices)) {
               grids.push(value);
             }
             const grids_external = create_Grids_externals(grids);
-              const data = { ...res.data.mesher_matrices };
+            const data = { ...res.data.mesher_matrices };
             Object.keys(res.data.mesher_matrices).forEach((k, index) => {
               data[k] = grids_external.data[index];
             });
@@ -338,8 +228,8 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 return '';
               })
               .catch((err) => console.log(err));
-            }
-          })
+          }
+        })
         .catch((err) => {
           if (err) {
             window.alert('Error while generating mesh, please try again');
@@ -379,7 +269,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             <div className='flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2'>
               {quantumDimensions.map(
                 (quantumComponent, indexQuantumComponent) => (
-                  <div className='xl:w-[30%] w-full' key={uniqid()}>
+                  <div className='xl:w-[30%] w-full'>
                     <input
                       disabled={
                         selectedProject.simulation?.status === 'Completed' ||
@@ -388,8 +278,8 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                       min={0.0}
                       className='w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl'
                       type='number'
-                      step={0.000001}
-                      value={quantumComponent}
+                      step={0.0001}
+                      value={parseFloat(quantumComponent.toFixed(4))}
                       onChange={(event) => {
                         if (indexQuantumComponent === 0) {
                           dispatch(
@@ -484,10 +374,10 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                       : solverIterations[0]
                   }
                   onChange={(event) => {
-                    setSolverIterations([
+                    dispatch(setSolverIterations([
                       parseInt(event.target.value),
                       solverIterations[1]
-                    ]);
+                    ]));
                   }}
                 />
               </div>
@@ -540,7 +430,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                       : convergenceThreshold
                   }
                   onChange={(event) => {
-                    setConvergenceThreshold(parseFloat(event.target.value));
+                    dispatch(setConvergenceTreshold(parseFloat(event.target.value)));
                   }}
                 />
               </div>
@@ -566,6 +456,20 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             }`}
             disabled={meshGenerated !== 'Generated'}
             onClick={() => {
+              const simulation: Simulation = {
+                name: `${selectedProject?.name} - sim`,
+                started: Date.now().toString(),
+                ended: '',
+                results: {} as SolverOutput,
+                status: 'Queued',
+                associatedProject: selectedProject?.faunaDocumentId as string,
+                solverAlgoParams: {
+                  innerIteration: solverIterations[0],
+                  outerIteration: solverIterations[1],
+                  convergenceThreshold
+                }
+              };
+              dispatch(updateSimulation(simulation));
               dispatch(setMeshApproved(true));
             }}
           >

@@ -1,10 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import { Disclosure } from '@headlessui/react';
-import useWebSocket from 'react-use-websocket';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { TiArrowMinimise } from 'react-icons/ti';
-import { Simulation } from '../../../../../../model/esymiaModels';
+import { Project, Simulation, SolverOutput } from '../../../../../../model/esymiaModels';
 import { MdKeyboardArrowUp } from 'react-icons/md';
+import { useDispatch, useSelector } from 'react-redux';
+import { convergenceTresholdSelector, solverIterationsSelector } from '../../../../../../store/solverSlice';
+import {
+  deleteSimulation,
+  findProjectByFaunaID, projectsSelector, selectedProjectSelector,
+  setMeshApproved, sharedProjectsSelector,
+  updateSimulation
+} from '../../../../../../store/projectSlice';
+import axios from 'axios';
+import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
+import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
+import { getMaterialListFrom } from '../../Simulator';
+import { ComponentEntity, useFaunaQuery } from 'cad-library';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean,
@@ -41,10 +54,98 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number}> =
   const [computingP, setComputingP] = useState(false);
   const [computingLpx, setComputingLpx] = useState(false);
   const [iterations, setIterations] = useState(0);
+  const selectedProject = useSelector(selectedProjectSelector) as Project
+  const solverIterations = useSelector(solverIterationsSelector)
+  const convergenceThreshold = useSelector(convergenceTresholdSelector)
+  const allProjects = useSelector(projectsSelector);
+  const allSharedProjects = useSelector(sharedProjectsSelector);
+  const { meshApproved } = selectedProject.meshData;
 
-  const { sendMessage } = useWebSocket(WS_URL, {
+  const dispatch = useDispatch()
+  const { execQuery } = useFaunaQuery()
+
+  const solverInputFrom = (
+    project: Project,
+    solverIterations: [number, number],
+    convergenceThreshold: number
+  ) => {
+    const frequencyArray: number[] = [];
+    if (project)
+      project.signal?.signalValues.forEach((sv) =>
+        frequencyArray.push(sv.freq)
+      );
+    const signalsValuesArray: { Re: number; Im: number }[] = [];
+    if (project)
+      project.signal?.signalValues.forEach((sv) =>
+        signalsValuesArray.push(sv.signal)
+      );
+
+    return {
+      mesherFileId: project.meshData.mesh,
+      solverInput: {
+        ports: project.ports.filter((p) => p.category === 'port'),
+        lumped_elements: project.ports.filter((p) => p.category === 'lumped'),
+        materials: getMaterialListFrom(
+          project?.model?.components as ComponentEntity[]
+        ),
+        frequencies: frequencyArray,
+        signals: signalsValuesArray,
+        powerPort: project && project.signal?.powerPort,
+        unit: selectedProject.modelUnit
+      },
+      solverAlgoParams: {
+        innerIteration: solverIterations[0],
+        outerIteration: solverIterations[1],
+        convergenceThreshold
+      }
+    };
+  };
+
+  const { sendMessage, readyState } = useWebSocket(WS_URL, {
     onOpen: () => {
       console.log('WebSocket connection established.');
+      // https://teemaserver.cloud/solving
+      console.log('start request')
+      axios
+        .post(
+          'http://127.0.0.1:8000/solving',
+          solverInputFrom(
+            selectedProject,
+            solverIterations,
+            convergenceThreshold
+          )
+        )
+        .then((res) => {
+          if (res.data === false) {
+            dispatch(deleteSimulation());
+            dispatch(setMeshApproved(false));
+          } else {
+            // dispatch(setSolverOutput(res.data));
+            const simulationUpdated: Simulation = {
+              ...selectedProject.simulation as Simulation,
+              results: res.data,
+              ended: Date.now().toString(),
+              status: 'Completed'
+            };
+            dispatch(updateSimulation(simulationUpdated));
+            execQuery(
+              updateProjectInFauna,
+              convertInFaunaProjectThis(
+                {
+                  ...findProjectByFaunaID([...allProjects, ...allSharedProjects], simulationUpdated.associatedProject),
+                  simulation: simulationUpdated
+                } as Project
+              )
+            ).then(() => {
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          window.alert('Error while solving, please try again');
+          dispatch(deleteSimulation());
+          dispatch(setMeshApproved(false));
+        });
     },
     shouldReconnect: () => true,
     onMessage: (event) => {
@@ -60,6 +161,8 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number}> =
       console.log('WebSocket connection closed.');
     }
   });
+
+
   return (
     <div className='w-full px-4 pt-2' key={name}>
       <div className='mx-auto w-full max-w-md rounded-2xl bg-white p-2'>
