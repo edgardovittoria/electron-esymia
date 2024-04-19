@@ -16,7 +16,7 @@ import {
   setMesh,
   setMeshApproved,
   setMeshGenerated,
-  setQuantum,
+  setQuantum, setSuggestedQuantum,
   unsetMesh, updateSimulation
 } from '../../../../../store/projectSlice';
 import { deleteFileS3, uploadFileS3 } from '../../../../../aws/mesherAPIs';
@@ -52,6 +52,22 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   const meshGenerated = useSelector(meshGeneratedSelector);
   const solverIterations = useSelector(solverIterationsSelector)
   const convergenceThreshold = useSelector(convergenceTresholdSelector)
+
+  useEffect(() => {
+    if(!selectedProject?.suggestedQuantum){
+      const components = selectedProject?.model
+        ?.components as ComponentEntity[];
+      const objToSendToMesher = {
+        STLList:
+          components &&
+          allMaterials &&
+          generateSTLListFromComponents(allMaterials, components),
+      };
+      axios
+        .post('http://127.0.0.1:8003/meshingAdvice', objToSendToMesher)
+        .then(res => dispatch(setSuggestedQuantum(res.data)))
+    }
+  }, []);
 
   useEffect(() => {
     if (
@@ -265,6 +281,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             Set quantum&apos;s dimensions
           </h6>
           <div className='mt-2'>
+
             <span className='text-[12px] xl:text-base'>X,Y,Z</span>
             <div className='flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2'>
               {quantumDimensions.map(
@@ -312,6 +329,11 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 )
               )}
             </div>
+            {selectedProject.suggestedQuantum &&
+              <div className='text-[12px] xl:text-base font-semibold mt-2'>
+                Suggested: [{selectedProject.suggestedQuantum[0].toFixed(4)}, {selectedProject.suggestedQuantum[1].toFixed(4)}, {selectedProject.suggestedQuantum[2].toFixed(4)}]
+              </div>
+            }
           </div>
         </div>
         <div className='w-[100%] pt-4'>

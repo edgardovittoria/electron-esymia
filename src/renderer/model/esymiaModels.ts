@@ -37,7 +37,8 @@ export type Project = {
     sharedWith: sharingInfoUser[]
     faunaDocumentId?: string,
     parentFolder: string,
-    boundingBoxDimension?: number
+    boundingBoxDimension?: number,
+    suggestedQuantum?: [number, number, number]
 }
 
 export type Port = {

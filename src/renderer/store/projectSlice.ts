@@ -258,6 +258,12 @@ export const ProjectSlice = createSlice({
                 selectedProject.boundingBoxDimension = action.payload
             }
         },
+        setSuggestedQuantum(state: ProjectState, action: PayloadAction<[number, number, number]>){
+          let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
+          if (selectedProject) {
+            selectedProject.suggestedQuantum = action.payload
+          }
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -317,7 +323,8 @@ export const {
     setModelUnit,
     setPortKey,
     setPortName,
-    setBoundingBoxDimension
+    setBoundingBoxDimension,
+    setSuggestedQuantum
 } = ProjectSlice.actions
 
 const selectTabEffects = (state: ProjectState, tab: string) => {
