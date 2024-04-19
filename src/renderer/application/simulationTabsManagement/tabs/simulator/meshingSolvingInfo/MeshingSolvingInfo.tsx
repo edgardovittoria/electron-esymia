@@ -379,7 +379,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             <div className='flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2'>
               {quantumDimensions.map(
                 (quantumComponent, indexQuantumComponent) => (
-                  <div className='xl:w-[30%] w-full' key={uniqid()}>
+                  <div className='xl:w-[30%] w-full'>
                     <input
                       disabled={
                         selectedProject.simulation?.status === 'Completed' ||
