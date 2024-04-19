@@ -52,6 +52,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   const meshGenerated = useSelector(meshGeneratedSelector);
   const solverIterations = useSelector(solverIterationsSelector)
   const convergenceThreshold = useSelector(convergenceTresholdSelector)
+  const quantumDimensionsLabels = ["X", "Y", "Z"]
 
   useEffect(() => {
     if(!selectedProject?.suggestedQuantum){
@@ -281,12 +282,11 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             Set quantum&apos;s dimensions
           </h6>
           <div className='mt-2'>
-
-            <span className='text-[12px] xl:text-base'>X,Y,Z</span>
             <div className='flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2'>
               {quantumDimensions.map(
                 (quantumComponent, indexQuantumComponent) => (
                   <div className='xl:w-[30%] w-full'>
+                    <span className='text-[12px] xl:text-base'>{quantumDimensionsLabels[indexQuantumComponent]}</span>
                     <input
                       disabled={
                         selectedProject.simulation?.status === 'Completed' ||
@@ -377,9 +377,9 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
         <div className='mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]'>
           <h6 className='text-[12px] xl:text-base'>Solver Iterations</h6>
           <div className='mt-2'>
-            <span className='text-[12px] xl:text-base'>Outer, Inner</span>
             <div className='flex justify-between mt-2'>
               <div className='w-[45%]'>
+              <span className='text-[12px] xl:text-base'>Outer</span>
                 <input
                   disabled={
                     selectedProject.simulation?.status === 'Completed' ||
@@ -404,6 +404,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                 />
               </div>
               <div className='w-[45%]'>
+              <span className='text-[12px] xl:text-base'>Inner</span>
                 <input
                   disabled={
                     selectedProject.simulation?.status === 'Completed' ||
