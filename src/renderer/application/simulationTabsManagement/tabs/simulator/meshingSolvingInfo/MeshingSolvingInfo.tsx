@@ -420,10 +420,10 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
                       : solverIterations[1]
                   }
                   onChange={(event) => {
-                    setSolverIterations([
+                    dispatch(setSolverIterations([
                       solverIterations[0],
                       parseInt(event.target.value)
-                    ]);
+                    ]));
                   }}
                 />
               </div>
