@@ -59,7 +59,6 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number}> =
   const convergenceThreshold = useSelector(convergenceTresholdSelector)
   const allProjects = useSelector(projectsSelector);
   const allSharedProjects = useSelector(sharedProjectsSelector);
-  const { meshApproved } = selectedProject.meshData;
 
   const dispatch = useDispatch()
   const { execQuery } = useFaunaQuery()
