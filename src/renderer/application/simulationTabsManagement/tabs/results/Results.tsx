@@ -66,7 +66,7 @@ export const Results: React.FC<ResultsProps> = ({
               type="button"
               className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60 text-sm"
               onClick={() => {
-                dispatch(deleteSimulation())
+                dispatch(deleteSimulation(selectedProject.faunaDocumentId))
                 dispatch(setMeshApproved(false));
                 execQuery(updateProjectInFauna,
                   convertInFaunaProjectThis(

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import { Disclosure } from '@headlessui/react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import useWebSocket from 'react-use-websocket';
 import { TiArrowMinimise } from 'react-icons/ti';
-import { Project, Simulation, SolverOutput } from '../../../../../../model/esymiaModels';
+import { Project, Simulation } from '../../../../../../model/esymiaModels';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { convergenceTresholdSelector, solverIterationsSelector } from '../../../../../../store/solverSlice';
@@ -40,7 +40,7 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
       </div>
       <hr className='text-secondaryColor w-full mb-5 mt-3' />
       <div className="max-h-[600px] overflow-y-scroll w-full">
-        {activeSimulations.map(sim => <SimulationStatusItem name={sim.simulation.name} frequenciesNumber={sim.freqNumber}/>)}
+        {activeSimulations.map(sim => <SimulationStatusItem name={sim.simulation.name} frequenciesNumber={sim.freqNumber} associatedProjectID={sim.simulation.associatedProject}/>)}
       </div>
     </div>
   );
@@ -49,7 +49,7 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
 export default SimulationStatus;
 
 
-const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number}> = ({ name, frequenciesNumber }) => {
+const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number, associatedProjectID: string}> = ({ name, frequenciesNumber, associatedProjectID }) => {
   const WS_URL = 'ws://localhost:8080';
   const [computingP, setComputingP] = useState(false);
   const [computingLpx, setComputingLpx] = useState(false);
@@ -116,7 +116,7 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number}> =
         )
         .then((res) => {
           if (res.data === false) {
-            dispatch(deleteSimulation());
+            dispatch(deleteSimulation(associatedProjectID));
             dispatch(setMeshApproved(false));
           } else {
             // dispatch(setSolverOutput(res.data));
@@ -142,7 +142,7 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number}> =
         .catch((err) => {
           console.log(err);
           window.alert('Error while solving, please try again');
-          dispatch(deleteSimulation());
+          dispatch(deleteSimulation(associatedProjectID));
           dispatch(setMeshApproved(false));
         });
     },

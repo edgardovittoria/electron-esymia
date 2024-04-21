@@ -151,9 +151,9 @@ export const ProjectSlice = createSlice({
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.associatedProject)
             if (selectedProject) selectedProject.simulation = action.payload;
         },
-        deleteSimulation(state: ProjectState) {
-            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
-            if (selectedProject) selectedProject.simulation = undefined;
+        deleteSimulation(state: ProjectState, action: PayloadAction<string>) {
+            let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload)
+            if (selectedProject && selectedProject.simulation) selectedProject.simulation = undefined;
         },
         addPorts(state: ProjectState, action: PayloadAction<Port | Probe>) {
             let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject)
