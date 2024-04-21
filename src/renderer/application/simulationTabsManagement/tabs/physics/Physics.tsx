@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
-import { FactoryShapes, meshFrom, useFaunaQuery } from 'cad-library';
+import React, { FC, useEffect, useState } from 'react';
+import { meshFrom, useFaunaQuery } from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
 import * as THREE from 'three';
 import { BiHide, BiShow } from 'react-icons/bi';
@@ -26,30 +26,29 @@ import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { Vector3 } from 'three';
 import { CanvasPhysics } from './CanvasPhysics';
+import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string;
   setSelectedTabLeftPanel: Function;
-  savedPortParameters: boolean;
-  setSavedPortParameters: Function;
 }
 
 export const Physics: React.FC<PhysicsProps> = ({
                                                   selectedTabLeftPanel,
-                                                  setSelectedTabLeftPanel,
-                                                  savedPortParameters,
-                                                  setSavedPortParameters
+                                                  setSelectedTabLeftPanel
                                                 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
-
-
-
-
+  const [savedPortParameters, setSavedPortParameters] = useState(true);
   const [selectedTabRightPanel, setSelectedTabRightPanel] = useState<string>('Ports');
   const [cameraPosition, setCameraPosition] = useState<Vector3>(new THREE.Vector3( 0, 0, 0 ));
   const [surfaceAdvices, setSurfaceAdvices] = useState<boolean>(false);
+  const [resetFocus, setResetFocus] = useState(false)
+  const toggleResetFocus = () => {
+    setResetFocus(!resetFocus)
+    setSurfaceAdvices(false)
+  }
 
 
   useEffect(() => {
@@ -81,6 +80,7 @@ export const Physics: React.FC<PhysicsProps> = ({
   return (
     <>
       <CanvasPhysics
+        resetFocus={resetFocus}
         setCameraPosition={setCameraPosition}
         surfaceAdvices={surfaceAdvices}
         setSavedPortParameters={setSavedPortParameters}
@@ -95,6 +95,7 @@ export const Physics: React.FC<PhysicsProps> = ({
               surfaceAdvices={surfaceAdvices}
               setSurfaceAdvices={setSurfaceAdvices}
             />
+            <ResetFocusButton toggleResetFocus={toggleResetFocus}/>
           </>
 
         )}
@@ -114,7 +115,6 @@ export const Physics: React.FC<PhysicsProps> = ({
     </>
   );
 };
-
 
 
 const SurfaceAdvicesButton: FC<{

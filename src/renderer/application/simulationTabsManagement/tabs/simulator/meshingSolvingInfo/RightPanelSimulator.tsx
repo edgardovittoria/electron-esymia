@@ -34,13 +34,13 @@ import {
   solverIterationsSelector
 } from '../../../../../store/solverSlice';
 
-interface MeshingSolvingInfoProps {
+interface RightPanelSimulatorProps {
   selectedProject: Project;
   allMaterials?: Material[];
   externalGrids?: ExternalGridsObject;
 }
 
-export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
+export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                                                                         selectedProject,
                                                                         allMaterials,
                                                                         externalGrids
@@ -53,6 +53,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
   const solverIterations = useSelector(solverIterationsSelector)
   const convergenceThreshold = useSelector(convergenceTresholdSelector)
   const quantumDimensionsLabels = ["X", "Y", "Z"]
+  const [suggestedQuantumError, setSuggestedQuantumError] = useState(false)
 
   useEffect(() => {
     if(!selectedProject?.suggestedQuantum){
@@ -66,7 +67,13 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
       };
       axios
         .post('http://127.0.0.1:8003/meshingAdvice', objToSendToMesher)
-        .then(res => dispatch(setSuggestedQuantum(res.data)))
+        .then(res => {
+          dispatch(setSuggestedQuantum(res.data))
+          execQuery(
+            updateProjectInFauna,
+            convertInFaunaProjectThis({...selectedProject, suggestedQuantum: res.data} as Project)
+          ).then();
+        }).catch((err) => setSuggestedQuantumError(true))
     }
   }, []);
 
@@ -285,7 +292,7 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             <div className='flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2'>
               {quantumDimensions.map(
                 (quantumComponent, indexQuantumComponent) => (
-                  <div className='xl:w-[30%] w-full'>
+                  <div className='xl:w-[30%] w-full' key={indexQuantumComponent}>
                     <span className='text-[12px] xl:text-base'>{quantumDimensionsLabels[indexQuantumComponent]}</span>
                     <input
                       disabled={
@@ -332,6 +339,11 @@ export const MeshingSolvingInfo: React.FC<MeshingSolvingInfoProps> = ({
             {selectedProject.suggestedQuantum &&
               <div className='text-[12px] xl:text-base font-semibold mt-2'>
                 Suggested: [{selectedProject.suggestedQuantum[0].toFixed(4)}, {selectedProject.suggestedQuantum[1].toFixed(4)}, {selectedProject.suggestedQuantum[2].toFixed(4)}]
+              </div>
+            }
+            {suggestedQuantumError &&
+              <div className='text-[12px] xl:text-base font-semibold mt-2'>
+                Unable to suggest quantum: check mesher connection!
               </div>
             }
           </div>

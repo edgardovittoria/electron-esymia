@@ -4,7 +4,7 @@ import * as THREE from "three";
 import {OrbitControls, GizmoHelper, GizmoViewport, Edges} from "@react-three/drei";
 import { MeshedElement } from './MeshedElement/MeshedElement';
 import { ExternalGridsObject } from '../../../../model/esymiaModels';
-import { Provider, ReactReduxContext, useDispatch, useSelector } from 'react-redux';
+import { Provider, ReactReduxContext, useSelector } from 'react-redux';
 import { selectedProjectSelector } from '../../../../store/projectSlice';
 import { FocusView } from '../../sharedElements/FocusView';
 import uniqid from 'uniqid';
@@ -13,10 +13,11 @@ import { alertMessageStyle, comeBackToModelerMessage } from '../../../config/tex
 
 interface CanvasSimulatorProps  {
   externalGrids: ExternalGridsObject | undefined,
-  selectedMaterials: string[]
+  selectedMaterials: string[],
+  resetFocus: boolean
 }
 
-export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, selectedMaterials}) => {
+export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, selectedMaterials, resetFocus}) => {
   const selectedProject = useSelector(selectedProjectSelector);
   let mesherOutput = selectedProject?.meshData.mesh;
 
@@ -36,9 +37,9 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
                     intensity={3}
                   />
                   {/* paint models */}
+                  <FocusView resetFocus={resetFocus}>
                   {!mesherOutput ? selectedProject.model.components.map((component) => {
                     return (
-                      <FocusView key={uniqid()}>
                         <mesh
                           userData={{
                             keyComponent: component.keyComponent,
@@ -52,23 +53,19 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
                           <FactoryShapes entity={component}/>
                           <Edges/>
                         </mesh>
-                      </FocusView>
                     )
                   }):
                     <>
                       {externalGrids &&
-                      <FocusView margin={1}>
                         <MeshedElement
                           externalGrids={externalGrids}
                           selectedProject={selectedProject}
                           selectedMaterials={selectedMaterials}
                         />
-                        </FocusView>
                       }
                     </>
-
                   }
-
+                  </FocusView>
                   {/*<Screenshot selectedProject={selectedProject}/>*/}
                   <OrbitControls makeDefault/>
                   <GizmoHelper alignment="bottom-left" margin={[150, 80]}>

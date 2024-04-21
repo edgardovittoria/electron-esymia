@@ -10,8 +10,8 @@ import * as THREE from 'three';
 import { FocusView } from '../../sharedElements/FocusView';
 import uniqid from 'uniqid';
 import { FactoryShapes } from 'cad-library';
-import { Edges, GizmoHelper, GizmoViewport, Line, OrbitControls, OrbitControlsProps } from '@react-three/drei';
-import React, { FC, ReactNode, useEffect, useRef, useState } from 'react';
+import { Edges, GizmoHelper, GizmoViewport, Line, OrbitControls } from '@react-three/drei';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import EdgesGenerator from './EdgesGenerator';
 import { Probe } from '../../../../model/esymiaModels';
 import { PortControls } from './portManagement/PortControls';
@@ -23,10 +23,11 @@ interface CanvasPhysicsProps {
   surfaceAdvices: boolean,
   setSurfaceAdvices: Function,
   setSavedPortParameters: Function
+  resetFocus: boolean
 }
 
 export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
-                                                              setCameraPosition, surfaceAdvices, setSavedPortParameters, setSurfaceAdvices
+                                                              setCameraPosition, surfaceAdvices, setSavedPortParameters, setSurfaceAdvices, resetFocus
                                                             }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
@@ -87,40 +88,41 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                   />
                   {/* paint models */}
                   <CanvasInfo setCameraPosition={setCameraPosition} />
-                  {selectedProject.model.components.map((component, index) => {
-                    return (
-                      <FocusView>
-                        <mesh
-                          ref={(el) => {
-                            setMesh(el, index);
-                          }}
-                          userData={{
-                            keyComponent: component.keyComponent,
-                            isSelected: false
-                          }}
-                          key={uniqid()}
-                          position={component.transformationParams.position}
-                          scale={component.transformationParams.scale}
-                          rotation={component.transformationParams.rotation}
-                          onDoubleClick={(e) => {
-                            if(selectedPort) {
-                              setPointerEvent(e)
-                              setSurfaceAdvices(false)
-                            }
-                          }}
-                        >
-                          <FactoryShapes entity={component} />
-                          <Edges />
-                        </mesh>
-                      </FocusView>
-                    );
-                  })}
-                  <EdgesGenerator
+                  <FocusView resetFocus={resetFocus}>
+                    {selectedProject.model.components.map((component, index) => {
+                      return (
+                          <mesh
+                            ref={(el) => {
+                              setMesh(el, index);
+                            }}
+                            userData={{
+                              keyComponent: component.keyComponent,
+                              isSelected: false
+                            }}
+                            key={uniqid()}
+                            position={component.transformationParams.position}
+                            scale={component.transformationParams.scale}
+                            rotation={component.transformationParams.rotation}
+                            onDoubleClick={(e) => {
+                              if(selectedPort) {
+                                setPointerEvent(e)
+                                setSurfaceAdvices(false)
+                              }
+                            }}
+                          >
+                            <FactoryShapes entity={component} />
+                            <Edges />
+                          </mesh>
+                      );
+                    })}
+                    </FocusView>
+                  {surfaceAdvices &&
+                    <EdgesGenerator
                     meshRef={mesh}
-                    surfaceAdvices={surfaceAdvices as boolean}
                     inputPortPositioned={inputPortPositioned as boolean}
                     setInputPortPositioned={setInputPortPositioned as Function}
                   />
+                  }
                   <PhysicsPortsDrawer />
                   <PhysicsPortsControlsDrawer
                     setSavedPortParameters={setSavedPortParameters}

@@ -6,7 +6,7 @@ import {
   setMeshGenerated,
 } from '../../../../store/projectSlice';
 import { SimulatorLeftPanelTab } from './SimulatorLeftPanelTab';
-import { MeshingSolvingInfo } from './meshingSolvingInfo/MeshingSolvingInfo';
+import { RightPanelSimulator } from './meshingSolvingInfo/RightPanelSimulator';
 import { MyPanel } from '../../sharedElements/MyPanel';
 import { Models } from '../../sharedElements/Models';
 import { ModelOutliner } from '../../sharedElements/ModelOutliner';
@@ -14,6 +14,7 @@ import { s3 } from '../../../../aws/s3Config';
 import { ExternalGridsObject, Project } from '../../../../model/esymiaModels';
 import StatusBar from '../../sharedElements/StatusBar';
 import { CanvasSimulator } from './CanvasSimulator';
+import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;
@@ -32,6 +33,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
+  const [resetFocus, setResetFocus] = useState(false)
+  const toggleResetFocus = () => setResetFocus(!resetFocus)
 
   useEffect(() => {
     if (selectedProject?.meshData.mesh) {
@@ -90,7 +93,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
     useState<string[]>(materialsNames);
   return (
     <>
-      <CanvasSimulator externalGrids={externalGrids} selectedMaterials={selectedMaterials}/>
+      <CanvasSimulator externalGrids={externalGrids} selectedMaterials={selectedMaterials} resetFocus={resetFocus}/>
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
       <MyPanel
         tabs={['Modeler', 'Simulator']}
@@ -110,13 +113,14 @@ export const Simulator: React.FC<SimulatorProps> = ({
           </Models>
         )}
       </MyPanel>
-      {/* <RightPanelSimulation> */}
-      <MeshingSolvingInfo
+      <RightPanelSimulator
         selectedProject={selectedProject as Project}
         allMaterials={allMaterials}
         externalGrids={externalGrids}
       />
-      {/* </RightPanelSimulation> */}
+      <div className='absolute lg:left-[42%] left-[38%] gap-2 top-[160px] flex flex-row'>
+        <ResetFocusButton toggleResetFocus={toggleResetFocus}/>
+      </div>
     </>
   );
 };

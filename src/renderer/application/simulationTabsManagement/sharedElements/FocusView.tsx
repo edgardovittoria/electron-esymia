@@ -1,31 +1,24 @@
 import { Bounds, useBounds } from "@react-three/drei"
 import { FC, ReactNode, useEffect } from "react"
-import { useSelector } from "react-redux"
-import { selectedProjectSelector } from "../../../store/projectSlice"
 
 
-export const FocusView: FC<{margin?:number, children: ReactNode}> = ({ margin, children }) => {
+export const FocusView: FC<{margin?:number, resetFocus?: boolean, children: ReactNode}> = ({ margin, resetFocus, children }) => {
     return (
         <Bounds fit clip observe margin={margin ? margin : 1.8}>
-            <FocusViewCommonActions>
-                {children}
-            </FocusViewCommonActions>
+          <FocusReset reset={resetFocus}/>
+          {children}
         </Bounds>
     )
 }
 
-const FocusViewCommonActions: FC<{children: ReactNode}> = ({ children }) => {
-    const selectedProject = useSelector(selectedProjectSelector)
+const FocusReset: FC<{reset?: boolean}> = ({reset}) => {
     const bounds = useBounds()
     useEffect(() => {
-        //bounds.refresh().fit()
-    }, [selectedProject])
-
+        bounds.refresh().fit()
+      }, [reset])
     return (
-        <group
-            //onPointerMissed={(e) => e.button === 0 && bounds.refresh().fit()}
-        >
-            {children}
-        </group>
+       <></>
     )
 }
+
+

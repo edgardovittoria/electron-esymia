@@ -13,34 +13,22 @@ import uniqid from 'uniqid';
 
 export interface EdgesGeneratorProps {
     meshRef: React.MutableRefObject<THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>[]>,
-    surfaceAdvices: boolean,
     inputPortPositioned: boolean,
     setInputPortPositioned: Function,
 }
 
-const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, surfaceAdvices, inputPortPositioned, setInputPortPositioned}) => {
+const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, inputPortPositioned, setInputPortPositioned}) => {
 
     const selectedProject = useSelector(selectedProjectSelector);
     const dispatch = useDispatch()
     let selectedPort = findSelectedPort(selectedProject)
-
-    let group = new THREE.Group()
-    if (selectedProject && selectedProject.model.components) {
-        selectedProject.model.components.forEach(c => {
-            group.add(meshFrom(c))
-        })
-    }
     let size = useSelector(boundingBoxDimensionSelector)
     const instancedMeshRef = useRef<InstancedMesh[]>([]);
     useEffect(() => {
             // console.log(doubleClicked)
             let tempObject = new Object3D();
-            group.children.forEach((c, index) => {
-                if (meshRef.current && meshRef.current.length !== 0 && surfaceAdvices) {
-                    ((meshRef.current[index] as Mesh).material as Material).opacity = 0.5
-                } else if ((meshRef.current && meshRef.current.length !== 0) && (!surfaceAdvices)) {
-                    ((meshRef.current[index] as Mesh).material as Material).opacity = 1
-                }
+            meshRef.current.forEach((c, index) => {
+                ((c as Mesh).material as Material).opacity = 0.5
                 let j = 0;
                 // const geometry = (c as Mesh).geometry.clone().applyMatrix4((c as Mesh).matrix);
                 (c as Mesh).geometry.applyQuaternion((c as Mesh).quaternion)
@@ -63,51 +51,47 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, surfaceAdvices,
                 }
             })
             // bounds.refresh().fit()
-    }, [selectedPort, selectedProject, surfaceAdvices])
+    }, [selectedPort, selectedProject])
 
     return (
         <>
             {
-                group.children.map((c, index) => {
+                meshRef.current.map((c, index) => {
                     return (
-                        <>
-                            {surfaceAdvices &&
-                                <instancedMesh
-                                    ref={(el) => {
-                                        if (el) {
-                                            instancedMeshRef.current[index] = el;
-                                        }
-                                    }}
-                                    position={c.position}
-                                    key={uniqid()}
-                                    //TODO: sistemare problemi derivanti dai tipi risultanti dalle operazioni binarie
-                                    args={[null as any, null as any, ((c as Mesh).geometry as BufferGeometry).attributes.position.array.length / 3]}
-                                    onDoubleClick={(e) => {
-                                        e.stopPropagation()
-                                        if (!inputPortPositioned) {
-                                            dispatch(
-                                                updatePortPosition({
-                                                    type: "first",
-                                                    position: [e.point.x, e.point.y, e.point.z],
-                                                })
-                                            );
-                                            setInputPortPositioned(true)
-                                        } else {
-                                            dispatch(
-                                                updatePortPosition({
-                                                    type: "last",
-                                                    position: [e.point.x, e.point.y, e.point.z],
-                                                })
-                                            );
-                                            setInputPortPositioned(false)
-                                        }
-                                    }}
-                                >
-                                    <sphereGeometry args={[(size as number) / 150, 20, 20]}/>
-                                    <meshPhongMaterial color={"black"}/>
-                                </instancedMesh>
-                            }
-                        </>
+                          <instancedMesh
+                              ref={(el) => {
+                                  if (el) {
+                                      instancedMeshRef.current[index] = el;
+                                  }
+                              }}
+                              position={c.position}
+                              key={uniqid()}
+                              //TODO: sistemare problemi derivanti dai tipi risultanti dalle operazioni binarie
+                              args={[null as any, null as any, ((c as Mesh).geometry as BufferGeometry).attributes.position.array.length / 3]}
+                              onDoubleClick={(e) => {
+                                  e.stopPropagation()
+                                  if (!inputPortPositioned) {
+                                      dispatch(
+                                          updatePortPosition({
+                                              type: "first",
+                                              position: [e.point.x, e.point.y, e.point.z],
+                                          })
+                                      );
+                                      setInputPortPositioned(true)
+                                  } else {
+                                      dispatch(
+                                          updatePortPosition({
+                                              type: "last",
+                                              position: [e.point.x, e.point.y, e.point.z],
+                                          })
+                                      );
+                                      setInputPortPositioned(false)
+                                  }
+                              }}
+                          >
+                              <sphereGeometry args={[(size as number) / 150, 20, 20]}/>
+                              <meshPhongMaterial color={"black"}/>
+                          </instancedMesh>
                     )
                 })
             }
