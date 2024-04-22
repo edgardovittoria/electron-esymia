@@ -4,7 +4,7 @@ import {
   Material,
   useFaunaQuery
 } from 'cad-library';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
@@ -33,6 +33,7 @@ import {
   setSolverIterations,
   solverIterationsSelector
 } from '../../../../../store/solverSlice';
+import { useEffectNotOnMount } from '../../../../../hook/useEffectNotOnMount';
 
 interface RightPanelSimulatorProps {
   selectedProject: Project;
@@ -68,16 +69,17 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
       axios
         .post('http://127.0.0.1:8003/meshingAdvice', objToSendToMesher)
         .then(res => {
-          dispatch(setSuggestedQuantum(res.data))
+          dispatch(setSuggestedQuantum(([parseFloat(res.data[0].toFixed(4)), parseFloat(res.data[1].toFixed(4)), parseFloat(res.data[2].toFixed(4))])))
           execQuery(
             updateProjectInFauna,
-            convertInFaunaProjectThis({...selectedProject, suggestedQuantum: res.data} as Project)
+            convertInFaunaProjectThis({...selectedProject, suggestedQuantum: [parseFloat(res.data[0].toFixed(4)), parseFloat(res.data[1].toFixed(4)), parseFloat(res.data[2].toFixed(4))]} as Project)
           ).then();
         }).catch((err) => setSuggestedQuantumError(true))
     }
   }, []);
 
-  useEffect(() => {
+
+  useEffectNotOnMount(() => {
     if (
       typeof selectedProject.meshData.mesh === 'string' &&
       typeof selectedProject.meshData.externalGrids === 'string'
@@ -88,10 +90,8 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
       ).then(() => {
       });
     }
-  }, [
-    selectedProject.meshData.mesh,
-    selectedProject.meshData.externalGrids
-  ]);
+  }, [selectedProject.meshData.mesh,
+    selectedProject.meshData.externalGrids])
 
 
 
@@ -177,9 +177,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
     if (externalGrids) {
       dispatch(
         setQuantum([
-          externalGrids.cell_size.cell_size_x * 1000,
-          externalGrids.cell_size.cell_size_y * 1000,
-          externalGrids.cell_size.cell_size_z * 1000
+          parseFloat(externalGrids.cell_size.cell_size_x.toFixed(4)),
+          parseFloat(externalGrids.cell_size.cell_size_y.toFixed(4)),
+          parseFloat(externalGrids.cell_size.cell_size_z.toFixed(4))
         ])
       );
     }

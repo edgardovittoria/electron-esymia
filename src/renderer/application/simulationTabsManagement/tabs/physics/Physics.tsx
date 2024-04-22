@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { meshFrom, useFaunaQuery } from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
 import * as THREE from 'three';
@@ -28,6 +28,7 @@ import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
 import { physicsRightPanelTitle } from '../../../config/panelTitles';
 import ScatteringParameter from './portManagement/components/ScatteringParameter';
 import FrequenciesDef from './frequenciesDef/FrequenciesDef';
+import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string;
@@ -51,8 +52,8 @@ export const Physics: React.FC<PhysicsProps> = ({
     setSurfaceAdvices(false)
   }
 
-
-  useEffect(() => {
+  useEffectNotOnMount(() => {
+    console.log("pippo")
     if (selectedProject && savedPortParameters) {
       execQuery(
         updateProjectInFauna,
@@ -60,7 +61,7 @@ export const Physics: React.FC<PhysicsProps> = ({
       ).then(() => {
       });
     }
-  }, [savedPortParameters, selectedProject?.frequencies]);
+  },[savedPortParameters, selectedProject?.frequencies])
 
   const boundingBoxDimension = useSelector(boundingBoxDimensionSelector)
 

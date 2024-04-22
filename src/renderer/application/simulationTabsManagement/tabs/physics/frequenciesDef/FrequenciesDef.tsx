@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectedProjectSelector, selectProject, setFrequencies } from '../../../../../store/projectSlice';
-import logSpace from '@stdlib/array-logspace';
+import { selectedProjectSelector, setFrequencies } from '../../../../../store/projectSlice';
 
 export interface FrequenciesDefProps{
 
@@ -21,11 +20,11 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({}) => {
         <h6 className="w-[100%] mb-3">Range Definition</h6>
         <div className='flex flex-row justify-between px-5'>
           <div className='flex flex-row items-center gap-2'>
-            <input type="radio" name="radio-1" className="radio" checked={scaleType === 0} onClick={() => setScaleType(0)}/>
+            <input type="radio" name="radio-1" className="radio" defaultChecked onClick={() => setScaleType(0)}/>
             <span>logarithmic</span>
           </div>
           <div className='flex flex-row items-center gap-2'>
-            <input type="radio" name="radio-1" className="radio" checked={scaleType === 1} onClick={() => setScaleType(1)}/>
+            <input type="radio" name="radio-1" className="radio" onClick={() => setScaleType(1)}/>
             <span>linear</span>
           </div>
 
