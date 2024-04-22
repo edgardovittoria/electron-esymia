@@ -6,7 +6,6 @@ export function getDefaultPort(key: number, size: number, position: Vector3){
     let port: Port = {
         name: "Port" + key,
         category: 'port',
-        type: 0,
         inputElement: {
             type: "CIRCLE",
             keyComponent: 0,
@@ -52,7 +51,6 @@ export function getDefaultPort(key: number, size: number, position: Vector3){
             transparency: false
         } as ComponentEntity,
         isSelected: true,
-        rlcParams: {} as RLCParams,
     }
     return port
 }

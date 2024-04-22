@@ -68,17 +68,7 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number, as
     solverIterations: [number, number],
     convergenceThreshold: number
   ) => {
-    const frequencyArray: number[] = [];
-    if (project)
-      project.signal?.signalValues.forEach((sv) =>
-        frequencyArray.push(sv.freq)
-      );
-    const signalsValuesArray: { Re: number; Im: number }[] = [];
-    if (project)
-      project.signal?.signalValues.forEach((sv) =>
-        signalsValuesArray.push(sv.signal)
-      );
-
+    const frequencyArray: number[] = project.frequencies as number[];
     return {
       mesherFileId: project.meshData.mesh,
       solverInput: {
@@ -88,9 +78,10 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number, as
           project?.model?.components as ComponentEntity[]
         ),
         frequencies: frequencyArray,
-        signals: signalsValuesArray,
-        powerPort: project && project.signal?.powerPort,
-        unit: selectedProject.modelUnit
+        /* signals: signalsValuesArray,
+        powerPort: project && project.signal?.powerPort, */
+        unit: selectedProject.modelUnit,
+        ports_scattering_value: project.scatteringValue
       },
       solverAlgoParams: {
         innerIteration: solverIterations[1],

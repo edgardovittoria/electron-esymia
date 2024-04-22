@@ -1,5 +1,5 @@
 import React from "react";
-import { Port } from "../../../../../../model/esymiaModels";
+import { Port, TempLumped } from '../../../../../../model/esymiaModels';
 import portType1 from '../../../../../../../../assets/portType1.png';
 import portType2 from '../../../../../../../../assets/portType2.png';
 import portType3 from '../../../../../../../../assets/portType3.png';
@@ -8,7 +8,7 @@ import portType5 from '../../../../../../../../assets/portType5.png';
 
 interface PortTypeProps {
 	setShow: Function;
-	selectedPort: Port;
+	selectedPort: TempLumped;
 	disabled: boolean;
 }
 

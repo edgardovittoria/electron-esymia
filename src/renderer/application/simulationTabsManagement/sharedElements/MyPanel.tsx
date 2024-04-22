@@ -3,6 +3,7 @@ import { Tab } from '@headlessui/react';
 import { useSelector } from 'react-redux';
 import { tabTitles } from './modelerTabTitlesAndIcons';
 import { selectedProjectSelector } from '../../../store/projectSlice';
+import { modelerLeftPanelTitle, resultsLeftPanelTitle } from '../../config/panelTitles';
 
 interface DashBoardProps {
   tabs: string[];
@@ -27,15 +28,12 @@ export const MyPanel: React.FC<DashBoardProps> = ({
 
   useEffect(() => {
     setSelectedIndex(0);
-    (tabs[0] === 'Modeler') && setSelectedTab('Modeler');
-    if (tabs[1] === 'Results') {
-      setSelectedTab('Results');
-    }
-  }, [tabs[1]]);
+    (tabs[0] === modelerLeftPanelTitle.first) && setSelectedTab(modelerLeftPanelTitle.first);
+  }, []);
 
   return (
     <div className={className}>
-      <Tab.Group selectedIndex={tabs[1] === 'Results' ? 1 : selectedIndex}>
+      <Tab.Group selectedIndex={selectedIndex}>
         <Tab.List className="flex bg-gray-300">
           {tabs.map((tab, index) => {
             return (

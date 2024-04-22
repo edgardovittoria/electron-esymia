@@ -27,7 +27,7 @@ import {
 import { FaunaFolder, FaunaProject } from './model/FaunaModels';
 import { numberOfActiveSimulationsSelector } from './store/solverSlice';
 import SimulationStatus
-  from './application/simulationTabsManagement/tabs/simulator/meshingSolvingInfo/components/SimulationStatus';
+  from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/SimulationStatus';
 
 
 export default function App() {

@@ -1,7 +1,7 @@
 import { CanvasState, ComponentEntity, UsersState } from "cad-library"
 import {
   Brick
-} from '../application/simulationTabsManagement/tabs/simulator/meshingSolvingInfo/components/createGridsExternals';
+} from '../application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/createGridsExternals';
 
 export type Folder = {
     name: string,
@@ -28,8 +28,10 @@ export type Project = {
     modelUnit?: string,
     modelS3?: string,
     ports: (Port | Probe | TempLumped)[],
+    scatteringValue?: number,
     portKey: number,
-    signal: Signal | undefined,
+    frequencies?: number[],
+    //signal: Signal | undefined,
     simulation?: Simulation,
     meshData: MeshData,
     screenshot: string | undefined,
@@ -41,7 +43,7 @@ export type Project = {
     suggestedQuantum?: [number, number, number]
 }
 
-export type Port = {
+export type TempLumped = {
     name: string,
     category: 'port' | 'lumped',
     type: number,
@@ -49,11 +51,16 @@ export type Port = {
     outputElement: ComponentEntity,
     isSelected: boolean,
     rlcParams: RLCParams,
+    value: number
 }
 
-export type TempLumped = {
-    value: number
-}&Port
+export type Port = {
+  name: string,
+  category: 'port' | 'lumped',
+  inputElement: ComponentEntity,
+  outputElement: ComponentEntity,
+  isSelected: boolean,
+}
 
 export type RLCParams = {
     inductance?: number,

@@ -4,7 +4,7 @@ import {Material} from "cad-library";
 import {ExternalGridsObject} from "../../../../../../model/esymiaModels";
 import {useSelector} from "react-redux";
 import {meshGeneratedSelector} from "../../../../../../store/projectSlice";
-import { Brick } from '../../meshingSolvingInfo/components/createGridsExternals';
+import { Brick } from '../../rightPanelSimulator/components/createGridsExternals';
 
 
 interface InstancedMeshProps {

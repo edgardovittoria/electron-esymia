@@ -1,44 +1,55 @@
 import { GiAtom, GiAtomicSlashes, GiCubeforce } from 'react-icons/gi';
 import { AiOutlineBarChart } from 'react-icons/ai';
 import { SiAzurefunctions } from 'react-icons/si';
+import {
+  modelerLeftPanelTitle,
+  physicsLeftPanelTitle, physicsRightPanelTitle,
+  resultsLeftPanelTitle,
+  simulatorLeftPanelTitle
+} from '../../config/panelTitles';
+import React, { ReactNode } from 'react';
 
-const modelerTabTitle = <div className='flex items-center'>
-  <div className='w-[25%]'><GiCubeforce color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
-  <div className='w-[65%]'>Modeler</div>
-</div>;
+const TitleContainer:React.FC<{children: ReactNode}> = ({ children }) => <div className='flex items-center gap-2'>{children}</div>
+
+const modelerTabTitle =
+  <TitleContainer>
+    <div><GiCubeforce color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
+    <div>{modelerLeftPanelTitle.first}</div>
+  </TitleContainer>
 
 
-const materialTabTitle = <div className='flex items-center'>
-  <div className='w-[25%]'><GiAtomicSlashes color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
-  <div className='w-[65%]'>Materials</div>
-</div>;
 
-const physicsTabTitle = <div className='flex items-center'>
+const materialTabTitle = <TitleContainer>
+  <div><GiAtomicSlashes color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
+  <div>{modelerLeftPanelTitle.second}</div>
+</TitleContainer>;
+
+const physicsTabTitle = <TitleContainer>
   <div className="flex flex-row items-center gap-2">
     <div><GiAtom color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
-    <div>Physics</div>
+    <div>{physicsLeftPanelTitle.first}</div>
   </div>
-</div>;
+</TitleContainer>;
 
-const simulatorTabTitle = <div className='flex items-center'>
-  <div className='w-[25%]'><GiAtomicSlashes color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
-  <div className='w-[65%]'>Materials</div>
-</div>;
+const simulatorTabTitle = <TitleContainer>
+  <div><GiAtomicSlashes color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
+  <div>{simulatorLeftPanelTitle.second}</div>
+</TitleContainer>;
 
-const resultsTabTitle = <div className='flex items-center'>
-  <div className='w-[25%]'><AiOutlineBarChart color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
-  <div className='w-[65%]'>Results</div>
-</div>;
+const resultsTabTitle = <TitleContainer>
+  <div><AiOutlineBarChart color={'#00ae52'} style={{ width: '25px', height: '25px' }} /></div>
+  <div>{resultsLeftPanelTitle.first}</div>
+</TitleContainer>;
 
-const portsTabTitle = <div className='flex items-center gap-2'>
+const portsTabTitle = <TitleContainer>
   <GiAtom color={'#00ae52'} style={{ width: '25px', height: '25px' }} />
-  <div>Ports</div>
-</div>;
+  <div>{physicsRightPanelTitle.first}</div>
+</TitleContainer>;
 
-const signalsTabTitle = <div className='flex items-center gap-2'>
+const signalsTabTitle = <TitleContainer>
   <SiAzurefunctions color={'#00ae52'} style={{ width: '25px', height: '25px' }} />
-  <div>Signals</div>
-</div>;
+  <div>{physicsRightPanelTitle.second}</div>
+</TitleContainer>;
 
 export const tabTitles = [
   {
@@ -67,12 +78,12 @@ export const tabTitles = [
     icon: <AiOutlineBarChart color={'#00ae52'} style={{ width: '25px', height: '25px' }} />
   },
   {
-    key: 'Ports',
+    key: 'Terminations',
     object: portsTabTitle,
     icon: <GiAtom color={'#00ae52'} style={{ width: '25px', height: '25px' }} />
   },
   {
-    key: 'Signals',
+    key: 'Frequencies',
     object: signalsTabTitle,
     icon: <SiAzurefunctions color={'#00ae52'} style={{ width: '25px', height: '25px' }} />
   }

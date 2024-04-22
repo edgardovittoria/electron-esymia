@@ -6,6 +6,7 @@ import { Simulator } from './tabs/simulator/Simulator';
 import { Modeler } from './tabs/modeler/Modeler';
 import { selectedMenuItemSelector } from '../../store/tabsAndMenuItemsSlice';
 import { useWindowInnerWidth } from '../../hook/useWindowInnerWidth';
+import { resultsLeftPanelTitle } from '../config/panelTitles';
 
 interface SimulationTabsContentFactoryProps {}
 
@@ -52,7 +53,7 @@ export const SimulationTabsContentFactory: React.FC<
     case 'Results':
       return (
         <Results
-          selectedTabLeftPanel={selectedTabLeftPanel}
+          selectedTabLeftPanel={resultsLeftPanelTitle.first}
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
         />
       );

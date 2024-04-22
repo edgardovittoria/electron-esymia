@@ -7,7 +7,7 @@ import {
   boundingBoxDimensionSelector,
   findSelectedPort,
   selectedProjectSelector,
-  setBoundingBoxDimension,
+  setBoundingBoxDimension, setRLCParams
 } from '../../../../store/projectSlice';
 import { PhysicsLeftPanelTab } from './PhysicsLeftPanelTab';
 import { CreatePorts } from './portManagement/selectPorts/CreatePorts';
@@ -19,7 +19,7 @@ import { ModalSelectPortType } from './portManagement/ModalSelectPortType';
 import { InputSignal } from './inputSignal/InputSignal';
 import { InputSignalManagement } from './inputSignal/InputSignalManagement';
 import { MyPanel } from '../../sharedElements/MyPanel';
-import { Port, Project } from '../../../../model/esymiaModels';
+import { Port, Project, RLCParams, TempLumped } from '../../../../model/esymiaModels';
 import { ImportExportPhysicsSetup } from './ImportExportPhysicsSetup';
 import StatusBar from '../../sharedElements/StatusBar';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
@@ -27,6 +27,9 @@ import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunct
 import { Vector3 } from 'three';
 import { CanvasPhysics } from './CanvasPhysics';
 import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
+import { physicsRightPanelTitle } from '../../../config/panelTitles';
+import ScatteringParameter from './portManagement/components/ScatteringParameter';
+import FrequenciesDef from './frequenciesDef/FrequenciesDef';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string;
@@ -41,7 +44,7 @@ export const Physics: React.FC<PhysicsProps> = ({
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
   const [savedPortParameters, setSavedPortParameters] = useState(true);
-  const [selectedTabRightPanel, setSelectedTabRightPanel] = useState<string>('Ports');
+  const [selectedTabRightPanel, setSelectedTabRightPanel] = useState<string>(physicsRightPanelTitle.first);
   const [cameraPosition, setCameraPosition] = useState<Vector3>(new THREE.Vector3( 0, 0, 0 ));
   const [surfaceAdvices, setSurfaceAdvices] = useState<boolean>(false);
   const [resetFocus, setResetFocus] = useState(false)
@@ -169,47 +172,61 @@ const PhysicsRightPanel: FC<{
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
   return (
     <MyPanel
-      tabs={['Ports', 'Signals']}
+      tabs={[physicsRightPanelTitle.first, physicsRightPanelTitle.second]}
       selectedTab={selectedTabRightPanel}
       setSelectedTab={setSelectedTabRightPanel}
       className='absolute right-[2%] top-[160px] w-1/4'
     >
-      {selectedTabRightPanel === 'Ports' ? (
-        <PortManagement
-          selectedPort={selectedPort}
-          savedPortParameters={savedPortParameters}
-          setSavedPortParameters={setSavedPortParameters}
-        >
-          <PortType
-            disabled={selectedProject?.simulation?.status === 'Completed'}
-            setShow={setShowModalSelectPortType}
-            selectedPort={selectedPort as Port}
-          />
-          <PortPosition
-            selectedPort={selectedPort as Port}
-            disabled={selectedProject?.simulation?.status === 'Completed'}
-            setSavedPortParameters={setSavedPortParameters}
-          />
-          <RLCParamsComponent
-            selectedPort={selectedPort as Port}
-            disabled={selectedProject?.simulation?.status === 'Completed'}
-            setSavedPortParameters={setSavedPortParameters}
-          />
-          {selectedProject?.simulation?.status !== 'Completed' && (
-            <ModalSelectPortType
-              show={showModalSelectPortType}
-              setShow={setShowModalSelectPortType}
-              selectedPort={selectedPort as Port}
+      {selectedTabRightPanel === physicsRightPanelTitle.first ? (
+        <>
+          {selectedPort?.category === "lumped" ?
+            <PortManagement
+              selectedPort={selectedPort}
+              savedPortParameters={savedPortParameters}
               setSavedPortParameters={setSavedPortParameters}
-            />
-          )}
-        </PortManagement>
+            >
+              <PortType
+                disabled={selectedProject?.simulation?.status === 'Completed'}
+                setShow={setShowModalSelectPortType}
+                selectedPort={selectedPort as TempLumped}
+              />
+              <RLCParamsComponent
+                selectedPort={selectedPort as TempLumped}
+                disabled={selectedProject?.simulation?.status === 'Completed'}
+                setSavedPortParameters={setSavedPortParameters}
+              />
+              <PortPosition
+                selectedPort={selectedPort as (Port | TempLumped)}
+                disabled={selectedProject?.simulation?.status === 'Completed'}
+                setSavedPortParameters={setSavedPortParameters}
+              />
+              {selectedProject?.simulation?.status !== 'Completed' && (
+                <ModalSelectPortType
+                  show={showModalSelectPortType}
+                  setShow={setShowModalSelectPortType}
+                  selectedPort={selectedPort as TempLumped}
+                  setSavedPortParameters={setSavedPortParameters}
+                />
+              )}
+            </PortManagement> :
+            <PortManagement selectedPort={selectedPort} savedPortParameters={savedPortParameters} setSavedPortParameters={setSavedPortParameters}>
+              <ScatteringParameter setSavedPortParameters={setSavedPortParameters}/>
+              <PortPosition
+                selectedPort={selectedPort as (Port | TempLumped)}
+                disabled={selectedProject?.simulation?.status === 'Completed'}
+                setSavedPortParameters={setSavedPortParameters}
+              />
+            </PortManagement>
+          }
+        </>
+
       ) : (
         <InputSignalManagement>
-          <InputSignal
+          <FrequenciesDef/>
+          {/* <InputSignal
             disabled={selectedProject?.simulation?.status === 'Completed'}
             selectedProject={selectedProject as Project}
-          />
+          /> */}
         </InputSignalManagement>
       )}
     </MyPanel>

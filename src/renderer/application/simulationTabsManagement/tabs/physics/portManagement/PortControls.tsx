@@ -22,7 +22,7 @@ export const PortControls: FC<PortControlsProps> = (
 
     useEffect(() => {
         if (transformationFirst.current) {
-            const controls = transformationFirst.current as unknown as Object3DNode<any, any>;
+            const controls: Object3DNode<any, any> = transformationFirst.current;
             controls.addEventListener("dragging-changed", onChangeFirstPositionHandler)
             return () => controls.removeEventListener("dragging-changed", onChangeFirstPositionHandler)
         }
@@ -30,7 +30,7 @@ export const PortControls: FC<PortControlsProps> = (
 
     useEffect(() => {
         if (transformationLast.current) {
-            const controls = transformationLast.current as unknown as Object3DNode<any, any>;
+            const controls: Object3DNode<any, any> = transformationLast.current;
             controls.addEventListener("dragging-changed", onChangeLastPositionHandler)
             return () => controls.removeEventListener("dragging-changed", onChangeLastPositionHandler)
         }

@@ -1,10 +1,10 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { Port, RLCParams } from '../../../../../../model/esymiaModels';
+import { RLCParams, TempLumped } from '../../../../../../model/esymiaModels';
 import { setRLCParams } from '../../../../../../store/projectSlice';
 
 interface RLCParamsProps {
-  selectedPort: Port;
+  selectedPort: TempLumped;
   disabled: boolean;
   setSavedPortParameters: Function;
 }

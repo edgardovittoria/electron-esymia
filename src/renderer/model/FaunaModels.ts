@@ -12,7 +12,8 @@ export type FaunaProjectDetails = {
     modelS3?: string,
     ports: (Port | Probe)[],
     portKey: number,
-    signal: Signal,
+    frequencies?: number[]
+    //signal: Signal,
     simulation?: Simulation|null,
     meshData: MeshData,
     screenshot: string | undefined,
@@ -21,7 +22,7 @@ export type FaunaProjectDetails = {
     parentFolder: string,
     boundingBoxDimension?: number,
     suggestedQuantum?: [number, number, number]
-
+    scatteringValue?: number
 }
 
 export type FaunaFolder = {

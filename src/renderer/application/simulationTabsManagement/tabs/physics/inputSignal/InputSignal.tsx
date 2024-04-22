@@ -1,3 +1,4 @@
+/*
 import React, { FormEvent, useEffect, useState } from "react";
 import { ModalInputSignal } from "./ModalInputSignal";
 import { useFaunaQuery } from "cad-library";
@@ -197,3 +198,4 @@ export const InputSignal: React.FC<InputSignalProps> = ({
 		</>
 	);
 };
+*/

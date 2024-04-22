@@ -98,6 +98,8 @@
     }
   },
   "dependencies": {
+    "@stdlib/array-linspace": "^0.2.1",
+    "@stdlib/array-logspace": "^0.2.1",
     "aws-sdk": "^2.1276.0",
     "axios": "^0.24.0",
     "browser-image-compression": "^1.0.17",

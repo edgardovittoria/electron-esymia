@@ -6,7 +6,7 @@ import {
   setMeshGenerated,
 } from '../../../../store/projectSlice';
 import { SimulatorLeftPanelTab } from './SimulatorLeftPanelTab';
-import { RightPanelSimulator } from './meshingSolvingInfo/RightPanelSimulator';
+import { RightPanelSimulator } from './rightPanelSimulator/RightPanelSimulator';
 import { MyPanel } from '../../sharedElements/MyPanel';
 import { Models } from '../../sharedElements/Models';
 import { ModelOutliner } from '../../sharedElements/ModelOutliner';
@@ -15,6 +15,7 @@ import { ExternalGridsObject, Project } from '../../../../model/esymiaModels';
 import StatusBar from '../../sharedElements/StatusBar';
 import { CanvasSimulator } from './CanvasSimulator';
 import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
+import { simulatorLeftPanelTitle } from '../../../config/panelTitles';
 
 interface SimulatorProps {
   selectedTabLeftPanel: string;
@@ -96,12 +97,12 @@ export const Simulator: React.FC<SimulatorProps> = ({
       <CanvasSimulator externalGrids={externalGrids} selectedMaterials={selectedMaterials} resetFocus={resetFocus}/>
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
       <MyPanel
-        tabs={['Modeler', 'Simulator']}
+        tabs={[simulatorLeftPanelTitle.first, simulatorLeftPanelTitle.second]}
         selectedTab={selectedTabLeftPanel}
         setSelectedTab={setSelectedTabLeftPanel}
         className="absolute left-[2%] top-[160px] md:w-1/4 xl:w-1/5"
       >
-        {selectedTabLeftPanel === 'Simulator' ? (
+        {selectedTabLeftPanel === simulatorLeftPanelTitle.second ? (
           <SimulatorLeftPanelTab
             allMaterials={allMaterials}
             selectedMaterials={selectedMaterials}

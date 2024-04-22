@@ -4,6 +4,7 @@ import {Models} from "../../sharedElements/Models";
 import {ModelOutliner} from "../../sharedElements/ModelOutliner";
 import StatusBar from "../../sharedElements/StatusBar";
 import { CanvasModeler } from './CanvasModeler';
+import { modelerLeftPanelTitle } from '../../../config/panelTitles';
 
 interface ModelerProps {
     selectedTabLeftPanel: string;
@@ -20,7 +21,7 @@ export const Modeler: React.FC<ModelerProps> = (
             <CanvasModeler/>
             <StatusBar/>
             <MyPanel
-                tabs={["Modeler", "Materials"]}
+                tabs={[modelerLeftPanelTitle.first, modelerLeftPanelTitle.second]}
                 selectedTab={selectedTabLeftPanel}
                 setSelectedTab={setSelectedTabLeftPanel}
                 className="absolute left-[2%] top-[160px] md:w-1/4 xl:w-1/5"

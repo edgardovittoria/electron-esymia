@@ -17,6 +17,7 @@ import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
 import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
 import {Project} from "../../../../model/esymiaModels";
 import { alertMessageStyle, comeBackToModelerMessage, emptyResultsMessage } from '../../../config/textMessages';
+import { resultsLeftPanelTitle } from '../../../config/panelTitles';
 
 interface ResultsProps {
   selectedTabLeftPanel: string;
@@ -44,29 +45,23 @@ export const Results: React.FC<ResultsProps> = ({
     <div className="flex">
       <div className="w-[20%]">
         <MyPanel
-          tabs={["Modeler", "Results"]}
+          tabs={[resultsLeftPanelTitle.first]}
           selectedTab={selectedTabLeftPanel}
           setSelectedTab={setSelectedTabLeftPanel}
           className="absolute left-[2%] top-[160px] w-1/6"
         >
-          {selectedTabLeftPanel === "Results" ? (
-            <ResultsLeftPanelTab
-              selectedPort={selectedPort ? selectedPort.name : "undefined"}
-              setSelectedPort={(portName: string) =>
-                dispatch(selectPort(portName))
-              }
-            />
-          ) : (
-            <Models>
-              <ModelOutliner />
-            </Models>
-          )}
+          <ResultsLeftPanelTab
+            selectedPort={selectedPort ? selectedPort.name : "undefined"}
+            setSelectedPort={(portName: string) =>
+              dispatch(selectPort(portName))
+            }
+          />
           {(selectedProject?.simulation) &&
             <button
               type="button"
               className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60 text-sm"
               onClick={() => {
-                dispatch(deleteSimulation(selectedProject.faunaDocumentId))
+                dispatch(deleteSimulation(selectedProject.faunaDocumentId as string))
                 dispatch(setMeshApproved(false));
                 execQuery(updateProjectInFauna,
                   convertInFaunaProjectThis(
@@ -83,7 +78,7 @@ export const Results: React.FC<ResultsProps> = ({
       <div className="w-[78%]">
         {selectedProject && selectedProject.simulation ? (
             <>
-              {selectedTabLeftPanel === "Results" && (
+              {selectedTabLeftPanel === resultsLeftPanelTitle.first && (
                 <ChartVisualizationMode
                   chartVisualizationMode={chartVisualizationMode}
                   setChartVisualizationMode={setChartVisualizationMode}

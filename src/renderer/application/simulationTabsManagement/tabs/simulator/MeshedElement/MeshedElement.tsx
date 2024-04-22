@@ -6,7 +6,7 @@ import { ExternalGridsObject, Project } from '../../../../../model/esymiaModels'
 import { Bounds, useBounds } from '@react-three/drei';
 import { useSelector } from 'react-redux';
 import { meshGeneratedSelector } from '../../../../../store/projectSlice';
-import { Brick } from '../meshingSolvingInfo/components/createGridsExternals';
+import { Brick } from '../rightPanelSimulator/components/createGridsExternals';
 
 interface PanelContentProps {
   selectedProject: Project;
