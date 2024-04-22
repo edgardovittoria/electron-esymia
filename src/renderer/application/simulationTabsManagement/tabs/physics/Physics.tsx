@@ -7,8 +7,7 @@ import {
   boundingBoxDimensionSelector,
   findSelectedPort,
   selectedProjectSelector,
-  setBoundingBoxDimension, setRLCParams
-} from '../../../../store/projectSlice';
+  setBoundingBoxDimension} from '../../../../store/projectSlice';
 import { PhysicsLeftPanelTab } from './PhysicsLeftPanelTab';
 import { CreatePorts } from './portManagement/selectPorts/CreatePorts';
 import { PortManagement } from './portManagement/PortManagement';
@@ -16,10 +15,9 @@ import { PortType } from './portManagement/components/PortType';
 import { PortPosition } from './portManagement/components/PortPosition';
 import { RLCParamsComponent } from './portManagement/components/RLCParamsComponent';
 import { ModalSelectPortType } from './portManagement/ModalSelectPortType';
-import { InputSignal } from './inputSignal/InputSignal';
 import { InputSignalManagement } from './inputSignal/InputSignalManagement';
 import { MyPanel } from '../../sharedElements/MyPanel';
-import { Port, Project, RLCParams, TempLumped } from '../../../../model/esymiaModels';
+import { Port, TempLumped } from '../../../../model/esymiaModels';
 import { ImportExportPhysicsSetup } from './ImportExportPhysicsSetup';
 import StatusBar from '../../sharedElements/StatusBar';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
@@ -62,7 +60,7 @@ export const Physics: React.FC<PhysicsProps> = ({
       ).then(() => {
       });
     }
-  }, [savedPortParameters, selectedProject?.signal]);
+  }, [savedPortParameters, selectedProject?.frequencies]);
 
   const boundingBoxDimension = useSelector(boundingBoxDimensionSelector)
 
