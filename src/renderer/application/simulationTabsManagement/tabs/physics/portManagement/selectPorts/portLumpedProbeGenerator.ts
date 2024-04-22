@@ -50,7 +50,7 @@ export function getDefaultPort(key: number, size: number, position: Vector3){
             opacity: 1,
             transparency: false
         } as ComponentEntity,
-        isSelected: true,
+        isSelected: false,
     }
     return port
 }
@@ -104,7 +104,7 @@ export function getDefaultLumped(key: number, size: number){
             opacity: 1,
             transparency: false
         } as ComponentEntity,
-        isSelected: true,
+        isSelected: false,
         rlcParams: {} as RLCParams,
         value: 0
     }

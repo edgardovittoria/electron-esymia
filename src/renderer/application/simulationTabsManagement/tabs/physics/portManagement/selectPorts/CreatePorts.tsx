@@ -7,7 +7,7 @@ import {getDefaultLumped, getDefaultPort, getDefaultProbe} from "./portLumpedPro
 import {
     addPorts,
     boundingBoxDimensionSelector,
-    portKeySelector,
+    portKeySelector, selectPort,
     setPortKey
 } from '../../../../../../store/projectSlice';
 import { Project } from '../../../../../../model/esymiaModels';
@@ -62,6 +62,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                                             let port = getDefaultPort((keyPort as number)+1, size as number, cameraPosition)
                                             dispatch(setPortKey((keyPort as number)+1))
                                             dispatch(addPorts(port))
+                                            dispatch(selectPort(port.name))
                                         }}
                                     >
                                         Port
@@ -78,6 +79,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                                             let lumped = getDefaultLumped((keyPort as number)+1, size as number)
                                             dispatch(setPortKey((keyPort as number)+1))
                                             dispatch(addPorts(lumped))
+                                            dispatch(selectPort(lumped.name))
                                         }}
                                     >
                                         Lumped
