@@ -53,7 +53,6 @@ export const Physics: React.FC<PhysicsProps> = ({
   }
 
   useEffectNotOnMount(() => {
-    console.log("pippo")
     if (selectedProject && savedPortParameters) {
       execQuery(
         updateProjectInFauna,
