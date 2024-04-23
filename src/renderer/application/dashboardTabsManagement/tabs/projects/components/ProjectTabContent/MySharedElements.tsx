@@ -22,13 +22,13 @@ import {
 	faunaProjectHaveParentInFolderList
 } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 
-export interface MyFilesProps {
+export interface MySharedElementsProps {
 	setShowModal: Function;
 	showCreateNewFolderModal: boolean;
 	setShowCreateNewFolderModal: Function;
 }
 
-const MyFiles: React.FC<MyFilesProps> = ({
+const MySharedElements: React.FC<MySharedElementsProps> = ({
 																					 setShowModal,
 																					 showCreateNewFolderModal,
 																					 setShowCreateNewFolderModal,
@@ -183,17 +183,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
 								className="my-[50px] mx-auto"
 								alt="No Projects Icon"
 							/>
-							<p>No projects for now.</p>
-							<button
-								className="button buttonPrimary lg:text-base text-sm mt-5"
-								data-toggle="modal"
-								data-target="#createNewProjectModal"
-								onClick={() => {
-									setShowModal(true);
-								}}
-							>
-								CREATE YOUR FIRST PROJECT
-							</button>
+							<p>No shared projects for now.</p>
 						</div>
 					)}
 				</div>
@@ -207,4 +197,4 @@ const MyFiles: React.FC<MyFilesProps> = ({
 	);
 };
 
-export default MyFiles;
+export default MySharedElements;

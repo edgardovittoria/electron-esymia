@@ -6,7 +6,7 @@ import { SetUserInfo, UsersState } from 'cad-library';
 import { HiOutlineLogout } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
 import { GiSettingsKnobs } from 'react-icons/gi';
-import { selectProject } from '../store/projectSlice';
+import { SelectedFolderSelector, selectProject } from '../store/projectSlice';
 import { CreateNewProjectModal } from './sharedModals/CreateNewProjectModal';
 import {
   closeProjectTab,
@@ -23,6 +23,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
   const tabSelected = useSelector(tabSelectedSelector);
   const projectsTabs = useSelector(projectsTabsSelector);
   const dispatch = useDispatch();
+  const selectedFolder = useSelector(SelectedFolderSelector)
 
   const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
 
@@ -99,7 +100,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
           })}
           <li className="nav-item m-auto mx-4">
             <FaPlus
-              onClick={() => setShowCreateNewProjectModal(true)}
+              onClick={() => (selectedFolder?.faunaDocumentId !== "shared_root") && setShowCreateNewProjectModal(true)}
               className="w-[12px] h-[12px] text-gray-400"
             />
           </li>
