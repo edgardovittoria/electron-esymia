@@ -162,7 +162,7 @@ const chartsDataOptionsFactory = (
 
   const computeGraphResults = (unit: string, ports:Port[], matrix: any[][][][], getGraphFormulaResult: (index: number, v:any[], innerLabels:number[]) => number) => {
     const labels = pairs(ports.map(p => p.name))
-    let innerLabels = (project && project.signal) ? project.signal.signalValues.map(sv => sv.freq) : [];
+    let innerLabels = (project && project.frequencies) ? project.frequencies : [];
     let matrices: number[][] = [];
     for (let i = 0; i < ports.length * ports.length; i++) {
       matrices.push([])

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { FC } from "react";
 import { useDispatch } from "react-redux";
 import { Port, Probe } from "../../../../../../model/esymiaModels";
 import { updatePortPosition } from "../../../../../../store/projectSlice";
+import { DebounceInput } from "react-debounce-input";
 
 interface PortPositionProps {
 	selectedPort: Port | Probe;
@@ -9,7 +10,7 @@ interface PortPositionProps {
 	setSavedPortParameters: Function
 }
 
-export const PortPosition: React.FC<PortPositionProps> = ({
+export const PortPosition: FC<PortPositionProps> = ({
 	selectedPort,
 	disabled,
 	setSavedPortParameters
@@ -26,101 +27,99 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 					<div className="mt-2">
 						<span className="xl:text-base text-[12px]">Input (X,Y,Z)</span>
 						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
-							<div className="lg:w-[30%] w-full">
-								<input
-									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-									type="number"
-									step={0.000001}
-									value={selectedPort.inputElement.transformationParams.position[0]}
-									onChange={(event) => {
-										let newPosition = [
-											parseFloat(event.currentTarget.value),
-											selectedPort.inputElement.transformationParams
-												.position[1],
-											selectedPort.inputElement.transformationParams
-												.position[2],
-										];
-										dispatch(
-											updatePortPosition({
-												type: "first",
-												position: newPosition as [number, number, number],
-											})
-										);
-										setSavedPortParameters(false)
-									}}
-									onWheel={(e) => e.currentTarget.blur()}
-								/>
-							</div>
-							<div className="lg:w-[30%] w-full">
-								<input
-									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-									type="number"
-									step={0.000001}
-									value={selectedPort.inputElement.transformationParams.position[1]}
-									onChange={(event) => {
-										let newPosition = [
-											selectedPort.inputElement.transformationParams
-												.position[0],
-											parseFloat(event.currentTarget.value),
-											selectedPort.inputElement.transformationParams
-												.position[2],
-										];
-										dispatch(
-											updatePortPosition({
-												type: "first",
-												position: newPosition as [number, number, number],
-											})
-										);
-										setSavedPortParameters(false)
-									}}
-									onWheel={(e) => e.currentTarget.blur()}
-								/>
-							</div>
-							<div className="lg:w-[30%] w-full">
-								<input
-									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-									type="number"
-									step={0.000001}
-									value={selectedPort.inputElement.transformationParams.position[2]}
-									onChange={(event) => {
-										let newPosition = [
-											selectedPort.inputElement.transformationParams
-												.position[0],
-											selectedPort.inputElement.transformationParams
-												.position[1],
-											parseFloat(event.currentTarget.value),
-										];
-										dispatch(
-											updatePortPosition({
-												type: "first",
-												position: newPosition as [number, number, number],
-											})
-										);
-										setSavedPortParameters(false)
-									}}
-									onWheel={(e) => e.currentTarget.blur()}
-								/>
-							</div>
+              <TerminationPositionInput
+                disabled={disabled}
+                value={selectedPort.inputElement.transformationParams.position[0]}
+                onChange={(event) => {
+                  let newPosition = [
+                    parseFloat(event.target.value),
+                    selectedPort.inputElement.transformationParams
+                      .position[1],
+                    selectedPort.inputElement.transformationParams
+                      .position[2],
+                  ];
+                  dispatch(
+                    updatePortPosition({
+                      type: "first",
+                      position: newPosition as [number, number, number],
+                    })
+                  );
+                  setSavedPortParameters(false)
+                }}
+              />
+              <TerminationPositionInput
+                disabled={disabled}
+                value={selectedPort.inputElement.transformationParams.position[1]}
+                onChange={(event) => {
+                  let newPosition = [
+                    selectedPort.inputElement.transformationParams
+                      .position[0],
+                    parseFloat(event.target.value),
+                    selectedPort.inputElement.transformationParams
+                      .position[2],
+                  ];
+                  dispatch(
+                    updatePortPosition({
+                      type: "first",
+                      position: newPosition as [number, number, number],
+                    })
+                  );
+                  setSavedPortParameters(false)
+                }}
+              />
+              <TerminationPositionInput
+                disabled={disabled}
+                value={selectedPort.inputElement.transformationParams.position[2]}
+                onChange={(event) => {
+                  let newPosition = [
+                    selectedPort.inputElement.transformationParams
+                      .position[0],
+                    selectedPort.inputElement.transformationParams
+                      .position[1],
+                    parseFloat(event.target.value),
+                  ];
+                  dispatch(
+                    updatePortPosition({
+                      type: "first",
+                      position: newPosition as [number, number, number],
+                    })
+                  );
+                  setSavedPortParameters(false)
+                }}
+              />
 						</div>
 					</div>
 					<div className="mt-2">
 						<span className="xl:text-base text-[12px]">Output (X,Y,Z)</span>
 						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
-							<div className="lg:w-[30%] w-full">
-								<input
-									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-									type="number"
-									step={0.000001}
-									value={selectedPort.outputElement.transformationParams.position[0]}
-									onChange={(event) => {
+              <TerminationPositionInput
+                  disabled={disabled}
+                  value={selectedPort.outputElement.transformationParams.position[0]}
+                  onChange={(event) => {
+                    let newPosition = [
+                      parseFloat(event.target.value),
+                      selectedPort.outputElement.transformationParams
+                        .position[1],
+                      selectedPort.outputElement.transformationParams
+                        .position[2],
+                    ];
+                    dispatch(
+                      updatePortPosition({
+                        type: "last",
+                        position: newPosition as [number, number, number],
+                      })
+                    );
+                    setSavedPortParameters(false)
+                  }}
+                />
+              <TerminationPositionInput
+                  disabled={disabled}
+                  value={selectedPort.outputElement.transformationParams.position[1]}
+                  onChange={(event) => {
 										let newPosition = [
-											parseFloat(event.currentTarget.value),
 											selectedPort.outputElement.transformationParams
-												.position[1],
+												.position[0],
+											parseFloat(event.target.value),
 											selectedPort.outputElement.transformationParams
 												.position[2],
 										];
@@ -132,49 +131,17 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 										);
 										setSavedPortParameters(false)
 									}}
-									onWheel={(e) => e.currentTarget.blur()}
-								/>
-							</div>
-							<div className="lg:w-[30%] w-full">
-								<input
-									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-									type="number"
-									step={0.000001}
-									value={selectedPort.outputElement.transformationParams.position[1]}
-									onChange={(event) => {
-										let newPosition = [
-											selectedPort.outputElement.transformationParams
-												.position[0],
-											parseFloat(event.currentTarget.value),
-											selectedPort.outputElement.transformationParams
-												.position[2],
-										];
-										dispatch(
-											updatePortPosition({
-												type: "last",
-												position: newPosition as [number, number, number],
-											})
-										);
-										setSavedPortParameters(false)
-									}}
-									onWheel={(e) => e.currentTarget.blur()}
-								/>
-							</div>
-							<div className="lg:w-[30%] w-full">
-								<input
-									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-									type="number"
-									step={0.000001}
-									value={selectedPort.outputElement.transformationParams.position[2]}
-									onChange={(event) => {
+                />
+							<TerminationPositionInput
+                  disabled={disabled}
+                  value={selectedPort.outputElement.transformationParams.position[2]}
+                  onChange={(event) => {
 										let newPosition = [
 											selectedPort.outputElement.transformationParams
 												.position[0],
 											selectedPort.outputElement.transformationParams
 												.position[1],
-											parseFloat(event.currentTarget.value),
+											parseFloat(event.target.value),
 										];
 										dispatch(
 											updatePortPosition({
@@ -184,9 +151,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 										);
 										setSavedPortParameters(false)
 									}}
-									onWheel={(e) => e.currentTarget.blur()}
-								/>
-							</div>
+                />
 						</div>
 					</div>
 				</div>
@@ -197,16 +162,12 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 					<div className="mt-2">
 						<span className="xl:text-base text-[12px]">Position (X,Y,Z)</span>
 						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
-							<div className="lg:w-[30%] w-full">
-								<input
-									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-									type="number"
-									step={0.000001}
-									value={(selectedPort as Probe).groupPosition[0].toFixed(6)}
-									onChange={(event) => {
+              <TerminationPositionInput
+                  disabled={disabled}
+                  value={parseFloat((selectedPort as Probe).groupPosition[0].toFixed(6))}
+                  onChange={(event) => {
 										let newPosition = [
-											parseFloat(event.currentTarget.value),
+											parseFloat(event.target.value),
 											(selectedPort as Probe).groupPosition[1],
 											(selectedPort as Probe).groupPosition[2],
 										];
@@ -218,20 +179,14 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 										);
 										setSavedPortParameters(false)
 									}}
-									onWheel={(e) => e.currentTarget.blur()}
-								/>
-							</div>
-							<div className="lg:w-[30%] w-full">
-								<input
-									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-									type="number"
-									step={0.000001}
-									value={(selectedPort as Probe).groupPosition[1].toFixed(6)}
-									onChange={(event) => {
+                />
+              <TerminationPositionInput
+                  disabled={disabled}
+                  value={parseFloat((selectedPort as Probe).groupPosition[1].toFixed(6))}
+                  onChange={(event) => {
 										let newPosition = [
 											(selectedPort as Probe).groupPosition[0],
-											parseFloat(event.currentTarget.value),
+											parseFloat(event.target.value),
 											(selectedPort as Probe).groupPosition[2],
 										];
 										dispatch(
@@ -242,21 +197,15 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 										);
 										setSavedPortParameters(false)
 									}}
-									onWheel={(e) => e.currentTarget.blur()}
-								/>
-							</div>
-							<div className="lg:w-[30%] w-full">
-								<input
-									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
-									type="number"
-									step={0.000001}
-									value={(selectedPort as Probe).groupPosition[2].toFixed(6)}
-									onChange={(event) => {
+                />
+              <TerminationPositionInput
+                  disabled={disabled}
+                  value={parseFloat((selectedPort as Probe).groupPosition[2].toFixed(6))}
+                  onChange={(event) => {
 										let newPosition = [
 											(selectedPort as Probe).groupPosition[0],
 											(selectedPort as Probe).groupPosition[1],
-											parseFloat(event.currentTarget.value),
+											parseFloat(event.target.value),
 										];
 										dispatch(
 											updatePortPosition({
@@ -266,9 +215,7 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 										);
 										setSavedPortParameters(false)
 									}}
-									onWheel={(e) => e.currentTarget.blur()}
-								/>
-							</div>
+                />
 						</div>
 					</div>
 				</div>
@@ -276,3 +223,28 @@ export const PortPosition: React.FC<PortPositionProps> = ({
 		</>
 	);
 };
+
+interface TerminationPositionInputProps {
+  disabled: boolean,
+  debounceTimeoutMilliSecs?: number,
+  inputStep?: number,
+  value: number,
+  onChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) & React.ChangeEventHandler<HTMLInputElement>,
+}
+
+const TerminationPositionInput: FC<TerminationPositionInputProps> = ({disabled, debounceTimeoutMilliSecs, inputStep, value, onChange}) => {
+  return (
+    <div className="lg:w-[30%] w-full">
+								<DebounceInput
+									disabled={disabled}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
+									type="number"
+                  debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
+									step={inputStep ? inputStep : 0.000001}
+									value={value}
+									onChange={onChange}
+									onWheel={(e: { target: { blur: () => any; }; }) => e.target.blur()}
+								/>
+							</div>
+  )
+}

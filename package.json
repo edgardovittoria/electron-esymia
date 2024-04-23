@@ -116,6 +116,7 @@
     "react-aws-s3-typescript": "^1.1.5",
     "react-chartjs-2": "^4.0.1",
     "react-contexify": "^6.0.0",
+    "react-debounce-input": "^3.3.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",

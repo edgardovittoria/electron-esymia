@@ -4,7 +4,7 @@ import {
   Material,
   useFaunaQuery
 } from 'cad-library';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
@@ -34,6 +34,7 @@ import {
   solverIterationsSelector
 } from '../../../../../store/solverSlice';
 import { useEffectNotOnMount } from '../../../../../hook/useEffectNotOnMount';
+import { DebounceInput } from 'react-debounce-input';
 
 interface RightPanelSimulatorProps {
   selectedProject: Project;
@@ -49,6 +50,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
   const quantumDimensions = selectedProject.meshData.quantum;
+  const [quantumDimsInput, setQuantumDimsInput] = useState<[number, number, number]>(quantumDimensions)
   const { meshApproved } = selectedProject.meshData;
   const meshGenerated = useSelector(meshGeneratedSelector);
   const solverIterations = useSelector(solverIterationsSelector)
@@ -121,7 +123,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
 
   function checkQuantumDimensionsValidity() {
     let validity = true;
-    quantumDimensions.forEach((v) => {
+    quantumDimsInput.forEach((v) => {
       if (v === 0) {
         validity = false;
       }
@@ -172,6 +174,10 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
     return 'saved';
   };
 
+  useEffectNotOnMount(() => {
+    setQuantumDimsInput(quantumDimensions)
+  },[quantumDimensions])
+
   // Show updated quantum values whenever the mesh gets updated.
   useEffect(() => {
     if (externalGrids) {
@@ -195,7 +201,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           components &&
           allMaterials &&
           generateSTLListFromComponents(allMaterials, components),
-        quantum: quantumDimensions
+        quantum: quantumDimsInput
       };
       // local meshing: http://127.0.0.1:8003/meshing
       // lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
@@ -290,49 +296,15 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           </h6>
           <div className='mt-2'>
             <div className='flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2'>
-              {quantumDimensions.map(
+              {quantumDimsInput.map(
                 (quantumComponent, indexQuantumComponent) => (
-                  <div className='xl:w-[30%] w-full' key={indexQuantumComponent}>
-                    <span className='text-[12px] xl:text-base'>{quantumDimensionsLabels[indexQuantumComponent]}</span>
-                    <input
-                      disabled={
-                        selectedProject.simulation?.status === 'Completed' ||
-                        selectedProject.model?.components === undefined
-                      }
-                      min={0.0}
-                      className='w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl'
-                      type='number'
-                      step={0.0001}
-                      value={parseFloat(quantumComponent.toFixed(4))}
-                      onChange={(event) => {
-                        if (indexQuantumComponent === 0) {
-                          dispatch(
-                            setQuantum([
-                              parseFloat(event.target.value),
-                              quantumDimensions[1],
-                              quantumDimensions[2]
-                            ])
-                          );
-                        } else if (indexQuantumComponent === 1) {
-                          dispatch(
-                            setQuantum([
-                              quantumDimensions[0],
-                              parseFloat(event.target.value),
-                              quantumDimensions[2]
-                            ])
-                          );
-                        } else if (indexQuantumComponent === 2) {
-                          dispatch(
-                            setQuantum([
-                              quantumDimensions[0],
-                              quantumDimensions[1],
-                              parseFloat(event.target.value)
-                            ])
-                          );
-                        }
-                      }}
-                    />
-                  </div>
+                  <QuantumDimsInput
+                    disabled={selectedProject.simulation?.status === 'Completed' || selectedProject.model?.components === undefined}
+                    key={indexQuantumComponent}
+                    label={quantumDimensionsLabels[indexQuantumComponent]}
+                    value={parseFloat(quantumComponent.toFixed(4))}
+                    onChange={(event) => setQuantumDimsInput(quantumDimsInput.map((q, ind) => ind === indexQuantumComponent ? parseFloat(event.target.value) : q) as [number, number, number])}
+                  />
                 )
               )}
             </div>
@@ -448,7 +420,8 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           <div className='mt-2'>
             <div className='flex justify-between mt-2'>
               <div className='w-full'>
-                <input
+                <DebounceInput
+                  debounceTimeout={500}
                   disabled={
                     selectedProject.simulation?.status === 'Completed' ||
                     meshGenerated !== 'Generated'
@@ -516,3 +489,31 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   );
 };
 
+
+interface QuantumDimsInputProps {
+  label: string,
+  key:number
+  disabled: boolean,
+  debounceTimeoutMilliSecs?: number,
+  inputStep?: number,
+  value: number,
+  onChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) & React.ChangeEventHandler<HTMLInputElement>,
+}
+
+const QuantumDimsInput: FC<QuantumDimsInputProps> = ({disabled, debounceTimeoutMilliSecs, inputStep, value, onChange, key, label}) => {
+  return (
+    <div className='xl:w-[30%] w-full' key={key}>
+                    <span className='text-[12px] xl:text-base'>{label}</span>
+                    <DebounceInput
+                      disabled={disabled}
+                      min={0.0}
+                      className='w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl'
+                      type='number'
+                      debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
+                      step={inputStep? inputStep : 0.0001}
+                      value={value}
+                      onChange={onChange}
+                    />
+                  </div>
+  )
+}

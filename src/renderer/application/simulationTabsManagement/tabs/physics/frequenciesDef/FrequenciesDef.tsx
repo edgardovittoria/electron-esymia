@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectedProjectSelector, setFrequencies } from '../../../../../store/projectSlice';
+import { DebounceInput } from 'react-debounce-input';
 
 export interface FrequenciesDefProps{
 
@@ -32,30 +33,33 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({}) => {
         <div className='flex flex-row justify-between gap-2 mt-5'>
           <div className='flex flex-col items-center gap-2'>
             <span>{scaleType === 0 ? 'exp f min' : 'f min'}</span>
-            <input
+            <DebounceInput
+              debounceTimeout={500}
               className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
               type="number"
-              defaultValue={fMin}
+              value={fMin}
               onChange={(e) => (scaleType === 0) ? setFMin(parseInt(e.target.value)) :setFMin(parseFloat(e.target.value))}
             />
           </div>
           <div className='flex flex-col items-center gap-2'>
             <span>{scaleType === 0 ? 'exp f max' : 'f max'}</span>
-            <input
+            <DebounceInput
+              debounceTimeout={500}
               className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
               type="number"
-              defaultValue={fMax}
+              value={fMax}
               onChange={(e) => (scaleType === 0) ? setFMax(parseInt(e.target.value)) :setFMax(parseFloat(e.target.value))}
             />
           </div>
           <div className='flex flex-col items-center gap-2'>
             <span>f num</span>
-            <input
+            <DebounceInput
+              debounceTimeout={500}
               className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
               type="number"
               min={0}
               step={1}
-              defaultValue={fNum}
+              value={fNum}
               onChange={(e) => setFNum(parseInt(e.target.value))}
             />
           </div>
