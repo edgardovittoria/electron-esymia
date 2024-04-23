@@ -61,7 +61,6 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
     }
   }, [externalGrids, meshGenerated]);
 
-  console.log(positions)
 
   return (
     // <Bounds fit margin={externalGrids.cell_size.cell_size_x * 9000}>

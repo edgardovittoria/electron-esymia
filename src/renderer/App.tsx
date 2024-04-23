@@ -74,38 +74,6 @@ export default function App() {
           );
         },
       );
-      execQuery(getSharedFolders, user.email).then((folders: FaunaFolder[]) => {
-        execQuery(getSharedSimulationProjects, user.email).then(
-          (projects: FaunaProject[]) => {
-            const sharedElementsRootFolder = {
-              id: 'shared_root',
-              folder: {
-                name: 'My Shared Elements',
-                owner: user,
-                sharedWith: [],
-                subFolders: folders
-                  .filter(
-                    (faunaFolder) =>
-                      !faunaFolderHaveParentInList(faunaFolder, folders),
-                  )
-                  .map((folder) => folder.id),
-                projectList: projects
-                  .filter(
-                    (p) => !faunaProjectHaveParentInFolderList(p, folders),
-                  )
-                  .map((p) => p.id),
-                parent: 'nobody',
-              },
-            } as FaunaFolder;
-            const folder = constructFolderStructure(
-              'shared_root',
-              [sharedElementsRootFolder, ...folders],
-              projects,
-            );
-            dispatch(setFolderOfElementsSharedWithUser(folder));
-          },
-        );
-      });
     }
   }, [user.userName]);
 

@@ -21,7 +21,6 @@ export interface MyFilesProps {
   setShowCreateNewFolderModal: Function;
   showSearchUser: boolean;
   setShowSearchUser: (v: boolean) => void;
-  mainFolder: Folder
 }
 
 const MyFiles: React.FC<MyFilesProps> = ({
@@ -29,11 +28,10 @@ const MyFiles: React.FC<MyFilesProps> = ({
   showCreateNewFolderModal,
   setShowCreateNewFolderModal,
   showSearchUser,
-  setShowSearchUser,
-  mainFolder
+  setShowSearchUser
 }) => {
+  const mainFolder = useSelector(mainFolderSelector)
   const selectedFolder = useSelector(SelectedFolderSelector);
-  const user = useSelector(usersStateSelector);
   const dispatch = useDispatch();
 
   const projects = selectedFolder?.projectList;

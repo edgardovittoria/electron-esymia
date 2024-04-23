@@ -76,17 +76,13 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
               setShowCreateNewFolderModal={setShowCreateNewFolderModal}
               showSearchUser={showSearchUser}
               setShowSearchUser={setShowSearchUser}
-              mainFolder={myFilesFolder}
             />
           </Tab.Panel>
           <Tab.Panel>
-            <MyFiles
+            <MySharedElements
               setShowModal={setShowModal}
               showCreateNewFolderModal={showCreateNewFolderModal}
               setShowCreateNewFolderModal={setShowCreateNewFolderModal}
-              showSearchUser={showSearchUser}
-              setShowSearchUser={setShowSearchUser}
-              mainFolder={mySharedElementsFolder}
             />
           </Tab.Panel>
         </Tab.Panels>
