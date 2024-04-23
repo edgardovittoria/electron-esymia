@@ -177,9 +177,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
     if (externalGrids) {
       dispatch(
         setQuantum([
-          parseFloat(externalGrids.cell_size.cell_size_x.toFixed(4)),
-          parseFloat(externalGrids.cell_size.cell_size_y.toFixed(4)),
-          parseFloat(externalGrids.cell_size.cell_size_z.toFixed(4))
+          parseFloat((externalGrids.cell_size.cell_size_x * 1000).toFixed(4)),
+          parseFloat((externalGrids.cell_size.cell_size_y * 1000).toFixed(4)),
+          parseFloat((externalGrids.cell_size.cell_size_z * 1000).toFixed(4))
         ])
       );
     }

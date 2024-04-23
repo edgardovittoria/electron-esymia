@@ -13,6 +13,7 @@ import { DraggableProjectCard } from '../droppableDraggableFolderProject/Draggab
 import { SearchUserAndShare } from '../droppableDraggableFolderProject/searchUserAndShare/searchUserAndShare';
 import { CreateNewFolderModal } from '../CreateNewFolderModal';
 import noProjectsIcon2 from '../../../../../../../../assets/noProjectsIcon2.png';
+import { Folder } from '../../../../../../model/esymiaModels';
 
 export interface MyFilesProps {
   setShowModal: Function;
@@ -20,6 +21,7 @@ export interface MyFilesProps {
   setShowCreateNewFolderModal: Function;
   showSearchUser: boolean;
   setShowSearchUser: (v: boolean) => void;
+  mainFolder: Folder
 }
 
 const MyFiles: React.FC<MyFilesProps> = ({
@@ -28,8 +30,8 @@ const MyFiles: React.FC<MyFilesProps> = ({
   setShowCreateNewFolderModal,
   showSearchUser,
   setShowSearchUser,
+  mainFolder
 }) => {
-  const mainFolder = useSelector(mainFolderSelector);
   const selectedFolder = useSelector(SelectedFolderSelector);
   const user = useSelector(usersStateSelector);
   const dispatch = useDispatch();
@@ -117,7 +119,6 @@ const MyFiles: React.FC<MyFilesProps> = ({
               )}
               <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[380px]">
                 {projects
-                  .filter((p) => p.owner.userName === user.userName)
                   .map((project) => {
                     return (
                       <DraggableProjectCard

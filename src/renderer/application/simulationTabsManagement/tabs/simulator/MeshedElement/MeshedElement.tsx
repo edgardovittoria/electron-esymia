@@ -53,13 +53,15 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
         setModelMaterials(finalMaterialList);
         setMesherMatrices(matrices);
         setPositions([
-          (externalGrids.cell_size.cell_size_x * externalGrids.n_cells.n_cells_x) / 2,
-          (externalGrids.cell_size.cell_size_y * externalGrids.n_cells.n_cells_y) / 2,
-          (externalGrids.cell_size.cell_size_z * externalGrids.n_cells.n_cells_z) / 2
+          (externalGrids.cell_size.cell_size_x * 1000 * externalGrids.n_cells.n_cells_x) / 2,
+          (externalGrids.cell_size.cell_size_y * 1000 * externalGrids.n_cells.n_cells_y) / 2,
+          (externalGrids.cell_size.cell_size_z * 1000 * externalGrids.n_cells.n_cells_z) / 2
         ]);
       }
     }
   }, [externalGrids, meshGenerated]);
+
+  console.log(positions)
 
   return (
     // <Bounds fit margin={externalGrids.cell_size.cell_size_x * 9000}>

@@ -85,7 +85,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 						<hr />
 					</div>
 
-					<div className="w-full text-left overflow-scroll overflow-x-hidden p-[20px] h-[80%]">
+					<div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[200px]">
 						{projects &&
 						folders &&
 						(projects.length > 0 || folders.length > 0) ? (

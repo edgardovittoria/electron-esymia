@@ -368,7 +368,7 @@ export const selectedProjectSelector = (state: { projects: ProjectState }) => {
 
 export const meshGeneratedSelector = (state: {
   projects: ProjectState
-}) => findProjectByFaunaID(takeAllProjectsIn(state.projects.projects), state.projects.selectedProject)?.meshData.meshGenerated;
+}) => findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject)?.meshData.meshGenerated;
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
   let allFolders: Folder[] = [];
   return recursiveFindFolders(state.projects.projects, allFolders);
