@@ -255,7 +255,7 @@ const PhysicsRightPanel: FC<{
               onClick={() => setSavedPhysicsParameters(true)}
               disabled={savedPhysicsParameters}
             >
-              SAVE
+              SAVE ON DB
             </button>
             <div className='tooltip tooltip-left' data-tip='Saving parameters on server now is not necessary in order to launch a simulation. Use this button if you are not intended to launch a simulation now.'>
               <IoMdInformationCircleOutline size={20}/>

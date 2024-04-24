@@ -68,11 +68,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
           className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
           disabled={(fNum === 0 || fMax <= fMin)}
           onClick={() => {
-            if(scaleType === 0) {
-              dispatch(setFrequencies(logSpace(fMin, fMax, fNum)))
-            }else {
-              dispatch(setFrequencies(linSpace(fMin, fMax, fNum)))
-            }
+            scaleType === 0 ? dispatch(setFrequencies(logSpace(fMin, fMax, fNum))) : dispatch(setFrequencies(linSpace(fMin, fMax, fNum)))
             setSavedPhysicsParameters(false)
           }}
         >
@@ -81,10 +77,15 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         {selectedProject && selectedProject.frequencies && selectedProject.frequencies.length > 0 &&
           <div className="mt-3">
             <h6 className="w-[100%] mb-2">Generated Frequencies</h6>
+            <div className='flex flex-row'>
+              <h6 className="w-[20%] mb-2">n.{selectedProject.frequencies.length}</h6>
+              <h6 className="w-[40%] mb-2"> min:{selectedProject.frequencies[0]}</h6>
+              <h6 className="w-[40%] mb-2"> max: {selectedProject.frequencies[selectedProject.frequencies.length -1]}</h6>
+            </div>
             <div className="p-3 bg-white border border-secondaryColor flex flex-col overflow-y-scroll max-h-[200px]">
-              {selectedProject.frequencies.map(f => {
+              {selectedProject.frequencies.map((f,index) => {
                 return(
-                  <span>{f}</span>
+                  <span key={index}>{f}</span>
                 )
               })}
             </div>
