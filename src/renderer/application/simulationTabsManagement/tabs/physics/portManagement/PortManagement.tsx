@@ -4,16 +4,12 @@ import { Port, Probe } from '../../../../../model/esymiaModels';
 
 interface PortManagementProps {
   selectedPort: Port | Probe | undefined;
-  savedPortParameters: boolean;
-  setSavedPortParameters: Function;
   children: ReactNode;
 }
 
 export const PortManagement: React.FC<PortManagementProps> = ({
   children,
-  selectedPort,
-  savedPortParameters,
-  setSavedPortParameters,
+  selectedPort
 }) => {
   let portColor = 'yellow';
   if (selectedPort && selectedPort.category === 'lumped') {
@@ -24,7 +20,7 @@ export const PortManagement: React.FC<PortManagementProps> = ({
   return (
     <>
       {selectedPort ? (
-        <div className="overflow-y-scroll lg:max-h-[300px] xl:max-h-[600px]">
+        <div>
           <div className="flex items-center gap-2 p-[5px]">
             <div className="col-1 pe-0 ps-0">
               <FaReact
@@ -38,18 +34,6 @@ export const PortManagement: React.FC<PortManagementProps> = ({
           </div>
           <div className="flex-col p-[10px] max-h-[300px] overflow-y-scroll overflow-x-hidden">
             {children}
-          </div>
-          <div
-            className={`flex p-[10px]`}
-          >
-            <button
-              type="button"
-              className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
-              onClick={() => setSavedPortParameters(true)}
-              disabled={savedPortParameters}
-            >
-              SAVE
-            </button>
           </div>
         </div>
       ) : (

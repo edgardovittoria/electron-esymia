@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { meshFrom, useFaunaQuery } from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
 import * as THREE from 'three';
@@ -15,7 +15,6 @@ import { PortType } from './portManagement/components/PortType';
 import { PortPosition } from './portManagement/components/PortPosition';
 import { RLCParamsComponent } from './portManagement/components/RLCParamsComponent';
 import { ModalSelectPortType } from './portManagement/ModalSelectPortType';
-import { InputSignalManagement } from './inputSignal/InputSignalManagement';
 import { MyPanel } from '../../sharedElements/MyPanel';
 import { Port, TempLumped } from '../../../../model/esymiaModels';
 import { ImportExportPhysicsSetup } from './ImportExportPhysicsSetup';
@@ -29,6 +28,8 @@ import { physicsRightPanelTitle } from '../../../config/panelTitles';
 import ScatteringParameter from './portManagement/components/ScatteringParameter';
 import FrequenciesDef from './frequenciesDef/FrequenciesDef';
 import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
+import { infoSavePhysicsParamsButton } from '../../../config/textMessages';
+import { IoMdInformationCircleOutline } from 'react-icons/io';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string;
@@ -42,7 +43,7 @@ export const Physics: React.FC<PhysicsProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
-  const [savedPortParameters, setSavedPortParameters] = useState(true);
+  const [savedPhysicsParameters, setSavedPhysicsParameters] = useState(true);
   const [selectedTabRightPanel, setSelectedTabRightPanel] = useState<string>(physicsRightPanelTitle.first);
   const [cameraPosition, setCameraPosition] = useState<Vector3>(new THREE.Vector3( 0, 0, 0 ));
   const [surfaceAdvices, setSurfaceAdvices] = useState<boolean>(false);
@@ -53,14 +54,14 @@ export const Physics: React.FC<PhysicsProps> = ({
   }
 
   useEffectNotOnMount(() => {
-    if (selectedProject && savedPortParameters) {
+    if (selectedProject && savedPhysicsParameters) {
       execQuery(
         updateProjectInFauna,
         convertInFaunaProjectThis(selectedProject)
       ).then(() => {
       });
     }
-  },[savedPortParameters, selectedProject?.frequencies])
+  },[savedPhysicsParameters])
 
   const boundingBoxDimension = useSelector(boundingBoxDimensionSelector)
 
@@ -84,7 +85,7 @@ export const Physics: React.FC<PhysicsProps> = ({
         resetFocus={resetFocus}
         setCameraPosition={setCameraPosition}
         surfaceAdvices={surfaceAdvices}
-        setSavedPortParameters={setSavedPortParameters}
+        setSavedPortParameters={setSavedPhysicsParameters}
         setSurfaceAdvices={setSurfaceAdvices}
       />
       <div className='absolute lg:left-[42%] left-[38%] gap-2 top-[160px] flex flex-row'>
@@ -109,8 +110,8 @@ export const Physics: React.FC<PhysicsProps> = ({
       <PhysicsRightPanel
         selectedTabRightPanel={selectedTabRightPanel}
         setSelectedTabRightPanel={setSelectedTabRightPanel}
-        savedPortParameters={savedPortParameters}
-        setSavedPortParameters={setSavedPortParameters}
+        savedPhysicsParameters={savedPhysicsParameters}
+        setSavedPhysicsParameters={setSavedPhysicsParameters}
       />
       <StatusBar />
     </>
@@ -162,9 +163,9 @@ const PhysicsLeftPanel: FC<{
 const PhysicsRightPanel: FC<{
   selectedTabRightPanel: string;
   setSelectedTabRightPanel: Function;
-  savedPortParameters: boolean;
-  setSavedPortParameters: Function;
-}> = ({ selectedTabRightPanel, setSelectedTabRightPanel, savedPortParameters, setSavedPortParameters }) => {
+  savedPhysicsParameters: boolean;
+  setSavedPhysicsParameters: Function;
+}> = ({ selectedTabRightPanel, setSelectedTabRightPanel, savedPhysicsParameters, setSavedPhysicsParameters }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
@@ -173,15 +174,13 @@ const PhysicsRightPanel: FC<{
       tabs={[physicsRightPanelTitle.first, physicsRightPanelTitle.second]}
       selectedTab={selectedTabRightPanel}
       setSelectedTab={setSelectedTabRightPanel}
-      className='absolute right-[2%] top-[160px] w-1/4'
+      className='absolute right-[2%] top-[160px] w-1/4 max-h-[500px]'
     >
       {selectedTabRightPanel === physicsRightPanelTitle.first ? (
         <>
           {selectedPort?.category === "lumped" ?
             <PortManagement
               selectedPort={selectedPort}
-              savedPortParameters={savedPortParameters}
-              setSavedPortParameters={setSavedPortParameters}
             >
               <PortType
                 disabled={selectedProject?.simulation?.status === 'Completed'}
@@ -191,42 +190,57 @@ const PhysicsRightPanel: FC<{
               <RLCParamsComponent
                 selectedPort={selectedPort as TempLumped}
                 disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPortParameters}
+                setSavedPortParameters={setSavedPhysicsParameters}
               />
               <PortPosition
                 selectedPort={selectedPort as (Port | TempLumped)}
                 disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPortParameters}
+                setSavedPortParameters={setSavedPhysicsParameters}
               />
               {selectedProject?.simulation?.status !== 'Completed' && (
                 <ModalSelectPortType
                   show={showModalSelectPortType}
                   setShow={setShowModalSelectPortType}
                   selectedPort={selectedPort as TempLumped}
-                  setSavedPortParameters={setSavedPortParameters}
+                  setSavedPortParameters={setSavedPhysicsParameters}
                 />
               )}
             </PortManagement> :
-            <PortManagement selectedPort={selectedPort} savedPortParameters={savedPortParameters} setSavedPortParameters={setSavedPortParameters}>
-              <ScatteringParameter setSavedPortParameters={setSavedPortParameters}/>
+            <PortManagement selectedPort={selectedPort}>
+              <ScatteringParameter setSavedPortParameters={setSavedPhysicsParameters}/>
               <PortPosition
                 selectedPort={selectedPort as (Port | TempLumped)}
                 disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPortParameters}
+                setSavedPortParameters={setSavedPhysicsParameters}
               />
             </PortManagement>
           }
         </>
 
       ) : (
-        <InputSignalManagement>
-          <FrequenciesDef/>
+        <div className="flex-col p-[20px] overflow-x-hidden">
+          <FrequenciesDef setSavedPhysicsParameters={setSavedPhysicsParameters}/>
           {/* <InputSignal
             disabled={selectedProject?.simulation?.status === 'Completed'}
             selectedProject={selectedProject as Project}
           /> */}
-        </InputSignalManagement>
+        </div>
       )}
+      <div
+            className={`flex px-[20px] flex-row gap-2 items-center`}
+          >
+            <button
+              type="button"
+              className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
+              onClick={() => setSavedPhysicsParameters(true)}
+              disabled={savedPhysicsParameters}
+            >
+              SAVE
+            </button>
+            <div className='tooltip tooltip-left' data-tip={infoSavePhysicsParamsButton}>
+              <IoMdInformationCircleOutline size={20}/>
+            </div>
+          </div>
     </MyPanel>
   );
 };

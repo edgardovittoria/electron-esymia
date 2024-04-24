@@ -4,10 +4,10 @@ import { selectedProjectSelector, setFrequencies } from '../../../../../store/pr
 import { DebounceInput } from 'react-debounce-input';
 
 export interface FrequenciesDefProps{
-
+  setSavedPhysicsParameters: Function
 }
 
-const FrequenciesDef: React.FC<FrequenciesDefProps> = ({}) => {
+const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameters}) => {
   const [fMin, setFMin] = useState<number>(0);
   const [fMax, setFMax] = useState<number>(0);
   const [fNum, setFNum] = useState<number>(0);
@@ -17,7 +17,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({}) => {
   const selectedProject = useSelector(selectedProjectSelector)
   const dispatch = useDispatch()
     return(
-      <div className='p-[10px] border-[1px] border-secondaryColor rounded bg-[#f6f6f6] text-left'>
+      <div className='p-[10px] border-[1px] border-secondaryColor bg-[#f6f6f6] text-left overflow-y-scroll max-h-[300px]'>
         <h6 className="w-[100%] mb-3">Range Definition</h6>
         <div className='flex flex-row justify-between px-5'>
           <div className='flex flex-row items-center gap-2'>
@@ -73,6 +73,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({}) => {
             }else {
               dispatch(setFrequencies(linSpace(fMin, fMax, fNum)))
             }
+            setSavedPhysicsParameters(false)
           }}
         >
           Generate

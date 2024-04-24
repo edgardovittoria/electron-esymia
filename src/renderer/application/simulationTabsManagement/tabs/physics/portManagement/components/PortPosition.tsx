@@ -22,7 +22,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 			{selectedPort.category === "port" ||
 			selectedPort.category === "lumped" ? (
 				<div
-					className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]`}>
+					className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor bg-[#f6f6f6]`}>
 					<h6 className="xl:text-base text-[12px]">Port Position</h6>
 					<div className="mt-2">
 						<span className="xl:text-base text-[12px]">Input (X,Y,Z)</span>
