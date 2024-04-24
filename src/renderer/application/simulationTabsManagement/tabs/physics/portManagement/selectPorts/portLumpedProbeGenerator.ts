@@ -55,7 +55,7 @@ export function getDefaultPort(key: number, size: number, position: Vector3){
     return port
 }
 
-export function getDefaultLumped(key: number, size: number){
+export function getDefaultLumped(key: number, size: number, position: Vector3){
     let lumped: TempLumped = {
         name: "Lumped" + key,
         category: 'lumped',
@@ -70,12 +70,12 @@ export function getDefaultLumped(key: number, size: number){
             name: "inputPort" + key,
             orbitEnabled: false,
             transformationParams: {
-                position: [-2.5, 2.5, 0],
+                position: [position.x-2.5, position.y, position.z-5],
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
             previousTransformationParams: {
-                position: [-2.5, 2.5, 0],
+                position: [position.x-2.5, position.y, position.z-5],
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
@@ -92,12 +92,12 @@ export function getDefaultLumped(key: number, size: number){
             name: "outputPort" + key,
             orbitEnabled: false,
             transformationParams: {
-                position: [2.5, 2.5, 0],
+                position: [position.x+2.5, position.y, position.z-5],
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,
             previousTransformationParams: {
-                position: [2.5, 2.5, 0],
+                position: [position.x+2.5, position.y, position.z-5],
                 rotation: [0, 0, 0],
                 scale: [1, 1, 1]
             } as TransformationParams,

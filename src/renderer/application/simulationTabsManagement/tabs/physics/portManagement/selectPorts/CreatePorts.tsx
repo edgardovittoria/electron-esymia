@@ -76,7 +76,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
-                                            let lumped = getDefaultLumped((keyPort as number)+1, size as number)
+                                            let lumped = getDefaultLumped((keyPort as number)+1, size as number, cameraPosition)
                                             dispatch(setPortKey((keyPort as number)+1))
                                             dispatch(addPorts(lumped))
                                             dispatch(selectPort(lumped.name))
