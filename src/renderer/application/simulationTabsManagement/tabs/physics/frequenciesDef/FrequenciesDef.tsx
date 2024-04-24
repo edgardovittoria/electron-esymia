@@ -79,8 +79,8 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
             <h6 className="w-[100%] mb-2">Generated Frequencies</h6>
             <div className='flex flex-row'>
               <h6 className="w-[20%] mb-2">n.{selectedProject.frequencies.length}</h6>
-              <h6 className="w-[40%] mb-2"> min:{selectedProject.frequencies[0]}</h6>
-              <h6 className="w-[40%] mb-2"> max: {selectedProject.frequencies[selectedProject.frequencies.length -1]}</h6>
+              <h6 className="w-[40%] mb-2"> min:{selectedProject.frequencies[0].toExponential()}</h6>
+              <h6 className="w-[40%] mb-2"> max: {selectedProject.frequencies[selectedProject.frequencies.length -1].toExponential()}</h6>
             </div>
             <div className="p-3 bg-white border border-secondaryColor flex flex-col overflow-y-scroll max-h-[200px]">
               {selectedProject.frequencies.map((f,index) => {
