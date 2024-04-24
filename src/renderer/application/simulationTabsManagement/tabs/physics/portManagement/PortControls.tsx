@@ -40,7 +40,7 @@ export const PortControls: FC<PortControlsProps> = (
 
     function onChangeFirstPositionHandler(event: THREE.Event) {
         setSavedPortParameters(false)
-        if (!event.target && transformationFirst.current) {
+        if (transformationFirst.current) {
             const controls: Object3DNode<any, any> = transformationFirst.current as unknown as Object3DNode<any, any>
             let transformationParmas = {
                 type: 'first',
@@ -53,7 +53,7 @@ export const PortControls: FC<PortControlsProps> = (
 
     function onChangeLastPositionHandler(event: THREE.Event) {
         setSavedPortParameters(false)
-        if (!event.target && transformationLast.current) {
+        if (transformationLast.current) {
             const controls: Object3DNode<any, any> = transformationLast.current as unknown as Object3DNode<any, any>
             let transformationParmas = {
                 type: 'last',
@@ -71,7 +71,7 @@ export const PortControls: FC<PortControlsProps> = (
             {selectedPort &&
                 <>
                     <TransformControls
-                        object={scene.getObjectByName((selectedPort as Port).outputElement.name)}
+                        object={scene.getObjectByName((selectedPort as Port).inputElement.name)}
                         ref={transformationFirst}
                         position={selectedPort.inputElement.transformationParams.position}
                         showX={selectedPort.isSelected}
