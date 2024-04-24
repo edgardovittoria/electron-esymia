@@ -21,6 +21,7 @@ import {
 	faunaFolderHaveParentInList,
 	faunaProjectHaveParentInFolderList
 } from '../../../../../../faunadb/apiAuxiliaryFunctions';
+import { ImSpinner } from 'react-icons/im';
 
 export interface MySharedElementsProps {
 	setShowModal: Function;
@@ -38,11 +39,12 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 	const myFilesFolder = useSelector(mainFolderSelector);
 	const user = useSelector(usersStateSelector);
 	const dispatch = useDispatch();
-
+  const [spinner, setSpinner] = useState<boolean>(false);
 	const [path, setPath] = useState([mainFolder]);
 	const { execQuery } = useFaunaQuery()
 
 	useEffect(() => {
+    setSpinner(true)
 		execQuery(getSharedFolders, user.email).then((folders: FaunaFolder[]) => {
 			execQuery(getSharedSimulationProjects, user.email).then(
 				(projects: FaunaProject[]) => {
@@ -72,6 +74,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 						projects,
 					);
 					dispatch(setFolderOfElementsSharedWithUser(folder));
+          setSpinner(false)
 				},
 			);
 		});
@@ -84,113 +87,119 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 	}, []);
 
 	return (
-		<DndProvider backend={HTML5Backend}>
-			<div className="box w-full">
-				<div className="flex p-2 gap-4 items-center">
-					<div className="sm:w-3/5 w-1/5">
-						<h5 className="text-base">My Shared Files</h5>
-					</div>
-					<button
-						className="md:w-1/5 text-end text-sm text-primaryColor hover:text-secondaryColor disabled:hover:no-underline hover:cursor-pointer hover:underline disabled:opacity-60"
-						onClick={() => setShowModal(true)}
-						disabled={selectedFolder?.faunaDocumentId === "shared_root"}
-					>
-						+ New Project
-					</button>
-					<button
-						className="md:w-1/5 text-sm text-center text-primaryColor hover:text-secondaryColor disabled:hover:no-underline hover:cursor-pointer hover:underline disabled:opacity-60"
-						onClick={() => setShowCreateNewFolderModal(true)}
-						disabled={selectedFolder?.faunaDocumentId === "shared_root"}
-					>
-						+ New Folder
-					</button>
-				</div>
+    <>
+      {spinner && (
+        <ImSpinner className='animate-spin w-12 h-12 absolute left-1/2 top-1/2 z-40' />
+      )}
+      <DndProvider backend={HTML5Backend}>
+        <div className="box w-full z-10" style={{opacity: spinner ? .5 : 1}}>
+          <div className="flex p-2 gap-4 items-center">
+            <div className="sm:w-3/5 w-1/5">
+              <h5 className="text-base">My Shared Files</h5>
+            </div>
+            <button
+              className="md:w-1/5 text-end text-sm text-primaryColor hover:text-secondaryColor disabled:hover:no-underline hover:cursor-pointer hover:underline disabled:opacity-60"
+              onClick={() => setShowModal(true)}
+              disabled={selectedFolder?.faunaDocumentId === "shared_root"}
+            >
+              + New Project
+            </button>
+            <button
+              className="md:w-1/5 text-sm text-center text-primaryColor hover:text-secondaryColor disabled:hover:no-underline hover:cursor-pointer hover:underline disabled:opacity-60"
+              onClick={() => setShowCreateNewFolderModal(true)}
+              disabled={selectedFolder?.faunaDocumentId === "shared_root"}
+            >
+              + New Folder
+            </button>
+          </div>
 
-				<div className="p-[12px] text-[18px]">
-					<hr />
-					{path.map((p, index) => {
-						return (
-							<div className="inline-block p-2" key={index}>
-								{index !== path.length - 1 ? (
-									<div>
+          <div className="p-[12px] text-[18px]">
+            <hr />
+            {path.map((p, index) => {
+              return (
+                <div className="inline-block p-2" key={index}>
+                  {index !== path.length - 1 ? (
+                    <div>
                     <span
-											className="hover:underline hover:cursor-pointer text-sm"
-											onClick={() => {
-												const newPath = path.filter((p, i) => i <= index);
-												setPath(newPath);
-												dispatch(selectFolder(p.faunaDocumentId as string));
-											}}
-										>
+                      className="hover:underline hover:cursor-pointer text-sm"
+                      onClick={() => {
+                        const newPath = path.filter((p, i) => i <= index);
+                        setPath(newPath);
+                        dispatch(selectFolder(p.faunaDocumentId as string));
+                      }}
+                    >
                       {p.name}
                     </span>
-										<span> &gt; </span>
-									</div>
-								) : (
-									<span className="font-bold text-sm">{p.name}</span>
-								)}
-							</div>
-						);
-					})}
-					<hr />
-				</div>
+                      <span> &gt; </span>
+                    </div>
+                  ) : (
+                    <span className="font-bold text-sm">{p.name}</span>
+                  )}
+                </div>
+              );
+            })}
+            <hr />
+          </div>
 
-				<div className="w-full text-left p-[20px] h-[80%]">
-					{selectedFolder?.projectList &&
-					selectedFolder.subFolders &&
-					(selectedFolder?.projectList.length > 0 || selectedFolder.subFolders.length > 0) ? (
-						<>
-							{selectedFolder.subFolders.length > 0 && (
-								<h5 className="w-[100%] text-sm font-semibold uppercase p-2">
-									Folders
-								</h5>
-							)}
-							<div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[200px]">
-								{selectedFolder.subFolders.map((folder) => {
-									return (
-										<DroppableAndDraggableFolder
-											key={folder.faunaDocumentId}
-											folder={folder}
-											path={path}
-											setPath={setPath}
-										/>
-									);
-								})}
-							</div>
-							{selectedFolder?.projectList.length > 0 && (
-								<h5 className="w-[100%] mt-4 mb-2 text-sm font-semibold uppercase p-2">
-									Projects
-								</h5>
-							)}
-							<div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[380px]">
-								{selectedFolder?.projectList
-									.map((project) => {
-										return (
-											<DraggableProjectCard
-												project={project}
-												key={project.faunaDocumentId}
-											/>
-										);
-									})}
-							</div>
-						</>
-					) : (
-						<div className="text-center p-[20px]">
-							<img
-								src={noProjectsIcon2}
-								className="my-[50px] mx-auto"
-								alt="No Projects Icon"
-							/>
-							<p>No shared projects for now.</p>
-						</div>
-					)}
-				</div>
-			</div>
-			{showCreateNewFolderModal && (
-				<CreateNewFolderModal
-					setShowNewFolderModal={setShowCreateNewFolderModal}
-				/>
-			)}
-		</DndProvider>
+          <div className="w-full text-left p-[20px] h-[80%]">
+            {selectedFolder?.projectList &&
+            selectedFolder.subFolders &&
+            (selectedFolder?.projectList.length > 0 || selectedFolder.subFolders.length > 0) ? (
+              <>
+                {selectedFolder.subFolders.length > 0 && (
+                  <h5 className="w-[100%] text-sm font-semibold uppercase p-2">
+                    Folders
+                  </h5>
+                )}
+                <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[200px]">
+                  {selectedFolder.subFolders.map((folder) => {
+                    return (
+                      <DroppableAndDraggableFolder
+                        key={folder.faunaDocumentId}
+                        folder={folder}
+                        path={path}
+                        setPath={setPath}
+                      />
+                    );
+                  })}
+                </div>
+                {selectedFolder?.projectList.length > 0 && (
+                  <h5 className="w-[100%] mt-4 mb-2 text-sm font-semibold uppercase p-2">
+                    Projects
+                  </h5>
+                )}
+                <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[380px]">
+                  {selectedFolder?.projectList
+                    .map((project) => {
+                      return (
+                        <DraggableProjectCard
+                          project={project}
+                          key={project.faunaDocumentId}
+                        />
+                      );
+                    })}
+                </div>
+              </>
+            ) : (
+              <div className="text-center p-[20px]">
+                <img
+                  src={noProjectsIcon2}
+                  className="my-[50px] mx-auto"
+                  alt="No Projects Icon"
+                />
+                <p>No shared projects for now.</p>
+              </div>
+            )}
+          </div>
+        </div>
+        {showCreateNewFolderModal && (
+          <CreateNewFolderModal
+            setShowNewFolderModal={setShowCreateNewFolderModal}
+          />
+        )}
+      </DndProvider>
+    </>
+
 	);
 };
 

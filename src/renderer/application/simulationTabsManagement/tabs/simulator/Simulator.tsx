@@ -119,7 +119,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
         allMaterials={allMaterials}
         externalGrids={externalGrids}
       />
-      <div className='absolute lg:left-[42%] left-[38%] gap-2 top-[160px] flex flex-row'>
+      <div className='absolute lg:left-[48%] left-[38%] gap-2 top-[160px] flex flex-row'>
         <ResetFocusButton toggleResetFocus={toggleResetFocus}/>
       </div>
     </>

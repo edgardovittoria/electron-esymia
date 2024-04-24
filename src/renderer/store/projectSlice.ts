@@ -232,10 +232,6 @@ export const ProjectSlice = createSlice({
         selectedProject.screenshot = action.payload;
       }
     },
-    setQuantum(state: ProjectState, action: PayloadAction<[number, number, number]>) {
-      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
-      if (project) project.meshData.quantum = action.payload;
-    },
     setMesh(state: ProjectState, action: PayloadAction<string>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       if (project) project.meshData.mesh = action.payload;
@@ -326,7 +322,6 @@ export const {
   deleteSimulation,
   renameFolder,
   shareFolder,
-  setQuantum,
   setMesh,
   setMeshGenerated,
   setMeshApproved,

@@ -8,6 +8,7 @@ import {
 } from '../../../../store/projectSlice';
 import MyFiles from './components/ProjectTabContent/MyFiles';
 import MySharedElements from './components/ProjectTabContent/MySharedElements';
+import { myFilesFolderID, mySharedElementsFolderID } from '../../../config/generalLabels';
 
 interface ProjectsProps {
   setShowModal: Function;
@@ -18,14 +19,10 @@ function classNames(...classes: string[]) {
 }
 
 export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
+
   const dispatch = useDispatch();
-
-  const myFilesFolder = useSelector(mainFolderSelector);
-  const mySharedElementsFolder = useSelector(sharedElementsFolderSelector);
-
   const [showSearchUser, setShowSearchUser] = useState(false);
-  const [showCreateNewFolderModal, setShowCreateNewFolderModal] =
-    useState(false);
+  const [showCreateNewFolderModal, setShowCreateNewFolderModal] = useState(false);
 
   return (
     <div className="w-full px-2 py-2">
@@ -34,7 +31,7 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
           <Tab
             key="My Files"
             onClick={() =>
-              dispatch(selectFolder(myFilesFolder.faunaDocumentId as string))
+              dispatch(selectFolder(myFilesFolderID))
             }
             className={({ selected }) =>
               classNames(
@@ -52,7 +49,7 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
             key="My Shared Elements"
             onClick={() =>
               dispatch(
-                selectFolder(mySharedElementsFolder.faunaDocumentId as string),
+                selectFolder(mySharedElementsFolderID),
               )
             }
             className={({ selected }) =>
