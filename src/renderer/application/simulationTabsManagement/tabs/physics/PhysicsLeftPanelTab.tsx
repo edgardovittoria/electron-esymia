@@ -5,24 +5,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BiRename } from 'react-icons/bi';
 import {
   deletePort,
-  portKeySelector,
   selectedProjectSelector,
   selectPort,
-  setPortKey,
   setPortName,
-  setScatteringValue,
   unsetScatteringValue,
 } from '../../../../store/projectSlice';
 import noPhysicsIcon from '../../../../../../assets/noPhysicsIcon.png';
 import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
+import { isTerminationNameValid } from './portManagement/selectPorts/portLumpedProbeGenerator';
+import { DebounceInput } from 'react-debounce-input';
+import toast from 'react-hot-toast';
 
 interface PhysicsLeftPanelTabProps {}
 
 export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   const dispatch = useDispatch();
   const selectedProject = useSelector(selectedProjectSelector);
-  const portKey = useSelector(portKeySelector);
-
   const [portRename, setPortRename] = useState('');
 
   useEffectNotOnMount(() => {
@@ -91,13 +89,14 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                             <div className="modal-box">
                               <h3 className="font-bold text-lg">Rename Port</h3>
                               <div className="flex justify-center items-center py-5">
-                                <input
+                                <DebounceInput
+                                  debounceTimeout={500}
                                   type="text"
                                   placeholder="Type here"
                                   className="input input-bordered w-full max-w-xs"
                                   value={portRename}
                                   onChange={(e) =>
-                                    setPortRename(e.currentTarget.value)
+                                    setPortRename(e.target.value)
                                   }
                                 />
                               </div>
@@ -112,7 +111,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                                   htmlFor="modalRename"
                                   className="btn h-[2rem] min-h-[2rem]"
                                   onClick={() =>
-                                    dispatch(setPortName(portRename))
+                                    isTerminationNameValid(portRename, selectedProject.ports) ? dispatch(setPortName(portRename)) : toast.error('Name already set! Please choose another one')
                                   }
                                 >
                                   Rename
@@ -125,7 +124,6 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                             data-tip="Delete"
                             onClick={() => {
                               dispatch(deletePort(port.name));
-                              dispatch(setPortKey((portKey as number) - 1));
                             }}
                           >
                             <IoTrashOutline

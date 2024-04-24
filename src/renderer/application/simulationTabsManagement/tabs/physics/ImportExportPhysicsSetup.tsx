@@ -3,19 +3,20 @@ import {useDispatch, useSelector} from "react-redux";
 import {
     Port,
     Probe,
-    Signal,
+    Project,
     TempLumped,
 } from "../../../../model/esymiaModels";
 import {
     addPorts,
     selectedProjectSelector, setFrequencies,
-    setPortKey
+    setScatteringValue
 } from '../../../../store/projectSlice';
 import {BiExport, BiImport} from "react-icons/bi";
 import { exportToJsonFileThis } from "../../sharedElements/utilityFunctions";
+import { generateTerminationName, isTerminationNameValid } from "./portManagement/selectPorts/portLumpedProbeGenerator";
 
 export const ImportExportPhysicsSetup: FC<{}> = () => {
-    const selectedProject = useSelector(selectedProjectSelector);
+    const selectedProject = useSelector(selectedProjectSelector) as Project;
     const dispatch = useDispatch();
     const inputRefPhysics = useRef(null);
 
@@ -29,8 +30,8 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
         <>
             <div className="tooltip" data-tip="Import Physics">
                 <button
-                    disabled={selectedProject?.simulation?.status === "Completed"}
-                    className={`bg-white rounded p-2 ${selectedProject?.simulation?.status === "Completed" && 'opacity-40'}`}
+                    disabled={selectedProject.simulation?.status === "Completed"}
+                    className={`bg-white rounded p-2 ${selectedProject.simulation?.status === "Completed" && 'opacity-40'}`}
                     onClick={onImportPhysicsClick}>
                     <BiImport className="h-5 w-5 text-green-300 hover:text-secondaryColor"/>
                     <input
@@ -43,13 +44,16 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                             files &&
                             files[0].text().then((value) => {
                                 let physics: {
-                                    ports: (Port | Probe | TempLumped)[];
-                                    frequencies: number[] | undefined;
-                                    portKey: number
+                                    ports?: (Port | Probe | TempLumped)[],
+                                    frequencies?: number[] | undefined,
+                                    portScatteringValue?: number,
+                                    portKey?: number
                                 } = JSON.parse(value);
-                                physics.ports.length > 0 && physics.ports.forEach((p) => dispatch(addPorts(p)));
+                                physics.ports && physics.ports.length > 0 && physics.ports.forEach((p) => {
+                                  isTerminationNameValid(p.name, selectedProject.ports) ? dispatch(addPorts(p)) : dispatch(addPorts({...p, name:generateTerminationName(selectedProject.ports, p.category)}))
+                                });
                                 physics.frequencies && dispatch(setFrequencies(physics.frequencies));
-                                dispatch(setPortKey(physics.portKey))
+                                physics.portScatteringValue && dispatch(setScatteringValue(physics.portScatteringValue))
                                 e.target.value = ""
                             });
                         }}
@@ -65,14 +69,14 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                     className="bg-white rounded p-2"
                     onClick={() => {
                         let physics = {
-                            ports: selectedProject?.ports,
-                            signal: selectedProject?.frequencies,
-                            portKey: selectedProject?.portKey
+                            ports: selectedProject.ports,
+                            frequencies: selectedProject.frequencies,
+                            portScatteringValue: selectedProject.scatteringValue
                         };
-                        exportToJsonFileThis(physics, selectedProject?.name + "_physics.json");
+                        exportToJsonFileThis(physics, selectedProject.name + "_physics.json");
                     }}>
-                    <BiExport className={`h-5 w-5 text-green-300 hover:text-secondaryColor ${!(selectedProject &&
-                        (selectedProject.ports.length > 0 || selectedProject.frequencies)) && 'opacity-40'}`}/>
+                    <BiExport className={`h-5 w-5 text-green-300 hover:text-secondaryColor
+                    ${!(selectedProject.ports.length > 0 || selectedProject.frequencies) && 'opacity-40'}`}/>
                 </button>
             </div>
         </>

@@ -14,7 +14,6 @@ import {
   Project,
   RLCParams,
   sharingInfoUser,
-  Signal,
   Simulation,
   TempLumped
 } from '../model/esymiaModels';
@@ -183,12 +182,6 @@ export const ProjectSlice = createSlice({
         }
       });
     },
-    setPortKey(state: ProjectState, action: PayloadAction<number>) {
-      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
-      if (selectedProject) {
-        selectedProject.portKey = action.payload;
-      }
-    },
     setPortName(state: ProjectState, action: PayloadAction<string>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       selectedProject?.ports.forEach(port => {
@@ -337,7 +330,6 @@ export const {
   setModel,
   setModelS3,
   setModelUnit,
-  setPortKey,
   setPortName,
   setBoundingBoxDimension,
   setSuggestedQuantum,
@@ -379,10 +371,6 @@ export const findProjectByFaunaID = (projects: Project[], faunaDocumentId: strin
   return (faunaDocumentId !== undefined) ? projects.filter(project => project.faunaDocumentId === faunaDocumentId)[0] : undefined;
 };
 export const findSelectedPort = (project: Project | undefined) => (project) ? project.ports.filter(port => port.isSelected)[0] : undefined;
-export const portKeySelector = (state: { projects: ProjectState }) => {
-  let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject);
-  return project?.portKey;
-};
 export const boundingBoxDimensionSelector = (state: { projects: ProjectState }) => {
   let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject);
   return project?.boundingBoxDimension;

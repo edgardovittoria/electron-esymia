@@ -1,15 +1,13 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {Menu, Transition} from "@headlessui/react";
 import {FiChevronDown} from "react-icons/fi";
 import {AiOutlineThunderbolt} from "react-icons/ai";
-import {getDefaultLumped, getDefaultPort, getDefaultProbe} from "./portLumpedProbeGenerator";
+import {generateTerminationName, getDefaultLumped, getDefaultPort, getDefaultProbe} from "./portLumpedProbeGenerator";
 import {
     addPorts,
     boundingBoxDimensionSelector,
-    portKeySelector, selectPort,
-    setPortKey
-} from '../../../../../../store/projectSlice';
+    selectPort} from '../../../../../../store/projectSlice';
 import { Project } from '../../../../../../model/esymiaModels';
 import { Vector3 } from 'three';
 
@@ -21,8 +19,6 @@ interface SelectPortsProps {
 export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, cameraPosition}) => {
 
     const dispatch = useDispatch()
-
-    const keyPort = useSelector(portKeySelector)
     const size = useSelector(boundingBoxDimensionSelector)
 
     return (
@@ -59,8 +55,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
-                                            let port = getDefaultPort((keyPort as number)+1, size as number, cameraPosition)
-                                            dispatch(setPortKey((keyPort as number)+1))
+                                            let port = getDefaultPort(generateTerminationName(selectedProject.ports, 'port'), size as number, cameraPosition)
                                             dispatch(addPorts(port))
                                             dispatch(selectPort(port.name))
                                         }}
@@ -76,8 +71,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
-                                            let lumped = getDefaultLumped((keyPort as number)+1, size as number, cameraPosition)
-                                            dispatch(setPortKey((keyPort as number)+1))
+                                            let lumped = getDefaultLumped(generateTerminationName(selectedProject.ports, 'lumped'), size as number, cameraPosition)
                                             dispatch(addPorts(lumped))
                                             dispatch(selectPort(lumped.name))
                                         }}
@@ -93,8 +87,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
-                                            let probe = getDefaultProbe((keyPort as number)+1, size as number)
-                                            dispatch(setPortKey((keyPort as number)+1))
+                                            let probe = getDefaultProbe(generateTerminationName(selectedProject.ports, 'probe'), size as number)
                                             dispatch(addPorts(probe))
                                         }}
                                     >
