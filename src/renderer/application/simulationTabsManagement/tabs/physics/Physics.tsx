@@ -107,7 +107,7 @@ export const Physics: React.FC<PhysicsProps> = ({
         selectedTabLeftPanel={selectedTabLeftPanel}
         setSelectedTabLeftPanel={setSelectedTabLeftPanel}
       />
-      <div className="mt-10 text-center h-fit max-h-[200px] overflow-y-scroll bg-white absolute left-[2%] top-[400px] md:w-1/4 xl:w-1/5">
+      <div className="mt-10 text-center h-fit max-h-[200px] overflow-y-scroll bg-white absolute left-[2%] top-[500px] md:w-1/4 xl:w-1/5">
           <PositioningPortsInfo />
       </div>
       <PhysicsRightPanel

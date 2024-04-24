@@ -47,10 +47,10 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                                     frequencies: number[] | undefined;
                                     portKey: number
                                 } = JSON.parse(value);
-                                physics.ports.length > 0 &&
-                                physics.ports.forEach((p) => dispatch(addPorts(p)));
+                                physics.ports.length > 0 && physics.ports.forEach((p) => dispatch(addPorts(p)));
                                 physics.frequencies && dispatch(setFrequencies(physics.frequencies));
                                 dispatch(setPortKey(physics.portKey))
+                                e.target.value = ""
                             });
                         }}
                     />

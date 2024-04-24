@@ -270,6 +270,12 @@ export const ProjectSlice = createSlice({
         selectedProject.scatteringValue = action.payload;
       }
     },
+    unsetScatteringValue(state: ProjectState) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if (selectedProject) {
+        selectedProject.scatteringValue = undefined;
+      }
+    },
     setFrequencies(state: ProjectState, action: PayloadAction<number[]>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       if (selectedProject) {
@@ -336,6 +342,7 @@ export const {
   setBoundingBoxDimension,
   setSuggestedQuantum,
   setScatteringValue,
+  unsetScatteringValue,
   setFrequencies
 } = ProjectSlice.actions;
 

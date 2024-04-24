@@ -8,7 +8,7 @@ export const infoSavePhysicsParamsButton = 'Saving parameters on server now is n
 export const PositioningPortsInfo: FC = () => {
   return (
     <div className='flex flex-col text-sm text-start p-[10px]'>
-      <span className="font-semibold">You can place terminations in the following ways:</span>
+      <span className="font-semibold">Once you have added a new termination, you can place it in the following ways:</span>
       <div className='list-decimal ml-3 mt-2'>
         <li>double clicking on model surface point of interest;</li>
         <li>
