@@ -107,7 +107,7 @@ export const Physics: React.FC<PhysicsProps> = ({
         selectedTabLeftPanel={selectedTabLeftPanel}
         setSelectedTabLeftPanel={setSelectedTabLeftPanel}
       />
-      <div className="mt-10 text-center h-[200px] bg-white absolute left-[2%] top-[500px] md:w-1/4 xl:w-1/5">
+      <div className="mt-10 text-center h-fit max-h-[200px] overflow-y-scroll bg-white absolute left-[2%] top-[400px] md:w-1/4 xl:w-1/5">
           <PositioningPortsInfo />
       </div>
       <PhysicsRightPanel
@@ -221,7 +221,7 @@ const PhysicsRightPanel: FC<{
         </>
 
       ) : (
-        <div className="flex-col p-[20px] overflow-x-hidden">
+        <div className="flex-col px-[20px] pb-[5px] overflow-x-hidden">
           <FrequenciesDef setSavedPhysicsParameters={setSavedPhysicsParameters}/>
           {/* <InputSignal
             disabled={selectedProject?.simulation?.status === 'Completed'}
@@ -230,11 +230,11 @@ const PhysicsRightPanel: FC<{
         </div>
       )}
       <div
-            className={`flex px-[20px] flex-row gap-2 items-center`}
+            className={`flex px-[20px] mt-2 flex-row gap-2 items-center`}
           >
             <button
               type="button"
-              className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
+              className="button buttonPrimary w-full hover:opacity-80 disabled:opacity-60"
               onClick={() => setSavedPhysicsParameters(true)}
               disabled={savedPhysicsParameters}
             >
