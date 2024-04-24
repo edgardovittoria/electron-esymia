@@ -25,7 +25,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   return (
     <>
       {selectedProject && selectedProject.ports.length !== 0 ? (
-        <div>
+        <div className="text-center lg:max-h-[150px] xl:max-h-[300px] xl:h-[300px] overflow-y-scroll">
           <ul className="list-none pl-3 mb-0">
             {selectedProject.ports &&
               selectedProject.ports.map((port) => {
@@ -135,14 +135,14 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
           </ul>
         </div>
       ) : (
-        <div className="text-center lg:max-h-[150px] xl:max-h-fit overflow-y-scroll">
+        <div className="text-center lg:max-h-[150px] xl:max-h-[300px] xl:h-[300px] lg:overflow-y-scroll xl:overflow-y-hidden">
           <img
             src={noPhysicsIcon}
-            className="mx-auto xl:mt-[50px] w-1/2"
+            className="mx-auto xl:mt-[20px] w-1/2"
             alt="No Physics"
           />
           <h5 className="lg:text-sm xl:text-xl">No Physics applied</h5>
-          <p className="mt-[50px] text-sm">
+          <p className="mt-[20px] text-sm">
             Select a tool from the Physics Toolbar and apply it to geometry in
             the 3D View.
           </p>

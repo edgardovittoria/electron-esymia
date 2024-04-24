@@ -28,7 +28,7 @@ import { physicsRightPanelTitle } from '../../../config/panelTitles';
 import ScatteringParameter from './portManagement/components/ScatteringParameter';
 import FrequenciesDef from './frequenciesDef/FrequenciesDef';
 import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
-import { infoSavePhysicsParamsButton } from '../../../config/textMessages';
+import { PositioningPortsInfo, infoSavePhysicsParamsButton } from '../../../config/textMessages';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
 
 interface PhysicsProps {
@@ -107,6 +107,9 @@ export const Physics: React.FC<PhysicsProps> = ({
         selectedTabLeftPanel={selectedTabLeftPanel}
         setSelectedTabLeftPanel={setSelectedTabLeftPanel}
       />
+      <div className="mt-10 text-center h-[200px] bg-white absolute left-[2%] top-[500px] md:w-1/4 xl:w-1/5">
+          <PositioningPortsInfo />
+      </div>
       <PhysicsRightPanel
         selectedTabRightPanel={selectedTabRightPanel}
         setSelectedTabRightPanel={setSelectedTabRightPanel}
