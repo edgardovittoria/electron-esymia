@@ -39,9 +39,6 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 	const user = useSelector(usersStateSelector);
 	const dispatch = useDispatch();
 
-	const projects = selectedFolder?.projectList;
-	const folders = selectedFolder?.subFolders;
-
 	const [path, setPath] = useState([mainFolder]);
 	const { execQuery } = useFaunaQuery()
 
@@ -138,17 +135,17 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 				</div>
 
 				<div className="w-full text-left p-[20px] h-[80%]">
-					{projects &&
-					folders &&
-					(projects.length > 0 || folders.length > 0) ? (
+					{selectedFolder?.projectList &&
+					selectedFolder.subFolders &&
+					(selectedFolder?.projectList.length > 0 || selectedFolder.subFolders.length > 0) ? (
 						<>
-							{folders.length > 0 && (
+							{selectedFolder.subFolders.length > 0 && (
 								<h5 className="w-[100%] text-sm font-semibold uppercase p-2">
 									Folders
 								</h5>
 							)}
 							<div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[200px]">
-								{folders.map((folder) => {
+								{selectedFolder.subFolders.map((folder) => {
 									return (
 										<DroppableAndDraggableFolder
 											key={folder.faunaDocumentId}
@@ -159,13 +156,13 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 									);
 								})}
 							</div>
-							{projects.length > 0 && (
+							{selectedFolder?.projectList.length > 0 && (
 								<h5 className="w-[100%] mt-4 mb-2 text-sm font-semibold uppercase p-2">
 									Projects
 								</h5>
 							)}
 							<div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[380px]">
-								{projects
+								{selectedFolder?.projectList
 									.map((project) => {
 										return (
 											<DraggableProjectCard
