@@ -128,7 +128,11 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
         });
         const extGrids = {
           externalGrids: data,
-          cell_size: res.data.cell_size,
+          cell_size: {
+            cell_size_x: res.data.cell_size.cell_size_x/1000,
+            cell_size_y: res.data.cell_size.cell_size_y/1000,
+            cell_size_z: res.data.cell_size.cell_size_z/1000
+          },
           origin: res.data.origin,
           n_cells: res.data.n_cells
         };

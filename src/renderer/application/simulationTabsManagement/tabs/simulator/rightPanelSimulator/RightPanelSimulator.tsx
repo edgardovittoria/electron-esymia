@@ -326,7 +326,6 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
 
 interface QuantumDimsInputProps {
   label: string,
-  key:number
   disabled: boolean,
   debounceTimeoutMilliSecs?: number,
   inputStep?: number,
@@ -334,9 +333,9 @@ interface QuantumDimsInputProps {
   onChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) & React.ChangeEventHandler<HTMLInputElement>,
 }
 
-const QuantumDimsInput: FC<QuantumDimsInputProps> = ({disabled, debounceTimeoutMilliSecs, inputStep, value, onChange, key, label}) => {
+const QuantumDimsInput: FC<QuantumDimsInputProps> = ({disabled, debounceTimeoutMilliSecs, inputStep, value, onChange, label}) => {
   return (
-    <div className='xl:w-[30%] w-full' key={key}>
+    <div className='xl:w-[30%] w-full'>
                     <span className='text-[12px] xl:text-base'>{label}</span>
                     <DebounceInput
                       disabled={disabled}
