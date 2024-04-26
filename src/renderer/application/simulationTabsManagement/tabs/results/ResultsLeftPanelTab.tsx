@@ -21,15 +21,15 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
         <div>
           <>
             <div
-              className="flex mb-2 p-[5px] hover:cursor-pointer border-2 border-gray-200 rounded-xl gap-2"
+              className="flex mb-2 p-[5px] border-2 border-gray-200 rounded-xl gap-2"
               key={selectedProject.simulation.name}
             >
-              <div className="w-[12%] flex items-center">
+              {/* <div className="w-[12%] flex items-center">
                 <GiPowerButton
                   color={"#00ae52"}
                   style={{ width: "20px", height: "20px" }}
                 />
-              </div>
+              </div> */}
               <span className="w-[90%] text-left text-sm">
                 {selectedProject.simulation.name}
               </span>

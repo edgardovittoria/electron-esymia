@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -27,7 +27,6 @@ ChartJS.register(
 );
 
 interface ChartsListProps {
-  scaleMode: string;
   graphToVisualize: "All Graph" | "Z" | "S" | "Y";
   selectedLabel: { label: string, id: number }[]
 }
@@ -39,9 +38,22 @@ interface Dataset {
   backgroundColor: string;
 }
 
+interface ScaleMode {
+  xaxis: 'logarithmic'|'linear',
+  xnotation: 'exponential'|'decimal',
+  yaxis: 'logarithmic'|'linear',
+  ynotation: 'exponential'|'decimal',
+}
+
+const defaultScaleModes = (length: number) : ScaleMode[] => {
+  let modes: ScaleMode[] = []
+  for (let index = 0; index < length; index++) {
+    modes[index] = {xaxis: 'logarithmic', yaxis: 'linear', xnotation: "decimal", ynotation: "decimal"}
+  }
+  return modes
+}
 
 export const ChartsList: React.FC<ChartsListProps> = ({
-  scaleMode,
   graphToVisualize,
   selectedLabel
 }) => {
@@ -50,73 +62,65 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   const matrix_Z = JSON.parse((selectedProject?.simulation as Simulation).results.matrix_Z);
   const matrix_Y = JSON.parse((selectedProject?.simulation as Simulation).results.matrix_Y);
   const matrix_S = JSON.parse((selectedProject?.simulation as Simulation).results.matrix_S);
-  const [chartsOrderedIDs, setChartsOrderedIDs] = useState([
-    "R",
-    "L",
-    "Z_Module",
-    "Z_Phase",
-    "G",
-    "C",
-    "Y_Module",
-    "Y_Phase",
-    "S_Module",
-    "S_Phase",
-    "S_dB",
-  ])
-  const [chartsDataOptionsList, setChartsDataOptionsList] = useState(chartsOrderedIDs.map((id) =>
-    chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
-  ))
-  const [chartsDataToVisualize, setChartsDataToVisualize] = useState(chartsDataOptionsList)
+  const [scaleMode, setScaleMode] = useState<ScaleMode[]>(defaultScaleModes(11))
+  const chartsOrderedIDs = ["R",
+  "L",
+  "Z_Module",
+  "Z_Phase",
+  "G",
+  "C",
+  "Y_Module",
+  "Y_Phase",
+  "S_Module",
+  "S_Phase",
+  "S_dB",]
+  const [chartsDataToVisualize, setChartsDataToVisualize] = useState(chartsOrderedIDs.map((id) =>
+  chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+))
   useEffect(() => {
+    let graphs: string[] = []
     if (graphToVisualize === "All Graph") {
-      setChartsOrderedIDs(["R", "L", "Z_Module", "Z_Phase", "G", "C", "Y_Module", "Y_Phase", "S_Module", "S_Phase", "S_dB",])
+      graphs = ["R", "L", "Z_Module", "Z_Phase", "G", "C", "Y_Module", "Y_Phase", "S_Module", "S_Phase", "S_dB",]
     }
     if (graphToVisualize === "Z") {
-      setChartsOrderedIDs(["R", "L", "Z_Module", "Z_Phase"])
+      graphs = ["R", "L", "Z_Module", "Z_Phase"]
     }
     if (graphToVisualize === "Y") {
-      setChartsOrderedIDs(["G", "C", "Y_Module", "Y_Phase"])
+      graphs = ["G", "C", "Y_Module", "Y_Phase"]
     }
     if (graphToVisualize === "S") {
-      setChartsOrderedIDs(["S_Module", "S_Phase", "S_dB"])
+      graphs = ["S_Module", "S_Phase", "S_dB"]
     }
-  }, [graphToVisualize, selectedProject])
-
-  useEffect(() => {
     setChartsDataToVisualize(
-      chartsOrderedIDs.map((id) =>
+      graphs.map((id) =>
         chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
       )
     )
-  }, [chartsOrderedIDs, selectedProject, selectedLabel])
+    setScaleMode(defaultScaleModes(graphs.length))
+  }, [graphToVisualize, selectedProject, selectedLabel])
 
 
-  const optionsWithScaleMode = (options: any, scaleMode: string) => {
-    let updatedOptions;
-    switch (scaleMode) {
-      case "logarithmic":
-        updatedOptions = {
-          ...options,
+  const optionsWithScaleMode = (options: any, scaleMode: ScaleMode) => {
+    return {
+      ...options,
           scales: {
-            x: {
-              type: "logarithmic",
-              display: true,
+            x:
+            { ...options.scale.x,
+              type: scaleMode.xaxis === "logarithmic" ? "logarithmic": "linear",
+              ticks: {
+                callback: (val: number) => scaleMode.xnotation === "exponential" ? (val.toExponential()) : (val % 1 !== 0 ? val.toFixed(2) : val)
+              }
             },
+            y:
+            { ...options.scale.y,
+              type: scaleMode.yaxis === "logarithmic" ? "logarithmic": "linear",
+              ticks: {
+                callback: (val: number) => scaleMode.ynotation === "exponential" ? (val.toExponential()) : (val % 1 !== 0 ? val.toFixed(2) : val)
+              }
+            }
           },
-        };
-        break;
-      case "linear":
-        updatedOptions = {
-          ...options,
-          scales: {}
-        }
-        break;
-      default:
-        break;
     }
-    return updatedOptions;
   };
-
 
 
   return (
@@ -125,15 +129,116 @@ export const ChartsList: React.FC<ChartsListProps> = ({
         return (
           <div className="box w-[100%]" key={index}>
             <Line
-              options={optionsWithScaleMode(chartData.options, scaleMode)}
+              options={optionsWithScaleMode(chartData.options, scaleMode[index])}
               data={chartData.data}
             />
+            <ScaleChartOptions index={index} scaleMode={scaleMode} setScaleMode={setScaleMode}/>
           </div>
         )
       })}
     </>
   );
 };
+
+
+const ScaleChartOptions: FC<{index: number, scaleMode: ScaleMode[], setScaleMode: Function}> = ({scaleMode, index, setScaleMode}) => {
+  return (
+    <>
+    <div className="flex justify-between">
+              <div className="flex flex-row">
+                <div
+                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].yaxis === 'logarithmic' ? 'border-[#0fb25b]' : ''}`}
+                    onClick={() => {
+                      let newScaleMode = [...scaleMode]
+                      newScaleMode[index] = {...newScaleMode[index], yaxis: 'logarithmic'}
+                      setScaleMode(newScaleMode)
+                    }}
+                >
+                    <span className="text-[12px]">logarithmic-y</span>
+                </div>
+                <div
+                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].yaxis === 'linear' ? 'border-[#0fb25b]' : ''}`}
+                    onClick={() => {
+                      let newScaleMode = [...scaleMode]
+                      newScaleMode[index] = {...newScaleMode[index], yaxis: 'linear'}
+                      setScaleMode(newScaleMode)
+                    }}
+                >
+                    <span className="text-[12px]">linear-y</span>
+                </div>
+              </div>
+              <div className="flex flex-row">
+                <div
+                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].xaxis === 'logarithmic' ? 'border-[#0fb25b]' : ''}`}
+                    onClick={() => {
+                      let newScaleMode = [...scaleMode]
+                      newScaleMode[index] = {...newScaleMode[index], xaxis: 'logarithmic'}
+                      setScaleMode(newScaleMode)
+                    }}
+                >
+                    <span className="text-[12px]">logarithmic-x</span>
+                </div>
+                <div
+                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].xaxis === 'linear' ? 'border-[#0fb25b]' : ''}`}
+                    onClick={() => {
+                      let newScaleMode = [...scaleMode]
+                      newScaleMode[index] = {...newScaleMode[index], xaxis: 'linear'}
+                      setScaleMode(newScaleMode)
+                    }}
+                >
+                    <span className="text-[12px]">linear-x</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <div className="flex flex-row">
+                <div
+                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].ynotation === "exponential" ? 'border-[#0fb25b]' : ''}`}
+                    onClick={() => {
+                      let newScaleMode = [...scaleMode]
+                      newScaleMode[index] = {...newScaleMode[index], ynotation: 'exponential'}
+                      setScaleMode(newScaleMode)
+                    }}
+                >
+                    <span className="text-[12px]">exp-notation-y</span>
+                </div>
+                <div
+                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].ynotation === 'decimal' ? 'border-[#0fb25b]' : ''}`}
+                    onClick={() => {
+                      let newScaleMode = [...scaleMode]
+                      newScaleMode[index] = {...newScaleMode[index], ynotation: 'decimal'}
+                      setScaleMode(newScaleMode)
+                    }}
+                >
+                    <span className="text-[12px]">lin-notation-y</span>
+                </div>
+              </div>
+              <div className="flex flex-row">
+                <div
+                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].xnotation === 'exponential' ? 'border-[#0fb25b]' : ''}`}
+                    onClick={() => {
+                      let newScaleMode = [...scaleMode]
+                      newScaleMode[index] = {...newScaleMode[index], xnotation: 'exponential'}
+                      setScaleMode(newScaleMode)
+                    }}
+                >
+                    <span className="text-[12px]">exp-notation-x</span>
+                </div>
+                <div
+                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].xnotation === 'decimal' ? 'border-[#0fb25b]' : ''}`}
+                    onClick={() => {
+                      let newScaleMode = [...scaleMode]
+                      newScaleMode[index] = {...newScaleMode[index], xnotation: 'decimal'}
+                      setScaleMode(newScaleMode)
+                    }}
+                >
+                    <span className="text-[12px]">lin-notation-x</span>
+                </div>
+              </div>
+            </div>
+    </>
+  )
+}
 
 const chartsDataOptionsFactory = (
   simulation: Simulation,
@@ -211,6 +316,14 @@ const chartsDataOptionsFactory = (
           right: 20,
         },
       },
+      scale:{
+        x:{
+          display: true,
+        },
+        y:{
+          display: true,
+        }
+      }
     };
     result.data = {
       labels: innerLabels,

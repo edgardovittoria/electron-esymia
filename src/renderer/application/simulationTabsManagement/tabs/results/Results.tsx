@@ -78,20 +78,17 @@ export const Results: React.FC<ResultsProps> = ({
       <div className="w-[78%]">
         {selectedProject && selectedProject.simulation && selectedProject.simulation.status == 'Completed' ? (
             <>
-              {selectedTabLeftPanel === resultsLeftPanelTitle.first && (
-                <ChartVisualizationMode
-                  chartVisualizationMode={chartVisualizationMode}
-                  setChartVisualizationMode={setChartVisualizationMode}
-                  chartsScaleMode={chartsScaleMode}
-                  setChartsScaleMode={setChartsScaleMode}
-                  setGraphToVisualize={setGraphToVisualize}
-                  selectedLabel={selectedLabel}
-                  setSelectedLabel={setSelectedLabel}
-                />
-              )}
+              <ChartVisualizationMode
+                chartVisualizationMode={chartVisualizationMode}
+                setChartVisualizationMode={setChartVisualizationMode}
+                chartsScaleMode={chartsScaleMode}
+                setChartsScaleMode={setChartsScaleMode}
+                setGraphToVisualize={setGraphToVisualize}
+                selectedLabel={selectedLabel}
+                setSelectedLabel={setSelectedLabel}
+              />
               <div className={chartVisualizationMode === "full" ? "overflow-scroll grid grid-cols-1 gap-4 max-h-[77vh] pb-10": "grid grid-cols-2 gap-4 overflow-scroll max-h-[77vh] pb-10"}>
                 <ChartsList
-                  scaleMode={chartsScaleMode}
                   graphToVisualize={graphToVisualize}
                   selectedLabel={selectedLabel}
                 />
