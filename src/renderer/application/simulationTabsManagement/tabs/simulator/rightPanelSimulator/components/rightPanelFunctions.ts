@@ -26,12 +26,15 @@ export function generateSTLListFromComponents(
     );
   });
 
-  const STLList: { material: string; STL: string }[] = [];
+  const STLList: { material: {name: string, conductivity: number}; STL: string }[] = [];
 
   filteredComponents.forEach((fc) => {
     const STLToPush = exportToSTL(fc);
     STLList.push({
-      material: fc[0].material?.name as string,
+      material: {
+        name: fc[0].material?.name as string,
+        conductivity: fc[0].material?.conductivity as number
+      },
       STL: STLToPush
     });
   });
