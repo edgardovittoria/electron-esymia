@@ -17,7 +17,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
 
   return (
     <>
-      {selectedProject && selectedProject.simulation ? (
+      {selectedProject && selectedProject.simulation && selectedProject.simulation.status == 'Completed' ? (
         <div>
           <>
             <div

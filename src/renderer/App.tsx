@@ -5,7 +5,6 @@ import { usersStateSelector, useFaunaQuery } from 'cad-library';
 import { ImSpinner } from 'react-icons/im';
 import { TabsContainer } from './application/TabsContainer';
 import {
-  setFolderOfElementsSharedWithUser,
   setProjectsFolderToUser,
   selectFolder, activeSimulationsSelector
 } from './store/projectSlice';
@@ -14,18 +13,13 @@ import { DashboardTabsContentFactory } from './application/dashboardTabsManageme
 import { SimulationTabsContentFactory } from './application/simulationTabsManagement/SimulationTabsContentFactory';
 import {
   getFoldersByOwner,
-  getSharedFolders,
-  getSharedSimulationProjects,
   getSimulationProjectsByOwner,
 } from './faunadb/projectsFolderAPIs';
 import { tabSelectedSelector } from './store/tabsAndMenuItemsSlice';
 import {
   constructFolderStructure,
-  faunaFolderHaveParentInList,
-  faunaProjectHaveParentInFolderList,
 } from './faunadb/apiAuxiliaryFunctions';
 import { FaunaFolder, FaunaProject } from './model/FaunaModels';
-import { numberOfActiveSimulationsSelector } from './store/solverSlice';
 import SimulationStatus
   from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/SimulationStatus';
 

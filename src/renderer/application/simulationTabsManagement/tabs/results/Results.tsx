@@ -56,7 +56,7 @@ export const Results: React.FC<ResultsProps> = ({
               dispatch(selectPort(portName))
             }
           />
-          {(selectedProject?.simulation) &&
+          {(selectedProject?.simulation && selectedProject.simulation.status == 'Completed') &&
             <button
               type="button"
               className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60 text-sm"
@@ -76,7 +76,7 @@ export const Results: React.FC<ResultsProps> = ({
         </MyPanel>
       </div>
       <div className="w-[78%]">
-        {selectedProject && selectedProject.simulation ? (
+        {selectedProject && selectedProject.simulation && selectedProject.simulation.status == 'Completed' ? (
             <>
               {selectedTabLeftPanel === resultsLeftPanelTitle.first && (
                 <ChartVisualizationMode
