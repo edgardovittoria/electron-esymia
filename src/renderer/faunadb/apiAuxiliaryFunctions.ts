@@ -96,7 +96,6 @@ export const convertInFaunaProjectThis = (project: Project) => {
       description: project.description,
       modelS3: project.modelS3,
       ports: project.ports,
-      portKey: project.portKey,
       frequencies: project.frequencies,
       //signal: project.signal,
       simulation: project.simulation === undefined ? null : project.simulation,
@@ -105,7 +104,8 @@ export const convertInFaunaProjectThis = (project: Project) => {
       owner: project.owner,
       sharedWith: project.sharedWith,
       parentFolder: project.parentFolder,
-      scatteringValue: project.scatteringValue
+      scatteringValue: project.scatteringValue,
+      suggestedQuantum: project.suggestedQuantum
     } as FaunaProjectDetails,
   };
   return faunaProject;

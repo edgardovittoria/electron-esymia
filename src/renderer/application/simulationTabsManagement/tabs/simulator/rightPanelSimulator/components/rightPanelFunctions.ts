@@ -178,10 +178,10 @@ export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: 
   axios
     .post('http://127.0.0.1:8003/meshingAdvice', objToSendToMesher)
     .then(res => {
-      dispatch(setSuggestedQuantum(([parseFloat(res.data[0].toFixed(4)), parseFloat(res.data[1].toFixed(4)), parseFloat(res.data[2].toFixed(4))])))
+      dispatch(setSuggestedQuantum(([parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))])))
       execQuery(
         updateProjectInFauna,
-        convertInFaunaProjectThis({...selectedProject, suggestedQuantum: [parseFloat(res.data[0].toFixed(4)), parseFloat(res.data[1].toFixed(4)), parseFloat(res.data[2].toFixed(4))]} as Project)
+        convertInFaunaProjectThis({...selectedProject, suggestedQuantum: [parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))]} as Project)
       ).then();
     }).catch((err) => setSuggestedQuantumError(true))
 }

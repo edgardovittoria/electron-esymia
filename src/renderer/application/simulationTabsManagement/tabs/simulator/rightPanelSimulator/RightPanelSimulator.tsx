@@ -81,6 +81,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
     }
   }, [selectedProject.meshData.mesh,
     selectedProject.meshData.externalGrids])
+
   function checkQuantumDimensionsValidity() {
     let validity = true;
     quantumDimsInput.forEach((v) => {
@@ -94,9 +95,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   useEffect(() => {
     if(externalGrids){
       setQuantumDimsInput([
-        parseFloat((externalGrids.cell_size.cell_size_x * 1000).toFixed(4)),
-        parseFloat((externalGrids.cell_size.cell_size_y * 1000).toFixed(4)),
-        parseFloat((externalGrids.cell_size.cell_size_z * 1000).toFixed(4)),
+        parseFloat((externalGrids.cell_size.cell_size_x * 1000).toFixed(5)),
+        parseFloat((externalGrids.cell_size.cell_size_y * 1000).toFixed(5)),
+        parseFloat((externalGrids.cell_size.cell_size_z * 1000).toFixed(5)),
       ])
     }
   },[externalGrids])
@@ -132,7 +133,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     disabled={selectedProject.simulation?.status === 'Completed' || selectedProject.model?.components === undefined}
                     key={indexQuantumComponent}
                     label={quantumDimensionsLabels[indexQuantumComponent]}
-                    value={parseFloat(quantumComponent.toFixed(4))}
+                    value={parseFloat(quantumComponent.toFixed(5))}
                     onChange={(event) => setQuantumDimsInput(quantumDimsInput.map((q, ind) => ind === indexQuantumComponent ? parseFloat(event.target.value) : q) as [number, number, number])}
                   />
                 )
@@ -140,7 +141,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             </div>
             {selectedProject.suggestedQuantum &&
               <div className='text-[12px] xl:text-base font-semibold mt-2'>
-                Suggested: [{selectedProject.suggestedQuantum[0].toFixed(4)}, {selectedProject.suggestedQuantum[1].toFixed(4)}, {selectedProject.suggestedQuantum[2].toFixed(4)}]
+                Suggested: [{selectedProject.suggestedQuantum[0].toFixed(5)}, {selectedProject.suggestedQuantum[1].toFixed(5)}, {selectedProject.suggestedQuantum[2].toFixed(5)}]
               </div>
             }
             {suggestedQuantumError &&

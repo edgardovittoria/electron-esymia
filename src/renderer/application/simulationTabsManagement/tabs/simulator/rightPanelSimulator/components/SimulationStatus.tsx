@@ -40,7 +40,7 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
       </div>
       <hr className='text-secondaryColor w-full mb-5 mt-3' />
       <div className="max-h-[600px] overflow-y-scroll w-full">
-        {activeSimulations.map(sim => <SimulationStatusItem name={sim.simulation.name} frequenciesNumber={sim.freqNumber} associatedProjectID={sim.simulation.associatedProject}/>)}
+        {activeSimulations.map(sim => <SimulationStatusItem key={sim.simulation.name} name={sim.simulation.name} frequenciesNumber={sim.freqNumber} associatedProjectID={sim.simulation.associatedProject}/>)}
       </div>
     </div>
   );
@@ -154,7 +154,7 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number, as
 
 
   return (
-    <div className='w-full px-4 pt-2' key={name}>
+    <div className='w-full px-4 pt-2'>
       <div className='mx-auto w-full max-w-md rounded-2xl bg-white p-2'>
         <Disclosure>
           {({ open }) => (
