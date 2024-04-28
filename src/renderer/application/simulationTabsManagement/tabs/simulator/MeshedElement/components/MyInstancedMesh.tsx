@@ -31,30 +31,24 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
             Object.values(externalGrids.externalGrids).forEach((matrix:Brick[], index) => {
                 if (externalGrids && meshRef.current[index]) {
                     let y = 0;
+                  console.log(matrix.length)
                     matrix.forEach(m => {
                         const id = y++;
                         tempObject.position.set(
                             m.x !== 0
-                                ? ((m.x - 1) * externalGrids.cell_size.cell_size_x +
-                                    externalGrids.cell_size.cell_size_x) *
-                                1020
-                                : externalGrids.origin.origin_x,
+                                ? ((m.x) * externalGrids.cell_size.cell_size_x) * 1020
+                                : externalGrids.origin.origin_x/1000,
                             m.y !== 0
-                                ? ((m.y - 1) * externalGrids.cell_size.cell_size_y +
-                                    externalGrids.cell_size.cell_size_y) *
+                                ? ((m.y) * externalGrids.cell_size.cell_size_y) *
                                 1020
-                                : externalGrids.origin.origin_y,
+                                : externalGrids.origin.origin_y/1000,
                             m.z !== 0
-                                ? ((m.z - 1) * externalGrids.cell_size.cell_size_z +
-                                    externalGrids.cell_size.cell_size_z) *
-                                1020
-                                : externalGrids.origin.origin_z
+                                ? ((m.z) * externalGrids.cell_size.cell_size_z ) * 1020
+                                : externalGrids.origin.origin_z/1000
                         );
                         tempObject.updateMatrix();
                         meshRef.current[index].setMatrixAt(id, tempObject.matrix);
                         edgeRef.current[index].setMatrixAt(id, tempObject.matrix);
-
-
                     })
 
                     meshRef.current[index].instanceMatrix.needsUpdate = true;
