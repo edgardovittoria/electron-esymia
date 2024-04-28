@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectedProjectSelector, setFrequencies } from '../../../../../store/projectSlice';
 import { DebounceInput } from 'react-debounce-input';
+import { log10 } from 'chart.js/helpers';
 
 export interface FrequenciesDefProps{
   setSavedPhysicsParameters: Function
@@ -32,22 +33,22 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         </div>
         <div className='flex flex-row justify-between gap-2 mt-5'>
           <div className='flex flex-col items-center gap-2'>
-            <span>{scaleType === 0 ? 'exp f min' : 'f min'}</span>
+            <span>{'f min'}</span>
             <DebounceInput
               debounceTimeout={500}
               className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
               type="number"
-              value={fMin}
+              value={isNaN(fMin) ? 0 : fMin}
               onChange={(e) => (scaleType === 0) ? setFMin(parseInt(e.target.value)) :setFMin(parseFloat(e.target.value))}
             />
           </div>
           <div className='flex flex-col items-center gap-2'>
-            <span>{scaleType === 0 ? 'exp f max' : 'f max'}</span>
+            <span>{'f max'}</span>
             <DebounceInput
               debounceTimeout={500}
               className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
               type="number"
-              value={fMax}
+              value={isNaN(fMax) ? 0 : fMax}
               onChange={(e) => (scaleType === 0) ? setFMax(parseInt(e.target.value)) :setFMax(parseFloat(e.target.value))}
             />
           </div>
@@ -59,7 +60,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
               type="number"
               min={0}
               step={1}
-              value={fNum}
+              value={isNaN(fNum) ? 0 : fNum}
               onChange={(e) => setFNum(parseInt(e.target.value))}
             />
           </div>
@@ -68,7 +69,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
           className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
           disabled={(fNum === 0 || fMax <= fMin)}
           onClick={() => {
-            scaleType === 0 ? dispatch(setFrequencies(logSpace(fMin, fMax, fNum))) : dispatch(setFrequencies(linSpace(fMin, fMax, fNum)))
+            scaleType === 0 ? dispatch(setFrequencies(logSpace(log10(fMin), log10(fMax), fNum))) : dispatch(setFrequencies(linSpace(fMin, fMax, fNum)))
             setSavedPhysicsParameters(false)
           }}
         >
@@ -79,13 +80,13 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
             <h6 className="w-[100%] mb-2">Generated Frequencies</h6>
             <div className='flex flex-row'>
               <h6 className="w-[20%] mb-2">n.{selectedProject.frequencies.length}</h6>
-              <h6 className="w-[40%] mb-2"> min:{selectedProject.frequencies[0].toExponential()}</h6>
-              <h6 className="w-[40%] mb-2"> max: {selectedProject.frequencies[selectedProject.frequencies.length -1].toExponential()}</h6>
+              <h6 className="w-[40%] mb-2"> min:{parseFloat(selectedProject.frequencies[0].toFixed(4)).toExponential()}</h6>
+              <h6 className="w-[40%] mb-2"> max: {parseFloat(selectedProject.frequencies[selectedProject.frequencies.length -1].toFixed(4)).toExponential()}</h6>
             </div>
             <div className="p-3 bg-white border border-secondaryColor flex flex-col overflow-y-scroll max-h-[200px]">
               {selectedProject.frequencies.map((f,index) => {
                 return(
-                  <span key={index}>{f}</span>
+                  <span key={index}>{f.toFixed(4)}</span>
                 )
               })}
             </div>

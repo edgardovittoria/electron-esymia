@@ -241,7 +241,7 @@ const TerminationPositionInput: FC<TerminationPositionInputProps> = ({disabled, 
 									type="number"
                   debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
 									step={inputStep ? inputStep : 0.000001}
-									value={value}
+									value={isNaN(value) ? 0 : value}
 									onChange={onChange}
 									onWheel={(e: { target: { blur: () => any; }; }) => e.target.blur()}
 								/>

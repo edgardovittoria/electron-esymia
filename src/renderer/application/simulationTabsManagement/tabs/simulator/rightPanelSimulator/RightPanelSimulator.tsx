@@ -210,9 +210,10 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   step={1}
                   value={
                     selectedProject.simulation
-                      ? selectedProject.simulation.solverAlgoParams
+                      ? isNaN(selectedProject.simulation.solverAlgoParams
+                        .innerIteration) ? 0 : selectedProject.simulation.solverAlgoParams
                         .innerIteration
-                      : solverIterations[0]
+                      : isNaN(solverIterations[0]) ? 0 : solverIterations[0]
                   }
                   onChange={(event) => {
                     dispatch(setSolverIterations([
@@ -235,9 +236,10 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   step={1}
                   value={
                     selectedProject.simulation
-                      ? selectedProject.simulation.solverAlgoParams
+                      ? isNaN(selectedProject.simulation.solverAlgoParams
+                        .outerIteration) ? 0 : selectedProject.simulation.solverAlgoParams
                         .outerIteration
-                      : solverIterations[1]
+                      : isNaN(solverIterations[1]) ? 0 : solverIterations[1]
                   }
                   onChange={(event) => {
                     dispatch(setSolverIterations([
@@ -261,16 +263,17 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     selectedProject.simulation?.status === 'Completed' ||
                     meshGenerated !== 'Generated'
                   }
-                  min={0.0000000001}
+                  min={0.0001}
                   max={0.1}
                   className='w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl'
                   type='number'
-                  step={0.0000000001}
+                  step={0.0001}
                   value={
                     selectedProject.simulation
-                      ? selectedProject.simulation.solverAlgoParams
+                      ? isNaN(selectedProject.simulation.solverAlgoParams
+                        .convergenceThreshold) ? 0 : selectedProject.simulation.solverAlgoParams
                         .convergenceThreshold
-                      : convergenceThreshold
+                      : isNaN(convergenceThreshold) ? 0 : convergenceThreshold
                   }
                   onChange={(event) => {
                     dispatch(setConvergenceTreshold(parseFloat(event.target.value)));
