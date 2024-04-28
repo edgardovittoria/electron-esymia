@@ -345,7 +345,7 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({disabled, debounceTimeoutM
                       type='number'
                       debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
                       step={inputStep? inputStep : 0.0001}
-                      value={value}
+                      value={isNaN(value) ? 0 : value}
                       onChange={onChange}
                     />
                   </div>
