@@ -38,10 +38,10 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
                                             <div className="flex gap-2 items-center">
                                                 <div className="flex items-center">
                                                     <FaCircle
-                                                        color={(material !== undefined) ? material.color : "gray"}/>
+                                                        color={(material) ? material.color : "gray"}/>
                                                 </div>
                                                 <div className="text-left">
-                                                    <h6 className="mb-0 text-[15px] font-normal">{(material !== undefined) ? material.name : "No material"}</h6>
+                                                    <h6 className="mb-0 text-[15px] font-normal">{(material) ? material.name : "No material"}</h6>
                                                 </div>
                                             </div>
                                             <MdOutlineKeyboardArrowDown
@@ -67,11 +67,11 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
                                                     <span>{material.conductivity}</span>
                                                 </div>
                                                 <div className="flexl gap-1">
-                                                    <span className="font-bold">Permittivity: </span>
+                                                    <span className="font-bold">Relative Permittivity: </span>
                                                     <span>{material.permittivity}</span>
                                                 </div>
                                                 <div className="flexl gap-1">
-                                                    <span className="font-bold">Permeability: </span>
+                                                    <span className="font-bold">Relative Permeability: </span>
                                                     <span>{material.permeability}</span>
                                                 </div>
                                                 <div className="flexl gap-1">
