@@ -14,6 +14,7 @@ import { Line } from "react-chartjs-2";
 import { Port, Project, Simulation } from "../../../../model/esymiaModels";
 import { useSelector } from "react-redux";
 import { selectedProjectSelector } from "../../../../store/projectSlice";
+import { VscSettings } from "react-icons/vsc";
 
 ChartJS.register(
   CategoryScale,
@@ -53,11 +54,20 @@ const defaultScaleModes = (length: number) : ScaleMode[] => {
   return modes
 }
 
+const defaultShowGraphsSettings = (length:number) => {
+  let shows = []
+  for (let index = 0; index < length; index++) {
+    shows[index] = false
+  }
+  return shows
+}
+
 export const ChartsList: React.FC<ChartsListProps> = ({
   graphToVisualize,
   selectedLabel
 }) => {
   const selectedProject = useSelector(selectedProjectSelector)
+  const [showGraphsSettings, setShowGraphsSettings] = useState<boolean[]>(defaultShowGraphsSettings(11))
   const ports = selectedProject?.ports.filter(p => p.category === 'port') as Port[]
   const matrix_Z = JSON.parse((selectedProject?.simulation as Simulation).results.matrix_Z);
   const matrix_Y = JSON.parse((selectedProject?.simulation as Simulation).results.matrix_Y);
@@ -128,11 +138,16 @@ export const ChartsList: React.FC<ChartsListProps> = ({
       {chartsDataToVisualize.map((chartData, index) => {
         return (
           <div className="box w-[100%]" key={index}>
+            <VscSettings onClick={() => {
+              let shows = [...showGraphsSettings]
+              shows[index] = !shows[index]
+              setShowGraphsSettings(shows)
+            }}/>
+            {showGraphsSettings[index] && <ScaleChartOptions index={index} scaleMode={scaleMode} setScaleMode={setScaleMode}/>}
             <Line
               options={optionsWithScaleMode(chartData.options, scaleMode[index])}
               data={chartData.data}
             />
-            <ScaleChartOptions index={index} scaleMode={scaleMode} setScaleMode={setScaleMode}/>
           </div>
         )
       })}
