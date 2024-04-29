@@ -1,5 +1,5 @@
 import './App.css';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { usersStateSelector, useFaunaQuery } from 'cad-library';
 import { ImSpinner } from 'react-icons/im';
@@ -15,13 +15,19 @@ import {
   getFoldersByOwner,
   getSimulationProjectsByOwner,
 } from './faunadb/projectsFolderAPIs';
-import { tabSelectedSelector } from './store/tabsAndMenuItemsSlice';
+import {
+  showCreateNewProjectModalSelector,
+  showInfoModalSelector,
+  tabSelectedSelector
+} from './store/tabsAndMenuItemsSlice';
 import {
   constructFolderStructure,
 } from './faunadb/apiAuxiliaryFunctions';
 import { FaunaFolder, FaunaProject } from './model/FaunaModels';
 import SimulationStatus
   from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/SimulationStatus';
+import InfoModal from './application/sharedModals/InfoModal';
+import { CreateNewProjectModal } from './application/sharedModals/CreateNewProjectModal';
 
 
 export default function App() {
@@ -85,10 +91,17 @@ export default function App() {
     }
   }, [activeSimulations.length]);
 
+  const showInfoModal = useSelector(showInfoModalSelector)
+  const showCreateNewProjectModal = useSelector(showCreateNewProjectModalSelector)
+
   return (
     <div className="lg:h-[100vh] h-screen">
       {loginSpinner && (
         <ImSpinner className="animate-spin w-12 h-12 absolute left-1/2 top-1/2" />
+      )}
+      {showInfoModal && <InfoModal/>}
+      {showCreateNewProjectModal && (
+        <CreateNewProjectModal />
       )}
       <div className={`${loginSpinner && 'opacity-40'} h-[100vh]`}>
         {memoizedTabsContainer}
@@ -106,7 +119,6 @@ export default function App() {
             SIM
           </button>
         }
-
         {activeSimulations && activeSimulations.length > 0 && <SimulationStatus feedbackSimulationVisible={feedbackSimulationVisible} setFeedbackSimulationVisible={setFeedbackSimulationVisible} activeSimulations={activeSimulations}/>}
       </div>
     </div>

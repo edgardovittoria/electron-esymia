@@ -191,12 +191,12 @@ export const ModalSignals: React.FC<ModalSignalsProps> = (
                                                             signalValues: signalValuesArray,
                                                             powerPort: undefined
                                                         }
-                                                        let confirm = window.confirm('Are you sure to save the signal?');
+                                                        /* let confirm = window.confirm('Are you sure to save the signal?');
                                                         if(confirm){
                                                             setAvailableSignals([...availableSignals, newSignal])
                                                             await execQuery(saveSignal, newSignal)
                                                             onModalClose()
-                                                        }
+                                                        } */
 
                                                     }}
                                             >ADD SIGNAL

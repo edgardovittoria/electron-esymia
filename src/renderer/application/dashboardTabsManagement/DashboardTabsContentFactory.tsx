@@ -11,30 +11,23 @@ interface DashboardTabsContentFactoryProps {}
 export const DashboardTabsContentFactory: React.FC<
   DashboardTabsContentFactoryProps
 > = () => {
-  const [showCreateNewProjectModal, setShowCreateNewProjectModal] =
-    useState(false);
+
   const menuItemSelected = useSelector(selectedMenuItemSelector);
 
   switch (menuItemSelected) {
     case 'Overview':
       return (
         <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] lg:h-[72vh] h-[80vh]">
-          <Overview setShowModal={setShowCreateNewProjectModal} />
+          <Overview />
           {/* <RightPanel /> */}
-          {showCreateNewProjectModal && (
-            <CreateNewProjectModal setShow={setShowCreateNewProjectModal} />
-          )}
         </div>
       );
 
     case 'Projects':
       return (
         <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] overflow-y-scroll h-[85vh]">
-          <Projects setShowModal={setShowCreateNewProjectModal} />
+          <Projects />
           {/* <RightPanel /> */}
-          {showCreateNewProjectModal && (
-            <CreateNewProjectModal setShow={setShowCreateNewProjectModal} />
-          )}
         </div>
       );
     case 'Simulations':

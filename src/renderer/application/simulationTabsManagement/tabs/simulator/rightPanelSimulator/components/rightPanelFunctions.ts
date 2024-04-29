@@ -13,6 +13,12 @@ import { Project } from '../../../../../../model/esymiaModels';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { AppDispatch } from '../../../../../../store/store';
+import {
+  setIsAlertInfoModal,
+  setMessageInfoModal,
+  setShowInfoModal
+} from '../../../../../../store/tabsAndMenuItemsSlice';
+import toast from 'react-hot-toast';
 
 export function generateSTLListFromComponents(
   materialList: Material[],
@@ -75,7 +81,7 @@ export const saveMeshAndExternalGridsToS3 = async (
           })
           .catch((err) => {
             console.log(err);
-            window.alert('Error while meshing, please try again');
+            toast.error('Error while saving mesh, please try again');
             dispatch(setMeshGenerated('Not Generated'));
           });
       }
@@ -85,7 +91,7 @@ export const saveMeshAndExternalGridsToS3 = async (
   return 'saved';
 };
 
-export const launchMeshing = (selectedProject: Project, allMaterials: Material[], quantumDimsInput: [number, number, number], dispatch: AppDispatch, saveMeshAndExternalGridsToS3: Function) => {
+export const launchMeshing = (selectedProject: Project, allMaterials: Material[], quantumDimsInput: [number, number, number], dispatch: AppDispatch, saveMeshAndExternalGridsToS3: Function, setAlert:Function) => {
   const components = selectedProject?.model
     ?.components as ComponentEntity[];
   const objToSendToMesher = {
@@ -101,24 +107,25 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
     .post('http://127.0.0.1:8003/meshing', objToSendToMesher)
     .then((res) => {
       if (res.data.x) {
-        dispatch(setMeshGenerated('Not Generated'));
-        alert(
-          `the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`
-        );
+        dispatch(setMessageInfoModal(`the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`))
+        dispatch(setIsAlertInfoModal(true))
+        dispatch(setShowInfoModal(true))
+        setAlert(true)
       } else if (res.data.y) {
-        dispatch(setMeshGenerated('Not Generated'));
-        alert(
-          `the size of the quantum on y is too large compared to the size of the model on y. Please reduce the size of the quantum on y! y must be less than ${res.data.max_y}`
-        );
+        dispatch(setMessageInfoModal(`the size of the quantum on y is too large compared to the size of the model on y. Please reduce the size of the quantum on y! y must be less than ${res.data.max_y}`))
+        dispatch(setIsAlertInfoModal(true))
+        dispatch(setShowInfoModal(true))
+        setAlert(true)
       } else if (res.data.z) {
-        dispatch(setMeshGenerated('Not Generated'));
-        alert(
-          `the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`
-        );
+        dispatch(setMessageInfoModal(`the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`))
+        dispatch(setIsAlertInfoModal(true))
+        dispatch(setShowInfoModal(true))
+        setAlert(true)
       } else if (res.data.mesh_is_valid.valid == false) {
-        window.alert('Error! Mesh not valid. Please adjust quantum along ' + res.data.mesh_is_valid.axis + ' axis.');
-        dispatch(setMeshGenerated('Not Generated'));
-        dispatch(unsetMesh());
+        dispatch(setMessageInfoModal('Error! Mesh not valid. Please adjust quantum along ' + res.data.mesh_is_valid.axis + ' axis.'))
+        dispatch(setIsAlertInfoModal(true))
+        dispatch(setShowInfoModal(true))
+        setAlert(true)
       } else {
         const grids: any[] = [];
         for (const value of Object.values(res.data.mesher_matrices)) {

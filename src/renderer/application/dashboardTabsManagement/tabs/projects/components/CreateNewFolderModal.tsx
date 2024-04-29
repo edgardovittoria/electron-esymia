@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addFolder, SelectedFolderSelector } from "../../../../../store/projectSlice";
 import { Dialog, Transition } from "@headlessui/react";
 import { Folder } from '../../../../../model/esymiaModels';
+import toast from 'react-hot-toast';
 
 interface CreateNewFolderModalProps {
     setShowNewFolderModal: Function,
@@ -45,7 +46,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
             })
             setShowNewFolderModal(false)
         } else {
-            alert("Folder's name is required!")
+            toast.error("Folder's name is required!")
         }
     }
 

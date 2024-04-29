@@ -5,14 +5,12 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { SetUserInfo, UsersState } from 'cad-library';
 import { HiOutlineLogout } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
-import { GiSettingsKnobs } from 'react-icons/gi';
 import { SelectedFolderSelector, selectProject } from '../store/projectSlice';
-import { CreateNewProjectModal } from './sharedModals/CreateNewProjectModal';
 import {
   closeProjectTab,
   projectsTabsSelector,
-  selectTab,
-  tabSelectedSelector,
+  selectTab, setShowCreateNewProjectModal,
+  tabSelectedSelector
 } from '../store/tabsAndMenuItemsSlice';
 
 interface TabsContainerProps {
@@ -29,8 +27,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
 
   const { loginWithPopup, isAuthenticated } = useAuth0();
 
-  const [showCreateNewProjectModal, setShowCreateNewProjectModal] =
-    useState(false);
+
 
   return (
     <>
@@ -100,7 +97,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
           })}
           <li className="nav-item m-auto mx-4">
             <FaPlus
-              onClick={() => (selectedFolder?.faunaDocumentId !== "shared_root") && setShowCreateNewProjectModal(true)}
+              onClick={() => (selectedFolder?.faunaDocumentId !== "shared_root") && dispatch(setShowCreateNewProjectModal(true))}
               className="w-[12px] h-[12px] text-gray-400"
             />
           </li>
@@ -151,9 +148,6 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
           )}
         </div>
       </div>
-      {showCreateNewProjectModal && (
-        <CreateNewProjectModal setShow={setShowCreateNewProjectModal} />
-      )}
     </>
   );
 };

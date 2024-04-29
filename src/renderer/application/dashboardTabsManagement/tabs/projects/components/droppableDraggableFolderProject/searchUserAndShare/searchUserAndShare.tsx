@@ -19,6 +19,7 @@ import {
   sharingInfoUser,
 } from '../../../../../../../model/esymiaModels';
 import { convertInFaunaProjectThis } from '../../../../../../../faunadb/apiAuxiliaryFunctions';
+import toast from 'react-hot-toast';
 
 interface SearchUserAndShareProps {
   setShowSearchUser: (v: boolean) => void;
@@ -81,11 +82,11 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
       execQuery(recursiveUpdateSharingInfoFolderInFauna, folderToShare)
         .then(() => {
           setShowSearchUser(false);
-          window.alert('Sharing Successful!!');
+          toast.success('Sharing Successful!');
         })
         .catch((err) => {
           setShowSearchUser(false);
-          window.alert('Sharing Failed!! Please try again!');
+          toast.error('Sharing Failed!! Please try again!');
         });
     }
   }, [folderToShare?.sharedWith]);
@@ -191,11 +192,11 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                             )
                               .then(() => {
                                 setShowSearchUser(false);
-                                window.alert('Sharing Successful!!');
+                                toast.success('Sharing Successful!!');
                               })
                               .catch((err) => {
                                 setShowSearchUser(false);
-                                window.alert(
+                                toast.error(
                                   'Sharing Failed!! Please try again!',
                                 );
                               });

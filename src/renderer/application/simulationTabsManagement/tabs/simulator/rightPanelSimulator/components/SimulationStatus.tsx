@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import { Disclosure } from '@headlessui/react';
 import useWebSocket from 'react-use-websocket';
@@ -18,6 +18,12 @@ import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAP
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { getMaterialListFrom } from '../../Simulator';
 import { ComponentEntity, useFaunaQuery } from 'cad-library';
+import {
+  infoModalSelector, isAlertInfoModalSelector, isConfirmedInfoModalSelector,
+  setIsAlertInfoModal,
+  setMessageInfoModal,
+  setShowInfoModal
+} from '../../../../../../store/tabsAndMenuItemsSlice';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean,
@@ -59,9 +65,22 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number, as
   const convergenceThreshold = useSelector(convergenceTresholdSelector)
   const allProjects = useSelector(projectsSelector);
   const allSharedProjects = useSelector(sharedProjectsSelector);
+  const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector)
+  const isAlert = useSelector(isAlertInfoModalSelector)
 
   const dispatch = useDispatch()
   const { execQuery } = useFaunaQuery()
+
+  useEffect(() => {
+    if(isAlertConfirmed){
+      if(!isAlert){
+        sendMessage('Stop computation');
+      }else{
+        dispatch(deleteSimulation(associatedProjectID));
+        dispatch(setMeshApproved(false));
+      }
+    }
+  }, [isAlertConfirmed]);
 
   const solverInputFrom = (
     project: Project,
@@ -132,9 +151,9 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number, as
         })
         .catch((err) => {
           console.log(err);
-          window.alert('Error while solving, please try again');
-          dispatch(deleteSimulation(associatedProjectID));
-          dispatch(setMeshApproved(false));
+          dispatch(setMessageInfoModal('Error while solving, please try again'))
+          dispatch(setIsAlertInfoModal(true))
+          dispatch(setShowInfoModal(true))
         });
     },
     shouldReconnect: () => true,
@@ -225,10 +244,9 @@ const SimulationStatusItem:React.FC<{name: string, frequenciesNumber: number, as
                   <div
                     className='button w-full buttonPrimary text-center mt-4 mb-4'
                     onClick={() => {
-                      const conf = confirm('Are you sure to stop the simulation?');
-                      if (conf) {
-                        sendMessage('Stop computation');
-                      }
+                      dispatch(setMessageInfoModal("Are you sure to stop the simulation?"))
+                      dispatch(setIsAlertInfoModal(false))
+                      dispatch(setShowInfoModal(true))
                     }}
                   >
             Stop Simulation

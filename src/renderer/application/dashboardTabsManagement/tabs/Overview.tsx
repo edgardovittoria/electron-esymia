@@ -3,16 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AiFillUnlock } from 'react-icons/ai';
 import { Simulations } from './Simulations';
 import { projectsSelector } from '../../../store/projectSlice';
-import { addProjectTab } from '../../../store/tabsAndMenuItemsSlice';
+import { addProjectTab, setShowCreateNewProjectModal } from '../../../store/tabsAndMenuItemsSlice';
 import { setModelInfoFromS3 } from './shared/utilFunctions';
 import noProjectsIcon2 from '../../../../../assets/noProjectsIcon2.png';
 import noResultsIconForProject from '../../../../../assets/noResultsIconForProject.png';
 
 interface OverviewProps {
-  setShowModal: Function;
 }
 
-export const Overview: React.FC<OverviewProps> = ({ setShowModal }) => {
+export const Overview: React.FC<OverviewProps> = ({  }) => {
   const dispatch = useDispatch();
   const projects = useSelector(projectsSelector);
   // const [cardMenuHovered, setCardMenuHovered] = useState(false);
@@ -25,7 +24,7 @@ export const Overview: React.FC<OverviewProps> = ({ setShowModal }) => {
           <button
             className="text-primaryColor text-sm bg-transparent border-none hover:underline hover:text-black"
             onClick={() => {
-              setShowModal(true);
+              dispatch(setShowCreateNewProjectModal(true))
             }}
           >
             + New Project
@@ -45,7 +44,7 @@ export const Overview: React.FC<OverviewProps> = ({ setShowModal }) => {
               data-toggle="modal"
               data-target="#createNewProjectModal"
               onClick={() => {
-                setShowModal(true);
+                dispatch(setShowCreateNewProjectModal(true))
               }}
             >
               CREATE YOUR FIRST PROJECT

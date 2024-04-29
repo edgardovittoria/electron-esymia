@@ -11,14 +11,13 @@ import MySharedElements from './components/ProjectTabContent/MySharedElements';
 import { myFilesFolderID, mySharedElementsFolderID } from '../../../config/generalLabels';
 
 interface ProjectsProps {
-  setShowModal: Function;
 }
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
+export const Projects: React.FC<ProjectsProps> = ({  }) => {
 
   const dispatch = useDispatch();
   const [showSearchUser, setShowSearchUser] = useState(false);
@@ -68,7 +67,6 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
         <Tab.Panels>
           <Tab.Panel>
             <MyFiles
-              setShowModal={setShowModal}
               showCreateNewFolderModal={showCreateNewFolderModal}
               setShowCreateNewFolderModal={setShowCreateNewFolderModal}
               showSearchUser={showSearchUser}
@@ -77,7 +75,6 @@ export const Projects: React.FC<ProjectsProps> = ({ setShowModal }) => {
           </Tab.Panel>
           <Tab.Panel>
             <MySharedElements
-              setShowModal={setShowModal}
               showCreateNewFolderModal={showCreateNewFolderModal}
               setShowCreateNewFolderModal={setShowCreateNewFolderModal}
             />

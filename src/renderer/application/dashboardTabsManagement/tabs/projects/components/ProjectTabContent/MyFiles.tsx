@@ -14,9 +14,9 @@ import { SearchUserAndShare } from '../droppableDraggableFolderProject/searchUse
 import { CreateNewFolderModal } from '../CreateNewFolderModal';
 import noProjectsIcon2 from '../../../../../../../../assets/noProjectsIcon2.png';
 import { Folder } from '../../../../../../model/esymiaModels';
+import { setShowCreateNewProjectModal } from '../../../../../../store/tabsAndMenuItemsSlice';
 
 export interface MyFilesProps {
-  setShowModal: Function;
   showCreateNewFolderModal: boolean;
   setShowCreateNewFolderModal: Function;
   showSearchUser: boolean;
@@ -24,7 +24,6 @@ export interface MyFilesProps {
 }
 
 const MyFiles: React.FC<MyFilesProps> = ({
-  setShowModal,
   showCreateNewFolderModal,
   setShowCreateNewFolderModal,
   showSearchUser,
@@ -48,7 +47,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
           </div>
           <div
             className="md:w-1/5 text-end text-sm text-primaryColor hover:text-secondaryColor hover:cursor-pointer hover:underline"
-            onClick={() => setShowModal(true)}
+            onClick={() => dispatch(setShowCreateNewProjectModal(true))}
           >
             + New Project
           </div>
@@ -140,7 +139,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
                 data-toggle="modal"
                 data-target="#createNewProjectModal"
                 onClick={() => {
-                  setShowModal(true);
+                  dispatch(setShowCreateNewProjectModal(true))
                 }}
               >
                 CREATE YOUR FIRST PROJECT

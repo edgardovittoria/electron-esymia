@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import {
   CanvasState,
@@ -14,15 +14,20 @@ import {
   SelectedFolderSelector
 } from '../../store/projectSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { addProjectTab } from '../../store/tabsAndMenuItemsSlice';
+import {
+  addProjectTab,
+  setIsAlertInfoModal,
+  setMessageInfoModal, setShowCreateNewProjectModal,
+  setShowInfoModal
+} from '../../store/tabsAndMenuItemsSlice';
 import { Project, sharingInfoUser } from '../../model/esymiaModels';
+import toast from 'react-hot-toast';
 
 interface CreateNewProjectModalProps {
-  setShow: Function;
 }
 
 export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
-                                                                              setShow
+
                                                                             }) => {
   const dispatch = useDispatch();
 
@@ -35,21 +40,16 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
   const [projectDescription, setProjectDescription] = useState('');
 
   const handleCreate = () => {
-    if (selectedFolder?.owner.email === user.email) {
-
-    }
     if (projectName.length > 0) {
       let newProject: Project = {
         name: projectName,
         description: projectDescription,
         model: {} as CanvasState,
         ports: [],
-        portKey: 0,
         frequencies: [],
         meshData: {
           meshApproved: false,
           meshGenerated: 'Not Generated',
-          quantum: [0.0, 0.0, 0.0]
         },
         screenshot: undefined,
         owner: (selectedFolder?.owner.email === user.email) ? user : selectedFolder?.owner as UsersState,
@@ -68,11 +68,10 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         );
         dispatch(addProject(newProject));
         dispatch(addProjectTab(newProject));
+        dispatch(setShowCreateNewProjectModal(false))
       });
-
-      setShow(false);
     } else {
-      alert('Project\'s name is required!');
+      toast.error('Project\'s name is required!')
     }
   };
 
@@ -80,7 +79,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
     <>
       {/* eslint-disable-next-line react/jsx-no-undef */}
       <Transition appear show={true} as={Fragment}>
-        <Dialog as='div' className='relative z-10' onClose={() => setShow(false)}>
+        <Dialog as='div' className='relative z-10' onClose={() => {}}>
           <Transition.Child
             as={Fragment}
             enter='ease-out duration-300'
@@ -147,7 +146,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                     <button
                       type='button'
                       className='button bg-red-500 text-white'
-                      onClick={() => setShow(false)}
+                      onClick={() => dispatch(setShowCreateNewProjectModal(false))}
                     >
                       CANCEL
                     </button>

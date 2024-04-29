@@ -20,7 +20,7 @@ import {
   unsetMesh, updateSimulation
 } from '../../../../../store/projectSlice';
 import { deleteFileS3, uploadFileS3 } from '../../../../../aws/mesherAPIs';
-import { selectMenuItem } from '../../../../../store/tabsAndMenuItemsSlice';
+import { infoModalSelector, selectMenuItem, setIsConfirmedInfoModal } from '../../../../../store/tabsAndMenuItemsSlice';
 import {
   ExternalGridsObject,
   Project, Simulation, SolverOutput
@@ -61,6 +61,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const convergenceThreshold = useSelector(convergenceTresholdSelector)
   const quantumDimensionsLabels = ["X", "Y", "Z"]
   const [suggestedQuantumError, setSuggestedQuantumError] = useState(false)
+  const [alert, setAlert] = useState<boolean>(false);
 
   useEffect(() => {
     if(!selectedProject?.suggestedQuantum && selectedProject.model.components){
@@ -101,6 +102,16 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
       ])
     }
   },[externalGrids])
+
+  const infoModal = useSelector(infoModalSelector)
+
+  useEffect(() => {
+    if(alert && infoModal.isConfirmed){
+      dispatch(setMeshGenerated('Not Generated'));
+      dispatch(unsetMesh());
+      setAlert(false)
+    }
+  }, [infoModal.isConfirmed]);
 
   return (
     <>
@@ -164,7 +175,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
                     dispatch(setMeshGenerated('Generating'))
-                    launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3)
+                    launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3, setAlert)
                   }}
                 >
                   Generate Mesh
@@ -184,7 +195,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                         dispatch(unsetMesh());
                       }
                     );
-                    launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3)
+                    launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3, setAlert)
                   }}
                 >
                   Regenerate

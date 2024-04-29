@@ -22,15 +22,14 @@ import {
 	faunaProjectHaveParentInFolderList
 } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { ImSpinner } from 'react-icons/im';
+import { setShowCreateNewProjectModal } from '../../../../../../store/tabsAndMenuItemsSlice';
 
 export interface MySharedElementsProps {
-	setShowModal: Function;
 	showCreateNewFolderModal: boolean;
 	setShowCreateNewFolderModal: Function;
 }
 
 const MySharedElements: React.FC<MySharedElementsProps> = ({
-																					 setShowModal,
 																					 showCreateNewFolderModal,
 																					 setShowCreateNewFolderModal,
 																				 }) => {
@@ -99,7 +98,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
             </div>
             <button
               className="md:w-1/5 text-end text-sm text-primaryColor hover:text-secondaryColor disabled:hover:no-underline hover:cursor-pointer hover:underline disabled:opacity-60"
-              onClick={() => setShowModal(true)}
+              onClick={() => dispatch(setShowCreateNewProjectModal(true))}
               disabled={selectedFolder?.faunaDocumentId === "shared_root"}
             >
               + New Project
