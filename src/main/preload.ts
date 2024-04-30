@@ -8,7 +8,8 @@ export type Channels =
   | 'api:response'
   | 'fauna:getFoldersByOwner'
   | 'fauna:getSimulationProjectsByOwner'
-  | 'logout';
+  | 'logout'
+  | 'runServer';
 
 const electronHandler = {
   ipcRenderer: {

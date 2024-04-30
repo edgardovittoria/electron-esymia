@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { usersStateSelector, useFaunaQuery } from 'cad-library';
 import { ImSpinner } from 'react-icons/im';
@@ -36,6 +36,14 @@ export default function App() {
   const user = useSelector(usersStateSelector);
   const tabSelected = useSelector(tabSelectedSelector);
   const [loginSpinner, setLoginSpinner] = useState(false);
+  const isFirstRun = useRef<boolean>(true);
+
+  /* useEffect(() => {
+    if(isFirstRun.current){
+      window.electron.ipcRenderer.sendMessage('runServer', []);
+      isFirstRun.current = false
+    }
+  }, []); */
 
   const { execQuery } = useFaunaQuery();
 

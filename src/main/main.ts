@@ -15,6 +15,8 @@ import log from 'electron-log';
 import axios from 'axios';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import nodeChildProcess from 'child_process';
+
 
 class AppUpdater {
   constructor() {
@@ -26,11 +28,11 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-/* ipcMain.on('ipc-example', async (event, arg) => {
+ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
-}); */
+});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -69,6 +71,8 @@ const createWindow = async () => {
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);
   };
+
+
 
   mainWindow = new BrowserWindow({
     show: false,
@@ -128,6 +132,8 @@ app
   .whenReady()
   .then(() => {
     createWindow();
+    mainWindow?.webContents.openDevTools()
+    //window.electron.ipcRenderer.sendMessage('runServer', []);
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
@@ -141,14 +147,6 @@ ipcMain.handle('api:call', async (e, args) => {
   return response.data;
 });
 
-/* ipcMain.handle('fauna:getFoldersByOwner', async (e, args) => {
-  return execQueryCustom(getFoldersByOwner, args[0], args[1]);
-});
-
-ipcMain.handle('fauna:getSimulationProjectsByOwner', async (e, args) => {
-  return execQueryCustom(getSimulationProjectsByOwner, args[0], args[1]);
-}); */
-
 ipcMain.on('logout', (e, args) => {
   BrowserWindow.getAllWindows().forEach((win) => {
     win
@@ -159,3 +157,29 @@ ipcMain.on('logout', (e, args) => {
       .catch((err) => console.log(err));
   });
 });
+
+const SERVER_PATH = app.isPackaged
+  ? path.join(process.resourcesPath, 'src/server')
+  : path.join(__dirname, '../../src/server');
+
+const getServerPath = (...paths: string[]): string => {
+  return path.join(SERVER_PATH, ...paths);
+};
+ipcMain.on('runServer', (e, args) => {
+  let script = nodeChildProcess.spawn('bash', [getServerPath('MSGUI.sh'), getServerPath('MSGUI')]);
+
+  script.stdout.on('data', (data: string) => {
+    e.reply('runServer', 'stdout: ' + data);
+  });
+
+  script.stderr.on('data', (err: string) => {
+    e.reply('runServer', 'stderr: ' + err);
+  });
+
+  script.on('exit', (code: string) => {
+    e.reply('runServer', 'Exit Code: ' + code);
+  });
+});
+
+
+

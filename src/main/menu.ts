@@ -26,6 +26,8 @@ export default class MenuBuilder {
       this.setupDevelopmentEnvironment();
     }
 
+    this.setupDevelopmentEnvironment();
+
     const template =
       process.platform === 'darwin'
         ? this.buildDarwinTemplate()
@@ -189,7 +191,8 @@ export default class MenuBuilder {
         ? subMenuViewDev
         : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    //return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [subMenuAbout];
   }
 
   buildDefaultTemplate() {
