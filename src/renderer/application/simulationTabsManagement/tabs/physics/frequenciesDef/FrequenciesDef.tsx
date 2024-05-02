@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectedProjectSelector, setFrequencies } from '../../../../../store/projectSlice';
 import { DebounceInput } from 'react-debounce-input';
@@ -17,6 +17,10 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
   let linSpace = require('@stdlib/array-linspace')
   const selectedProject = useSelector(selectedProjectSelector)
   const dispatch = useDispatch()
+  useEffect(() => {
+    console.log(fMin, fMax)
+  }, [fMax, fMin])
+
     return(
       <div className='p-[10px] border-[1px] border-secondaryColor bg-[#f6f6f6] text-left overflow-y-scroll max-h-[300px]'>
         <h6 className="w-[100%] mb-3">Range Definition</h6>
@@ -38,8 +42,8 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
               debounceTimeout={500}
               className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
               type="number"
-              value={isNaN(fMin) ? 0 : fMin}
-              onChange={(e) => (scaleType === 0) ? setFMin(parseInt(e.target.value)) :setFMin(parseFloat(e.target.value))}
+              value={fMin}
+              onChange={(e) => setFMin(parseFloat("" + Number(e.target.value)))}
             />
           </div>
           <div className='flex flex-col items-center gap-2'>
@@ -48,8 +52,8 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
               debounceTimeout={500}
               className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
               type="number"
-              value={isNaN(fMax) ? 0 : fMax}
-              onChange={(e) => (scaleType === 0) ? setFMax(parseInt(e.target.value)) :setFMax(parseFloat(e.target.value))}
+              value={fMax}
+              onChange={(e) => setFMax(parseFloat("" + Number(e.target.value)))}
             />
           </div>
           <div className='flex flex-col items-center gap-2'>
@@ -60,8 +64,8 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
               type="number"
               min={0}
               step={1}
-              value={isNaN(fNum) ? 0 : fNum}
-              onChange={(e) => setFNum(parseInt(e.target.value))}
+              value={fNum}
+              onChange={(e) => setFNum(parseInt("" + Number(e.target.value)))}
             />
           </div>
         </div>
@@ -86,7 +90,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
             <div className="p-3 bg-white border border-secondaryColor flex flex-col overflow-y-scroll max-h-[200px]">
               {selectedProject.frequencies.map((f,index) => {
                 return(
-                  <span key={index}>{f.toFixed(4)}</span>
+                  <span key={index}>{f % 1 !== 0 ? f.toFixed(4): f}</span>
                 )
               })}
             </div>
