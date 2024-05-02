@@ -115,7 +115,11 @@ export function getDefaultLumped(name: string, size: number, position: Vector3){
             transparency: false
         } as ComponentEntity,
         isSelected: false,
-        rlcParams: {} as RLCParams,
+        rlcParams: {
+          resistance: 0,
+          inductance: 0,
+          capacitance: 0
+        } as RLCParams,
         value: 0
     }
     return lumped
