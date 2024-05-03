@@ -12,7 +12,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
   const [mesherLogs, setMesherLogs] = useState<string[]>([]);
   window.electron.ipcRenderer.on('runMesher', (arg) => {
     // eslint-disable-next-line no-console
-    setMesherLogs((prevState) => [...prevState, arg as string])
+    setMesherLogs([...mesherLogs, arg as string])
     //console.log(arg);
   });
   return (
