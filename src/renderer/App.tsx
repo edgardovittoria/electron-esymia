@@ -141,7 +141,7 @@ export default function App() {
         }
         {activeSimulations && activeSimulations.length > 0 && <SimulationStatus feedbackSimulationVisible={feedbackSimulationVisible} setFeedbackSimulationVisible={setFeedbackSimulationVisible} activeSimulations={activeSimulations}/>}
         {activePlugins && activePlugins.length > 0 && !pluginsVisible &&
-          <button className="absolute bottom-32 right-10 rounded-full p-4 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
+          <button className="absolute bottom-40 right-10 rounded-full p-4 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
                   onClick={() => setPluginsVisible(true)}
           >
             <BsPlugin size={30}/>
