@@ -30,6 +30,8 @@ import InfoModal from './application/sharedModals/InfoModal';
 import { CreateNewProjectModal } from './application/sharedModals/CreateNewProjectModal';
 import { ActivePluginsSelector } from './store/pluginsSlice';
 import Plugins from './plugin/Plugins';
+import { VscServerProcess } from 'react-icons/vsc';
+import { BsPlugin } from 'react-icons/bs';
 
 
 export default function App() {
@@ -142,7 +144,7 @@ export default function App() {
           <button className="absolute bottom-32 right-10 rounded-full p-4 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
                   onClick={() => setPluginsVisible(true)}
           >
-            PLUGS
+            <BsPlugin size={30}/>
           </button>
         }
         {activePlugins && activePlugins.length > 0 && <Plugins pluginsVisible={pluginsVisible} setPluginsVisible={setPluginsVisible} activePlugins={activePlugins}/>}

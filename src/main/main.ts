@@ -169,11 +169,11 @@ ipcMain.on('runMesher', (e, args) => {
   let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES/juliaMesher')]);
 
   scriptMesher.stdout.on('data', (data: string) => {
-    e.reply('runMesher', 'stdout: ' + data);
+    e.reply('runMesher', '' + data);
   });
 
   scriptMesher.stderr.on('data', (err: string) => {
-    e.reply('runMesher', 'stderr: ' + err);
+    e.reply('runMesher', '' + err);
   });
 
   scriptMesher.on('exit', (code: string) => {
@@ -185,11 +185,11 @@ ipcMain.on('runSolver', (e, args) => {
   let scriptSolver = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverINIT.sh'), getServerPath('MSGUI/juliaCODES/juliaSolver')]);
 
   scriptSolver.stdout.on('data', (data: string) => {
-    e.reply('runSolver', 'stdout: ' + data);
+    e.reply('runSolver', '' + data);
   });
 
   scriptSolver.stderr.on('data', (err: string) => {
-    e.reply('runSolver', 'stderr: ' + err);
+    e.reply('runSolver', '' + err);
   });
 
   scriptSolver.on('exit', (code: string) => {
