@@ -12,6 +12,9 @@ import {
   selectTab, setShowCreateNewProjectModal,
   tabSelectedSelector
 } from '../store/tabsAndMenuItemsSlice';
+import { BsPlugin } from 'react-icons/bs';
+import { VscServerProcess } from 'react-icons/vsc';
+import { addActivePlugin } from '../store/pluginsSlice';
 
 interface TabsContainerProps {
   user: UsersState;
@@ -24,7 +27,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
   const selectedFolder = useSelector(SelectedFolderSelector)
 
   const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
-
+  const [pluginVisibility, setPluginVisibility] = useState<boolean>(false);
   const { loginWithPopup, isAuthenticated } = useAuth0();
 
 
@@ -106,38 +109,64 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
           {/* <FaBell */}
           {/*    className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"/> */}
           {isAuthenticated ? (
-            <div>
-              <FaUser
-                className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
-                onClick={() =>
-                  setUserDropdownVisibility(!userDropdownVisibility)
-                }
-              />
-              <ul
-                style={{ display: !userDropdownVisibility ? 'none' : 'block' }}
-                className="px-4 py-2 bg-white rounded list-none absolute right-[10px] mt-[8px] w-max shadow z-[10000]"
-              >
-                <li className="font-bold text-lg text-secondaryColor">
-                  {user.userName}
-                </li>
-                <hr className="mb-3" />
-                {/* <div className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer">
+            <>
+              <div>
+                <BsPlugin
+                  className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
+                  onClick={() => {
+                    setPluginVisibility(false)
+                    setUserDropdownVisibility(!userDropdownVisibility)
+                  }}
+                />
+                <ul
+                  style={{ display: !userDropdownVisibility ? 'none' : 'block' }}
+                  className="px-4 py-2 bg-white rounded list-none absolute right-[10px] mt-[8px] w-max shadow z-[10000]"
+                >
+                  <div className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer"
+                      onClick={() => {
+                        dispatch(addActivePlugin("serverGUI"))
+                      }}
+                  >
+                    <VscServerProcess className="w-[20px] h-[20px] mr-[10px] text-primaryColor" />
+                    <li>Mesher & Solver</li>
+                  </div>
+                </ul>
+              </div>
+              <div>
+                <FaUser
+                  className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
+                  onClick={() => {
+                    setUserDropdownVisibility(false)
+                    setPluginVisibility(!pluginVisibility)
+                  }}
+                />
+                <ul
+                  style={{ display: !pluginVisibility ? 'none' : 'block' }}
+                  className="px-4 py-2 bg-white rounded list-none absolute right-[10px] mt-[8px] w-max shadow z-[10000]"
+                >
+                  <li className="font-bold text-lg text-secondaryColor">
+                    {user.userName}
+                  </li>
+                  <hr className="mb-3" />
+                  {/* <div className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer">
                   <GiSettingsKnobs className="w-[20px] h-[20px] mr-[10px] text-primaryColor" />
                   <li>Settings</li>
                 </div> */}
-                <div
-                  className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer"
-                  onClick={() => {
-                    window.electron.ipcRenderer.sendMessage('logout', [
-                      process.env.REACT_APP_AUTH0_DOMAIN,
-                    ]);
-                  }}
-                >
-                  <HiOutlineLogout className="w-[20px] h-[20px] mr-[10px] text-primaryColor" />
-                  <li>Logout</li>
-                </div>
-              </ul>
-            </div>
+                  <div
+                    className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer"
+                    onClick={() => {
+                      window.electron.ipcRenderer.sendMessage('logout', [
+                        process.env.REACT_APP_AUTH0_DOMAIN,
+                      ]);
+                    }}
+                  >
+                    <HiOutlineLogout className="w-[20px] h-[20px] mr-[10px] text-primaryColor" />
+                    <li>Logout</li>
+                  </div>
+                </ul>
+              </div>
+            </>
+
           ) : (
             <button
               className="text-primaryColor rounded mr-[20px] border-2 border-secondaryColor font-bold py-[4px] px-[10px] hover:bg-green-200"

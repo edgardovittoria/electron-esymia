@@ -165,19 +165,35 @@ const SERVER_PATH = app.isPackaged
 const getServerPath = (...paths: string[]): string => {
   return path.join(SERVER_PATH, ...paths);
 };
-ipcMain.on('runServer', (e, args) => {
-  let script = nodeChildProcess.spawn('bash', [getServerPath('MSGUI.sh'), getServerPath('MSGUI')]);
+ipcMain.on('runMesher', (e, args) => {
+  let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES/juliaMesher')]);
 
-  script.stdout.on('data', (data: string) => {
-    e.reply('runServer', 'stdout: ' + data);
+  scriptMesher.stdout.on('data', (data: string) => {
+    e.reply('runMesher', 'stdout: ' + data);
   });
 
-  script.stderr.on('data', (err: string) => {
-    e.reply('runServer', 'stderr: ' + err);
+  scriptMesher.stderr.on('data', (err: string) => {
+    e.reply('runMesher', 'stderr: ' + err);
   });
 
-  script.on('exit', (code: string) => {
-    e.reply('runServer', 'Exit Code: ' + code);
+  scriptMesher.on('exit', (code: string) => {
+    e.reply('runMesher', 'Exit Code: ' + code);
+  });
+});
+
+ipcMain.on('runSolver', (e, args) => {
+  let scriptSolver = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverINIT.sh'), getServerPath('MSGUI/juliaCODES/juliaSolver')]);
+
+  scriptSolver.stdout.on('data', (data: string) => {
+    e.reply('runSolver', 'stdout: ' + data);
+  });
+
+  scriptSolver.stderr.on('data', (err: string) => {
+    e.reply('runSolver', 'stderr: ' + err);
+  });
+
+  scriptSolver.on('exit', (code: string) => {
+    e.reply('runSolver', 'Exit Code: ' + code);
   });
 });
 

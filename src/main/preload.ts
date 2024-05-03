@@ -9,7 +9,9 @@ export type Channels =
   | 'fauna:getFoldersByOwner'
   | 'fauna:getSimulationProjectsByOwner'
   | 'logout'
-  | 'runServer';
+  | 'runMesher'
+  | 'runSolver'
+  ;
 
 const electronHandler = {
   ipcRenderer: {

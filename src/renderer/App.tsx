@@ -28,6 +28,8 @@ import SimulationStatus
   from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/SimulationStatus';
 import InfoModal from './application/sharedModals/InfoModal';
 import { CreateNewProjectModal } from './application/sharedModals/CreateNewProjectModal';
+import { ActivePluginsSelector } from './store/pluginsSlice';
+import Plugins from './plugin/Plugins';
 
 
 export default function App() {
@@ -99,6 +101,14 @@ export default function App() {
     }
   }, [activeSimulations.length]);
 
+  const activePlugins = useSelector(ActivePluginsSelector)
+  const [pluginsVisible, setPluginsVisible] = useState<boolean>(false);
+  useEffect(() => {
+    if(activePlugins.length > 0){
+      setPluginsVisible(true)
+    }
+  }, [activePlugins.length]);
+
   const showInfoModal = useSelector(showInfoModalSelector)
   const showCreateNewProjectModal = useSelector(showCreateNewProjectModalSelector)
 
@@ -128,6 +138,14 @@ export default function App() {
           </button>
         }
         {activeSimulations && activeSimulations.length > 0 && <SimulationStatus feedbackSimulationVisible={feedbackSimulationVisible} setFeedbackSimulationVisible={setFeedbackSimulationVisible} activeSimulations={activeSimulations}/>}
+        {activePlugins && activePlugins.length > 0 && !pluginsVisible &&
+          <button className="absolute bottom-32 right-10 rounded-full p-4 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
+                  onClick={() => setPluginsVisible(true)}
+          >
+            PLUGS
+          </button>
+        }
+        {activePlugins && activePlugins.length > 0 && <Plugins pluginsVisible={pluginsVisible} setPluginsVisible={setPluginsVisible} activePlugins={activePlugins}/>}
       </div>
     </div>
   );
