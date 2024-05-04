@@ -42,6 +42,25 @@ export default function App() {
   const [loginSpinner, setLoginSpinner] = useState(false);
   const isFirstRun = useRef<boolean>(true);
 
+  const activeSimulations = useSelector(activeSimulationsSelector)
+  const [feedbackSimulationVisible, setFeedbackSimulationVisible] = useState<boolean>(false);
+  useEffect(() => {
+    if(activeSimulations.length > 0){
+      setFeedbackSimulationVisible(true)
+    }
+  }, [activeSimulations.length]);
+
+  const activePlugins = useSelector(ActivePluginsSelector)
+  const [pluginsVisible, setPluginsVisible] = useState<boolean>(false);
+  useEffect(() => {
+    if(activePlugins.length > 0){
+      setPluginsVisible(true)
+    }
+  }, [activePlugins.length]);
+
+  const showInfoModal = useSelector(showInfoModalSelector)
+  const showCreateNewProjectModal = useSelector(showCreateNewProjectModalSelector)
+
   /* useEffect(() => {
     if(isFirstRun.current){
       window.electron.ipcRenderer.sendMessage('runServer', []);
@@ -91,28 +110,9 @@ export default function App() {
 
   // MEMOIZED COMPONENTS
   const memoizedTabsContainer = useMemo(
-    () => <TabsContainer user={user} />,
+    () => <TabsContainer user={user} setPluginModalVisible={setPluginsVisible}/>,
     [user],
   );
-
-  const activeSimulations = useSelector(activeSimulationsSelector)
-  const [feedbackSimulationVisible, setFeedbackSimulationVisible] = useState<boolean>(false);
-  useEffect(() => {
-    if(activeSimulations.length > 0){
-      setFeedbackSimulationVisible(true)
-    }
-  }, [activeSimulations.length]);
-
-  const activePlugins = useSelector(ActivePluginsSelector)
-  const [pluginsVisible, setPluginsVisible] = useState<boolean>(false);
-  useEffect(() => {
-    if(activePlugins.length > 0){
-      setPluginsVisible(true)
-    }
-  }, [activePlugins.length]);
-
-  const showInfoModal = useSelector(showInfoModalSelector)
-  const showCreateNewProjectModal = useSelector(showCreateNewProjectModalSelector)
 
   return (
     <div className="lg:h-[100vh] h-screen">

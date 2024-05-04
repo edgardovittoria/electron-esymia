@@ -14,13 +14,14 @@ import {
 } from '../store/tabsAndMenuItemsSlice';
 import { BsPlugin } from 'react-icons/bs';
 import { VscServerProcess } from 'react-icons/vsc';
-import { addActivePlugin } from '../store/pluginsSlice';
+import { ActivePluginsSelector, addActivePlugin } from '../store/pluginsSlice';
 
 interface TabsContainerProps {
   user: UsersState;
+  setPluginModalVisible: (v: boolean) => void
 }
 
-export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
+export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginModalVisible }) => {
   const tabSelected = useSelector(tabSelectedSelector);
   const projectsTabs = useSelector(projectsTabsSelector);
   const dispatch = useDispatch();
@@ -29,6 +30,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
   const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
   const [pluginVisibility, setPluginVisibility] = useState<boolean>(false);
   const { loginWithPopup, isAuthenticated } = useAuth0();
+  const activePlugins = useSelector(ActivePluginsSelector)
 
 
 
@@ -114,17 +116,22 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
                 <BsPlugin
                   className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
                   onClick={() => {
-                    setPluginVisibility(false)
-                    setUserDropdownVisibility(!userDropdownVisibility)
+                    setPluginVisibility(!pluginVisibility)
+                    setUserDropdownVisibility(false)
                   }}
                 />
                 <ul
-                  style={{ display: !userDropdownVisibility ? 'none' : 'block' }}
+                  style={{ display: !pluginVisibility ? 'none' : 'block' }}
                   className="px-4 py-2 bg-white rounded list-none absolute right-[10px] mt-[8px] w-max shadow z-[10000]"
                 >
-                  <div className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer"
+                  <div className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:cursor-pointer"
                       onClick={() => {
-                        dispatch(addActivePlugin("serverGUI"))
+                        if(activePlugins.filter(p => p === "serverGUI").length > 0) {
+                          setPluginModalVisible(true)
+                        }else {
+                          dispatch(addActivePlugin("serverGUI"))
+                        }
+                        setPluginVisibility(false)
                       }}
                   >
                     <VscServerProcess className="w-[20px] h-[20px] mr-[10px] text-primaryColor" />
@@ -136,12 +143,12 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user }) => {
                 <FaUser
                   className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
                   onClick={() => {
-                    setUserDropdownVisibility(false)
-                    setPluginVisibility(!pluginVisibility)
+                    setUserDropdownVisibility(!userDropdownVisibility)
+                    setPluginVisibility(false)
                   }}
                 />
                 <ul
-                  style={{ display: !pluginVisibility ? 'none' : 'block' }}
+                  style={{ display: !userDropdownVisibility ? 'none' : 'block' }}
                   className="px-4 py-2 bg-white rounded list-none absolute right-[10px] mt-[8px] w-max shadow z-[10000]"
                 >
                   <li className="font-bold text-lg text-secondaryColor">
