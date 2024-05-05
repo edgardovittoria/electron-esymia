@@ -132,7 +132,6 @@ app
   .whenReady()
   .then(() => {
     createWindow();
-    mainWindow?.webContents.openDevTools()
     //window.electron.ipcRenderer.sendMessage('runServer', []);
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

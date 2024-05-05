@@ -10,6 +10,8 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
   const [spinnerMesher, setSpinnerMesher] = useState<boolean>(false);
   const [spinnerSolver, setSpinnerSolver] = useState<boolean>(false);
   const [mesherLogs, setMesherLogs] = useState<string[]>([]);
+  const [disableMesherInit, setDisableMesherInit] = useState<boolean>(false);
+  const [disableSolverInit, setDisableSolverInit] = useState<boolean>(false);
   window.electron.ipcRenderer.on('runMesher', (arg) => {
     setSpinnerMesher(false)
     setMesherLogs([...mesherLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
@@ -30,8 +32,11 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
             {mesherLogs.map((ml, index) => <div key={index} className="text-sm">{ml}</div>)}
           </div>
           <div className='flex flex-row gap-4 mt-3'>
-            <button className='button border border-black hover:bg-secondaryColor hover:text-white text-sm'
+            <button className='button border border-black hover:bg-secondaryColor hover:text-white text-sm disabled:opacity-40'
+                    disabled={disableMesherInit}
                     onClick={() => {
+                      setDisableMesherInit(true)
+                      setMesherLogs([])
                       setSpinnerMesher(true)
                       window.electron.ipcRenderer.sendMessage('runMesher', [])
                     }}
@@ -41,6 +46,8 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
             <button className='button border border-black hover:bg-red-500 hover:text-white text-sm'
                     onClick={() => {
                       window.electron.ipcRenderer.sendMessage('haltMesher', [])
+                      setDisableMesherInit(false)
+                      setMesherLogs(["MESHER HALTED"])
                     }}
             >
               HALT
@@ -59,8 +66,11 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
             {solverLogs.map((sl, index) => <div key={index} className="text-sm">{sl}</div>)}
           </div>
           <div className='flex flex-row gap-4 mt-3'>
-            <button className='button border border-black hover:bg-secondaryColor hover:text-white text-sm'
+            <button className='button border border-black hover:bg-secondaryColor hover:text-white text-sm disabled:opacity-40'
+                    disabled={disableSolverInit}
                     onClick={() => {
+                      setDisableSolverInit(true)
+                      setSolverLogs([])
                       setSpinnerSolver(true)
                       window.electron.ipcRenderer.sendMessage('runSolver', [])
                     }}
@@ -70,6 +80,8 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
             <button className='button border border-black hover:bg-red-500 hover:text-white text-sm'
                     onClick={() => {
                       window.electron.ipcRenderer.sendMessage('haltSolver', [])
+                      setDisableSolverInit(false)
+                      setSolverLogs(["SOLVER HALTED"])
                     }}
             >
               HALT
