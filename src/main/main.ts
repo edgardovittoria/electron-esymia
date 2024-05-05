@@ -158,6 +158,9 @@ ipcMain.on('logout', (e, args) => {
   });
 });
 
+
+let serverProcesses: {mesher?: nodeChildProcess.ChildProcessWithoutNullStreams, solver?: nodeChildProcess.ChildProcessWithoutNullStreams} = {}
+
 const SERVER_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'src/server')
   : path.join(__dirname, '../../src/server');
@@ -167,7 +170,7 @@ const getServerPath = (...paths: string[]): string => {
 };
 ipcMain.on('runMesher', (e, args) => {
   let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES/juliaMesher')]);
-
+  serverProcesses.mesher = scriptMesher
   scriptMesher.stdout.on('data', (data: string) => {
     e.reply('runMesher', '' + data);
   });
@@ -183,7 +186,7 @@ ipcMain.on('runMesher', (e, args) => {
 
 ipcMain.on('runSolver', (e, args) => {
   let scriptSolver = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverINIT.sh'), getServerPath('MSGUI/juliaCODES/juliaSolver')]);
-
+  serverProcesses.solver = scriptSolver
   scriptSolver.stdout.on('data', (data: string) => {
     e.reply('runSolver', '' + data);
   });
@@ -195,6 +198,20 @@ ipcMain.on('runSolver', (e, args) => {
   scriptSolver.on('exit', (code: string) => {
     e.reply('runSolver', 'Exit Code: ' + code);
   });
+});
+
+ipcMain.on('haltMesher', (e, args) => {
+  if (serverProcesses.mesher){
+    serverProcesses.mesher.kill()
+    nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherHALT.sh'), getServerPath('MSGUI/juliaCODES/juliaSolver')]);
+  }
+});
+
+ipcMain.on('haltSolver', (e, args) => {
+  if (serverProcesses.solver){
+    serverProcesses.solver.kill()
+    nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverHALT.sh'), getServerPath('MSGUI/juliaCODES/juliaSolver')]);
+  }
 });
 
 

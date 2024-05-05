@@ -11,6 +11,8 @@ export type Channels =
   | 'logout'
   | 'runMesher'
   | 'runSolver'
+  | 'haltMesher'
+  | 'haltSolver'
   ;
 
 const electronHandler = {

@@ -38,7 +38,13 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
             >
               INIT
             </button>
-            <button className='button border border-black hover:bg-red-500 hover:text-white text-sm'>HALT</button>
+            <button className='button border border-black hover:bg-red-500 hover:text-white text-sm'
+                    onClick={() => {
+                      window.electron.ipcRenderer.sendMessage('haltMesher', [])
+                    }}
+            >
+              HALT
+            </button>
             <button className='button border border-black hover:bg-gray-400 hover:text-white text-sm'
                     onClick={() => setMesherLogs([])}
             >
@@ -61,7 +67,13 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
             >
               INIT
             </button>
-            <button className='button border border-black hover:bg-red-500 hover:text-white text-sm'>HALT</button>
+            <button className='button border border-black hover:bg-red-500 hover:text-white text-sm'
+                    onClick={() => {
+                      window.electron.ipcRenderer.sendMessage('haltSolver', [])
+                    }}
+            >
+              HALT
+            </button>
             <button className='button border border-black hover:bg-gray-400 hover:text-white text-sm'
                     onClick={() => setSolverLogs([])}
             >
