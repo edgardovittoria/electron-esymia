@@ -27,10 +27,3 @@ root.render(
     </Provider>
   </Auth0Provider>,
 );
-
-
-
-window.electron.ipcRenderer.on('runSolver', (arg) => {
-  // eslint-disable-next-line no-console
-  console.log(arg);
-});

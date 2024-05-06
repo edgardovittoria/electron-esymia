@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface PluginsState {
   activePlugins: string[],
-  mesherStatus: 'idle' | 'starting' | 'started',
-  solverStatus: 'idle' | 'starting' | 'started',
+  mesherStatus: 'idle' | 'starting' | 'ready',
+  solverStatus: 'idle' | 'starting' | 'ready',
 }
 
 export const PluginsSlice = createSlice({
@@ -22,10 +22,10 @@ export const PluginsSlice = createSlice({
       removeActivePlugin(state: PluginsState, action: PayloadAction<string>){
         state.activePlugins = state.activePlugins.filter(p => p !== action.payload)
       },
-      setMesherStatus(state: PluginsState, action: PayloadAction<'idle' | 'starting' | 'started'>){
+      setMesherStatus(state: PluginsState, action: PayloadAction<'idle' | 'starting' | 'ready'>){
         state.mesherStatus = action.payload
       },
-      setSolverStatus(state: PluginsState, action: PayloadAction<'idle' | 'starting' | 'started'>){
+      setSolverStatus(state: PluginsState, action: PayloadAction<'idle' | 'starting' | 'ready'>){
         state.solverStatus = action.payload
       }
     }

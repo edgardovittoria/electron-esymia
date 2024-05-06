@@ -12,8 +12,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
   const [spinnerMesher, setSpinnerMesher] = useState<boolean>(false);
   const [spinnerSolver, setSpinnerSolver] = useState<boolean>(false);
   const [mesherLogs, setMesherLogs] = useState<string[]>([]);
-  const [disableMesherInit, setDisableMesherInit] = useState<boolean>(false);
-  const [disableSolverInit, setDisableSolverInit] = useState<boolean>(false);
+  const [solverLogs, setSolverLogs] = useState<string[]>([]);
   const mesherStatus = useSelector(MesherStatusSelector)
   const solverStatus = useSelector(SolverStatusSelector)
 
@@ -23,7 +22,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
     setSpinnerMesher(false)
     setMesherLogs([...mesherLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
   });
-  const [solverLogs, setSolverLogs] = useState<string[]>([]);
+
   window.electron.ipcRenderer.on('runSolver', (arg) => {
     setSpinnerSolver(false)
     setSolverLogs([...solverLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
@@ -32,7 +31,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
   useEffect(() => {
     mesherLogs.forEach(l => {
       if(l.includes("MESHER READY")){
-        dispatch(setMesherStatus('started'))
+        dispatch(setMesherStatus('ready'))
       }
     })
   }, [mesherLogs]);
@@ -40,7 +39,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
   useEffect(() => {
     solverLogs.forEach(l => {
       if(l.includes("SOLVER READY")){
-        dispatch(setSolverStatus('started'))
+        dispatch(setSolverStatus('ready'))
       }
     })
   }, [solverLogs]);
@@ -61,9 +60,8 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
           </div>
           <div className='flex flex-row gap-4 mt-3'>
             <button className='button border border-black hover:bg-secondaryColor hover:text-white text-sm disabled:opacity-40'
-                    disabled={disableMesherInit}
+                    disabled={mesherStatus !== 'idle'}
                     onClick={() => {
-                      setDisableMesherInit(true)
                       setMesherLogs([])
                       setSpinnerMesher(true)
                       dispatch(setMesherStatus('starting'))
@@ -72,10 +70,10 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
             >
               INIT
             </button>
-            <button className='button border border-black hover:bg-red-500 hover:text-white text-sm'
+            <button className='button border border-black hover:bg-red-500 hover:text-white text-sm disabled:opacity-40'
+                    disabled={mesherStatus === 'idle'}
                     onClick={() => {
                       window.electron.ipcRenderer.sendMessage('haltMesher', [])
-                      setDisableMesherInit(false)
                       dispatch(setMesherStatus('idle'))
                       setMesherLogs(["MESHER HALTED"])
                     }}
@@ -101,9 +99,8 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
           </div>
           <div className='flex flex-row gap-4 mt-3'>
             <button className='button border border-black hover:bg-secondaryColor hover:text-white text-sm disabled:opacity-40'
-                    disabled={disableSolverInit}
+                    disabled={solverStatus !== 'idle'}
                     onClick={() => {
-                      setDisableSolverInit(true)
                       setSolverLogs([])
                       setSpinnerSolver(true)
                       dispatch(setSolverStatus('starting'))
@@ -112,10 +109,10 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
             >
               INIT
             </button>
-            <button className='button border border-black hover:bg-red-500 hover:text-white text-sm'
+            <button className='button border border-black hover:bg-red-500 hover:text-white text-sm disabled:opacity-40'
+                    disabled={solverStatus === 'idle'}
                     onClick={() => {
                       window.electron.ipcRenderer.sendMessage('haltSolver', [])
-                      setDisableSolverInit(false)
                       dispatch(setSolverStatus('idle'))
                       setSolverLogs(["SOLVER HALTED"])
                     }}
