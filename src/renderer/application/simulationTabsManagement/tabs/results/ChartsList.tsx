@@ -138,11 +138,11 @@ export const ChartsList: React.FC<ChartsListProps> = ({
       {chartsDataToVisualize.map((chartData, index) => {
         return (
           <div className="box w-[100%]" key={index}>
-            <VscSettings onClick={() => {
-              let shows = [...showGraphsSettings]
-              shows[index] = !shows[index]
-              setShowGraphsSettings(shows)
-            }}/>
+              <VscSettings onClick={() => {
+                let shows = [...showGraphsSettings]
+                shows[index] = !shows[index]
+                setShowGraphsSettings(shows)
+              }}/>
             {showGraphsSettings[index] && <ScaleChartOptions index={index} scaleMode={scaleMode} setScaleMode={setScaleMode}/>}
             <Line
               options={optionsWithScaleMode(chartData.options, scaleMode[index])}
