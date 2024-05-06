@@ -48,6 +48,20 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
     <>
       <div className='flex relative flex-col py-5 px-5 border-2 border-secondaryColor'>
         <h5 className="absolute top-[-16px] bg-white left-10 font-bold px-2 text-secondaryColor">serverGUI</h5>
+        <div className='flex flex-row gap-4 mb-3 w-full justify-end'>
+          <div className='flex flex-row gap-1 items-center'>
+            <div className="h-3 w-3 p-[6px] border-2 border-gray-700 rounded-full bg-gray-400" />
+            <span className="text-sm font-semibold">IDLE</span>
+          </div>
+          <div className='flex flex-row gap-1 items-center'>
+            <div className="h-3 w-3 p-[6px] border-2 border-gray-700 rounded-full bg-orange-400" />
+            <span className="text-sm font-semibold">STARTING</span>
+          </div>
+          <div className='flex flex-row gap-1 items-center'>
+            <div className="h-3 w-3 p-[6px] border-2 border-gray-700 rounded-full bg-green-500" />
+            <span className="text-sm font-semibold">READY</span>
+          </div>
+        </div>
         <div className="flex flex-col border border-secondaryColor bg-gray-100 py-3 px-5">
           <div className="flex flex-row gap-2 items-center">
             <h5>Mesher</h5>
