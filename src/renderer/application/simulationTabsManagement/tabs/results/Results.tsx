@@ -18,6 +18,7 @@ import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunct
 import {Project} from "../../../../model/esymiaModels";
 import { alertMessageStyle, comeBackToModelerMessage, emptyResultsMessage } from '../../../config/textMessages';
 import { resultsLeftPanelTitle } from '../../../config/panelTitles';
+import { CSVLink } from "react-csv";
 
 interface ResultsProps {
   selectedTabLeftPanel: string;
@@ -56,6 +57,7 @@ export const Results: React.FC<ResultsProps> = ({
               dispatch(selectPort(portName))
             }
           />
+          { selectedProject?.simulation?.results && <CSVLink className="hover:underline" data={[["S", selectedProject.simulation.results.matrix_S], ["Z", selectedProject.simulation.results.matrix_Z], ["Y", selectedProject.simulation.results.matrix_Y]]}>Export To CSV</CSVLink>}
           {(selectedProject?.simulation && selectedProject.simulation.status == 'Completed') &&
             <button
               type="button"
