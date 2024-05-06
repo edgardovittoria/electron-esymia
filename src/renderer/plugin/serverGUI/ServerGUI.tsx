@@ -12,6 +12,8 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
   const [mesherLogs, setMesherLogs] = useState<string[]>([]);
   const [disableMesherInit, setDisableMesherInit] = useState<boolean>(false);
   const [disableSolverInit, setDisableSolverInit] = useState<boolean>(false);
+  const [mesherStatus, setMesherStatus] = useState<'idle' | 'starting' | 'started'>('idle');
+  const [solverStatus, setSolverStatus] = useState<'idle' | 'starting' | 'started'>('idle');
   window.electron.ipcRenderer.on('runMesher', (arg) => {
     setSpinnerMesher(false)
     setMesherLogs([...mesherLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
@@ -21,13 +23,34 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
     setSpinnerSolver(false)
     setSolverLogs([...solverLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
   });
+
+  useEffect(() => {
+    mesherLogs.forEach(l => {
+      if(l.includes("MESHER READY")){
+        setMesherStatus('started')
+      }
+    })
+  }, [mesherLogs]);
+
+  useEffect(() => {
+    solverLogs.forEach(l => {
+      if(l.includes("SOLVER READY")){
+        setSolverStatus('started')
+      }
+    })
+  }, [solverLogs]);
+
   return (
     <>
-      <div className='flex relative flex-col py-10 px-5 border-2 border-secondaryColor'>
+      <div className='flex relative flex-col py-5 px-5 border-2 border-secondaryColor'>
         <h5 className="absolute top-[-16px] bg-white left-10 font-bold px-2 text-secondaryColor">serverGUI</h5>
         <div className="flex flex-col border border-secondaryColor bg-gray-100 py-3 px-5">
-          <h5>Mesher</h5>
-          <div className={`h-[200px] max-h-[200px] overflow-y-scroll border border-secondaryColor p-3 flex flex-col ${spinnerMesher ? 'items-center justify-center bg-gray-100 bg-opacity-30': 'bg-white'}`}>
+          <div className="flex flex-row gap-2 items-center">
+            <h5>Mesher</h5>
+            <div className={`h-3 w-3 p-[6px] border-2 border-gray-700 rounded-full ${mesherStatus === 'idle' ? 'bg-gray-400': mesherStatus === 'starting' ? 'bg-orange-400' : 'bg-green-500'}`}></div>
+            {mesherStatus === 'starting' && <ImSpinner className='animate-spin w-4 h-4 z-50' />}
+          </div>
+          <div className={`h-[150px] max-h-[150px] overflow-y-scroll border border-secondaryColor p-3 flex flex-col ${spinnerMesher ? 'items-center justify-center bg-gray-100 bg-opacity-30': 'bg-white'}`}>
             {spinnerMesher && <ImSpinner className='animate-spin w-12 h-12 z-50' />}
             {mesherLogs.map((ml, index) => <div key={index} className="text-sm">{ml}</div>)}
           </div>
@@ -38,6 +61,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                       setDisableMesherInit(true)
                       setMesherLogs([])
                       setSpinnerMesher(true)
+                      setMesherStatus('starting')
                       window.electron.ipcRenderer.sendMessage('runMesher', [])
                     }}
             >
@@ -47,6 +71,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                     onClick={() => {
                       window.electron.ipcRenderer.sendMessage('haltMesher', [])
                       setDisableMesherInit(false)
+                      setMesherStatus('idle')
                       setMesherLogs(["MESHER HALTED"])
                     }}
             >
@@ -60,8 +85,12 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
           </div>
         </div>
         <div className="flex flex-col mt-10 border border-secondaryColor bg-gray-100 py-3 px-5">
-          <h5>Solver</h5>
-          <div className={`h-[200px] max-h-[200px] overflow-y-scroll border border-secondaryColor p-3 flex flex-col ${spinnerSolver ? 'items-center justify-center bg-gray-100 bg-opacity-30': 'bg-white'}`}>
+          <div className="flex flex-row gap-2 items-center">
+            <h5>Solver</h5>
+            <div className={`h-3 w-3 p-[6px] border-2 border-gray-700 rounded-full ${solverStatus === 'idle' ? 'bg-gray-400': solverStatus === 'starting' ? 'bg-orange-400' : 'bg-green-500'}`}></div>
+            {solverStatus === 'starting' && <ImSpinner className='animate-spin w-4 h-4 z-50' />}
+          </div>
+          <div className={`h-[150px] max-h-[150px] overflow-y-scroll border border-secondaryColor p-3 flex flex-col ${spinnerSolver ? 'items-center justify-center bg-gray-100 bg-opacity-30': 'bg-white'}`}>
             {spinnerSolver && <ImSpinner className='animate-spin w-12 h-12' />}
             {solverLogs.map((sl, index) => <div key={index} className="text-sm">{sl}</div>)}
           </div>
@@ -72,6 +101,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                       setDisableSolverInit(true)
                       setSolverLogs([])
                       setSpinnerSolver(true)
+                      setSolverStatus('starting')
                       window.electron.ipcRenderer.sendMessage('runSolver', [])
                     }}
             >
@@ -81,6 +111,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                     onClick={() => {
                       window.electron.ipcRenderer.sendMessage('haltSolver', [])
                       setDisableSolverInit(false)
+                      setSolverStatus('idle')
                       setSolverLogs(["SOLVER HALTED"])
                     }}
             >

@@ -16,7 +16,7 @@ const pluginsFactory = (name:string) => {
 const Plugins: React.FC<PluginsProps> = ({pluginsVisible, setPluginsVisible, activePlugins}) => {
     return(
       <div
-        className={`absolute right-10 w-1/2 bottom-40 border border-secondaryColor flex flex-col justify-center items-center bg-white p-5 rounded ${
+        className={`absolute right-10 w-1/2 top-20 border border-secondaryColor flex flex-col justify-center items-center bg-white p-3 rounded ${
           !pluginsVisible && 'hidden'
         }`}
       >
