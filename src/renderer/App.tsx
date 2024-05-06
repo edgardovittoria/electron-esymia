@@ -28,7 +28,13 @@ import SimulationStatus
   from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/SimulationStatus';
 import InfoModal from './application/sharedModals/InfoModal';
 import { CreateNewProjectModal } from './application/sharedModals/CreateNewProjectModal';
-import { ActivePluginsSelector } from './store/pluginsSlice';
+import {
+  ActivePluginsSelector,
+  addActivePlugin,
+  MesherStatusSelector,
+  setMesherStatus,
+  setSolverStatus, SolverStatusSelector
+} from './store/pluginsSlice';
 import Plugins from './plugin/Plugins';
 import { VscServerProcess } from 'react-icons/vsc';
 import { BsPlugin } from 'react-icons/bs';
@@ -40,7 +46,6 @@ export default function App() {
   const user = useSelector(usersStateSelector);
   const tabSelected = useSelector(tabSelectedSelector);
   const [loginSpinner, setLoginSpinner] = useState(false);
-  const isFirstRun = useRef<boolean>(true);
 
   const activeSimulations = useSelector(activeSimulationsSelector)
   const [feedbackSimulationVisible, setFeedbackSimulationVisible] = useState<boolean>(false);
@@ -51,7 +56,7 @@ export default function App() {
   }, [activeSimulations.length]);
 
   const activePlugins = useSelector(ActivePluginsSelector)
-  const [pluginsVisible, setPluginsVisible] = useState<boolean>(false);
+  const [pluginsVisible, setPluginsVisible] = useState<boolean>(true);
   useEffect(() => {
     if(activePlugins.length > 0){
       setPluginsVisible(true)
@@ -60,13 +65,22 @@ export default function App() {
 
   const showInfoModal = useSelector(showInfoModalSelector)
   const showCreateNewProjectModal = useSelector(showCreateNewProjectModalSelector)
+  const mesherStatus = useSelector(MesherStatusSelector)
+  const solverStatus = useSelector(SolverStatusSelector)
 
-  /* useEffect(() => {
-    if(isFirstRun.current){
-      window.electron.ipcRenderer.sendMessage('runServer', []);
-      isFirstRun.current = false
+   useEffect(() => {
+    if(user.userName){
+      dispatch(addActivePlugin('serverGUI'))
+      if(mesherStatus === 'idle'){
+        dispatch(setMesherStatus('starting'))
+        window.electron.ipcRenderer.sendMessage('runMesher', [])
+      }
+      if(solverStatus === 'idle'){
+        dispatch(setSolverStatus('starting'))
+        window.electron.ipcRenderer.sendMessage('runSolver', [])
+      }
     }
-  }, []); */
+  }, [user.userName]);
 
   const { execQuery } = useFaunaQuery();
 

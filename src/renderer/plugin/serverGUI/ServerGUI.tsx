@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ImSpinner } from 'react-icons/im';
+import { useDispatch, useSelector } from 'react-redux';
+import { MesherStatusSelector, setMesherStatus, setSolverStatus, SolverStatusSelector } from '../../store/pluginsSlice';
 
 export interface ServerGUIProps{
 
@@ -12,8 +14,11 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
   const [mesherLogs, setMesherLogs] = useState<string[]>([]);
   const [disableMesherInit, setDisableMesherInit] = useState<boolean>(false);
   const [disableSolverInit, setDisableSolverInit] = useState<boolean>(false);
-  const [mesherStatus, setMesherStatus] = useState<'idle' | 'starting' | 'started'>('idle');
-  const [solverStatus, setSolverStatus] = useState<'idle' | 'starting' | 'started'>('idle');
+  const mesherStatus = useSelector(MesherStatusSelector)
+  const solverStatus = useSelector(SolverStatusSelector)
+
+  const dispatch = useDispatch()
+
   window.electron.ipcRenderer.on('runMesher', (arg) => {
     setSpinnerMesher(false)
     setMesherLogs([...mesherLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
@@ -27,7 +32,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
   useEffect(() => {
     mesherLogs.forEach(l => {
       if(l.includes("MESHER READY")){
-        setMesherStatus('started')
+        dispatch(setMesherStatus('started'))
       }
     })
   }, [mesherLogs]);
@@ -35,7 +40,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
   useEffect(() => {
     solverLogs.forEach(l => {
       if(l.includes("SOLVER READY")){
-        setSolverStatus('started')
+        dispatch(setSolverStatus('started'))
       }
     })
   }, [solverLogs]);
@@ -61,7 +66,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                       setDisableMesherInit(true)
                       setMesherLogs([])
                       setSpinnerMesher(true)
-                      setMesherStatus('starting')
+                      dispatch(setMesherStatus('starting'))
                       window.electron.ipcRenderer.sendMessage('runMesher', [])
                     }}
             >
@@ -71,7 +76,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                     onClick={() => {
                       window.electron.ipcRenderer.sendMessage('haltMesher', [])
                       setDisableMesherInit(false)
-                      setMesherStatus('idle')
+                      dispatch(setMesherStatus('idle'))
                       setMesherLogs(["MESHER HALTED"])
                     }}
             >
@@ -101,7 +106,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                       setDisableSolverInit(true)
                       setSolverLogs([])
                       setSpinnerSolver(true)
-                      setSolverStatus('starting')
+                      dispatch(setSolverStatus('starting'))
                       window.electron.ipcRenderer.sendMessage('runSolver', [])
                     }}
             >
@@ -111,7 +116,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                     onClick={() => {
                       window.electron.ipcRenderer.sendMessage('haltSolver', [])
                       setDisableSolverInit(false)
-                      setSolverStatus('idle')
+                      dispatch(setSolverStatus('idle'))
                       setSolverLogs(["SOLVER HALTED"])
                     }}
             >
