@@ -45,13 +45,11 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                     key={port.name}
                     className={
                       port.isSelected
-                        ? 'mt-[5px] rounded bg-gray-200 hover:bg-gray-200 hover:cursor-pointer hover:rounded px-1'
+                        ? 'mt-[5px] rounded bg-gray-200 hover:bg-gray-200 hover:cursor-pointer hover:rounded'
                         : 'mt-[5px] hover:bg-gray-200 hover:cursor-pointer hover:rounded'
                     }
                     onClick={() => {
-                      if(!selectedProject?.simulation?.results) {
-                        dispatch(selectPort(port.name))
-                      }
+                      dispatch(selectPort(port.name))
                     }}
                   >
                     <div className="flex items-center">
@@ -64,7 +62,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                       <div className="w-[75%] text-start">
                         <h5 className="text-[15px] font-normal">{port.name}</h5>
                       </div>
-                      {port.isSelected && (
+                      {port.isSelected && !selectedProject.simulation?.results && (
                         <div className="flex">
                           <div
                             className="w-[15%] tooltip mr-5"

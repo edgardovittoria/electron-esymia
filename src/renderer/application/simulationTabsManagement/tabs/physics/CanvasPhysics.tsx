@@ -27,7 +27,11 @@ interface CanvasPhysicsProps {
 }
 
 export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
-                                                              setCameraPosition, surfaceAdvices, setSavedPortParameters, setSurfaceAdvices, resetFocus
+                                                              setCameraPosition,
+                                                              surfaceAdvices,
+                                                              setSavedPortParameters,
+                                                              setSurfaceAdvices,
+                                                              resetFocus
                                                             }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
@@ -91,37 +95,37 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                   <FocusView resetFocus={resetFocus}>
                     {selectedProject.model.components.map((component, index) => {
                       return (
-                          <mesh
-                            ref={(el) => {
-                              setMesh(el, index);
-                            }}
-                            userData={{
-                              keyComponent: component.keyComponent,
-                              isSelected: false
-                            }}
-                            key={uniqid()}
-                            position={component.transformationParams.position}
-                            scale={component.transformationParams.scale}
-                            rotation={component.transformationParams.rotation}
-                            onDoubleClick={(e) => {
-                              if(selectedPort) {
-                                setPointerEvent(e)
-                                setSurfaceAdvices(false)
-                              }
-                            }}
-                          >
-                            <FactoryShapes entity={component} />
-                            <Edges />
-                          </mesh>
+                        <mesh
+                          ref={(el) => {
+                            setMesh(el, index);
+                          }}
+                          userData={{
+                            keyComponent: component.keyComponent,
+                            isSelected: false
+                          }}
+                          key={uniqid()}
+                          position={component.transformationParams.position}
+                          scale={component.transformationParams.scale}
+                          rotation={component.transformationParams.rotation}
+                          onDoubleClick={(e) => {
+                            if (selectedPort) {
+                              setPointerEvent(e);
+                              setSurfaceAdvices(false);
+                            }
+                          }}
+                        >
+                          <FactoryShapes entity={component} />
+                          <Edges />
+                        </mesh>
                       );
                     })}
-                    </FocusView>
+                  </FocusView>
                   {surfaceAdvices &&
                     <EdgesGenerator
-                    meshRef={mesh}
-                    inputPortPositioned={inputPortPositioned as boolean}
-                    setInputPortPositioned={setInputPortPositioned as Function}
-                  />
+                      meshRef={mesh}
+                      inputPortPositioned={inputPortPositioned as boolean}
+                      setInputPortPositioned={setInputPortPositioned as Function}
+                    />
                   }
                   <PhysicsPortsDrawer />
                   <PhysicsPortsControlsDrawer
@@ -142,7 +146,7 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
           )}
         </ReactReduxContext.Consumer>
       ) : (
-        <div className="absolute top-1/2">
+        <div className='absolute top-1/2'>
           <span className={alertMessageStyle}>{comeBackToModelerMessage}</span>
         </div>
       )}
@@ -227,7 +231,7 @@ const PhysicsPortsControlsDrawer: FC<{ setSavedPortParameters: Function }> = ({
   const dispatch = useDispatch();
   return (
     <>
-      {selectedProject?.simulation?.status !== 'Completed' && (
+      {selectedProject?.simulation?.status !== 'Completed' ? (
         <>
           {selectedPort &&
             (selectedPort.category === 'port' ||
@@ -252,7 +256,24 @@ const PhysicsPortsControlsDrawer: FC<{ setSavedPortParameters: Function }> = ({
             />
           )}
         </>
-      )}
+      )
+        :
+        <>
+          {selectedPort &&
+            (selectedPort.category === 'port' ||
+              selectedPort.category === 'lumped') && (
+              <PortControls
+                selectedPort={selectedPort}
+                updatePortPosition={(obj: {
+                  type: 'first' | 'last';
+                  position: [number, number, number];
+                }) => dispatch(updatePortPosition(obj))}
+                setSavedPortParameters={setSavedPortParameters}
+                disabled={true}
+              />
+            )}
+        </>
+      }
     </>
   );
 };

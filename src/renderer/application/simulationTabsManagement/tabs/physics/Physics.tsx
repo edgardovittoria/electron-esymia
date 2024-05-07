@@ -239,7 +239,7 @@ const PhysicsRightPanel: FC<{
 
       ) : (
         <div className="flex-col px-[20px] pb-[5px] overflow-x-hidden">
-          <FrequenciesDef setSavedPhysicsParameters={setSavedPhysicsParameters}/>
+          <FrequenciesDef disabled={selectedProject?.simulation?.status === 'Completed'} setSavedPhysicsParameters={setSavedPhysicsParameters}/>
           {/* <InputSignal
             disabled={selectedProject?.simulation?.status === 'Completed'}
             selectedProject={selectedProject as Project}

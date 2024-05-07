@@ -5,10 +5,11 @@ import { DebounceInput } from 'react-debounce-input';
 import { log10 } from 'chart.js/helpers';
 
 export interface FrequenciesDefProps{
-  setSavedPhysicsParameters: Function
+  setSavedPhysicsParameters: Function,
+  disabled: boolean
 }
 
-const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameters}) => {
+const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameters, disabled}) => {
   const [fMin, setFMin] = useState<number>(0);
   const [fMax, setFMax] = useState<number>(0);
   const [fNum, setFNum] = useState<number>(0);
@@ -36,7 +37,8 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         <div className='flex flex-col items-center gap-2'>
           <span>{'f min'}</span>
           <DebounceInput
-            debounceTimeout={500}
+            debounceTimeout={700}
+            disabled={disabled}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
             value={fMin}
@@ -46,7 +48,8 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         <div className='flex flex-col items-center gap-2'>
           <span>{'f max'}</span>
           <DebounceInput
-            debounceTimeout={500}
+            disabled={disabled}
+            debounceTimeout={700}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
             value={fMax}
@@ -56,7 +59,8 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         <div className='flex flex-col items-center gap-2'>
           <span>f num</span>
           <DebounceInput
-            debounceTimeout={500}
+            debounceTimeout={700}
+            disabled={disabled}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
             min={0}

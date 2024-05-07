@@ -7,12 +7,13 @@ import { Port } from "../../../../../model/esymiaModels";
 interface PortControlsProps {
     selectedPort: Port,
     updatePortPosition: Function
-    setSavedPortParameters: Function
+    setSavedPortParameters: Function,
+    disabled?: boolean
 }
 
 export const PortControls: FC<PortControlsProps> = (
     {
-        selectedPort, updatePortPosition, setSavedPortParameters
+        selectedPort, updatePortPosition, setSavedPortParameters, disabled
     }
 ) => {
 
@@ -73,6 +74,7 @@ export const PortControls: FC<PortControlsProps> = (
                     <TransformControls
                         object={scene.getObjectByName((selectedPort as Port).inputElement.name)}
                         ref={transformationFirst}
+                        enabled={!disabled}
                         position={selectedPort.inputElement.transformationParams.position}
                         showX={selectedPort.isSelected}
                         showY={selectedPort.isSelected}
@@ -81,6 +83,7 @@ export const PortControls: FC<PortControlsProps> = (
                     <TransformControls
                         object={scene.getObjectByName((selectedPort as Port).outputElement.name)}
                         ref={transformationLast}
+                        enabled={!disabled}
                         position={selectedPort.outputElement.transformationParams.position}
                         showX={selectedPort.isSelected}
                         showY={selectedPort.isSelected}
