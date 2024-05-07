@@ -165,7 +165,10 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
     })
     .catch((err) => {
       if (err) {
-        window.alert('Error while generating mesh, please try again');
+        dispatch(setMessageInfoModal('Error while generating mesh, please start mesher on plugins section and try again'))
+        dispatch(setIsAlertInfoModal(true))
+        dispatch(setShowInfoModal(true))
+        setAlert(true)
         dispatch(setMeshGenerated('Not Generated'));
         dispatch(unsetMesh());
         console.log(err);

@@ -194,6 +194,13 @@ const SimulationStatusItem: React.FC<{
     onClose: () => {
       console.log('WebSocket connection closed.');
     },
+    onError: () => {
+      dispatch(setMessageInfoModal('Error while solving, please start solver on plugins section and try again'))
+      dispatch(setIsAlertInfoModal(true))
+      dispatch(setShowInfoModal(true))
+      dispatch(deleteSimulation(associatedProjectID));
+      dispatch(setMeshApproved(false));
+    }
   });
 
   return (
