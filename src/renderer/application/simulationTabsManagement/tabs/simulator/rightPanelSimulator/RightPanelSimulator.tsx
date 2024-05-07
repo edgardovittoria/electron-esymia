@@ -1,33 +1,25 @@
 import {
-  ComponentEntity,
-  exportToSTL,
   Material,
   useFaunaQuery
 } from 'cad-library';
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
 import { ImSpinner } from 'react-icons/im';
 
 import {
   meshGeneratedSelector,
-  setExternalGrids,
-  setMesh,
   setMeshApproved,
   setMeshGenerated,
-  setSuggestedQuantum,
-  unsetMesh, updateSimulation
+  updateSimulation
 } from '../../../../../store/projectSlice';
-import { deleteFileS3, uploadFileS3 } from '../../../../../aws/mesherAPIs';
-import { infoModalSelector, selectMenuItem, setIsConfirmedInfoModal } from '../../../../../store/tabsAndMenuItemsSlice';
+import { infoModalSelector, selectMenuItem } from '../../../../../store/tabsAndMenuItemsSlice';
 import {
   ExternalGridsObject,
   Project, Simulation, SolverOutput
 } from '../../../../../model/esymiaModels';
 import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFunctions';
-import { create_Grids_externals } from './components/createGridsExternals';
 import {
   convergenceTresholdSelector, setConvergenceTreshold,
   setSolverIterations,
@@ -37,7 +29,6 @@ import { useEffectNotOnMount } from '../../../../../hook/useEffectNotOnMount';
 import { DebounceInput } from 'react-debounce-input';
 import {
   computeSuggestedQuantum,
-  generateSTLListFromComponents,
   launchMeshing, saveMeshAndExternalGridsToS3
 } from './components/rightPanelFunctions';
 
@@ -107,8 +98,6 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
 
   useEffect(() => {
     if(alert && infoModal.isConfirmed){
-      dispatch(setMeshGenerated('Not Generated'));
-      dispatch(unsetMesh());
       setAlert(false)
     }
   }, [infoModal.isConfirmed]);
@@ -174,8 +163,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   }
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
+                    let meshStatus = meshGenerated
                     dispatch(setMeshGenerated('Generating'))
-                    launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3, setAlert)
+                    launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3, setAlert, meshStatus)
                   }}
                 >
                   Generate Mesh
@@ -189,13 +179,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   className='button buttonPrimary w-full text-[12px] xl:text-base'
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
+                    let meshStatus = meshGenerated
                     dispatch(setMeshGenerated('Generating'));
-                    deleteFileS3(selectedProject.meshData.mesh as string).then(
-                      () => {
-                        dispatch(unsetMesh());
-                      }
-                    );
-                    launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3, setAlert)
+                    launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3, setAlert, meshStatus)
                   }}
                 >
                   Regenerate

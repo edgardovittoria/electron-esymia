@@ -31,7 +31,6 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
             Object.values(externalGrids.externalGrids).forEach((matrix:Brick[], index) => {
                 if (externalGrids && meshRef.current[index]) {
                     let y = 0;
-                  console.log(matrix.length)
                     matrix.forEach(m => {
                         const id = y++;
                         tempObject.position.set(

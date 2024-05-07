@@ -4,9 +4,7 @@ import {
   setExternalGrids,
   setMesh,
   setMeshGenerated,
-  setSuggestedQuantum,
-  unsetMesh
-} from '../../../../../../store/projectSlice';
+  setSuggestedQuantum} from '../../../../../../store/projectSlice';
 import axios from 'axios';
 import { create_Grids_externals } from './createGridsExternals';
 import { Project } from '../../../../../../model/esymiaModels';
@@ -91,7 +89,7 @@ export const saveMeshAndExternalGridsToS3 = async (
   return 'saved';
 };
 
-export const launchMeshing = (selectedProject: Project, allMaterials: Material[], quantumDimsInput: [number, number, number], dispatch: AppDispatch, saveMeshAndExternalGridsToS3: Function, setAlert:Function) => {
+export const launchMeshing = (selectedProject: Project, allMaterials: Material[], quantumDimsInput: [number, number, number], dispatch: AppDispatch, saveMeshAndExternalGridsToS3: Function, setAlert:Function, previousMeshStatus: "Not Generated" | "Generated" | "Generating") => {
   const components = selectedProject?.model
     ?.components as ComponentEntity[];
   const objToSendToMesher = {
@@ -169,8 +167,7 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
         dispatch(setIsAlertInfoModal(true))
         dispatch(setShowInfoModal(true))
         setAlert(true)
-        dispatch(setMeshGenerated('Not Generated'));
-        dispatch(unsetMesh());
+        dispatch(setMeshGenerated(previousMeshStatus));
         console.log(err);
       }
     });

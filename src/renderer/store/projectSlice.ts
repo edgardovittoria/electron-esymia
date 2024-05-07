@@ -233,10 +233,6 @@ export const ProjectSlice = createSlice({
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       if (project) project.meshData.externalGrids = action.payload;
     },
-    unsetMesh(state: ProjectState) {
-      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
-      if (project) project.meshData.mesh = undefined;
-    },
     setMeshGenerated(state: ProjectState, action: PayloadAction<'Not Generated' | 'Generated' | 'Generating'>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       if (project) project.meshData.meshGenerated = action.payload;
@@ -325,7 +321,6 @@ export const {
   setMeshGenerated,
   setMeshApproved,
   setFolderOfElementsSharedWithUser,
-  unsetMesh,
   setExternalGrids,
   setModel,
   setModelS3,
@@ -362,7 +357,7 @@ export const selectedProjectSelector = (state: { projects: ProjectState }) => {
 
 export const meshGeneratedSelector = (state: {
   projects: ProjectState
-}) => findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject)?.meshData.meshGenerated;
+}) => (findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject) as Project).meshData.meshGenerated;
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
   let allFolders: Folder[] = [];
   return recursiveFindFolders(state.projects.projects, allFolders);
