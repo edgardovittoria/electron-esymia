@@ -12,7 +12,7 @@ interface ExportToCsvZippedButtonProps {
 
 export const ExportToCsvZippedButton: FC<ExportToCsvZippedButtonProps> = ({graphDataToExport, buttonLabel, zipFilename, className}) => {
   return (
-    <button className={className ? className : "btn btn-success"} onClick={() =>{
+    <button className={className ? className : "btn btn-sm text-sm bg-white text-black capitalize border-[#0fb25b] hover:bg-[#0fb25b] hover:text-white"} onClick={() =>{
       const zip = new JSZip();
       graphDataToExport.map((chartData) => {
         const folder = zip.folder(chartData.representedFunction);

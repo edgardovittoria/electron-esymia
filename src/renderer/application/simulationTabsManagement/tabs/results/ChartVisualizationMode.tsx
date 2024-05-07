@@ -4,7 +4,8 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { useSelector } from "react-redux";
 import { selectedProjectSelector } from "../../../../store/projectSlice";
 import { Port } from "../../../../model/esymiaModels";
-import { pairs } from './sharedElements';
+import { Dataset, pairs } from './sharedElements';
+import { ExportToCsvZippedButton } from './ExportToCsvZippedButton';
 
 interface ChartVisualizationModeProps {
     chartVisualizationMode: 'grid' | 'full',
@@ -13,13 +14,14 @@ interface ChartVisualizationModeProps {
     setChartsScaleMode: Function,
     setGraphToVisualize: Function,
     selectedLabel: { label: string, id: number }[],
-    setSelectedLabel: Function
+    setSelectedLabel: Function,
+    graphDataToExport: { data: { datasets: Dataset[]; labels: number[] }; options: {}, representedFunction: string }[]
 }
 
 export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
     {
         chartVisualizationMode, setChartVisualizationMode, chartsScaleMode, setChartsScaleMode,
-        setGraphToVisualize, selectedLabel, setSelectedLabel
+        setGraphToVisualize, selectedLabel, setSelectedLabel, graphDataToExport
     }
 ) => {
 
@@ -93,21 +95,8 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = (
                     </ul>
                 </div>
             </div>
-            <div className="flex">
-                <div
-                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${chartsScaleMode === 'logarithmic' ? 'border-[#0fb25b]' : ''}`}
-                    onClick={() => setChartsScaleMode('logarithmic')}
-                >
-                    <span className="text-[12px]">logarithmic</span>
-                </div>
-                <div
-                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${chartsScaleMode === 'linear' ? 'border-[#0fb25b]' : ''}`}
-                    onClick={() => setChartsScaleMode('linear')}
-                >
-                    <span className="text-[12px]">linear</span>
-                </div>
-
-            </div>
+          <ExportToCsvZippedButton buttonLabel='Export all graphs to csv' graphDataToExport={graphDataToExport}
+                                   zipFilename='graphs_data' />
         </div>
     )
 

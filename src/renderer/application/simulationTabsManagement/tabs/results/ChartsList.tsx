@@ -19,6 +19,7 @@ import JSZip from "jszip";
 import saveAs from "file-saver";
 import { Dataset, pairs } from "./sharedElements";
 import { ExportToCsvZippedButton } from "./ExportToCsvZippedButton";
+import { BsGrid3X3Gap } from 'react-icons/bs';
 
 ChartJS.register(
   CategoryScale,
@@ -136,14 +137,19 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     <>
       {chartsDataToVisualize.map((chartData, index) => {
         return (
-          <div className="box w-[100%]" key={index}>
-            <div>
-              <VscSettings onClick={() => {
+          <div className="box w-full" key={index}>
+            <div className="flex flex-row justify-between items-center">
+              <div
+                className={`box p-[5px] flex flex-col items-center border text-[#0fb25b] border-[#0fb25b] hover:cursor-pointer hover:bg-[#0fb25b] hover:text-white`}
+                onClick={() => {
                   let shows = [...showGraphsSettings]
                   shows[index] = !shows[index]
                   setShowGraphsSettings(shows)
-              }}/>
-              <ExportToCsvZippedButton className="btn" buttonLabel="to CSV" graphDataToExport={[chartData]} zipFilename="graphs_data"/>
+                }}
+              >
+                <VscSettings size={15} />
+              </div>
+              <ExportToCsvZippedButton buttonLabel="to CSV" graphDataToExport={[chartData]} zipFilename="graphs_data"/>
             </div>
             {showGraphsSettings[index] && <ScaleChartOptions index={index} scaleMode={scaleMode} setScaleMode={setScaleMode}/>}
             <Line
@@ -161,7 +167,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
 const ScaleChartOptions: FC<{index: number, scaleMode: ScaleMode[], setScaleMode: Function}> = ({scaleMode, index, setScaleMode}) => {
   return (
     <>
-    <div className="flex justify-between">
+    <div className="flex justify-between mt-3">
               <div className="flex flex-row">
                 <div
                     className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].yaxis === 'logarithmic' ? 'border-[#0fb25b]' : ''}`}

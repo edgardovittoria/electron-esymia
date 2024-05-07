@@ -89,8 +89,8 @@ export const Results: React.FC<ResultsProps> = ({
                 setGraphToVisualize={setGraphToVisualize}
                 selectedLabel={selectedLabel}
                 setSelectedLabel={setSelectedLabel}
+                graphDataToExport={graphDataToExport}
               />
-              <ExportToCsvZippedButton buttonLabel="Export all graphs to csv" graphDataToExport={graphDataToExport} zipFilename="graphs_data"/>
               <div className={chartVisualizationMode === "full" ? "overflow-scroll grid grid-cols-1 gap-4 max-h-[77vh] pb-10": "grid grid-cols-2 gap-4 overflow-scroll max-h-[77vh] pb-10"}>
                 <ChartsList
                   graphToVisualize={graphToVisualize}
