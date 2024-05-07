@@ -9,14 +9,12 @@ import {
 import { ChartVisualizationMode } from "./ChartVisualizationMode";
 import {ChartsList} from "./ChartsList";
 import { ResultsLeftPanelTab } from "./ResultsLeftPanelTab";
-import { Models } from "../../sharedElements/Models";
-import { ModelOutliner } from "../../sharedElements/ModelOutliner";
 import { MyPanel } from "../../sharedElements/MyPanel";
 import { useFaunaQuery } from "cad-library";
 import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
 import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
 import {Project} from "../../../../model/esymiaModels";
-import { alertMessageStyle, comeBackToModelerMessage, emptyResultsMessage } from '../../../config/textMessages';
+import { alertMessageStyle, emptyResultsMessage } from '../../../config/textMessages';
 import { resultsLeftPanelTitle } from '../../../config/panelTitles';
 
 interface ResultsProps {
