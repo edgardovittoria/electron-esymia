@@ -69,7 +69,7 @@ export const Simulations: React.FC<SimulationsProps> = ({maxH}) => {
     <div className="text-center p-[20px] box w-full flex flex-col h-fit">
       <h5 className="text-left text-base p-2">Simulations</h5>
       {simulations.length > 0 ? (
-        <div className={`overflow-auto h-full ${maxH} w-full mt-5`}>
+        <div className={`overflow-scroll h-full ${maxH} w-full mt-5`}>
           <table className="table mt-4 w-full">
             <thead className="sticky top-0 bg-[#f4f4f4]">
               <tr>
@@ -101,9 +101,9 @@ export const Simulations: React.FC<SimulationsProps> = ({maxH}) => {
                     key={`${simulation.name}_${index}`}
                     className="hover:bg-[#f1f1f1]"
                   >
-                    <th scope="row" className="pl-8">
+                    <td scope="row" className="pl-8">
                       {statusIcon}
-                    </th>
+                    </td>
                     <td className="fw-bold py-4">{simulation.name}</td>
                     <td className="py-4">{`${started.toLocaleString()}`}</td>
                     <td className="py-4">{`${ended.toLocaleString()}`}</td>

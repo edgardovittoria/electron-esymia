@@ -146,8 +146,8 @@ export default function App() {
         ) : (
           <SimulationTabsContentFactory />
         )}
-        {activeSimulations && activeSimulations.length > 0 && !feedbackSimulationVisible &&
-          <button className="absolute bottom-16 right-10 rounded-full p-4 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
+        {activeSimulations && !(activeSimulations.length > 0) && !feedbackSimulationVisible &&
+          <button className="absolute bottom-24 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor text-sm"
             onClick={() => setFeedbackSimulationVisible(true)}
           >
             SIM
@@ -155,10 +155,10 @@ export default function App() {
         }
         {activeSimulations && activeSimulations.length > 0 && <SimulationStatus feedbackSimulationVisible={feedbackSimulationVisible} setFeedbackSimulationVisible={setFeedbackSimulationVisible} activeSimulations={activeSimulations}/>}
         {activePlugins && activePlugins.length > 0 && !pluginsVisible &&
-          <button className="absolute bottom-40 right-10 rounded-full p-4 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
+          <button className="absolute bottom-40 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
                   onClick={() => setPluginsVisible(true)}
           >
-            <BsPlugin size={30}/>
+            <BsPlugin size={22}/>
           </button>
         }
         {activePlugins && activePlugins.length > 0 && <Plugins pluginsVisible={pluginsVisible} setPluginsVisible={setPluginsVisible} activePlugins={activePlugins}/>}
