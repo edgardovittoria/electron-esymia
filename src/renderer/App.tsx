@@ -146,7 +146,7 @@ export default function App() {
         ) : (
           <SimulationTabsContentFactory />
         )}
-        {activeSimulations && !(activeSimulations.length > 0) && !feedbackSimulationVisible &&
+        {activeSimulations && activeSimulations.length > 0 && !feedbackSimulationVisible &&
           <button className="absolute bottom-24 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor text-sm"
             onClick={() => setFeedbackSimulationVisible(true)}
           >
