@@ -7,17 +7,19 @@ import { Bounds, useBounds } from '@react-three/drei';
 import { useSelector } from 'react-redux';
 import { meshGeneratedSelector } from '../../../../../store/projectSlice';
 import { Brick } from '../rightPanelSimulator/components/createGridsExternals';
+import { ScalingViewParams } from '../../../sharedElements/utilityFunctions';
 
 interface PanelContentProps {
   selectedProject: Project;
   externalGrids: ExternalGridsObject;
   selectedMaterials: string[];
+  scalingViewParams: ScalingViewParams
 }
 
 export const MeshedElement: React.FC<PanelContentProps> = ({
                                                              selectedProject,
                                                              externalGrids,
-                                                             selectedMaterials
+                                                             selectedMaterials, scalingViewParams
                                                            }) => {
   let meshGenerated = useSelector(meshGeneratedSelector);
   let allMaterialsList = selectedProject.model?.components.map(c => c.material as Material) as Material[];
@@ -68,6 +70,7 @@ export const MeshedElement: React.FC<PanelContentProps> = ({
         {mesherMatrices.map((matrix, index) => {
             return (
               <MyInstancedMesh
+                scalingViewParams={scalingViewParams}
                 key={index}
                 index={index}
                 materialsList={modelMaterials}

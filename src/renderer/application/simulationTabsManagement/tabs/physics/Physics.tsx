@@ -16,7 +16,7 @@ import { PortPosition } from './portManagement/components/PortPosition';
 import { RLCParamsComponent } from './portManagement/components/RLCParamsComponent';
 import { ModalSelectPortType } from './portManagement/ModalSelectPortType';
 import { MyPanel } from '../../sharedElements/MyPanel';
-import { Port, TempLumped } from '../../../../model/esymiaModels';
+import { Port, Project, TempLumped } from '../../../../model/esymiaModels';
 import { ImportExportPhysicsSetup } from './ImportExportPhysicsSetup';
 import StatusBar from '../../sharedElements/StatusBar';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
@@ -29,6 +29,7 @@ import ScatteringParameter from './portManagement/components/ScatteringParameter
 import FrequenciesDef from './frequenciesDef/FrequenciesDef';
 import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
+import { calculateModelBoundingBox } from '../../sharedElements/utilityFunctions';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string;
@@ -66,13 +67,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 
   useEffect(() => {
     if(!boundingBoxDimension){
-      const group = new THREE.Group();
-      if (selectedProject && selectedProject.model.components) {
-        selectedProject.model.components.forEach((c) => {
-          group.add(meshFrom(c));
-        });
-      }
-      const boundingbox = new THREE.Box3().setFromObject(group);
+      const boundingbox = calculateModelBoundingBox(selectedProject as Project)
       dispatch(setBoundingBoxDimension(boundingbox.getSize(boundingbox.max).x));
     }
 

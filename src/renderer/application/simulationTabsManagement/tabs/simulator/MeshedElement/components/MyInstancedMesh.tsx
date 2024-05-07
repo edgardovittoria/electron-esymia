@@ -5,12 +5,14 @@ import {ExternalGridsObject} from "../../../../../../model/esymiaModels";
 import {useSelector} from "react-redux";
 import {meshGeneratedSelector} from "../../../../../../store/projectSlice";
 import { Brick } from '../../rightPanelSimulator/components/createGridsExternals';
+import { ScalingViewParams } from "../../../../sharedElements/utilityFunctions";
 
 
 interface InstancedMeshProps {
     index: number;
     materialsList: Material[];
-    externalGrids: ExternalGridsObject
+    externalGrids: ExternalGridsObject,
+    scalingViewParams: ScalingViewParams
 
 }
 
@@ -18,6 +20,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                                                                   index,
                                                                   materialsList,
                                                                   externalGrids,
+                                                                  scalingViewParams
                                                               }) => {
     let meshGenerated = useSelector(meshGeneratedSelector)
 
@@ -35,14 +38,14 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                         const id = y++;
                         tempObject.position.set(
                             m.x !== 0
-                                ? ((m.x) * externalGrids.cell_size.cell_size_x) * 1020
+                                ? ((m.x) * externalGrids.cell_size.cell_size_x) * 1020 * scalingViewParams.x
                                 : externalGrids.origin.origin_x/1000,
                             m.y !== 0
                                 ? ((m.y) * externalGrids.cell_size.cell_size_y) *
-                                1020
+                                1020 * scalingViewParams.y
                                 : externalGrids.origin.origin_y/1000,
                             m.z !== 0
-                                ? ((m.z) * externalGrids.cell_size.cell_size_z ) * 1020
+                                ? ((m.z) * externalGrids.cell_size.cell_size_z ) * 1020 * scalingViewParams.z
                                 : externalGrids.origin.origin_z/1000
                         );
                         tempObject.updateMatrix();
@@ -55,7 +58,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                 }
             });
         }
-    }, [meshGenerated, materialsList, externalGrids]);
+    }, [meshGenerated, materialsList, externalGrids, scalingViewParams]);
 
 
     return (
@@ -73,9 +76,9 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                     args={
                         [
 
-                            (externalGrids?.cell_size.cell_size_x as number) * 1000,
-                            (externalGrids?.cell_size.cell_size_y as number) * 1000,
-                            (externalGrids?.cell_size.cell_size_z as number) * 1000,
+                            (externalGrids?.cell_size.cell_size_x as number) * 1000 * scalingViewParams.x,
+                            (externalGrids?.cell_size.cell_size_y as number) * 1000 * scalingViewParams.y,
+                            (externalGrids?.cell_size.cell_size_z as number) * 1000 * scalingViewParams.z,
 
                         ]
                     }
@@ -98,9 +101,9 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                     args={
                         [
 
-                            (externalGrids?.cell_size.cell_size_x as number) * 1000,
-                            (externalGrids?.cell_size.cell_size_y as number) * 1000,
-                            (externalGrids?.cell_size.cell_size_z as number) * 1000,
+                            (externalGrids?.cell_size.cell_size_x as number) * 1000 * scalingViewParams.x,
+                            (externalGrids?.cell_size.cell_size_y as number) * 1000 * scalingViewParams.y,
+                            (externalGrids?.cell_size.cell_size_z as number) * 1000 * scalingViewParams.z,
 
                         ]
                     }
