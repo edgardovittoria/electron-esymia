@@ -16,6 +16,10 @@ import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunct
 import {Project} from "../../../../model/esymiaModels";
 import { alertMessageStyle, emptyResultsMessage } from '../../../config/textMessages';
 import { resultsLeftPanelTitle } from '../../../config/panelTitles';
+import { Dataset } from "./sharedElements";
+import saveAs from "file-saver";
+import JSZip from "jszip";
+import { ExportToCsvZippedButton } from "./ExportToCsvZippedButton";
 
 interface ResultsProps {
   selectedTabLeftPanel: string;
@@ -37,6 +41,7 @@ export const Results: React.FC<ResultsProps> = ({
     "grid" | "full"
   >("grid");
   const [graphToVisualize, setGraphToVisualize] = useState<"All Graph" | "Z" | "S" | "Y">("All Graph")
+  const [graphDataToExport, setGraphDataToExport] = useState<{ data: { datasets: Dataset[]; labels: number[] }; options: {}, representedFunction: string }[]>([])
   const { execQuery } = useFaunaQuery();
 
   return (
@@ -85,10 +90,12 @@ export const Results: React.FC<ResultsProps> = ({
                 selectedLabel={selectedLabel}
                 setSelectedLabel={setSelectedLabel}
               />
+              <ExportToCsvZippedButton buttonLabel="Export all graphs to csv" graphDataToExport={graphDataToExport} zipFilename="graphs_data"/>
               <div className={chartVisualizationMode === "full" ? "overflow-scroll grid grid-cols-1 gap-4 max-h-[77vh] pb-10": "grid grid-cols-2 gap-4 overflow-scroll max-h-[77vh] pb-10"}>
                 <ChartsList
                   graphToVisualize={graphToVisualize}
                   selectedLabel={selectedLabel}
+                  setGraphsData={setGraphDataToExport}
                 />
               </div>
             </>

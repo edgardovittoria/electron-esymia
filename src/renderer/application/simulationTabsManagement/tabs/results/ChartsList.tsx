@@ -15,6 +15,10 @@ import { Port, Project, Simulation } from "../../../../model/esymiaModels";
 import { useSelector } from "react-redux";
 import { selectedProjectSelector } from "../../../../store/projectSlice";
 import { VscSettings } from "react-icons/vsc";
+import JSZip from "jszip";
+import saveAs from "file-saver";
+import { Dataset, pairs } from "./sharedElements";
+import { ExportToCsvZippedButton } from "./ExportToCsvZippedButton";
 
 ChartJS.register(
   CategoryScale,
@@ -29,14 +33,8 @@ ChartJS.register(
 
 interface ChartsListProps {
   graphToVisualize: "All Graph" | "Z" | "S" | "Y";
-  selectedLabel: { label: string, id: number }[]
-}
-
-interface Dataset {
-  label: string;
-  data: number[];
-  borderColor: string;
-  backgroundColor: string;
+  selectedLabel: { label: string, id: number }[],
+  setGraphsData: Function
 }
 
 interface ScaleMode {
@@ -64,7 +62,8 @@ const defaultShowGraphsSettings = (length:number) => {
 
 export const ChartsList: React.FC<ChartsListProps> = ({
   graphToVisualize,
-  selectedLabel
+  selectedLabel,
+   setGraphsData
 }) => {
   const selectedProject = useSelector(selectedProjectSelector)
   const [showGraphsSettings, setShowGraphsSettings] = useState<boolean[]>(defaultShowGraphsSettings(11))
@@ -101,12 +100,12 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     if (graphToVisualize === "S") {
       graphs = ["S_Module", "S_Phase", "S_dB"]
     }
-    setChartsDataToVisualize(
-      graphs.map((id) =>
-        chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
-      )
-    )
+    let charts = graphs.map((id) =>
+    chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+  )
+    setChartsDataToVisualize(charts)
     setScaleMode(defaultScaleModes(graphs.length))
+    setGraphsData(charts)
   }, [graphToVisualize, selectedProject, selectedLabel])
 
 
@@ -138,11 +137,14 @@ export const ChartsList: React.FC<ChartsListProps> = ({
       {chartsDataToVisualize.map((chartData, index) => {
         return (
           <div className="box w-[100%]" key={index}>
+            <div>
               <VscSettings onClick={() => {
-                let shows = [...showGraphsSettings]
-                shows[index] = !shows[index]
-                setShowGraphsSettings(shows)
+                  let shows = [...showGraphsSettings]
+                  shows[index] = !shows[index]
+                  setShowGraphsSettings(shows)
               }}/>
+              <ExportToCsvZippedButton className="btn" buttonLabel="to CSV" graphDataToExport={[chartData]} zipFilename="graphs_data"/>
+            </div>
             {showGraphsSettings[index] && <ScaleChartOptions index={index} scaleMode={scaleMode} setScaleMode={setScaleMode}/>}
             <Line
               options={optionsWithScaleMode(chartData.options, scaleMode[index])}
@@ -274,10 +276,11 @@ const chartsDataOptionsFactory = (
     "yellow",
     "pink",
   ];
-  let result: { data: { datasets: Dataset[]; labels: number[] }; options: {} } =
+  let result: { data: { datasets: Dataset[]; labels: number[] }; options: {}, representedFunction: string } =
   {
     data: { datasets: [], labels: [] },
     options: {},
+    representedFunction: ""
   };
 
   const computeGraphResults = (unit: string, ports:Port[], matrix: any[][][][], getGraphFormulaResult: (index: number, v:any[], innerLabels:number[]) => number) => {
@@ -345,6 +348,7 @@ const chartsDataOptionsFactory = (
       datasets: datasets,
     };
     result.options = options;
+    result.representedFunction = unit
     return result
   }
   switch (label) {
@@ -386,11 +390,3 @@ const chartsDataOptionsFactory = (
   }
   return result;
 };
-
-export const pairs = (a: string[]) => {
-  return a.flatMap((x: string) => {
-    return a.flatMap((y: string) => {
-      return [[x, y]]
-    });
-  });
-}

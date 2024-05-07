@@ -4,7 +4,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { useSelector } from "react-redux";
 import { selectedProjectSelector } from "../../../../store/projectSlice";
 import { Port } from "../../../../model/esymiaModels";
-import { pairs } from "./ChartsList";
+import { pairs } from './sharedElements';
 
 interface ChartVisualizationModeProps {
     chartVisualizationMode: 'grid' | 'full',
