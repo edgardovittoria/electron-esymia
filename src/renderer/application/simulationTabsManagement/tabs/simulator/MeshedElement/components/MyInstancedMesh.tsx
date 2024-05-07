@@ -5,14 +5,13 @@ import {ExternalGridsObject} from "../../../../../../model/esymiaModels";
 import {useSelector} from "react-redux";
 import {meshGeneratedSelector} from "../../../../../../store/projectSlice";
 import { Brick } from '../../rightPanelSimulator/components/createGridsExternals';
-import { ScalingViewParams } from "../../../../sharedElements/utilityFunctions";
+import { scalingViewParamsOfMeshSelector } from "../../../../../../store/tabsAndMenuItemsSlice";
 
 
 interface InstancedMeshProps {
     index: number;
     materialsList: Material[];
     externalGrids: ExternalGridsObject,
-    scalingViewParams: ScalingViewParams
 
 }
 
@@ -20,13 +19,12 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
                                                                   index,
                                                                   materialsList,
                                                                   externalGrids,
-                                                                  scalingViewParams
                                                               }) => {
     let meshGenerated = useSelector(meshGeneratedSelector)
 
     const meshRef = useRef<InstancedMesh[]>([]);
     const edgeRef = useRef<InstancedMesh[]>([])
-
+    const scalingViewParams = useSelector(scalingViewParamsOfMeshSelector)
 
     useEffect(() => {
         if (meshGenerated === "Generated") {

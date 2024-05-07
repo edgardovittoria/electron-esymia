@@ -10,16 +10,14 @@ import { FocusView } from '../../sharedElements/FocusView';
 import uniqid from 'uniqid';
 import { FactoryShapes } from 'cad-library';
 import { alertMessageStyle, comeBackToModelerMessage } from '../../../config/textMessages';
-import { ScalingViewParams } from "../../sharedElements/utilityFunctions";
 
 interface CanvasSimulatorProps  {
   externalGrids: ExternalGridsObject | undefined,
   selectedMaterials: string[],
-  resetFocus: boolean,
-  scalingViewParams: ScalingViewParams
+  resetFocus: boolean
 }
 
-export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, selectedMaterials, resetFocus, scalingViewParams}) => {
+export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, selectedMaterials, resetFocus}) => {
   const selectedProject = useSelector(selectedProjectSelector);
   let mesherOutput = selectedProject?.meshData.mesh;
 
@@ -60,7 +58,6 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
                     <>
                       {externalGrids &&
                         <MeshedElement
-                          scalingViewParams={scalingViewParams}
                           externalGrids={externalGrids}
                           selectedProject={selectedProject}
                           selectedMaterials={selectedMaterials}

@@ -16,7 +16,6 @@ import StatusBar from '../../sharedElements/StatusBar';
 import { CanvasSimulator } from './CanvasSimulator';
 import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
 import { simulatorLeftPanelTitle } from '../../../config/panelTitles';
-import { ScalingViewParams } from '../../sharedElements/utilityFunctions';
 import { OriginaProportionsButton } from './OriginalProportionsButton';
 import { AlteredProportionsButton } from './AlteredProportionsButton';
 
@@ -80,6 +79,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
     }
   }, [externalGrids]);
 
+
   let materialsNames: string[] = [];
   let allMaterials: Material[] = [];
   if (selectedProject?.model?.components) {
@@ -97,11 +97,9 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const [selectedMaterials, setSelectedMaterials] =
     useState<string[]>(materialsNames);
 
-  const [scalingViewParams, setScalingViewParams] = useState<ScalingViewParams>({x:1, y:1, z:1})
-
   return (
     <>
-      <CanvasSimulator externalGrids={externalGrids} selectedMaterials={selectedMaterials} resetFocus={resetFocus} scalingViewParams={scalingViewParams}/>
+      <CanvasSimulator externalGrids={externalGrids} selectedMaterials={selectedMaterials} resetFocus={resetFocus}/>
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
       <MyPanel
         tabs={[simulatorLeftPanelTitle.first, simulatorLeftPanelTitle.second]}
@@ -128,8 +126,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
       />
       <div className='absolute lg:left-[48%] left-[38%] gap-2 top-[160px] flex flex-row'>
         <ResetFocusButton toggleResetFocus={toggleResetFocus}/>
-        <OriginaProportionsButton setScalingViewParams={setScalingViewParams}/>
-        <AlteredProportionsButton selectedProject={selectedProject as Project} setScalingViewParams={setScalingViewParams} threshold={3}/>
+        <OriginaProportionsButton />
+        <AlteredProportionsButton threshold={3}/>
       </div>
     </>
   );

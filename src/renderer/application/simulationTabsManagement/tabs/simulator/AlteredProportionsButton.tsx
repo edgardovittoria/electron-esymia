@@ -1,17 +1,20 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { TbAxisX } from "react-icons/tb";
 import { Project } from "../../../../model/esymiaModels";
-import { ScalingViewParams, calculateModelBoundingBox } from "../../sharedElements/utilityFunctions";
+import { calculateModelBoundingBox } from "../../sharedElements/utilityFunctions";
 import * as THREE from 'three'
+import { useDispatch, useSelector } from "react-redux";
+import { selectedProjectSelector } from "../../../../store/projectSlice";
+import { setScalingViewParamsOfMesh } from "../../../../store/tabsAndMenuItemsSlice";
 
 export const AlteredProportionsButton: FC<{
   threshold: number,
-  selectedProject: Project,
-  setScalingViewParams: Function
-}> = ({ selectedProject, setScalingViewParams, threshold }) => {
+}> = ({ threshold }) => {
 
-  const calculateScalingViewParams = (selectedProject: Project) : ScalingViewParams => {
-    let scalingFactors: ScalingViewParams = {x:1, y:1, z:1}
+  const selectedProject = useSelector(selectedProjectSelector)
+
+  const calculateScalingViewParams = (selectedProject: Project) => {
+    let scalingFactors = {x:1, y:1, z:1}
     let dims = calculateModelBoundingBox(selectedProject).getSize(new THREE.Vector3());
     if(dims.x >= dims.y && dims.x >= dims.z){
       scalingFactors.y = (dims.x/dims.y) > threshold ? (dims.x/dims.y)/threshold : 1 // threshold è un valore scelto a caso per fissare una soglia che le dimensioni devono essere in rapporto minore o uguale a threshold.
@@ -28,6 +31,9 @@ export const AlteredProportionsButton: FC<{
     return scalingFactors
   }
 
+  const dispatch = useDispatch()
+  const alteredParams = useMemo(() => calculateScalingViewParams(selectedProject as Project), [selectedProject])
+
   return (
     <div
       className='tooltip'
@@ -37,7 +43,9 @@ export const AlteredProportionsButton: FC<{
     >
       <button
         className='bg-white rounded p-2'
-        onClick={() => {setScalingViewParams(calculateScalingViewParams(selectedProject))}}
+        onClick={() => {
+          dispatch(setScalingViewParamsOfMesh(alteredParams))
+        }}
       >
       <TbAxisX className='h-5 w-5 text-green-300 hover:text-secondaryColor' />
       </button>

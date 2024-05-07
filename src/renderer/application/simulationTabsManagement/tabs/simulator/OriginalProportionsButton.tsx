@@ -1,12 +1,10 @@
 import { FC } from "react";
 import { LuAxis3D } from "react-icons/lu";
-import { Project } from "../../../../model/esymiaModels";
-import { ScalingViewParams } from "../../sharedElements/utilityFunctions";
+import { useDispatch } from "react-redux";
+import { resetScalingViewParamsOfMesh } from "../../../../store/tabsAndMenuItemsSlice";
 
-export const OriginaProportionsButton: FC<{
-  setScalingViewParams: Function
-}> = ({ setScalingViewParams }) => {
-
+export const OriginaProportionsButton: FC<{}> = () => {
+  const dispatch = useDispatch()
   return (
     <div
       className='tooltip'
@@ -16,7 +14,7 @@ export const OriginaProportionsButton: FC<{
     >
       <button
         className='bg-white rounded p-2'
-        onClick={() => {setScalingViewParams({x:1, y:1, z:1} as ScalingViewParams)}}
+        onClick={() => dispatch(resetScalingViewParamsOfMesh())}
       >
       <LuAxis3D className='h-5 w-5 text-green-300 hover:text-secondaryColor' />
       </button>

@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Project } from '../model/esymiaModels';
+import { selectProject } from './projectSlice';
 
 const getMenuItemsArrayBasedOnTabType = (tabType: string) => {
   switch (tabType) {
@@ -9,6 +10,12 @@ const getMenuItemsArrayBasedOnTabType = (tabType: string) => {
       return ['Modeler', 'Physics', 'Simulator', 'Results'];
   }
 };
+
+interface ScalingViewParams {
+  x:number,
+  y:number,
+  z:number
+}
 
 type TabsAndMenuItemsState = {
   tabSelected: string;
@@ -22,6 +29,7 @@ type TabsAndMenuItemsState = {
     isConfirmed: boolean
   },
   showCreateNewProjectModal: boolean
+  scalingViewParamsOfMesh: ScalingViewParams
 }
 
 export const TabsAndMenuItemsSlice = createSlice({
@@ -38,7 +46,8 @@ export const TabsAndMenuItemsSlice = createSlice({
       isConfirmed: false,
       isAlerted: false
     },
-    showCreateNewProjectModal: false
+    showCreateNewProjectModal: false,
+    scalingViewParamsOfMesh: {x:1, y:1, z:1}
   } as TabsAndMenuItemsState,
   reducers: {
     selectTab(state: TabsAndMenuItemsState, action: PayloadAction<string>) {
@@ -72,6 +81,18 @@ export const TabsAndMenuItemsSlice = createSlice({
     setShowCreateNewProjectModal(state: TabsAndMenuItemsState, action: PayloadAction<boolean>) {
       state.showCreateNewProjectModal = action.payload;
     },
+    setScalingViewParamsOfMesh(state: TabsAndMenuItemsState, action: PayloadAction<ScalingViewParams>) {
+      state.scalingViewParamsOfMesh = action.payload;
+    },
+    resetScalingViewParamsOfMesh(state: TabsAndMenuItemsState) {
+      state.scalingViewParamsOfMesh = {x:1, y:1, z:1};
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(selectProject, (state, action) => {
+        state.scalingViewParamsOfMesh = {x:1, y:1, z:1}
+      });
   }
 });
 
@@ -84,7 +105,9 @@ export const {
   setMessageInfoModal,
   setIsAlertInfoModal,
   setIsConfirmedInfoModal,
-  setShowCreateNewProjectModal
+  setShowCreateNewProjectModal,
+  setScalingViewParamsOfMesh,
+  resetScalingViewParamsOfMesh
 } = TabsAndMenuItemsSlice.actions;
 
 
@@ -124,3 +147,7 @@ export const isAlertInfoModalSelector = (state: {
 export const showCreateNewProjectModalSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState
 }) => state.tabsAndMenuItems.showCreateNewProjectModal;
+
+export const scalingViewParamsOfMeshSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.scalingViewParamsOfMesh;

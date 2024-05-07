@@ -24,9 +24,3 @@ export const exportToJsonFileThis = (data: any, fileName: string) => {
       const boundingbox = new THREE.Box3().setFromObject(group);
       return boundingbox
   }
-
-export interface ScalingViewParams {
-  x:number,
-  y:number,
-  z:number
-}
