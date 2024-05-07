@@ -109,21 +109,25 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
         dispatch(setIsAlertInfoModal(true))
         dispatch(setShowInfoModal(true))
         setAlert(true)
+        dispatch(setMeshGenerated(previousMeshStatus))
       } else if (res.data.y) {
         dispatch(setMessageInfoModal(`the size of the quantum on y is too large compared to the size of the model on y. Please reduce the size of the quantum on y! y must be less than ${res.data.max_y}`))
         dispatch(setIsAlertInfoModal(true))
         dispatch(setShowInfoModal(true))
         setAlert(true)
+        dispatch(setMeshGenerated(previousMeshStatus))
       } else if (res.data.z) {
         dispatch(setMessageInfoModal(`the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`))
         dispatch(setIsAlertInfoModal(true))
         dispatch(setShowInfoModal(true))
         setAlert(true)
+        dispatch(setMeshGenerated(previousMeshStatus))
       } else if (res.data.mesh_is_valid.valid == false) {
         dispatch(setMessageInfoModal('Error! Mesh not valid. Please adjust quantum along ' + res.data.mesh_is_valid.axis + ' axis.'))
         dispatch(setIsAlertInfoModal(true))
         dispatch(setShowInfoModal(true))
         setAlert(true)
+        dispatch(setMeshGenerated(previousMeshStatus))
       } else {
         const grids: any[] = [];
         for (const value of Object.values(res.data.mesher_matrices)) {
