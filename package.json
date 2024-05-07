@@ -100,7 +100,6 @@
   "dependencies": {
     "@stdlib/array-linspace": "^0.2.1",
     "@stdlib/array-logspace": "^0.2.1",
-    "@types/react-csv": "^1.1.10",
     "aws-sdk": "^2.1276.0",
     "axios": "^0.24.0",
     "browser-image-compression": "^1.0.17",
@@ -152,6 +151,7 @@
     "@types/jest": "^24.9.1",
     "@types/node": "^12.20.37",
     "@types/react": "^18.2.65",
+    "@types/react-csv": "^1.1.10",
     "@types/react-dom": "^18.2.21",
     "@types/react-redux": "^7.1.20",
     "@types/react-test-renderer": "^18.0.1",
