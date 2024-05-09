@@ -169,6 +169,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
             </Item>
             <Separator />
             <Item
+              data-testid="deleteButton"
               onClick={(p) => {
                 p.event.stopPropagation();
                 dispatch(removeProject(project.faunaDocumentId as string));

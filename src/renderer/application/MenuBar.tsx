@@ -22,6 +22,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
         {(menuItems as string[]).map((item) => (
           <li
             key={item}
+            data-testid={item}
             className="flex flex-col justify-center items-center hover:cursor-pointer"
             onClick={() => dispatch(selectMenuItem(item))}
           >

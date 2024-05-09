@@ -29,7 +29,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
 
   const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
   const [pluginVisibility, setPluginVisibility] = useState<boolean>(false);
-  const { loginWithPopup, isAuthenticated } = useAuth0();
+  const { loginWithPopup, isAuthenticated, loginWithRedirect } = useAuth0();
   const activePlugins = useSelector(ActivePluginsSelector)
 
 
@@ -43,6 +43,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
         </span>
         <ul className="flex xl:col-span-10 sm:col-span-9 col-span-7 flex-row gap-1 pl-0 mb-0 overflow-auto w-full">
           <li
+            data-testid="dashboard"
             className={
               tabSelected === 'DASHBOARD'
                 ? `px-3 py-3 bg-white rounded-t text-black flex justify-between items-center gap-2`
@@ -141,6 +142,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
               </div>
               <div>
                 <FaUser
+                  id="profileIcon"
                   className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
                   onClick={() => {
                     setUserDropdownVisibility(!userDropdownVisibility)
@@ -177,7 +179,8 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
           ) : (
             <button
               className="text-primaryColor rounded mr-[20px] border-2 border-secondaryColor font-bold py-[4px] px-[10px] hover:bg-green-200"
-              onClick={() => loginWithPopup()}
+              onClick={() => process.env.NODE_ENV === 'development' ? loginWithRedirect() : loginWithPopup()}
+              name="loginButton"
             >
               Login
             </button>

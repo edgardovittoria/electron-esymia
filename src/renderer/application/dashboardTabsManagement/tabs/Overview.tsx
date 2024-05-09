@@ -51,11 +51,12 @@ export const Overview: React.FC<OverviewProps> = ({  }) => {
             </button>
           </div>
         ) : (
-          <div className="p-[15px] overflow-scroll max-h-[300px]">
+          <div className="p-[15px] overflow-scroll max-h-[300px]" data-testid="projectsContainer">
             {projects.map((project) => {
               return (
                 <div
                   key={project.name}
+                  id={project.name}
                   className="w-100 rounded border-[1px] border-gray-400 mb-[15px] hover:cursor-pointer"
                   onClick={() => {
                     if (!project.model.components && project.modelS3) {

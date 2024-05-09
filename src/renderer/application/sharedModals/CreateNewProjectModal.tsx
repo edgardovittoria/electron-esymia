@@ -92,7 +92,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
             <div className='fixed inset-0 bg-black bg-opacity-25' />
           </Transition.Child>
 
-          <div className='fixed inset-0 overflow-y-auto'>
+          <div className='fixed inset-0 overflow-y-auto' data-testid="createNewProjectModal">
             <div className='flex min-h-full items-center justify-center p-4 text-center'>
               <Transition.Child
                 as={Fragment}
@@ -118,6 +118,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                         <h6>Insert Project's Name</h6>
                         <input
                           type='text'
+                          data-testid="projectName"
                           className='formControl bg-gray-100 rounded p-2 w-full mt-3'
                           placeholder="Project's Name"
                           value={projectName}
@@ -128,6 +129,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                         <h6>Insert Project's Description</h6>
                         <textarea
                           className='formControl h-[100px] bg-gray-100 rounded p-2 w-full mt-3'
+                          data-testid="projectDescription"
                           placeholder="Project's Description"
                           value={projectDescription}
                           onChange={(e) => setProjectDescription(e.target.value)}
