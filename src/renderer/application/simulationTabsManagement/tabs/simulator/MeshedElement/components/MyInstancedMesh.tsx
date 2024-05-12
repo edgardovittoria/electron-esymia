@@ -1,12 +1,12 @@
 import React, { useLayoutEffect, useRef } from "react";
-import { Color, FrontSide, InstancedMesh, Object3D, Vector3 } from "three";
+import { FrontSide, InstancedMesh, Object3D } from "three";
 import { Material } from "cad-library";
 import { CellSize, OriginPoint } from "../../../../../../model/esymiaModels";
 import { useSelector } from "react-redux";
 import { Brick } from '../../rightPanelSimulator/components/createGridsExternals';
 import { scalingViewParamsOfMeshSelector } from "../../../../../../store/tabsAndMenuItemsSlice";
-import { extend } from "@react-three/fiber";
-import { shaderMaterial } from "@react-three/drei";
+import { EdgesMaterial } from "./EdgesMaterial";
+import { Wireframe } from "@react-three/drei";
 
 
 interface InstancedMeshProps {
@@ -14,40 +14,6 @@ interface InstancedMeshProps {
   origin: OriginPoint,
   cellSize: CellSize
   bricks: Brick[]
-}
-
-const MeshEdgesMaterial = shaderMaterial(
-  {
-    color: new Color('white'),
-    size: new Vector3(1, 1, 1),
-    thickness: 0.01,
-    smoothness: 0.2
-  },
-  /*glsl*/ `varying vec3 vPosition;
-  void main() {
-    vPosition = position;
-    gl_Position = projectionMatrix * viewMatrix * instanceMatrix * vec4(position, 1.0);
-  }`,
-  /*glsl*/ `varying vec3 vPosition;
-  uniform vec3 size;
-  uniform vec3 color;
-  uniform float thickness;
-  uniform float smoothness;
-  void main() {
-    vec3 d = abs(vPosition) - (size * 0.5);
-    float a = smoothstep(thickness, thickness + smoothness, min(min(length(d.xy), length(d.yz)), length(d.xz)));
-    gl_FragColor = vec4(color, 1.0-a);
-  }`
-)
-
-extend({ MeshEdgesMaterial })
-
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      meshEdgesMaterial: any;
-    }
-  }
 }
 
 export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
@@ -62,7 +28,18 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
   const scalingViewParams = useSelector(scalingViewParamsOfMeshSelector)
   let tempObject = new Object3D();
 
+  let boxDims: [number, number, number] = [
+    cellSize.cell_size_x * 1000 * scalingViewParams.x,
+    cellSize.cell_size_y * 1000 * scalingViewParams.y,
+    cellSize.cell_size_z * 1000 * scalingViewParams.z,
+  ]
+
   useLayoutEffect(() => {
+    boxDims = [
+      cellSize.cell_size_x * 1000 * scalingViewParams.x,
+      cellSize.cell_size_y * 1000 * scalingViewParams.y,
+      cellSize.cell_size_z * 1000 * scalingViewParams.z,
+    ]
     if (meshRef.current) {
       bricks.forEach((brick, id) => {
         tempObject.position.set(
@@ -70,8 +47,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
             ? ((brick.x) * cellSize.cell_size_x) * 1000 * scalingViewParams.x
             : origin.origin_x / 1000,
           brick.y !== 0
-            ? ((brick.y) * cellSize.cell_size_y) *
-            1000 * scalingViewParams.y
+            ? ((brick.y) * cellSize.cell_size_y) * 1000 * scalingViewParams.y
             : origin.origin_y / 1000,
           brick.z !== 0
             ? ((brick.z) * cellSize.cell_size_z) * 1000 * scalingViewParams.z
@@ -84,28 +60,24 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
 
       meshRef.current.instanceMatrix.needsUpdate = true;
       edgeRef.current.instanceMatrix.needsUpdate = true;
+      // edgeRef.current.geometry = meshRef.current.geometry
+      // edgeRef.current.instanceMatrix = meshRef.current.instanceMatrix;
     }
   }, [bricks, scalingViewParams]);
 
-  const boxDims: [number, number, number] = [
-    cellSize.cell_size_x * 1000 * scalingViewParams.x,
-    cellSize.cell_size_y * 1000 * scalingViewParams.y,
-    cellSize.cell_size_z * 1000 * scalingViewParams.z,
-  ]
 
-  const meanBoxDims = (boxDims[0]+boxDims[1]+boxDims[2])/3
+  const meanBoxDims = (boxDims[0] + boxDims[1] + boxDims[2]) / 3
 
   return (
     <>
       <instancedMesh ref={meshRef} frustumCulled={false} args={[null as any, null as any, bricks.length]}>
-        <boxGeometry args={boxDims} />
+        <boxGeometry args={boxDims}/>
         <meshPhongMaterial color={material && material.color} side={FrontSide}/>
+        {/* <Wireframe simplify stroke={'#000000'} thickness={0.1}/> */}
       </instancedMesh>
       <instancedMesh ref={edgeRef} frustumCulled={false} args={[null as any, null as any, bricks.length]}>
         <boxGeometry args={boxDims} />
-        <meshEdgesMaterial transparent polygonOffset polygonOffsetFactor={-0.2} size={boxDims}
-          color="black" thickness={meanBoxDims * 0.03}
-          smoothness={meanBoxDims * 0.01} side={FrontSide} />
+        <EdgesMaterial boxDims={boxDims} smoothness={meanBoxDims * 0.01} thickness={meanBoxDims * 0.03} polygonOffsetFactor={-0.2} color="black"/>
       </instancedMesh>
     </>
   );
