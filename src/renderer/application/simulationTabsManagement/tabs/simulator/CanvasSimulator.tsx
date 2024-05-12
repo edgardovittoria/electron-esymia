@@ -15,9 +15,10 @@ interface CanvasSimulatorProps  {
   externalGrids: ExternalGridsObject | undefined,
   selectedMaterials: string[],
   resetFocus: boolean
+  setResetFocus: Function
 }
 
-export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, selectedMaterials, resetFocus}) => {
+export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, selectedMaterials, resetFocus, setResetFocus}) => {
   const selectedProject = useSelector(selectedProjectSelector);
   let mesherOutput = selectedProject?.meshData.mesh;
 
@@ -58,8 +59,8 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
                     <>
                       {externalGrids &&
                         <MeshedElement
+                          resetFocus={setResetFocus}
                           externalGrids={externalGrids}
-                          selectedProject={selectedProject}
                           selectedMaterials={selectedMaterials}
                         />
                       }

@@ -1,115 +1,112 @@
-import React, {useEffect, useRef} from "react";
-import {FrontSide, InstancedMesh, Object3D} from "three";
-import {Material} from "cad-library";
-import {ExternalGridsObject} from "../../../../../../model/esymiaModels";
-import {useSelector} from "react-redux";
-import {meshGeneratedSelector} from "../../../../../../store/projectSlice";
+import React, { useLayoutEffect, useRef } from "react";
+import { Color, FrontSide, InstancedMesh, Object3D, Vector3 } from "three";
+import { Material } from "cad-library";
+import { CellSize, OriginPoint } from "../../../../../../model/esymiaModels";
+import { useSelector } from "react-redux";
 import { Brick } from '../../rightPanelSimulator/components/createGridsExternals';
 import { scalingViewParamsOfMeshSelector } from "../../../../../../store/tabsAndMenuItemsSlice";
+import { extend } from "@react-three/fiber";
+import { shaderMaterial } from "@react-three/drei";
 
 
 interface InstancedMeshProps {
-    index: number;
-    materialsList: Material[];
-    externalGrids: ExternalGridsObject,
+  material: Material;
+  origin: OriginPoint,
+  cellSize: CellSize
+  bricks: Brick[]
+}
 
+const MeshEdgesMaterial = shaderMaterial(
+  {
+    color: new Color('white'),
+    size: new Vector3(1, 1, 1),
+    thickness: 0.01,
+    smoothness: 0.2
+  },
+  /*glsl*/ `varying vec3 vPosition;
+  void main() {
+    vPosition = position;
+    gl_Position = projectionMatrix * viewMatrix * instanceMatrix * vec4(position, 1.0);
+  }`,
+  /*glsl*/ `varying vec3 vPosition;
+  uniform vec3 size;
+  uniform vec3 color;
+  uniform float thickness;
+  uniform float smoothness;
+  void main() {
+    vec3 d = abs(vPosition) - (size * 0.5);
+    float a = smoothstep(thickness, thickness + smoothness, min(min(length(d.xy), length(d.yz)), length(d.xz)));
+    gl_FragColor = vec4(color, 1.0-a);
+  }`
+)
+
+extend({ MeshEdgesMaterial })
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      meshEdgesMaterial: any;
+    }
+  }
 }
 
 export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
-                                                                  index,
-                                                                  materialsList,
-                                                                  externalGrids,
-                                                              }) => {
-    let meshGenerated = useSelector(meshGeneratedSelector)
+  material,
+  bricks,
+  origin,
+  cellSize
+}) => {
 
-    const meshRef = useRef<InstancedMesh[]>([]);
-    const edgeRef = useRef<InstancedMesh[]>([])
-    const scalingViewParams = useSelector(scalingViewParamsOfMeshSelector)
+  const meshRef = useRef<InstancedMesh>({} as InstancedMesh);
+  const edgeRef = useRef<InstancedMesh>({} as InstancedMesh)
+  const scalingViewParams = useSelector(scalingViewParamsOfMeshSelector)
+  let tempObject = new Object3D();
 
-    useEffect(() => {
-        if (meshGenerated === "Generated") {
-            let tempObject = new Object3D();
-            Object.values(externalGrids.externalGrids).forEach((matrix:Brick[], index) => {
-                if (externalGrids && meshRef.current[index]) {
-                    let y = 0;
-                    matrix.forEach(m => {
-                        const id = y++;
-                        tempObject.position.set(
-                            m.x !== 0
-                                ? ((m.x) * externalGrids.cell_size.cell_size_x) * 1020 * scalingViewParams.x
-                                : externalGrids.origin.origin_x/1000,
-                            m.y !== 0
-                                ? ((m.y) * externalGrids.cell_size.cell_size_y) *
-                                1020 * scalingViewParams.y
-                                : externalGrids.origin.origin_y/1000,
-                            m.z !== 0
-                                ? ((m.z) * externalGrids.cell_size.cell_size_z ) * 1020 * scalingViewParams.z
-                                : externalGrids.origin.origin_z/1000
-                        );
-                        tempObject.updateMatrix();
-                        meshRef.current[index].setMatrixAt(id, tempObject.matrix);
-                        edgeRef.current[index].setMatrixAt(id, tempObject.matrix);
-                    })
+  useLayoutEffect(() => {
+    if (meshRef.current) {
+      bricks.forEach((brick, id) => {
+        tempObject.position.set(
+          brick.x !== 0
+            ? ((brick.x) * cellSize.cell_size_x) * 1000 * scalingViewParams.x
+            : origin.origin_x / 1000,
+          brick.y !== 0
+            ? ((brick.y) * cellSize.cell_size_y) *
+            1000 * scalingViewParams.y
+            : origin.origin_y / 1000,
+          brick.z !== 0
+            ? ((brick.z) * cellSize.cell_size_z) * 1000 * scalingViewParams.z
+            : origin.origin_z / 1000
+        );
+        tempObject.updateMatrix();
+        meshRef.current.setMatrixAt(id, tempObject.matrix);
+        edgeRef.current.setMatrixAt(id, tempObject.matrix);
+      })
 
-                    meshRef.current[index].instanceMatrix.needsUpdate = true;
-                    edgeRef.current[index].instanceMatrix.needsUpdate = true;
-                }
-            });
-        }
-    }, [meshGenerated, materialsList, externalGrids, scalingViewParams]);
+      meshRef.current.instanceMatrix.needsUpdate = true;
+      edgeRef.current.instanceMatrix.needsUpdate = true;
+    }
+  }, [bricks, scalingViewParams]);
 
+  const boxDims: [number, number, number] = [
+    cellSize.cell_size_x * 1000 * scalingViewParams.x,
+    cellSize.cell_size_y * 1000 * scalingViewParams.y,
+    cellSize.cell_size_z * 1000 * scalingViewParams.z,
+  ]
 
-    return (
-        <>
-            <instancedMesh
-            frustumCulled={false}
-                ref={(el) => {
-                    if (el) {
-                        meshRef.current[index] = el;
-                    }
-                }}
-                key={index}
-                args={[null as any, null as any, Object.values(externalGrids.externalGrids)[index].length]}>
-                <boxGeometry
-                    args={
-                        [
+  const meanBoxDims = (boxDims[0]+boxDims[1]+boxDims[2])/3
 
-                            (externalGrids?.cell_size.cell_size_x as number) * 1000 * scalingViewParams.x,
-                            (externalGrids?.cell_size.cell_size_y as number) * 1000 * scalingViewParams.y,
-                            (externalGrids?.cell_size.cell_size_z as number) * 1000 * scalingViewParams.z,
-
-                        ]
-                    }
-                />
-                <meshPhongMaterial
-                    color={materialsList[index] && materialsList[index].color}
-                    side={FrontSide}
-                />
-            </instancedMesh>
-            <instancedMesh
-            frustumCulled={false}
-                ref={(el) => {
-                    if (el) {
-                        edgeRef.current[index] = el;
-                    }
-                }}
-                key={index + 1}
-                args={[null as any, null as any, Object.values(externalGrids.externalGrids)[index].length]}>
-                <boxGeometry
-                    args={
-                        [
-
-                            (externalGrids?.cell_size.cell_size_x as number) * 1000 * scalingViewParams.x,
-                            (externalGrids?.cell_size.cell_size_y as number) * 1000 * scalingViewParams.y,
-                            (externalGrids?.cell_size.cell_size_z as number) * 1000 * scalingViewParams.z,
-
-                        ]
-                    }
-                ></boxGeometry>
-                <meshPhongMaterial
-                    color={"black"} wireframe={true}
-                />
-            </instancedMesh>
-        </>
-    );
+  return (
+    <>
+      <instancedMesh ref={meshRef} frustumCulled={false} args={[null as any, null as any, bricks.length]}>
+        <boxGeometry args={boxDims} />
+        <meshPhongMaterial color={material && material.color} side={FrontSide}/>
+      </instancedMesh>
+      <instancedMesh ref={edgeRef} frustumCulled={false} args={[null as any, null as any, bricks.length]}>
+        <boxGeometry args={boxDims} />
+        <meshEdgesMaterial transparent polygonOffset polygonOffsetFactor={-0.2} size={boxDims}
+          color="black" thickness={meanBoxDims * 0.03}
+          smoothness={meanBoxDims * 0.01} side={FrontSide} />
+      </instancedMesh>
+    </>
+  );
 };

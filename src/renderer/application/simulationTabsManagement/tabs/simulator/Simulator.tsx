@@ -99,7 +99,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
   return (
     <>
-      <CanvasSimulator externalGrids={externalGrids} selectedMaterials={selectedMaterials} resetFocus={resetFocus}/>
+      <CanvasSimulator externalGrids={externalGrids} selectedMaterials={selectedMaterials} resetFocus={resetFocus} setResetFocus={toggleResetFocus}/>
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
       <MyPanel
         tabs={[simulatorLeftPanelTitle.first, simulatorLeftPanelTitle.second]}
