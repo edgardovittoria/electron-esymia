@@ -14,7 +14,7 @@ import { useFaunaQuery } from "cad-library";
 import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
 import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
 import {Project} from "../../../../model/esymiaModels";
-import { alertMessageStyle, emptyResultsMessage } from '../../../config/textMessages';
+import { alertMessageStyle, emptyResultsMessage, runningSimulationMessageOnResults } from '../../../config/textMessages';
 import { resultsLeftPanelTitle } from '../../../config/panelTitles';
 import { Dataset } from "./sharedElements";
 import saveAs from "file-saver";
@@ -101,7 +101,7 @@ export const Results: React.FC<ResultsProps> = ({
             </>
         ) : (
           <div className="absolute top-1/2 flex justify-center w-[78%]">
-            <span className={alertMessageStyle}>{emptyResultsMessage}</span>
+            <span className={alertMessageStyle}>{(selectedProject && selectedProject.simulation && selectedProject.simulation.status == 'Queued') ? runningSimulationMessageOnResults : emptyResultsMessage}</span>
           </div>
         )}
       </div>
