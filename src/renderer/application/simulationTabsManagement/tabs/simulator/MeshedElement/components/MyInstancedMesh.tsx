@@ -16,13 +16,7 @@ interface InstancedMeshProps {
   bricks: Brick[]
 }
 
-export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({
-  material,
-  bricks,
-  origin,
-  cellSize
-}) => {
-
+export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({material, bricks, origin, cellSize}) => {
   const meshRef = useRef<InstancedMesh>({} as InstancedMesh);
   const edgeRef = useRef<InstancedMesh>({} as InstancedMesh)
   const scalingViewParams = useSelector(scalingViewParamsOfMeshSelector)
