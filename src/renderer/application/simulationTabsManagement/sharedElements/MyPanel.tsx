@@ -38,6 +38,7 @@ export const MyPanel: React.FC<DashBoardProps> = ({
           {tabs.map((tab, index) => {
             return (
               <Tab
+                data-testid={tab}
                 key={index}
                 className={({ selected }) =>
                   classNames(

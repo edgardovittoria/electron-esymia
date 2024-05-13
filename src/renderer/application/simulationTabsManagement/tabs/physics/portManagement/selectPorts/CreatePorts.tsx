@@ -26,6 +26,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
             < div className={`${(selectedProject.simulation?.status === 'Completed') && 'opacity-40'}`}>
                 <Menu as="div" className="relative inline-block text-left">
                     <Menu.Button
+                        data-testid="addPort"
                         disabled = {selectedProject.simulation?.status === 'Completed'}
                         className="inline-flex w-full justify-center rounded-md bg-white px-2 py-2 text-sm font-medium text-black hover:bg-opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
                         <AiOutlineThunderbolt
@@ -51,6 +52,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                             <Menu.Item>
                                 {({active}) => (
                                     <span
+                                        data-testid="port"
                                         className={`${
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
@@ -67,6 +69,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                             <Menu.Item>
                                 {({active}) => (
                                     <span
+                                      data-testid="lumped"
                                         className={`${
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
@@ -80,7 +83,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                                     </span>
                                 )}
                             </Menu.Item>
-                            <Menu.Item>
+                            {/* <Menu.Item>
                                 {({active}) => (
                                     <span
                                         className={`${
@@ -94,7 +97,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                                         Probe
                                     </span>
                                 )}
-                            </Menu.Item>
+                            </Menu.Item> */}
                         </Menu.Items>
                     </Transition>
                 </Menu>

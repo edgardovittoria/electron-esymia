@@ -83,6 +83,7 @@ const SimulationStatusItem: React.FC<{
   const [computingP, setComputingP] = useState(false);
   const [computingLpx, setComputingLpx] = useState(false);
   const [iterations, setIterations] = useState(0);
+  const [computationCompleted, setComputationCompleted] = useState<boolean>(false);
   const selectedProject = useSelector(selectedProjectSelector) as Project;
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
@@ -133,7 +134,7 @@ const SimulationStatusItem: React.FC<{
     };
   };
 
-  const { sendMessage, readyState } = useWebSocket(WS_URL, {
+  const { sendMessage } = useWebSocket(WS_URL, {
     onOpen: () => {
       console.log('WebSocket connection established.');
       // https://teemaserver.cloud/solving
@@ -159,6 +160,7 @@ const SimulationStatusItem: React.FC<{
               ended: Date.now().toString(),
               status: 'Completed',
             };
+
             dispatch(updateSimulation(simulationUpdated));
             execQuery(
               updateProjectInFauna,
@@ -181,18 +183,25 @@ const SimulationStatusItem: React.FC<{
           dispatch(setShowInfoModal(true));
         });
     },
-    shouldReconnect: () => true,
+    shouldReconnect: () => false,
     onMessage: (event) => {
       if (event.data === 'P Computing Completed') {
         setComputingP(true);
       } else if (event.data === 'Lp Computing Completed') {
         setComputingLpx(true);
+      } else if (event.data === 'Computation Completed') {
+        setComputationCompleted(true);
       } else {
         setIterations(event.data);
       }
     },
     onClose: () => {
       console.log('WebSocket connection closed.');
+      /* if(!computationCompleted){
+        dispatch(setMessageInfoModal('WebSocket connection failure. Feedback and stop computation not allowed anymore, but simulation is still running.'))
+        dispatch(setIsAlertInfoModal(true))
+        dispatch(setShowInfoModal(true))
+      } */
     },
     onError: () => {
       dispatch(setMessageInfoModal('Error while solving, please start solver on plugins section and try again'))

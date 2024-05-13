@@ -28,6 +28,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 						<span className="xl:text-base text-[12px]">Input (X,Y,Z)</span>
 						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
               <TerminationPositionInput
+                dataTestId="inputPositionX"
                 disabled={disabled}
                 value={selectedPort.inputElement.transformationParams.position[0]}
                 onChange={(event) => {
@@ -48,6 +49,7 @@ export const PortPosition: FC<PortPositionProps> = ({
                 }}
               />
               <TerminationPositionInput
+                dataTestId="inputPositionY"
                 disabled={disabled}
                 value={selectedPort.inputElement.transformationParams.position[1]}
                 onChange={(event) => {
@@ -68,6 +70,7 @@ export const PortPosition: FC<PortPositionProps> = ({
                 }}
               />
               <TerminationPositionInput
+                dataTestId="inputPositionZ"
                 disabled={disabled}
                 value={selectedPort.inputElement.transformationParams.position[2]}
                 onChange={(event) => {
@@ -93,6 +96,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 						<span className="xl:text-base text-[12px]">Output (X,Y,Z)</span>
 						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
               <TerminationPositionInput
+                  dataTestId="outputPositionX"
                   disabled={disabled}
                   value={selectedPort.outputElement.transformationParams.position[0]}
                   onChange={(event) => {
@@ -113,6 +117,7 @@ export const PortPosition: FC<PortPositionProps> = ({
                   }}
                 />
               <TerminationPositionInput
+                  dataTestId="outputPositionY"
                   disabled={disabled}
                   value={selectedPort.outputElement.transformationParams.position[1]}
                   onChange={(event) => {
@@ -133,6 +138,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 									}}
                 />
 							<TerminationPositionInput
+                  dataTestId="outputPositionZ"
                   disabled={disabled}
                   value={selectedPort.outputElement.transformationParams.position[2]}
                   onChange={(event) => {
@@ -225,6 +231,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 };
 
 interface TerminationPositionInputProps {
+  dataTestId?: string,
   disabled: boolean,
   debounceTimeoutMilliSecs?: number,
   inputStep?: number,
@@ -232,10 +239,11 @@ interface TerminationPositionInputProps {
   onChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) & React.ChangeEventHandler<HTMLInputElement>,
 }
 
-const TerminationPositionInput: FC<TerminationPositionInputProps> = ({disabled, debounceTimeoutMilliSecs, inputStep, value, onChange}) => {
+const TerminationPositionInput: FC<TerminationPositionInputProps> = ({dataTestId, disabled, debounceTimeoutMilliSecs, inputStep, value, onChange}) => {
   return (
     <div className="lg:w-[30%] w-full">
 								<DebounceInput
+                  id={dataTestId}
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"

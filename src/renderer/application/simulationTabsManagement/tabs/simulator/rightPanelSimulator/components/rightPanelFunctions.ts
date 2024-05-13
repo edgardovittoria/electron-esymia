@@ -104,6 +104,7 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
   axios
     .post('http://127.0.0.1:8003/meshing', objToSendToMesher)
     .then((res) => {
+      console.log(res.data)
       if (res.data.x) {
         dispatch(setMessageInfoModal(`the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`))
         dispatch(setIsAlertInfoModal(true))

@@ -245,6 +245,7 @@ const PhysicsRightPanel: FC<{
             className={`flex px-[20px] mt-2 flex-row gap-2 items-center`}
           >
             <button
+              data-testid="savePhysics"
               type="button"
               className="button buttonPrimary w-full hover:opacity-80 disabled:opacity-60"
               onClick={() => setSavedPhysicsParameters(true)}

@@ -17,6 +17,7 @@ const ScatteringParameter: React.FC<ScatteringParameterProps> = ({setSavedPortPa
         <h6 className="lg:text-base text-[12px]">Scattering Parameters Reference Impedance</h6>
         <div className="mt-2">
           <DebounceInput
+            data-testid="scattering"
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
             debounceTimeout={500}

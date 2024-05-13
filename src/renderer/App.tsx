@@ -68,19 +68,19 @@ export default function App() {
   const mesherStatus = useSelector(MesherStatusSelector)
   const solverStatus = useSelector(SolverStatusSelector)
 
-  //  useEffect(() => {
-  //   if(user.userName){
-  //     dispatch(addActivePlugin('serverGUI'))
-  //     if(mesherStatus === 'idle'){
-  //       dispatch(setMesherStatus('starting'))
-  //       window.electron.ipcRenderer.sendMessage('runMesher', [])
-  //     }
-  //     if(solverStatus === 'idle'){
-  //       dispatch(setSolverStatus('starting'))
-  //       window.electron.ipcRenderer.sendMessage('runSolver', [])
-  //     }
-  //   }
-  // }, [user.userName]);
+   /* useEffect(() => {
+    if(user.userName){
+      dispatch(addActivePlugin('serverGUI'))
+      if(mesherStatus === 'idle'){
+        dispatch(setMesherStatus('starting'))
+        window.electron.ipcRenderer.sendMessage('runMesher', [])
+      }
+      if(solverStatus === 'idle'){
+        dispatch(setSolverStatus('starting'))
+        window.electron.ipcRenderer.sendMessage('runSolver', [])
+      }
+    }
+  }, [user.userName]); */
 
   const { execQuery } = useFaunaQuery();
 

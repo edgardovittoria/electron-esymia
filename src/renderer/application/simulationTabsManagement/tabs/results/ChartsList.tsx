@@ -48,7 +48,7 @@ interface ScaleMode {
 const defaultScaleModes = (length: number) : ScaleMode[] => {
   let modes: ScaleMode[] = []
   for (let index = 0; index < length; index++) {
-    modes[index] = {xaxis: 'logarithmic', yaxis: 'linear', xnotation: "exponential", ynotation: "exponential"}
+    modes[index] = {xaxis: 'logarithmic', yaxis: 'linear', xnotation: "exponential", ynotation: "decimal"}
   }
   return modes
 }

@@ -130,6 +130,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               {quantumDimsInput.map(
                 (quantumComponent, indexQuantumComponent) => (
                   <QuantumDimsInput
+                    dataTestId={'quantumInput'+indexQuantumComponent}
                     disabled={selectedProject.simulation?.status === 'Completed' || selectedProject.model?.components === undefined}
                     key={indexQuantumComponent}
                     label={quantumDimensionsLabels[indexQuantumComponent]}
@@ -156,6 +157,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             {meshGenerated === 'Not Generated' && (
               <div>
                 <button
+                  data-testid="generateMeshButton"
                   className={
                     checkQuantumDimensionsValidity()
                       ? 'button buttonPrimary w-[100%]'
@@ -291,6 +293,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           </button>
         ) : (
           <button
+            data-testid="startSimulationButton"
             className={`w-full mt-3 button text-[12px] xl:text-base
               ${
               meshGenerated !== 'Generated'
@@ -326,6 +329,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
 
 
 interface QuantumDimsInputProps {
+  dataTestId: string,
   label: string,
   disabled: boolean,
   debounceTimeoutMilliSecs?: number,
@@ -334,11 +338,12 @@ interface QuantumDimsInputProps {
   onChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) & React.ChangeEventHandler<HTMLInputElement>,
 }
 
-const QuantumDimsInput: FC<QuantumDimsInputProps> = ({disabled, debounceTimeoutMilliSecs, inputStep, value, onChange, label}) => {
+const QuantumDimsInput: FC<QuantumDimsInputProps> = ({dataTestId, disabled, debounceTimeoutMilliSecs, inputStep, value, onChange, label}) => {
   return (
     <div className='xl:w-[30%] w-full'>
                     <span className='text-[12px] xl:text-base'>{label}</span>
                     <DebounceInput
+                      data-testid={dataTestId}
                       disabled={disabled}
                       min={0.0}
                       className='w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl'

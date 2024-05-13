@@ -37,6 +37,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         <div className='flex flex-col items-center gap-2'>
           <span>{'f min'}</span>
           <DebounceInput
+            data-testid="fmin"
             debounceTimeout={700}
             disabled={disabled}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
@@ -48,6 +49,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         <div className='flex flex-col items-center gap-2'>
           <span>{'f max'}</span>
           <DebounceInput
+            data-testid="fmax"
             disabled={disabled}
             debounceTimeout={700}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
@@ -59,6 +61,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         <div className='flex flex-col items-center gap-2'>
           <span>f num</span>
           <DebounceInput
+            data-testid="fnum"
             debounceTimeout={700}
             disabled={disabled}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
@@ -71,6 +74,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         </div>
       </div>
       <button
+        data-testid="generateFrequencies"
         className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
         disabled={(fNum === 0 || fMax <= fMin)}
         onClick={() => {
