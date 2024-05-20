@@ -1,0 +1,1 @@
+export type CadmiaModality = 'NormalSelection' | 'MultipleSelection' | 'BinaryOperation'

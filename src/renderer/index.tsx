@@ -2,8 +2,8 @@ import { createRoot } from 'react-dom/client';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { Provider } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
-import { store } from './store/store';
 import App from './App';
+import { store } from './store';
 
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);

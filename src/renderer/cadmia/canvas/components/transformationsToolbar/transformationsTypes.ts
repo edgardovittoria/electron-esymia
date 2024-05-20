@@ -1,0 +1,1 @@
+export type TransformationType = 'translate' | 'rotate' | 'scale'

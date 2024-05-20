@@ -48,6 +48,12 @@ body{
   background-color: #ececec;
 }
 
+.contexify_item:not(.contexify_item--disabled):hover > .contexify_itemContent,
+.contexify_item:not(.contexify_item--disabled):focus > .contexify_itemContent {
+  background-color: black !important;
+  color: white !important;
+}
+
 .react-contexify__item:not(.react-contexify__item--disabled):hover > .react-contexify__item__content,
 .react-contexify__item:not(.react-contexify__item--disabled):focus > .react-contexify__item__content {
   background-color: rgb(187, 247, 208, 1) !important;
@@ -55,3 +61,15 @@ body{
 }
 
 .react-contexify__item:not(.react-contexify__item--disabled):hover > .react-contexify__submenu {}
+
+.cadmia{
+  background-image: url("../../assets/cadmia.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.esymia{
+  background-image: url("../../assets/esymia.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
