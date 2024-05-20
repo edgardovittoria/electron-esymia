@@ -26,8 +26,8 @@ export default function App() {
         />
       </div>
       {tabsSelected === 'home' && <Home setSelectedTab={setTabsSelected}/>}
-      {tabsSelected === 'cadmia' && <Cadmia/>}
-      {tabsSelected === 'esymia' && <Esymia/>}
+      <Cadmia selectedTab={tabsSelected}/>
+      <Esymia selectedTab={tabsSelected}/>
     </>
 
   );
