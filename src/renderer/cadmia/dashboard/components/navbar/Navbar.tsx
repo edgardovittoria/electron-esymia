@@ -56,7 +56,7 @@ const Navbar: React.FC<NavbarProps> = ({
           <span className="text-xl">Profile</span>
         </div>
       </div> */}
-      {user ? (
+      {/* {user ? (
         <div
           className="absolute bottom-10 flex flex-col gap-5 w-3/4 items-center px-10 py-2 border border-white rounded-xl hover:bg-white hover:text-black hover:cursor-pointer"
           onClick={() => {
@@ -80,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({
             <span className="text-xl font-semibold">Login/Register</span>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

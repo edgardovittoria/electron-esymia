@@ -4,7 +4,7 @@ import {
   FaunaCadModel,
   getModelsByOwner,
   resetState,
-  useFaunaQuery,
+  useFaunaQuery
 } from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
 import { ActionCreators } from 'redux-undo';
@@ -18,7 +18,7 @@ import {
   ModelsSelector,
   removeModel,
   setSharedModel,
-  SharedModelsSelector,
+  SharedModelsSelector
 } from '../store/modelSlice';
 import { getSharedModels } from '../faunaDB/functions';
 import MySharedProject from './components/mySharedProjects/MySharedProject';
@@ -62,15 +62,15 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
   }, [user, showCad, selectedMenuItem]);
 
   return (
-    <div className="flex flex-row">
+    <div className='flex flex-row'>
       <Navbar
         selectedMenuItem={selectedMenuItem}
         setSelectedMenuItem={setSelectedMenuItem}
       />
-      {user ? (
-        <div className="w-full h-[100vh] flex items-start pt-20 relative">
+      {user && (
+        <div className='w-full h-[100vh] flex items-start pt-20 relative'>
           {selectedMenuItem === 'MP' && (
-            <div className="w-full px-10 grid grid-cols-5 gap-4">
+            <div className='w-full px-10 grid grid-cols-5 gap-4'>
               {models.map((m) => {
                 return (
                   <MyProject
@@ -81,7 +81,7 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
                 );
               })}
               <div
-                className="px-10 py-12 relative rounded-xl border border-dashed border-black flex flex-col items-center hover:bg-black hover:text-white hover:cursor-pointer hover:shadow-2xl"
+                className='px-10 py-12 relative rounded-xl border border-dashed border-black flex flex-col items-center hover:bg-black hover:text-white hover:cursor-pointer hover:shadow-2xl'
                 onClick={() => {
                   dispatch(resetState());
                   dispatch(ActionCreators.clearHistory());
@@ -89,23 +89,24 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
                 }}
               >
                 <AiOutlineAppstoreAdd size={75} />
-                <span className="absolute bottom-2 font-semibold">
+                <span className='absolute bottom-2 font-semibold'>
                   New Blank Project
                 </span>
               </div>
             </div>
           )}
           {selectedMenuItem === 'MSP' && (
-            <div className={`w-full flex ${shardeModels.length > 0 ? 'items-start' : 'justify-center items-center'}  relative`}>
+            <div
+              className={`w-full flex ${shardeModels.length > 0 ? 'items-start' : 'justify-center items-center'}  relative`}>
               {shardeModels.length === 0 ? (
-                <div className="flex flex-col justify-center items-center gap-3">
-                  <img src={boxIcon} alt="box icon" />
-                  <span className="text-xl font-semibold">
+                <div className='flex flex-col justify-center items-center gap-3'>
+                  <img src={boxIcon} alt='box icon' />
+                  <span className='text-xl font-semibold'>
                     No Shared Projects
                   </span>
                 </div>
               ) : (
-                <div className="w-full px-10 items-start grid grid-cols-5 gap-4">
+                <div className='w-full px-10 items-start grid grid-cols-5 gap-4'>
                   {shardeModels.map((m) => {
                     return (
                       <MySharedProject
@@ -120,14 +121,8 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
             </div>
           )}
         </div>
-      ) : (
-        <div className="w-full flex flex-col justify-center items-center gap-3">
-          <img src={boxIcon} alt="box icon" />
-          <span className="text-xl font-semibold">
-            Login/Register and create your first project
-          </span>
-        </div>
-      )}
+      )
+      }
     </div>
   );
 };

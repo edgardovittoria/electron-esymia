@@ -140,7 +140,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                   </div>
                 </ul>
               </div>
-              <div>
+              {/* <div>
                 <FaUser
                   id="profileIcon"
                   className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
@@ -157,10 +157,10 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                     {user.userName}
                   </li>
                   <hr className="mb-3" />
-                  {/* <div className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer">
+                  <div className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer">
                   <GiSettingsKnobs className="w-[20px] h-[20px] mr-[10px] text-primaryColor" />
                   <li>Settings</li>
-                </div> */}
+                </div>
                   <div
                     className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer"
                     onClick={() => {
@@ -173,7 +173,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                     <li>Logout</li>
                   </div>
                 </ul>
-              </div>
+              </div> */}
             </>
 
           ) : (

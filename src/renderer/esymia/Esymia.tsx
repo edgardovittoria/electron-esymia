@@ -49,7 +49,8 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
   const user = useSelector(usersStateSelector);
   const tabSelected = useSelector(tabSelectedSelector);
   const [loginSpinner, setLoginSpinner] = useState(false);
-  const [alert, setAlert] = useState<boolean>(false);
+  // da scommentare nel caso esymia dovesse essere estrapolata
+  /* const [alert, setAlert] = useState<boolean>(false);
   const activeSimulations = useSelector(activeSimulationsSelector);
   const [feedbackSimulationVisible, setFeedbackSimulationVisible] =
     useState<boolean>(false);
@@ -66,7 +67,7 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
     if (activeMeshing.length > 0) {
       setFeedbackMeshingVisible(true);
     }
-  }, [activeMeshing.length]);
+  }, [activeMeshing.length]); */
 
   const activePlugins = useSelector(ActivePluginsSelector);
   const [pluginsVisible, setPluginsVisible] = useState<boolean>(true);
@@ -163,7 +164,7 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
             ) : (
               <SimulationTabsContentFactory />
             )}
-            {activeSimulations &&
+            {/* {activeSimulations &&
               activeSimulations.length > 0 &&
               !feedbackSimulationVisible && (
                 <button
@@ -197,7 +198,7 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
                 activeMeshing={activeMeshing}
                 setAlert={setAlert}
               />
-            )}
+            )} */}
             {activePlugins && activePlugins.length > 0 && !pluginsVisible && (
               <button
                 className="absolute bottom-40 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
