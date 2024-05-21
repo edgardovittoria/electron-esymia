@@ -101,7 +101,7 @@ const SimulationStatusItem: React.FC<{
         sendMessage('Stop computation');
       } else {
         dispatch(deleteSimulation(associatedProjectID));
-        dispatch(setMeshApproved(false));
+        dispatch(setMeshApproved({ approved: false, projectToUpdate: associatedProjectID }));
       }
     }
   }, [isAlertConfirmed]);
@@ -151,7 +151,7 @@ const SimulationStatusItem: React.FC<{
         .then((res) => {
           if (res.data === false) {
             dispatch(deleteSimulation(associatedProjectID));
-            dispatch(setMeshApproved(false));
+            dispatch(setMeshApproved({ approved: false, projectToUpdate: associatedProjectID }));
           } else {
             // dispatch(setSolverOutput(res.data));
             const simulationUpdated: Simulation = {
@@ -203,7 +203,7 @@ const SimulationStatusItem: React.FC<{
       dispatch(setIsAlertInfoModal(true))
       dispatch(setShowInfoModal(true))
       dispatch(deleteSimulation(associatedProjectID));
-      dispatch(setMeshApproved(false));
+      dispatch(setMeshApproved({approved: false, projectToUpdate: associatedProjectID}));
     }
   });
 

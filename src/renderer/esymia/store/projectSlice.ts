@@ -1,4 +1,4 @@
-import { ComponentEntity, ImportActionParamsObject, UsersState } from 'cad-library';
+import { ComponentEntity, ImportActionParamsObject, Material, UsersState } from 'cad-library';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   recursiveFindFolders, removeFolderFromStore, removeProjectFromStore,
@@ -17,6 +17,7 @@ import {
   Simulation,
   TempLumped
 } from '../model/esymiaModels';
+import { getMaterialListFrom } from '../application/simulationTabsManagement/tabs/simulator/Simulator';
 
 
 export type ProjectState = {
@@ -225,21 +226,25 @@ export const ProjectSlice = createSlice({
         selectedProject.screenshot = action.payload;
       }
     },
-    setMesh(state: ProjectState, action: PayloadAction<string>) {
-      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
-      if (project) project.meshData.mesh = action.payload;
+    setMesh(state: ProjectState, action: PayloadAction<{ mesh:string, projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.mesh = action.payload.mesh;
     },
-    setExternalGrids(state: ProjectState, action: PayloadAction<string>) {
-      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
-      if (project) project.meshData.externalGrids = action.payload;
+    setExternalGrids(state: ProjectState, action: PayloadAction<{ extGrids:string, projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.externalGrids = action.payload.extGrids;
     },
-    setMeshGenerated(state: ProjectState, action: PayloadAction<'Not Generated' | 'Generated' | 'Generating'>) {
-      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
-      if (project) project.meshData.meshGenerated = action.payload;
+    setMeshGenerated(state: ProjectState, action: PayloadAction<{ status: 'Not Generated' | 'Generated' | 'Generating', projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.meshGenerated = action.payload.status;
     },
-    setMeshApproved(state: ProjectState, action: PayloadAction<boolean>) {
-      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
-      if (project) project.meshData.meshApproved = action.payload;
+    setMeshApproved(state: ProjectState, action: PayloadAction<{ approved:boolean, projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.meshApproved = action.payload.approved;
+    },
+    setQuantum(state: ProjectState, action: PayloadAction<{ quantum: [number, number, number], projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.quantum = action.payload.quantum;
     },
     setBoundingBoxDimension(state: ProjectState, action: PayloadAction<number>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
@@ -320,6 +325,7 @@ export const {
   setMesh,
   setMeshGenerated,
   setMeshApproved,
+  setQuantum,
   setFolderOfElementsSharedWithUser,
   setExternalGrids,
   setModel,
@@ -394,3 +400,40 @@ export const activeSimulationsSelector = (state: { projects: ProjectState }) => 
   });
   return activeSimulations;
 };
+
+export const activeMeshingSelector = (state: { projects: ProjectState }) => {
+  let activeMeshing: { selectedProject: Project, allMaterials: Material[], quantum: [number, number, number], meshStatus: "Not Generated" | "Generated" | "Generating"}[] = [];
+  state.projects.projects.projectList.forEach(p => {
+    let allMaterials: Material[] = [];
+    if (p?.model?.components) {
+      allMaterials = getMaterialListFrom(
+        p?.model.components as ComponentEntity[],
+      );
+    }
+    if (p.meshData && p.meshData.meshGenerated === 'Generating') {
+      activeMeshing.push({
+        selectedProject: p,
+        allMaterials: allMaterials,
+        quantum: p.meshData.quantum,
+        meshStatus: p.meshData.meshGenerated
+      })
+    }
+  });
+  state.projects.sharedElements.projectList.forEach(p => {
+    let allMaterials: Material[] = [];
+    if (p?.model?.components) {
+      allMaterials = getMaterialListFrom(
+        p?.model.components as ComponentEntity[],
+      );
+    }
+    if (p.meshData && p.meshData.meshGenerated === 'Generating') {
+      activeMeshing.push({
+        selectedProject: p,
+        allMaterials: allMaterials,
+        quantum: p.meshData.quantum,
+        meshStatus: p.meshData.meshGenerated
+      })
+    }
+  });
+  return activeMeshing;
+}

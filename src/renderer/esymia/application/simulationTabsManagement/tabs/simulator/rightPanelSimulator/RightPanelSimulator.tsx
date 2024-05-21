@@ -5,13 +5,11 @@ import {
 import React, { FC, useEffect, useState } from 'react';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
-import { ImSpinner } from 'react-icons/im';
 
 import {
-  deleteSimulation,
   meshGeneratedSelector,
   setMeshApproved,
-  setMeshGenerated,
+  setMeshGenerated, setQuantum,
   updateSimulation
 } from '../../../../../store/projectSlice';
 import {
@@ -37,7 +35,7 @@ import {
   computeSuggestedQuantum,
   launchMeshing, saveMeshAndExternalGridsToS3
 } from './components/rightPanelFunctions';
-import MeshingStatus from './components/MeshingStatus';
+import MeshingStatusItem from './components/MeshingStatus';
 
 interface RightPanelSimulatorProps {
   selectedProject: Project;
@@ -59,27 +57,12 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
   const quantumDimensionsLabels = ['X', 'Y', 'Z'];
   const [suggestedQuantumError, setSuggestedQuantumError] = useState(false);
-  const [alert, setAlert] = useState<boolean>(false);
 
   useEffect(() => {
     if (!selectedProject?.suggestedQuantum && selectedProject.model.components) {
       computeSuggestedQuantum(selectedProject, allMaterials as Material[], dispatch, execQuery, setSuggestedQuantumError);
     }
   }, []);
-
-  useEffectNotOnMount(() => {
-    if (
-      typeof selectedProject.meshData.mesh === 'string' &&
-      typeof selectedProject.meshData.externalGrids === 'string'
-    ) {
-      execQuery(
-        updateProjectInFauna,
-        convertInFaunaProjectThis(selectedProject)
-      ).then(() => {
-      });
-    }
-  }, [selectedProject.meshData.mesh,
-    selectedProject.meshData.externalGrids]);
 
   function checkQuantumDimensionsValidity() {
     let validity = true;
@@ -101,21 +84,21 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
     }
   }, [externalGrids]);
 
-  const infoModal = useSelector(infoModalSelector);
+  /* const infoModal = useSelector(infoModalSelector);
 
   useEffect(() => {
     if (alert && infoModal.isConfirmed) {
       setAlert(false);
     }
-  }, [infoModal.isConfirmed]);
+  }, [infoModal.isConfirmed]); */
 
 
   return (
     <>
-      {meshGenerated === 'Generating' && (
-        <MeshingStatus selectedProject={selectedProject} quantumDimsInput={quantumDimsInput} allMaterials={allMaterials as Material[]}
+      {/* {meshGenerated === 'Generating' && (
+        <MeshingStatusItem selectedProject={selectedProject} quantumDimsInput={quantumDimsInput} allMaterials={allMaterials as Material[]}
                        meshStatus={meshGenerated} setAlert={setAlert} />
-      )}
+      )} */}
       <div
         className={`${
           (meshGenerated === 'Generating' ||
@@ -175,8 +158,8 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   }
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
-                    dispatch(setMeshGenerated('Generating'));
-                    //launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3, setAlert, meshStatus);
+                    dispatch(setMeshGenerated({ status: 'Generating', projectToUpdate: selectedProject.faunaDocumentId as string }));
+                    dispatch(setQuantum({ quantum: quantumDimsInput, projectToUpdate: selectedProject.faunaDocumentId as string }))
                   }}
                 >
                   Generate Mesh
@@ -190,8 +173,8 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   className='button buttonPrimary w-full text-[12px] xl:text-base'
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
-                    dispatch(setMeshGenerated('Generating'));
-                    //launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3, setAlert, meshStatus);
+                    dispatch(setMeshGenerated({ status: 'Generating', projectToUpdate: selectedProject.faunaDocumentId as string }));
+                    dispatch(setQuantum({ quantum: quantumDimsInput, projectToUpdate: selectedProject.faunaDocumentId as string }))
                   }}
                 >
                   Regenerate
@@ -324,7 +307,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 }
               };
               dispatch(updateSimulation(simulation));
-              dispatch(setMeshApproved(true));
+              dispatch(setMeshApproved({ approved: true, projectToUpdate: selectedProject.faunaDocumentId as string }));
             }}
           >
             Start Simulation

@@ -4,7 +4,8 @@ import {
   setExternalGrids,
   setMesh,
   setMeshGenerated,
-  setSuggestedQuantum} from '../../../../../../store/projectSlice';
+  setSuggestedQuantum
+} from '../../../../../../store/projectSlice';
 import axios from 'axios';
 import { create_Grids_externals } from './createGridsExternals';
 import { Project } from '../../../../../../model/esymiaModels';
@@ -30,7 +31,7 @@ export function generateSTLListFromComponents(
     );
   });
 
-  const STLList: { material: {name: string, conductivity: number}; STL: string }[] = [];
+  const STLList: { material: { name: string, conductivity: number }; STL: string }[] = [];
 
   filteredComponents.forEach((fc) => {
     const STLToPush = exportToSTL(fc);
@@ -49,39 +50,54 @@ export function generateSTLListFromComponents(
 export const saveMeshAndExternalGridsToS3 = async (
   mesherOutput: any,
   externalGrid: any,
-  dispatch: AppDispatch
+  dispatch: AppDispatch,
+  selectedProject: Project,
+  execQuery: Function
 ) => {
   const blobFile = new Blob([JSON.stringify(mesherOutput)]);
   const meshFile = new File([blobFile], `mesh.json`, {
     type: 'application/json'
   });
-  const saveExternalGridsToS3 = async (externalGrids: any, dispatch: AppDispatch) => {
-    const blobFile = new Blob([JSON.stringify(externalGrids)]);
-    const meshFile = new File([blobFile], `mesh.json`, {
-      type: 'application/json'
-    });
-    uploadFileS3(meshFile).then((res) => {
-      if (res) {
-        dispatch(setExternalGrids(res.key));
-      }
-    });
-    return 'saved';
-  };
-
-  uploadFileS3(meshFile)
+  uploadFileS3(meshFile, selectedProject)
     .then((res) => {
       if (res) {
-        saveExternalGridsToS3(externalGrid, dispatch)
-          .then(() => {
-            dispatch(setMeshGenerated('Generated'));
-            dispatch(setMesh(res.key));
-            return '';
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error('Error while saving mesh, please try again');
-            dispatch(setMeshGenerated('Not Generated'));
-          });
+        const blobFile = new Blob([JSON.stringify(externalGrid)]);
+        const meshFile = new File([blobFile], `mesh.json`, {
+          type: 'application/json'
+        });
+        uploadFileS3(meshFile, selectedProject)
+          .then((resExternalGrids) => {
+            if (resExternalGrids) {
+              dispatch(setMeshGenerated({
+                status: 'Generated',
+                projectToUpdate: selectedProject.faunaDocumentId as string
+              }));
+              dispatch(setMesh({ mesh: res.key, projectToUpdate: selectedProject.faunaDocumentId as string }));
+              dispatch(setExternalGrids({
+                extGrids: resExternalGrids.key,
+                projectToUpdate: selectedProject.faunaDocumentId as string
+              }));
+              execQuery(
+                updateProjectInFauna,
+                convertInFaunaProjectThis({
+                  ...selectedProject,
+                  meshData: {
+                    ...selectedProject.meshData,
+                    mesh: res.key,
+                    externalGrids: resExternalGrids.key,
+                    meshGenerated: 'Generated'
+                  }
+                })
+              ).then(() => {
+              });
+              return '';
+            }
+          }).catch((err) => {
+          console.log(err);
+          toast.error('Error while saving mesh, please try again');
+          dispatch(setMeshGenerated({ status: 'Not Generated', projectToUpdate: selectedProject.faunaDocumentId as string }));
+        });
+
       }
       return '';
     })
@@ -89,7 +105,7 @@ export const saveMeshAndExternalGridsToS3 = async (
   return 'saved';
 };
 
-export const launchMeshing = (selectedProject: Project, allMaterials: Material[], quantumDimsInput: [number, number, number], dispatch: AppDispatch, saveMeshAndExternalGridsToS3: Function, setAlert:Function, previousMeshStatus: "Not Generated" | "Generated" | "Generating") => {
+export const launchMeshing = (selectedProject: Project, allMaterials: Material[], quantumDimsInput: [number, number, number], dispatch: AppDispatch, saveMeshAndExternalGridsToS3: Function, setAlert: Function, previousMeshStatus: 'Not Generated' | 'Generated' | 'Generating', execQuery: Function) => {
   const components = selectedProject?.model
     ?.components as ComponentEntity[];
   const objToSendToMesher = {
@@ -104,31 +120,43 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
   axios
     .post('http://127.0.0.1:8003/meshing', objToSendToMesher)
     .then((res) => {
-      console.log(res.data)
+      console.log(res.data);
       if (res.data.x) {
-        dispatch(setMessageInfoModal(`the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`))
-        dispatch(setIsAlertInfoModal(true))
-        dispatch(setShowInfoModal(true))
-        setAlert(true)
-        dispatch(setMeshGenerated(previousMeshStatus))
+        dispatch(setMessageInfoModal(`the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`));
+        dispatch(setIsAlertInfoModal(true));
+        dispatch(setShowInfoModal(true));
+        setAlert(true);
+        dispatch(setMeshGenerated({
+          status: previousMeshStatus,
+          projectToUpdate: selectedProject.faunaDocumentId as string
+        }));
       } else if (res.data.y) {
-        dispatch(setMessageInfoModal(`the size of the quantum on y is too large compared to the size of the model on y. Please reduce the size of the quantum on y! y must be less than ${res.data.max_y}`))
-        dispatch(setIsAlertInfoModal(true))
-        dispatch(setShowInfoModal(true))
-        setAlert(true)
-        dispatch(setMeshGenerated(previousMeshStatus))
+        dispatch(setMessageInfoModal(`the size of the quantum on y is too large compared to the size of the model on y. Please reduce the size of the quantum on y! y must be less than ${res.data.max_y}`));
+        dispatch(setIsAlertInfoModal(true));
+        dispatch(setShowInfoModal(true));
+        setAlert(true);
+        dispatch(setMeshGenerated({
+          status: previousMeshStatus,
+          projectToUpdate: selectedProject.faunaDocumentId as string
+        }));
       } else if (res.data.z) {
-        dispatch(setMessageInfoModal(`the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`))
-        dispatch(setIsAlertInfoModal(true))
-        dispatch(setShowInfoModal(true))
-        setAlert(true)
-        dispatch(setMeshGenerated(previousMeshStatus))
+        dispatch(setMessageInfoModal(`the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`));
+        dispatch(setIsAlertInfoModal(true));
+        dispatch(setShowInfoModal(true));
+        setAlert(true);
+        dispatch(setMeshGenerated({
+          status: previousMeshStatus,
+          projectToUpdate: selectedProject.faunaDocumentId as string
+        }));
       } else if (res.data.mesh_is_valid.valid == false) {
-        dispatch(setMessageInfoModal('Error! Mesh not valid. Please adjust quantum along ' + res.data.mesh_is_valid.axis + ' axis.'))
-        dispatch(setIsAlertInfoModal(true))
-        dispatch(setShowInfoModal(true))
-        setAlert(true)
-        dispatch(setMeshGenerated(previousMeshStatus))
+        dispatch(setMessageInfoModal('Error! Mesh not valid. Please adjust quantum along ' + res.data.mesh_is_valid.axis + ' axis.'));
+        dispatch(setIsAlertInfoModal(true));
+        dispatch(setShowInfoModal(true));
+        setAlert(true);
+        dispatch(setMeshGenerated({
+          status: previousMeshStatus,
+          projectToUpdate: selectedProject.faunaDocumentId as string
+        }));
       } else {
         const grids: any[] = [];
         for (const value of Object.values(res.data.mesher_matrices)) {
@@ -142,9 +170,9 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
         const extGrids = {
           externalGrids: data,
           cell_size: {
-            cell_size_x: res.data.cell_size.cell_size_x/1000,
-            cell_size_y: res.data.cell_size.cell_size_y/1000,
-            cell_size_z: res.data.cell_size.cell_size_z/1000
+            cell_size_x: res.data.cell_size.cell_size_x / 1000,
+            cell_size_y: res.data.cell_size.cell_size_y / 1000,
+            cell_size_z: res.data.cell_size.cell_size_z / 1000
           },
           origin: res.data.origin,
           n_cells: res.data.n_cells
@@ -159,7 +187,7 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
             }
           );
         }
-        saveMeshAndExternalGridsToS3(res.data, extGrids, dispatch)
+        saveMeshAndExternalGridsToS3(res.data, extGrids, dispatch, selectedProject, execQuery)
           .then(() => {
             return '';
           })
@@ -168,15 +196,18 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
     })
     .catch((err) => {
       if (err) {
-        dispatch(setMessageInfoModal('Error while generating mesh, please start mesher on plugins section and try again'))
-        dispatch(setIsAlertInfoModal(true))
-        dispatch(setShowInfoModal(true))
-        setAlert(true)
-        dispatch(setMeshGenerated(previousMeshStatus));
+        dispatch(setMessageInfoModal('Error while generating mesh, please start mesher on plugins section and try again'));
+        dispatch(setIsAlertInfoModal(true));
+        dispatch(setShowInfoModal(true));
+        setAlert(true);
+        dispatch(setMeshGenerated({
+          status: previousMeshStatus,
+          projectToUpdate: selectedProject.faunaDocumentId as string
+        }));
         console.log(err);
       }
     });
-}
+};
 
 export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: Material[], dispatch: AppDispatch, execQuery: Function, setSuggestedQuantumError: Function) => {
   const components = selectedProject?.model
@@ -185,16 +216,19 @@ export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: 
     STLList:
       components &&
       allMaterials &&
-      generateSTLListFromComponents(allMaterials, components),
+      generateSTLListFromComponents(allMaterials, components)
   };
   axios
     .post('http://127.0.0.1:8003/meshingAdvice', objToSendToMesher)
     .then(res => {
-      dispatch(setSuggestedQuantum(([parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))])))
+      dispatch(setSuggestedQuantum(([parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))])));
       execQuery(
         updateProjectInFauna,
-        convertInFaunaProjectThis({...selectedProject, suggestedQuantum: [parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))]} as Project)
+        convertInFaunaProjectThis({
+          ...selectedProject,
+          suggestedQuantum: [parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))]
+        } as Project)
       ).then();
-    }).catch((err) => setSuggestedQuantumError(true))
-}
+    }).catch((err) => setSuggestedQuantumError(true));
+};
 

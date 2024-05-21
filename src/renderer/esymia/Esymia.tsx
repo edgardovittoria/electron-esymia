@@ -7,9 +7,10 @@ import {
   tabSelectedSelector,
 } from './store/tabsAndMenuItemsSlice';
 import {
+  activeMeshingSelector,
   activeSimulationsSelector,
   selectFolder,
-  setProjectsFolderToUser,
+  setProjectsFolderToUser
 } from './store/projectSlice';
 import {
   ActivePluginsSelector,
@@ -35,6 +36,8 @@ import { SimulationTabsContentFactory } from './application/simulationTabsManage
 import SimulationStatus from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/SimulationStatus';
 import { BsPlugin } from 'react-icons/bs';
 import Plugins from './plugin/Plugins';
+import MeshingStatus
+  from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/MeshingStatus';
 
 export interface EsymiaProps {
   selectedTab: string
@@ -46,7 +49,7 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
   const user = useSelector(usersStateSelector);
   const tabSelected = useSelector(tabSelectedSelector);
   const [loginSpinner, setLoginSpinner] = useState(false);
-
+  const [alert, setAlert] = useState<boolean>(false);
   const activeSimulations = useSelector(activeSimulationsSelector);
   const [feedbackSimulationVisible, setFeedbackSimulationVisible] =
     useState<boolean>(false);
@@ -55,6 +58,15 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
       setFeedbackSimulationVisible(true);
     }
   }, [activeSimulations.length]);
+
+  const activeMeshing = useSelector(activeMeshingSelector);
+  const [feedbackMeshingVisible, setFeedbackMeshingVisible] =
+    useState<boolean>(false);
+  useEffect(() => {
+    if (activeMeshing.length > 0) {
+      setFeedbackMeshingVisible(true);
+    }
+  }, [activeMeshing.length]);
 
   const activePlugins = useSelector(ActivePluginsSelector);
   const [pluginsVisible, setPluginsVisible] = useState<boolean>(true);
@@ -166,6 +178,24 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
                 feedbackSimulationVisible={feedbackSimulationVisible}
                 setFeedbackSimulationVisible={setFeedbackSimulationVisible}
                 activeSimulations={activeSimulations}
+              />
+            )}
+            {activeMeshing &&
+              activeMeshing.length > 0 &&
+              !feedbackMeshingVisible && (
+                <button
+                  className="absolute bottom-24 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor text-sm"
+                  onClick={() => setFeedbackMeshingVisible(true)}
+                >
+                  MES
+                </button>
+              )}
+            {activeMeshing && activeMeshing.length > 0 && (
+              <MeshingStatus
+                feedbackMeshingVisible={feedbackMeshingVisible}
+                setFeedbackMeshingVisible={setFeedbackMeshingVisible}
+                activeMeshing={activeMeshing}
+                setAlert={setAlert}
               />
             )}
             {activePlugins && activePlugins.length > 0 && !pluginsVisible && (
