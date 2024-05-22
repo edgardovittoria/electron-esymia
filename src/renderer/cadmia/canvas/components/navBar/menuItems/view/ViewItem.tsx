@@ -29,7 +29,12 @@ import {
   shapesToolbarVisibilitySelector
 } from '../shapes/shapesToolbarSlice';
 import { resetFocusToScene } from './viewItemSlice';
-import { navbarDropdownBoxStyle, navbarDropdownPadding, navbarDropdownStyle } from '../../../../../config/styles';
+import {
+  navbarDropdownBoxStyle,
+  navbarDropdownPadding,
+  navbarDropdownStyle,
+  navbarItemStyle
+} from '../../../../../config/styles';
 
 interface ViewItemProps {
 }
@@ -50,7 +55,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
       {({ open }) => (
         <>
           <Popover.Button
-            className='group inline-flex items-center rounded-md bg-white text-base text-black font-medium p-1 hover:bg-black hover:text-white hover:cursor-pointer'>
+            className={navbarItemStyle}>
             <span>View</span>
             <ChevronDownIcon
               className='ml-2 h-5 w-5'
@@ -86,7 +91,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                                 ? dispatch(openObjectsDetails())
                                 : dispatch(closeObjectsDetails())
                             }
-                            className={`${sideBarChecked ? 'bg-black' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
+                            className={`${sideBarChecked ? 'bg-secondaryColor' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
                           >
                             <span
                               aria-hidden='true'
@@ -112,7 +117,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                                 ? dispatch(openBinaryOperationsToolbar())
                                 : dispatch(closeBinaryOperationsToolbar())
                             }
-                            className={`${binaryOperationsToolbarChecked ? 'bg-black' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
+                            className={`${binaryOperationsToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
                           >
                             <span
                               aria-hidden='true'
@@ -138,7 +143,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                                 ? dispatch(openMiscToolbar())
                                 : dispatch(closeMiscToolbar())
                             }
-                            className={`${miscToolbarChecked ? 'bg-black' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
+                            className={`${miscToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
                           >
                             <span
                               aria-hidden='true'
@@ -163,7 +168,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                                 ? dispatch(openTransformationsToolbar())
                                 : dispatch(closeTransformationsToolbar())
                             }
-                            className={`${transformationsToolbarChecked ? 'bg-black' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
+                            className={`${transformationsToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
                           >
                             <span
                               aria-hidden='true'
@@ -188,7 +193,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                                 ? dispatch(openShapesToolbar())
                                 : dispatch(closeShapesToolbar())
                             }
-                            className={`${shapesToolbarChecked ? 'bg-black' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
+                            className={`${shapesToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
                           >
                             <span
                               aria-hidden='true'

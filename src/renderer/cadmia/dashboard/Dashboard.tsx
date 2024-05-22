@@ -81,7 +81,7 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
                 );
               })}
               <div
-                className='px-10 py-12 relative rounded-xl border border-dashed border-black flex flex-col items-center hover:bg-black hover:text-white hover:cursor-pointer hover:shadow-2xl'
+                className='px-10 py-12 relative rounded-xl border border-dashed border-black flex flex-col items-center hover:bg-secondaryColor hover:text-white hover:cursor-pointer hover:shadow-2xl'
                 onClick={() => {
                   dispatch(resetState());
                   dispatch(ActionCreators.clearHistory());

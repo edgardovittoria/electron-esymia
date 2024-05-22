@@ -19,6 +19,8 @@ import {
 } from './miscToolbarSlice';
 import { useCadmiaModalityManager } from '../cadmiaModality/useCadmiaModalityManager';
 import { toolbarIconsHeight, toolbarIconsWidth, toolbarsHintStyle } from '../../../config/styles';
+import { resetFocusToScene } from '../navBar/menuItems/view/viewItemSlice';
+import { TbZoomReset } from 'react-icons/tb';
 
 interface MiscToolbarProps {}
 
@@ -57,7 +59,7 @@ export const MiscToolbar: React.FC<MiscToolbarProps> = () => {
   return (
     <>
       {miscToolbarVisible && (
-        <div className="absolute left-[15px] top-[10px] w-[90px] text-center shadow grid grid-cols-3">
+        <div className="absolute left-[15px] top-[10px] w-[120px] text-center shadow grid grid-cols-4">
           <div className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth} p-1 group bg-white`}>
             <DocumentDuplicateIcon
               className="w-8 h-8"
@@ -108,6 +110,19 @@ export const MiscToolbar: React.FC<MiscToolbarProps> = () => {
             <div className={toolbarsHintStyle}>
               <span className="relative z-10 p-2 leading-none text-white whitespace-no-wrap bg-black shadow-lg rounded-md">
                 MULTIPLE SELECTION
+              </span>
+            </div>
+          </div>
+          <div
+            className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth} p-1 group bg-white`}
+            onClick={() =>
+              dispatch(resetFocusToScene())
+            }
+          >
+            <TbZoomReset className="w-8 h-8 text-black"/>
+            <div className={toolbarsHintStyle}>
+              <span className="relative z-10 p-2 leading-none text-white whitespace-no-wrap bg-black shadow-lg rounded-md">
+                RESET SCENE FOCUS
               </span>
             </div>
           </div>

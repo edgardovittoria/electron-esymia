@@ -11,7 +11,7 @@ import {
   navbarDropdownBoxStyle,
   navbarDropdownItemStyle,
   navbarDropdownPadding,
-  navbarDropdownStyle,
+  navbarDropdownStyle, navbarItemStyle,
   navbarShortcutStyle
 } from '../../../../../config/styles';
 
@@ -29,7 +29,7 @@ export const EditItem: React.FC<EditItemProps> = () => {
       {({ open }) => (
         <>
           <Popover.Button
-            className="group inline-flex items-center rounded-md bg-white text-base text-black font-medium p-1 hover:bg-black hover:text-white hover:cursor-pointer"
+            className={navbarItemStyle}
           >
             <span>Edit</span>
             <ChevronDownIcon

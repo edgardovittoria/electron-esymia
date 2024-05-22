@@ -15,9 +15,8 @@ const Navbar: React.FC<NavbarProps> = ({
   selectedMenuItem,
   setSelectedMenuItem,
 }) => {
-  const { loginWithPopup, user } = useAuth0();
   return (
-    <div className="w-1/5 bg-black h-[100vh] relative flex flex-col text-white items-center py-5">
+    <div className="w-1/5 bg-secondaryColor h-[100vh] relative flex flex-col text-white items-center py-5">
       <span className="text-4xl font-semibold">CADmIA</span>
       <hr className="w-full border border-white mt-3" />
       <div

@@ -30,7 +30,7 @@ export const TransformationsToolBar: React.FC<TransformationsToolBarProps> = () 
     return (
         <>
             {transformationsToolbarVisible &&
-                <div className="absolute left-[440px] top-[10px] w-[90px] text-center shadow grid grid-cols-3">
+                <div className="absolute left-[470px] top-[10px] w-[90px] text-center shadow grid grid-cols-3">
                     {transformations.map((transformation, index) => {
                         return (
                             <div key={index} className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth} p-1 group hover:bg-gray-300 hover:cursor-pointer

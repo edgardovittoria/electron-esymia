@@ -18,10 +18,10 @@ export const ShapesToolbar: React.FC = () => {
   return (
     <>
       {shapesToolbarVisible && (
-        <div className={`absolute flex flex-row left-[285px] top-[10px] text-center shadow ${toolbarIconsWidth}`}>
+        <div className={`absolute flex flex-row left-[315px] top-[10px] text-center shadow ${toolbarIconsWidth}`}>
           {baseShapes.map((shape) => (
             <div
-              className={`relative flex px-1 items-center justify-center group bg-white hover:bg-black hover:text-white hover:cursor-pointer ${toolbarIconsHeight}`}
+              className={`relative flex px-1 items-center justify-center group bg-white hover:bg-secondaryColor hover:text-white hover:cursor-pointer ${toolbarIconsHeight}`}
               onClick={() => {
                 dispatch(setModality('NormalSelection'))
                 let newComp = addToTheSceneANew(shape);

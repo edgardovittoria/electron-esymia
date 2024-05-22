@@ -58,7 +58,7 @@ export default function App() {
         <div>
           <FaUser
             id="profileIcon"
-            className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
+            className="w-[20px] h-[20px] mr-4 text-black hover:opacity-40 hover:cursor-pointer"
             onClick={() => {
               setUserDropdownVisibility(!userDropdownVisibility)
             }}
@@ -67,23 +67,23 @@ export default function App() {
             style={{ display: !userDropdownVisibility ? 'none' : 'block' }}
             className="px-4 py-2 bg-white rounded list-none absolute right-[10px] mt-[20px] w-max shadow z-[10000]"
           >
-            <li className="font-bold text-lg text-secondaryColor">
+            <li className="font-bold text-lg text-black">
               {user.nickname}
             </li>
             <hr className="mb-3" />
-            <div className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer">
-              <GiSettingsKnobs className="w-[20px] h-[20px] mr-[10px] text-primaryColor" />
+            <div className="flex items-center p-[5px] hover:bg-black hover:text-white hover:cursor-pointer">
+              <GiSettingsKnobs className="w-[20px] h-[20px] mr-[10px]" />
               <li>Settings</li>
             </div>
             <div
-              className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:font-semibold hover:cursor-pointer"
+              className="flex items-center p-[5px] hover:bg-black hover:text-white hover:cursor-pointer"
               onClick={() => {
                 window.electron.ipcRenderer.sendMessage('logout', [
                   process.env.REACT_APP_AUTH0_DOMAIN,
                 ]);
               }}
             >
-              <HiOutlineLogout className="w-[20px] h-[20px] mr-[10px] text-primaryColor" />
+              <HiOutlineLogout className="w-[20px] h-[20px] mr-[10px]" />
               <li>Logout</li>
             </div>
           </ul>

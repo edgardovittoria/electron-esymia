@@ -13,7 +13,7 @@ import {
   navbarDropdownBoxStyle,
   navbarDropdownItemStyle,
   navbarDropdownPadding,
-  navbarDropdownStyle
+  navbarDropdownStyle, navbarItemStyle
 } from '../../../../../config/styles';
 import { useDispatch } from 'react-redux';
 import { setModality } from '../../../cadmiaModality/cadmiaModalitySlice';
@@ -48,7 +48,7 @@ export const Shapes: FC = () => {
     <Popover className="relative">
       {({ open }) => (
         <>
-          <Popover.Button className="group inline-flex items-center rounded-md bg-white text-base text-black font-medium p-1 hover:bg-black hover:text-white hover:cursor-pointer">
+          <Popover.Button className={navbarItemStyle}>
             <span>Shapes</span>
             <ChevronDownIcon
               className="ml-2 h-5 w-5"

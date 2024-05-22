@@ -38,10 +38,10 @@ export const KeyboardEventMapper: React.FC<KeyboardEventMapperProps> = () => {
             dispatch(resetState())
         }
         //delete selected component
-        if(e.key === 'Delete' && selectedComponentKey !== 0){
+        /* if(e.key === 'Delete' && selectedComponentKey !== 0){
             e.preventDefault()
             dispatch(removeComponent(selectedComponentKey))
-        }
+        } */
         //set sidebar visibility
         if(e.ctrlKey && e.key === 'd'){
             e.preventDefault()

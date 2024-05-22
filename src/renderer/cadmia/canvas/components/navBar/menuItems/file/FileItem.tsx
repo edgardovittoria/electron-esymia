@@ -46,9 +46,10 @@ import { updateModelInFauna } from '../../../../../faunaDB/functions';
 import {
   navbarDropdownBoxStyle,
   navbarDropdownItemStyle,
-  navbarDropdownPadding, navbarDropdownStyle,
+  navbarDropdownPadding, navbarDropdownStyle, navbarItemStyle,
   navbarShortcutStyle
 } from '../../../../../config/styles';
+import { setModality } from '../../../cadmiaModality/cadmiaModalitySlice';
 
 interface FileItemProps {}
 
@@ -135,7 +136,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
       <Popover className="relative">
         {({ open }) => (
           <>
-            <Popover.Button className="group inline-flex items-center rounded-md bg-white text-base text-black font-medium p-1 hover:bg-black hover:text-white hover:cursor-pointer">
+            <Popover.Button className={navbarItemStyle}>
               <span>File</span>
               <ChevronDownIcon className="ml-2 h-5 w-5" aria-hidden="true" />
             </Popover.Button>
@@ -242,28 +243,18 @@ export const FileItem: React.FC<FileItemProps> = () => {
                         </div>
                       </span>
                     )}
-                    {isAuthenticated ? (
+                    {isAuthenticated && (
                       <span
                         className={navbarDropdownItemStyle}
                         onClick={() => setModalLoad(true)}
                       >
-                        <div className="flex justify-between w-full hover:cursor-pointer">
+                        <div className="flex justify-between w-full hover:cursor-pointer"
+                             onClick={() => dispatch(setModality("NormalSelection"))}
+                        >
                           <div className="flex">
                             <CloudArrowUpIcon className="w-[20px] mr-4" />
                             <p className="text-base font-medium">
                               Load
-                            </p>
-                          </div>
-                          {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
-                        </div>
-                      </span>
-                    ) : (
-                      <span className={navbarDropdownItemStyle}>
-                        <div className="flex justify-between w-full hover:cursor-pointer">
-                          <div className="flex">
-                            <CloudArrowUpIcon className="w-[20px] mr-4 text-gray-300" />
-                            <p className="text-base font-medium text-gray-300">
-                              Load From DB
                             </p>
                           </div>
                           {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
@@ -275,7 +266,9 @@ export const FileItem: React.FC<FileItemProps> = () => {
                       actionParams={{} as ImportActionParamsObject}
                       importAction={importStateCanvas}
                     >
-                      <div className="flex justify-between w-full hover:cursor-pointer">
+                      <div className="flex justify-between w-full hover:cursor-pointer"
+                           onClick={() => dispatch(setModality("NormalSelection"))}
+                      >
                         <div className="flex">
                           <ArrowDownTrayIcon className="w-[20px] mr-4" />
                           <p className="text-base font-medium">
@@ -289,7 +282,9 @@ export const FileItem: React.FC<FileItemProps> = () => {
                       className={navbarDropdownItemStyle}
                       onClick={onImportSTLClick}
                     >
-                      <div className="flex justify-between w-full hover:cursor-pointer">
+                      <div className="flex justify-between w-full hover:cursor-pointer"
+                          onClick={() => dispatch(setModality("NormalSelection"))}
+                      >
                         <div className="flex">
                           <ArrowDownTrayIcon className="w-[20px] mr-4" />
                           <p className="text-base font-medium">

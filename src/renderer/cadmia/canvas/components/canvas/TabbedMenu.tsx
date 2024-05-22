@@ -16,7 +16,7 @@ const TabbedMenu: React.FC<TabbedMenuProps> = ({}) => {
     <>
       <div className="absolute bottom-0 left-0 flex flex-row gap-1">
         <div
-          className={` font-semibold ${objectsDetailsVisibility ? 'text-black bg-white' : 'text-white bg-black'} z-50 rounded-tr-xl px-3 w-fit hover:cursor-pointer hover:bg-white hover:text-black`}
+          className={` font-semibold ${objectsDetailsVisibility ? 'text-black bg-white' : 'text-white bg-secondaryColor border border-black border-b-0 border-l-0'} z-50 rounded-tr-xl px-3 w-fit hover:cursor-pointer hover:bg-white hover:text-black`}
           onClick={() => {
             if (objectsDetailsVisibility) {
               dispatch(closeObjectsDetails());

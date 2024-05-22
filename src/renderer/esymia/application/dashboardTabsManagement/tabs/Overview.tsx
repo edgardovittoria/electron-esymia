@@ -90,7 +90,7 @@ export const Overview: React.FC<OverviewProps> = ({  }) => {
           </div>
         )}
       </div>
-      <div className="box relative bg-gradient-to-br from-primaryColor to-green-600 text-white">
+      <div className="box relative bg-secondaryColor text-white">
         <h5 className="text-base p-2">Your Plan</h5>
         <div className="pl-[20px]">
           <h2 className="mt-[10px]">

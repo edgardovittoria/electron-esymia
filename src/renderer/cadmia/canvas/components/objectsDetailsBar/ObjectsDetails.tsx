@@ -17,7 +17,7 @@ export const ObjectsDetails: React.FC<ObjectsDetailsProps> = () => {
 
   return (
     <div
-      className={`absolute bottom-0 z-10 left-0 w-[18vw] bg-white px-[20px] pt-[20px] pb-[50px] text-white text-center translate-y-0 transition`}
+      className={`absolute bottom-0 z-10 left-0 w-[18vw] bg-white px-[20px] pt-[20px] pb-[50px] text-white text-center translate-y-0 transition border border-black border-b-0 rounded-tr-xl`}
     >
       <div className="h-full max-h-[800px] overflow-scroll">
         <Outliner
@@ -32,7 +32,7 @@ export const ObjectsDetails: React.FC<ObjectsDetailsProps> = () => {
                 <h6 className="text-black mt-[10px] text-sm font-bold">
                   Transformation Params
                 </h6>
-                <hr className="border-amber-500 mt-1" />
+                <hr className="border-black mt-1" />
                 <Transformations
                   transformationParams={selectedComponent.transformationParams}
                 />
@@ -44,7 +44,7 @@ export const ObjectsDetails: React.FC<ObjectsDetailsProps> = () => {
                 <h6 className="text-black mt-[10px] text-sm font-bold">
                   Geometry Params
                 </h6>
-                <hr className="border-amber-500 mb-2 mt-1" />
+                <hr className="border-black mb-2 mt-1" />
                 <GeometryParams entity={selectedComponent} />
               </>
             )}
@@ -54,7 +54,7 @@ export const ObjectsDetails: React.FC<ObjectsDetailsProps> = () => {
                 <h6 className="text-black mt-[10px] text-sm font-bold">
                   Visualization
                 </h6>
-                <hr className="border-amber-500 mb-2 mt-1" />
+                <hr className="border-black mb-2 mt-1" />
                 <BordersMeshOption />
               </>
             )}

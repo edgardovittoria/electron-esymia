@@ -32,8 +32,8 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
   return (
     <div className="flex flex-col">
       <h6 className="text-black mt-[10px] text-sm font-bold">Material</h6>
-      <hr className="border-amber-500 mb-2 mt-1" />
-      <div className="flex flex-row">
+      <hr className="border-black mb-2 mt-1" />
+      <div className="flex flex-row items-center gap-4">
         <Listbox
           value={defaultMaterial}
           onChange={(material) => {
@@ -105,20 +105,23 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
             </Transition>
           </div>
         </Listbox>
-        <CgDetailsMore
-          color="black"
-          className="hover:cursor-pointer"
-          onClick={() => {
-            setShowDetails(!showDetails);
-          }}
-        />
+        <div className='tooltip tooltip-left' data-tip="Material Details">
+          <CgDetailsMore
+            color="black"
+            className="hover:cursor-pointer w-5 h-5 "
+            onClick={() => {
+              setShowDetails(!showDetails);
+            }}
+          />
+        </div>
+
       </div>
       {showDetails && materialSelected && (
-        <div className="overflow-scroll justify-between">
+        <div className="overflow-scroll max-h-[200px] justify-between mt-2 px-2">
           {Object.entries(materialSelected).map(([p, value]) => (
-            <div className="flex flex-row justify-between text-sm">
-              <div className="text-black">{p}:</div>
-              <div className="text-black">{value}</div>
+            <div className="flex flex-row justify-between text-sm leading-tight">
+              <div className="text-black text-[12px]">{p}:</div>
+              <div className="text-black text-[12px]">{value}</div>
             </div>
           ))}
         </div>

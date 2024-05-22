@@ -27,7 +27,7 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = () => {
   );
 
   return (
-    <div className="h-[94vh]">
+    <div className="h-[91vh]">
       <ReactReduxContext.Consumer>
         {({ store }) => (
           <Canvas

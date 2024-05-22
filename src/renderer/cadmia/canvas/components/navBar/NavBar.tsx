@@ -22,26 +22,25 @@ export const Navbar: React.FC<NavbarProps> = ({ setShowCad }) => {
 
   return (
     <Popover className='relative bg-white h-[3vh]'>
-      <div className='px-6'>
-        <div className='flex flex-row items-center justify-between w-full h-full'>
-          <Popover.Group as='nav' className='hidden space-x-3 md:flex'>
-            <FileItem />
-            <ViewItem />
-            <EditItem />
-            <Shapes />
-          </Popover.Group>
+      <div className='px-6 flex flex-row items-center justify-between w-full h-full'>
+        <Popover.Group as='nav' className='hidden space-x-1 md:flex'>
+          <FileItem />
+          <ViewItem />
+          <EditItem />
+          <Shapes />
+        </Popover.Group>
 
-          <span className='text-2xl font-semibold'>CADmIA</span>
+        {/* <span className='text-2xl font-semibold'>CADmIA</span> */}
 
-          <div
-            className='flex flex-row items-center gap-2 px-2 py-1 rounded-xl hover:bg-black hover:text-white hover:cursor-pointer'
-            onClick={() => setShowCad(false)}
-          >
-            <MdDashboard size={25} />
-            <span className='font-semibold'>{user?.nickname}&apos;s Dashboard</span>
-          </div>
-
+        <div
+          className='flex flex-row items-center gap-2 px-2 py-1 rounded hover:bg-secondaryColor hover:text-white hover:cursor-pointer'
+          onClick={() => setShowCad(false)}
+        >
+          <MdDashboard size={20} />
+          <span className='text-sm'>Dashboard</span>
         </div>
+
+
       </div>
     </Popover>
   );
