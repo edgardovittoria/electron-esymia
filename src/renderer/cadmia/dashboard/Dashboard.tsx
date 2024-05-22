@@ -68,7 +68,7 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
         setSelectedMenuItem={setSelectedMenuItem}
       />
       {user && (
-        <div className='w-full h-[100vh] flex items-start pt-20 relative'>
+        <div className='w-full h-[97vh] flex items-start pt-20 relative'>
           {selectedMenuItem === 'MP' && (
             <div className='w-full px-10 grid grid-cols-5 gap-4'>
               {models.map((m) => {

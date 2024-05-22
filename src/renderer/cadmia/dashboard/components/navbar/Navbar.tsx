@@ -16,7 +16,7 @@ const Navbar: React.FC<NavbarProps> = ({
   setSelectedMenuItem,
 }) => {
   return (
-    <div className="w-1/5 bg-secondaryColor h-[100vh] relative flex flex-col text-white items-center py-5">
+    <div className="w-1/5 bg-secondaryColor h-[97vh] relative flex flex-col text-white items-center py-5">
       <span className="text-4xl font-semibold">CADmIA</span>
       <hr className="w-full border border-white mt-3" />
       <div
