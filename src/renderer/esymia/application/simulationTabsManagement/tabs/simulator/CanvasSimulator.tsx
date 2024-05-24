@@ -10,6 +10,7 @@ import { FocusView } from '../../sharedElements/FocusView';
 import uniqid from 'uniqid';
 import { FactoryShapes } from 'cad-library';
 import { alertMessageStyle, comeBackToModelerMessage } from '../../../config/textMessages';
+import { Perf } from 'r3f-perf'
 
 interface CanvasSimulatorProps  {
   externalGrids: ExternalGridsObject | undefined,
@@ -29,6 +30,7 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
           {({store}) => (
             <div className="flex flex-col">
               <Canvas className="w-[100vw] lg:h-[70vh] xl:h-[82vh]">
+                {/* <Perf/> */}
                 <Provider store={store}>
                   <pointLight position={[100, 100, 100]} intensity={0.8}/>
                   <hemisphereLight

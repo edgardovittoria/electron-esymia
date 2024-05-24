@@ -93,7 +93,8 @@ export type Probe = {
 
 export type MeshData = {
   mesh?: string,
-  externalGrids?: string
+  externalGrids?: string,
+  previousMeshStatus?:  "Not Generated" | "Generated",
   meshGenerated: "Not Generated" | "Generated" | "Generating",
   meshApproved: boolean,
   quantum: [number, number, number],

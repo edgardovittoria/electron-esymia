@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComponentEntity, Material } from 'cad-library';
 import {
@@ -18,6 +18,7 @@ import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
 import { simulatorLeftPanelTitle } from '../../../config/panelTitles';
 import { OriginaProportionsButton } from './OriginalProportionsButton';
 import { AlteredProportionsButton } from './AlteredProportionsButton';
+import { ImSpinner } from 'react-icons/im';
 
 
 interface SimulatorProps {
@@ -38,11 +39,13 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
   const [resetFocus, setResetFocus] = useState(false)
+  const [spinner, setSpinner] = useState<boolean>(false);
   const toggleResetFocus = () => setResetFocus(!resetFocus)
 
   useEffect(() => {
     if (selectedProject?.meshData.mesh) {
       setExternalGrids(undefined);
+      setSpinner(true)
       s3.getObject(
         {
           Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
@@ -55,7 +58,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
           setExternalGrids(
             JSON.parse(data.Body?.toString() as string) as ExternalGridsObject,
           );
-          dispatch(setMeshGenerated('Generated'));
+          dispatch(setMeshGenerated({ status: 'Generated', projectToUpdate: selectedProject.faunaDocumentId as string }));
+          setSpinner(false)
         },
       );
     }
@@ -99,6 +103,11 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
   return (
     <>
+      {spinner &&
+        <div className="absolute top-1/2 left-1/2">
+          <ImSpinner className="animate-spin w-8 h-8" />
+        </div>
+      }
       <CanvasSimulator externalGrids={externalGrids} selectedMaterials={selectedMaterials} resetFocus={resetFocus} setResetFocus={toggleResetFocus}/>
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
       <MyPanel

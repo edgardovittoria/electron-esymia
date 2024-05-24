@@ -238,6 +238,10 @@ export const ProjectSlice = createSlice({
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.meshGenerated = action.payload.status;
     },
+    setPreviousMeshStatus(state: ProjectState, action: PayloadAction<{ status: 'Not Generated' | 'Generated' | undefined, projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.previousMeshStatus = action.payload.status;
+    },
     setMeshApproved(state: ProjectState, action: PayloadAction<{ approved:boolean, projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.meshApproved = action.payload.approved;
@@ -324,6 +328,7 @@ export const {
   shareFolder,
   setMesh,
   setMeshGenerated,
+  setPreviousMeshStatus,
   setMeshApproved,
   setQuantum,
   setFolderOfElementsSharedWithUser,
@@ -402,7 +407,7 @@ export const activeSimulationsSelector = (state: { projects: ProjectState }) => 
 };
 
 export const activeMeshingSelector = (state: { projects: ProjectState }) => {
-  let activeMeshing: { selectedProject: Project, allMaterials: Material[], quantum: [number, number, number], meshStatus: "Not Generated" | "Generated" | "Generating"}[] = [];
+  let activeMeshing: { selectedProject: Project, allMaterials: Material[], quantum: [number, number, number], meshStatus: "Not Generated" | "Generated"}[] = [];
   state.projects.projects.projectList.forEach(p => {
     let allMaterials: Material[] = [];
     if (p?.model?.components) {
@@ -415,7 +420,7 @@ export const activeMeshingSelector = (state: { projects: ProjectState }) => {
         selectedProject: p,
         allMaterials: allMaterials,
         quantum: p.meshData.quantum,
-        meshStatus: p.meshData.meshGenerated
+        meshStatus: p.meshData.previousMeshStatus as 'Not Generated' | 'Generated'
       })
     }
   });
@@ -431,7 +436,7 @@ export const activeMeshingSelector = (state: { projects: ProjectState }) => {
         selectedProject: p,
         allMaterials: allMaterials,
         quantum: p.meshData.quantum,
-        meshStatus: p.meshData.meshGenerated
+        meshStatus: p.meshData.previousMeshStatus as 'Not Generated' | 'Generated'
       })
     }
   });

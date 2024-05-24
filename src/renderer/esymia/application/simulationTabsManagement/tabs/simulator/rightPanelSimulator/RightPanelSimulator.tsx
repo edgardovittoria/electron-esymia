@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   meshGeneratedSelector,
   setMeshApproved,
-  setMeshGenerated, setQuantum,
+  setMeshGenerated, setPreviousMeshStatus, setQuantum,
   updateSimulation
 } from '../../../../../store/projectSlice';
 import {
@@ -158,6 +158,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   }
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
+                    dispatch(setPreviousMeshStatus({ status: selectedProject.meshData.meshGenerated, projectToUpdate: selectedProject.faunaDocumentId as string }));
                     dispatch(setMeshGenerated({ status: 'Generating', projectToUpdate: selectedProject.faunaDocumentId as string }));
                     dispatch(setQuantum({ quantum: quantumDimsInput, projectToUpdate: selectedProject.faunaDocumentId as string }))
                   }}
@@ -173,6 +174,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   className='button buttonPrimary w-full text-[12px] xl:text-base'
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
+                    dispatch(setPreviousMeshStatus({ status: selectedProject.meshData.meshGenerated, projectToUpdate: selectedProject.faunaDocumentId as string }));
                     dispatch(setMeshGenerated({ status: 'Generating', projectToUpdate: selectedProject.faunaDocumentId as string }));
                     dispatch(setQuantum({ quantum: quantumDimsInput, projectToUpdate: selectedProject.faunaDocumentId as string }))
                   }}

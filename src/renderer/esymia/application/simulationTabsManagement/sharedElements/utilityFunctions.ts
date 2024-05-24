@@ -1,5 +1,5 @@
 import { meshFrom } from 'cad-library';
-import * as THREE from 'three'
+import * as THREE from 'three';
 import { Project } from '../../../model/esymiaModels';
 
 export const exportToJsonFileThis = (data: any, fileName: string) => {
@@ -21,6 +21,5 @@ export const exportToJsonFileThis = (data: any, fileName: string) => {
           group.add(meshFrom(c));
         });
       }
-      const boundingbox = new THREE.Box3().setFromObject(group);
-      return boundingbox
+    return new THREE.Box3().setFromObject(group)
   }

@@ -1,7 +1,7 @@
 import { shaderMaterial } from "@react-three/drei";
 import { extend } from "@react-three/fiber";
-import { FC } from "react";
-import { Color, FrontSide, Vector3 } from "three";
+import React, { FC } from "react";
+import { BackSide, Color, FrontSide, Vector3 } from 'three';
 
 // funzione applicata ai vertici della geometria. In questo caso andiamo a definire i vertici esattamente
 // nella stessa posizione di quelli della geometria.
@@ -54,8 +54,11 @@ export const EdgesMaterial: FC<{boxDims: [number, number, number], thickness: nu
   boxDims, smoothness, thickness, side = FrontSide, color = "black", polygonOffsetFactor = -0.2
 }) => {
   return (
-    <meshEdgesMaterial transparent polygonOffset polygonOffsetFactor={polygonOffsetFactor} size={boxDims}
-          color={color} thickness={thickness}
-          smoothness={smoothness} side={side} />
+    <>
+      <meshEdgesMaterial  transparent polygonOffset polygonOffsetFactor={polygonOffsetFactor} size={boxDims}
+                          color={color} thickness={thickness}
+                          smoothness={smoothness} side={side}/>
+    </>
+
   )
 }
