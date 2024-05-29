@@ -19,6 +19,7 @@ import { simulatorLeftPanelTitle } from '../../../config/panelTitles';
 import { OriginaProportionsButton } from './OriginalProportionsButton';
 import { AlteredProportionsButton } from './AlteredProportionsButton';
 import { ImSpinner } from 'react-icons/im';
+import { useStorageData } from './rightPanelSimulator/hook/useStorageData';
 
 
 interface SimulatorProps {
@@ -41,29 +42,15 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const [resetFocus, setResetFocus] = useState(false)
   const [spinner, setSpinner] = useState<boolean>(false);
   const toggleResetFocus = () => setResetFocus(!resetFocus)
+  const { loadMeshData } = useStorageData()
 
   useEffect(() => {
-    if (selectedProject?.meshData.mesh) {
+    if (selectedProject?.meshData.mesh && selectedProject?.meshData.meshGenerated === "Generated") {
       setExternalGrids(undefined);
       setSpinner(true)
-      s3.getObject(
-        {
-          Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-          Key: selectedProject.meshData.externalGrids as string,
-        },
-        (err, data) => {
-          if (err) {
-            console.log(err);
-          }
-          setExternalGrids(
-            JSON.parse(data.Body?.toString() as string) as ExternalGridsObject,
-          );
-          dispatch(setMeshGenerated({ status: 'Generated', projectToUpdate: selectedProject.faunaDocumentId as string }));
-          setSpinner(false)
-        },
-      );
+      loadMeshData(setSpinner, setExternalGrids)
     }
-  }, [selectedProject?.meshData.externalGrids]);
+  }, [selectedProject?.meshData.meshGenerated]);
 
   useEffect(() => {
     setVoxelsPainted(0);

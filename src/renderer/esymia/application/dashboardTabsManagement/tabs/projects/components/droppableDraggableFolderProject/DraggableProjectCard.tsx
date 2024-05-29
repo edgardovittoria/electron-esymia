@@ -31,6 +31,10 @@ import {
 import { Folder, Project } from '../../../../../../model/esymiaModels';
 import { setModelInfoFromS3 } from '../../../shared/utilFunctions';
 import noResultsIconForProject from '../../../../../../../../../assets/noResultsIconForProject.png';
+import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
+import {
+  useStorageData
+} from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
 
 interface DraggableProjectCardProps {
   project: Project;
@@ -41,6 +45,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
 }) => {
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
+  const { deleteProject } = useStorageData()
   const selectedFolder = useSelector(SelectedFolderSelector) as Folder;
   const allProjectFolders = useSelector(allProjectFoldersSelector);
   const user = useSelector(usersStateSelector);
@@ -67,6 +72,8 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
     e.preventDefault();
     show({ event: e, props: { key: 'value' } });
   }
+
+  console.log(project)
 
   return (
     <>
@@ -172,13 +179,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
               data-testid="deleteButton"
               onClick={(p) => {
                 p.event.stopPropagation();
-                dispatch(removeProject(project.faunaDocumentId as string));
-                dispatch(closeProjectTab(project.faunaDocumentId as string));
-                execQuery(
-                  deleteSimulationProjectFromFauna,
-                  project.faunaDocumentId,
-                  project.parentFolder,
-                );
+                deleteProject(project)
                 hideAll();
               }}
             >

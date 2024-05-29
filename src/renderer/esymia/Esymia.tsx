@@ -38,6 +38,7 @@ import { BsPlugin } from 'react-icons/bs';
 import Plugins from './plugin/Plugins';
 import MeshingStatus
   from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/MeshingStatus';
+import { createFolder, getDirContents, uploadFile } from '../fileSystemAPIs/fileSystemAPIs';
 
 export interface EsymiaProps {
   selectedTab: string
@@ -68,6 +69,16 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
       setFeedbackMeshingVisible(true);
     }
   }, [activeMeshing.length]); */
+
+  useEffect(() => {
+    getDirContents([]).then(res => {
+      if(res.filter((s: string) => s === 'esymiaProjects').length === 0){
+        createFolder('esymiaProjects')
+        createFolder('esymiaProjects/mesherOutputs')
+        createFolder('esymiaProjects/externalGrids')
+      }
+    })
+  }, []);
 
   const activePlugins = useSelector(ActivePluginsSelector);
   const [pluginsVisible, setPluginsVisible] = useState<boolean>(true);

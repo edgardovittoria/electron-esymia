@@ -42,6 +42,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
   const handleCreate = () => {
     if (projectName.length > 0) {
       let newProject: Project = {
+        storage: process.env.STORAGE_MODE as string as ('local' | 'online'),
         name: projectName,
         description: projectDescription,
         model: {} as CanvasState,
@@ -50,6 +51,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         meshData: {
           meshApproved: false,
           meshGenerated: 'Not Generated',
+          quantum: [0,0,0]
         },
         screenshot: undefined,
         owner: (selectedFolder?.owner.email === user.email) ? user : selectedFolder?.owner as UsersState,

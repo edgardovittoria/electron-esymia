@@ -22,6 +22,7 @@ export type sharingInfoUser = {
 
 
 export type Project = {
+  storage: 'local' | 'online'
   name: string,
   description: string,
   model: CanvasState,

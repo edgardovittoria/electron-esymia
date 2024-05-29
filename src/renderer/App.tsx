@@ -8,14 +8,27 @@ import SimulationStatus
   from './esymia/application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/SimulationStatus';
 import MeshingStatus
   from './esymia/application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/MeshingStatus';
-import { useSelector } from 'react-redux';
-import { activeMeshingSelector, activeSimulationsSelector } from './esymia/store/projectSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { activeMeshingSelector, activeSimulationsSelector, setHomePat } from './esymia/store/projectSlice';
 import { HiOutlineLogout } from 'react-icons/hi';
 import { GiSettingsKnobs } from 'react-icons/gi';
 import { FaUser } from 'react-icons/fa';
+import {
+  createFolder,
+  deleteFile,
+  deleteFolder,
+  getDirContents,
+  uploadFile
+} from './fileSystemAPIs/fileSystemAPIs';
 
 
 export default function App() {
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    window.electron.ipcRenderer.invoke('getInstallationDir').then(res => dispatch(setHomePat(res)))
+  }, []);
 
   const [tabsSelected, setTabsSelected] = useState<string>('home');
   const { user } = useAuth0();

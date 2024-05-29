@@ -47,65 +47,9 @@ export function generateSTLListFromComponents(
 }
 
 
-export const saveMeshAndExternalGridsToS3 = async (
-  mesherOutput: any,
-  externalGrid: any,
-  dispatch: AppDispatch,
-  selectedProject: Project,
-  execQuery: Function
-) => {
-  const blobFile = new Blob([JSON.stringify(mesherOutput)]);
-  const meshFile = new File([blobFile], `mesh.json`, {
-    type: 'application/json'
-  });
-  uploadFileS3(meshFile, selectedProject)
-    .then((res) => {
-      if (res) {
-        const blobFile = new Blob([JSON.stringify(externalGrid)]);
-        const meshFile = new File([blobFile], `mesh.json`, {
-          type: 'application/json'
-        });
-        uploadFileS3(meshFile, selectedProject)
-          .then((resExternalGrids) => {
-            if (resExternalGrids) {
-              dispatch(setMeshGenerated({
-                status: 'Generated',
-                projectToUpdate: selectedProject.faunaDocumentId as string
-              }));
-              dispatch(setMesh({ mesh: res.key, projectToUpdate: selectedProject.faunaDocumentId as string }));
-              dispatch(setExternalGrids({
-                extGrids: resExternalGrids.key,
-                projectToUpdate: selectedProject.faunaDocumentId as string
-              }));
-              execQuery(
-                updateProjectInFauna,
-                convertInFaunaProjectThis({
-                  ...selectedProject,
-                  meshData: {
-                    ...selectedProject.meshData,
-                    mesh: res.key,
-                    externalGrids: resExternalGrids.key,
-                    meshGenerated: 'Generated'
-                  }
-                })
-              ).then(() => {
-              });
-              return '';
-            }
-          }).catch((err) => {
-          console.log(err);
-          toast.error('Error while saving mesh, please try again');
-          dispatch(setMeshGenerated({ status: 'Not Generated', projectToUpdate: selectedProject.faunaDocumentId as string }));
-        });
 
-      }
-      return '';
-    })
-    .catch((err) => console.log(err));
-  return 'saved';
-};
 
-export const launchMeshing = (selectedProject: Project, allMaterials: Material[], quantumDimsInput: [number, number, number], dispatch: AppDispatch, saveMeshAndExternalGridsToS3: Function, setAlert: Function, previousMeshStatus: 'Not Generated' | 'Generated', execQuery: Function, setLoadingData: Function) => {
+export const launchMeshing = (selectedProject: Project, allMaterials: Material[], quantumDimsInput: [number, number, number], dispatch: AppDispatch, saveMeshData: Function, setAlert: Function, previousMeshStatus: 'Not Generated' | 'Generated', execQuery: Function, setLoadingData: Function) => {
   const components = selectedProject?.model
     ?.components as ComponentEntity[];
   const objToSendToMesher = {
@@ -120,7 +64,7 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
   axios
     .post('http://127.0.0.1:8003/meshing', objToSendToMesher)
     .then((res) => {
-      console.log(res.data);
+      //console.log(res.data);
       if (res.data.x) {
         dispatch(setMessageInfoModal(`the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`));
         dispatch(setIsAlertInfoModal(true));
@@ -182,22 +126,13 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
           origin: res.data.origin,
           n_cells: res.data.n_cells
         };
-        if (selectedProject.meshData.mesh) {
-          deleteFileS3(selectedProject.meshData.mesh).then(() => {
-          });
-        }
-        if (selectedProject.meshData.externalGrids) {
-          deleteFileS3(selectedProject.meshData.externalGrids).then(
-            () => {
-            }
-          );
-        }
         setLoadingData(true)
-        saveMeshAndExternalGridsToS3(res.data, extGrids, dispatch, selectedProject, execQuery)
+        saveMeshData(res.data, extGrids)
+        /* saveMeshAndExternalGridsToS3(res.data, extGrids, dispatch, selectedProject, execQuery)
           .then(() => {
             return '';
           })
-          .catch((err: any) => console.log(err));
+          .catch((err: any) => console.log(err)); */
       }
     })
     .catch((err) => {

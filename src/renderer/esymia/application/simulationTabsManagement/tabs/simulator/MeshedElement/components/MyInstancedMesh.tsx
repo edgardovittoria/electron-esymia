@@ -68,8 +68,6 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
 
 
   const meanBoxDims = (boxDims[0] + boxDims[1] + boxDims[2]) / 3;
-  const boundingboxModel = calculateModelBoundingBox(selectedProject as Project)
-  console.log(boundingboxModel)
 
   return (
     <>
@@ -77,7 +75,6 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
         <instancedMesh ref={meshRef} frustumCulled={false} args={[null as any, null as any, bricks.length]}>
         <boxGeometry args={boxDims}/>
         <meshPhongMaterial color={material && material.color} side={FrontSide}/>
-        <Wireframe simplify stroke={'#000000'} thickness={0.1}/>
       </instancedMesh> :
         <>
           {selectedProject && selectedProject.model.components.map((component) => {

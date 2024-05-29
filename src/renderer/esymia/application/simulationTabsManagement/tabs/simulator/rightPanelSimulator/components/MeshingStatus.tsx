@@ -11,13 +11,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import useWebSocket from 'react-use-websocket';
 import { setMeshGenerated, setPreviousMeshStatus } from '../../../../../../store/projectSlice';
 import { Project, Simulation } from '../../../../../../model/esymiaModels';
-import { launchMeshing, saveMeshAndExternalGridsToS3 } from './rightPanelFunctions';
+import { launchMeshing } from './rightPanelFunctions';
 import { Material, useFaunaQuery } from 'cad-library';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { useEffectNotOnMount } from '../../../../../../hook/useEffectNotOnMount';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
+import { useStorageData } from '../hook/useStorageData';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;
@@ -55,7 +56,7 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
       <div className='max-h-[600px] overflow-y-scroll w-full'>
         {activeMeshing.map((m) => (
           <MeshingStatusItem selectedProject={m.selectedProject} allMaterials={m.allMaterials}
-                         quantumDimsInput={m.quantum} setAlert={setAlert} meshStatus={m.meshStatus} />
+                             quantumDimsInput={m.quantum} setAlert={setAlert} meshStatus={m.meshStatus} />
         ))}
       </div>
     </div>
@@ -84,34 +85,33 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   const WS_URL = 'ws://localhost:8081';
   const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
   const isAlert = useSelector(isAlertInfoModalSelector);
-  const { execQuery } = useFaunaQuery()
+  const { execQuery } = useFaunaQuery();
   const [meshing, setMeshing] = useState<boolean>(false);
   const [checkProgressLength, setCheckProgressLength] = useState<number>(0);
   const [checkProgressValue, setCheckProgressValue] = useState<number>(0);
   const [loadingData, setLoadingData] = useState<boolean>(false);
-
+  const { saveMeshData } = useStorageData();
   const { sendMessage } = useWebSocket(WS_URL, {
     onOpen: () => {
       console.log('WebSocket connection established.');
       console.log('start request');
-      launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshAndExternalGridsToS3, setAlert, meshStatus, execQuery, setLoadingData);
+      launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshData, setAlert, meshStatus, execQuery, setLoadingData);
     },
     shouldReconnect: () => false,
     onMessage: (event) => {
-      if(event.data === "Computing completed"){
-        setMeshing(true)
-      }
-      else if((event.data as string).startsWith("length")){
-        console.log(parseInt((event.data as string).substring((event.data as string).indexOf(":")+1)))
-        setCheckProgressLength(parseInt((event.data as string).substring((event.data as string).indexOf(":")+1)))
-      }else{
-        console.log(event.data)
-        setCheckProgressValue(event.data)
+      if (event.data === 'Computing completed') {
+        setMeshing(true);
+      } else if ((event.data as string).startsWith('length')) {
+        console.log(parseInt((event.data as string).substring((event.data as string).indexOf(':') + 1)));
+        setCheckProgressLength(parseInt((event.data as string).substring((event.data as string).indexOf(':') + 1)));
+      } else {
+        console.log(event.data);
+        setCheckProgressValue(event.data);
       }
     },
     onClose: () => {
       console.log('WebSocket connection closed.');
-      dispatch(setPreviousMeshStatus({status: undefined, projectToUpdate: selectedProject.faunaDocumentId as string}))
+      dispatch(setPreviousMeshStatus({ status: undefined, projectToUpdate: selectedProject.faunaDocumentId as string }));
     },
     onError: () => {
       dispatch(setMessageInfoModal('Error while meshing, please start mesher on plugins section and try again'));
@@ -135,51 +135,50 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   return (
     <div
       className='p-5 bg-white rounded-xl flex flex-col gap-4 items-center justify-center w-full'>
-      <div className="flex flex-col gap-2 w-full">
+      <div className='flex flex-col gap-2 w-full'>
         <span>Meshing</span>
-        <div className="flex flex-row justify-between items-center w-full">
+        <div className='flex flex-row justify-between items-center w-full'>
           {meshing ? (
-            <div className="flex flex-row w-full justify-between items-center">
+            <div className='flex flex-row w-full justify-between items-center'>
               <progress
-                className="progress w-full mr-4"
+                className='progress w-full mr-4'
                 value={1}
                 max={1}
               />
               <AiOutlineCheckCircle
-                size="20px"
-                className="text-green-500"
+                size='20px'
+                className='text-green-500'
               />
             </div>
           ) : (
-            <progress className="progress w-full" />
+            <progress className='progress w-full' />
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-2 w-full">
+      <div className='flex flex-col gap-2 w-full'>
         <span>Check mesh validity</span>
-        <div className="flex flex-row justify-between items-center w-full">
+        <div className='flex flex-row justify-between items-center w-full'>
           {checkProgressLength > 0 ? (
-            <div className="flex flex-row w-full justify-between items-center">
+            <div className='flex flex-row w-full justify-between items-center'>
               <progress
-                className="progress w-full mr-4"
+                className='progress w-full mr-4'
                 value={checkProgressValue}
                 max={checkProgressLength}
               />
-              <AiOutlineCheckCircle
-                size="20px"
-                className="text-green-500"
-              />
+              {checkProgressValue === checkProgressLength &&
+                <AiOutlineCheckCircle size='20px' className='text-green-500' />}
+
             </div>
           ) : (
-            <progress className="progress w-full" />
+            <progress className='progress w-full' />
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-2 w-full">
+      <div className='flex flex-col gap-2 w-full'>
         <span>Loading Data</span>
-        <div className="flex flex-row justify-between items-center w-full">
+        <div className='flex flex-row justify-between items-center w-full'>
           {loadingData && (
-            <progress className="progress w-full" />
+            <progress className='progress w-full' />
           )}
         </div>
       </div>

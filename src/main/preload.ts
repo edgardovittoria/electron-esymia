@@ -1,6 +1,7 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { readdir } from 'fs';
 
 export type Channels =
   | 'ipc-example'
@@ -13,6 +14,13 @@ export type Channels =
   | 'runSolver'
   | 'haltMesher'
   | 'haltSolver'
+  | 'getInstallationDir'
+  | 'directoryContents'
+  | 'saveFile'
+  | 'deleteFile'
+  | 'createFolder'
+  | 'deleteFolder'
+  | 'readFile'
   ;
 
 const electronHandler = {

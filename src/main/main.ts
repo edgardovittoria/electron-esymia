@@ -16,6 +16,7 @@ import axios from 'axios';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import nodeChildProcess from 'child_process';
+import { mkdir, readdir, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync } from 'fs';
 
 
 class AppUpdater {
@@ -213,6 +214,35 @@ ipcMain.on('haltSolver', (e, args) => {
     nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverHALT.sh'), getServerPath('MSGUI/juliaCODES/juliaSolver')]);
   }
 });
+ipcMain.handle('getInstallationDir', (e, args) => {
+  return app.getPath('home')
+});
 
+ipcMain.handle('directoryContents', (e, args) => {
+  let path = app.getPath('home')+args[0]
+  return readdirSync(path, { withFileTypes: false })
+})
 
+ipcMain.handle('saveFile', (e, args) => {
+  let path = app.getPath('home')
+  writeFileSync(path+"/"+args[0], args[1])
+})
 
+ipcMain.handle('readFile', (e, args) => {
+  //let path = app.getPath('home')+"/esymiaProjects"+args[0]
+  return readFileSync(args[0], {encoding: 'utf8', flag: 'r'})
+})
+ipcMain.handle('deleteFile', (e, args) => {
+  //let path = app.getPath('home')+"/esymiaProjects"
+  unlinkSync(args[0])
+})
+
+ipcMain.handle('createFolder', (e, args) => {
+  let path = app.getPath('home')
+  mkdir(path+"/"+args[0], null, () => {})
+})
+
+ipcMain.handle('deleteFolder', (e, args) => {
+  let path = app.getPath('home')+"/esymiaProjects"
+  rmdir(path+"/"+args[0],  () => {})
+})

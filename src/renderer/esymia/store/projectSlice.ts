@@ -24,12 +24,14 @@ export type ProjectState = {
   projects: Folder,
   sharedElements: Folder,
   selectedProject: string | undefined,
-  selectedFolder: string | undefined
+  selectedFolder: string | undefined,
+  homePath: string
 }
 
 export const ProjectSlice = createSlice({
   name: 'projects',
   initialState: {
+    homePath: '',
     projects: {
       name: 'My Files',
       owner: {} as UsersState,
@@ -50,6 +52,9 @@ export const ProjectSlice = createSlice({
     selectedFolder: undefined
   } as ProjectState,
   reducers: {
+    setHomePat(state: ProjectState, action: PayloadAction<string>){
+      state.homePath = action.payload
+    },
     addProject(state: ProjectState, action: PayloadAction<Project>) {
       let selectedFolder = folderByID(state, state.selectedFolder);
       selectedFolder?.projectList.push(action.payload);
@@ -61,9 +66,6 @@ export const ProjectSlice = createSlice({
       state.sharedElements = action.payload;
     },
     removeProject(state: ProjectState, action: PayloadAction<string>) {
-      let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload);
-      (project?.meshData.mesh) && deleteFileS3(project?.meshData.mesh as string).catch((err) => console.log(err));
-      (project?.meshData.externalGrids) && deleteFileS3(project?.meshData.externalGrids as string).catch((err) => console.log(err));
       removeProjectFromStore(state, action.payload);
     },
     moveFolder(state: ProjectState, action: PayloadAction<{
@@ -303,6 +305,7 @@ export const ProjectSlice = createSlice({
 
 export const {
   //qui vanno inserite tutte le azioni che vogliamo esporatare
+  setHomePat,
   addProject,
   removeProject,
   importModel,
@@ -352,6 +355,7 @@ const selectTabEffects = (state: ProjectState, tab: string) => {
   }
 };
 
+export const homePathSelector = (state: { projects: ProjectState }) => state.projects.homePath;
 export const projectsSelector = (state: { projects: ProjectState }) => takeAllProjectsIn(state.projects.projects);
 export const sharedProjectsSelector = (state: {
   projects: ProjectState
