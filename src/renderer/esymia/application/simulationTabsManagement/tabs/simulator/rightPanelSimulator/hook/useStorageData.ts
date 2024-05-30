@@ -153,9 +153,18 @@ export const useStorageData = () => {
 
   }
 
-  const deleteProjectOnline = (project: Project) => {
+  const deleteMeshDataOnline = (project: Project) => {
     (project?.meshData.mesh) && deleteFileS3(project?.meshData.mesh as string).catch((err) => console.log(err));
     (project?.meshData.externalGrids) && deleteFileS3(project?.meshData.externalGrids as string).catch((err) => console.log(err));
+  }
+
+  const deleteMeshDataLocal = (project: Project) => {
+    (project?.meshData.mesh) && deleteFile(project.meshData.mesh);
+    (project?.meshData.externalGrids) && deleteFile(project.meshData.externalGrids)
+  }
+
+  const deleteProjectOnline = (project: Project) => {
+    deleteMeshDataOnline(project)
     dispatch(removeProject(project.faunaDocumentId as string));
     dispatch(closeProjectTab(project.faunaDocumentId as string));
     execQuery(
@@ -166,8 +175,7 @@ export const useStorageData = () => {
   }
 
   const deleteProjectLocal = (project: Project) => {
-    (project?.meshData.mesh) && deleteFile(project.meshData.mesh);
-    (project?.meshData.externalGrids) && deleteFile(project.meshData.externalGrids)
+    deleteMeshDataLocal(project)
     dispatch(removeProject(project.faunaDocumentId as string));
     dispatch(closeProjectTab(project.faunaDocumentId as string));
     execQuery(
@@ -201,7 +209,15 @@ export const useStorageData = () => {
     }
   }
 
-  return {saveMeshData, loadMeshData, deleteProject}
+  const deleteProjectStoredMeshData = (project: Project) => {
+    if(project.storage === 'local'){
+      deleteMeshDataLocal(project)
+    }else{
+      deleteMeshDataOnline(project)
+    }
+  }
+
+  return {saveMeshData, loadMeshData, deleteProject, deleteProjectStoredMeshData}
 };
 
 

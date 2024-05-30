@@ -4,7 +4,7 @@ import { FactoryShapes, Material } from 'cad-library';
 import { CellSize, OriginPoint, Project } from '../../../../../../model/esymiaModels';
 import { useSelector } from 'react-redux';
 import { Brick } from '../../rightPanelSimulator/components/createGridsExternals';
-import { scalingViewParamsOfMeshSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
+import { meshVisualizationSelector, scalingViewParamsOfMeshSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { EdgesMaterial } from './EdgesMaterial';
 import { Edges, Wireframe } from '@react-three/drei';
 import uniqid from 'uniqid';
@@ -26,6 +26,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
   const scalingViewParams = useSelector(scalingViewParamsOfMeshSelector);
   let tempObject = new Object3D();
   const selectedProject = useSelector(selectedProjectSelector);
+  const meshVisualization = useSelector(meshVisualizationSelector)
 
   let boxDims: [number, number, number] = [
     cellSize.cell_size_x * 1000 * scalingViewParams.x,
@@ -53,25 +54,25 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
             : origin.origin_z
         );
         tempObject.updateMatrix();
-        (bricks.length < 1000000) && meshRef.current.setMatrixAt(id, tempObject.matrix);
+        (meshVisualization === 'normal') && meshRef.current.setMatrixAt(id, tempObject.matrix);
         edgeRef.current.setMatrixAt(id, tempObject.matrix);
       });
 
-      if(bricks.length < 1000000){
+      if(meshVisualization === 'normal'){
         meshRef.current.instanceMatrix.needsUpdate = true;
       }
       edgeRef.current.instanceMatrix.needsUpdate = true;
       // edgeRef.current.geometry = meshRef.current.geometry
       // edgeRef.current.instanceMatrix = meshRef.current.instanceMatrix;
     }
-  }, [bricks, scalingViewParams]);
+  }, [bricks, scalingViewParams, meshVisualization]);
 
 
   const meanBoxDims = (boxDims[0] + boxDims[1] + boxDims[2]) / 3;
 
   return (
     <>
-      {bricks.length < 1000000 ?
+      {meshVisualization === 'normal' ?
         <instancedMesh ref={meshRef} frustumCulled={false} args={[null as any, null as any, bricks.length]}>
         <boxGeometry args={boxDims}/>
         <meshPhongMaterial color={material && material.color} side={FrontSide}/>

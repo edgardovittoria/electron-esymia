@@ -28,6 +28,9 @@ import {
 import { RenameFolder } from './RenameFolder';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
 import { Folder, Project } from '../../../../../../model/esymiaModels';
+import { takeAllProjectsInArrayOf } from '../../../../../../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
+import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
+import { useStorageData } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
 
 interface DroppableAndDraggableFolderProps {
   folder: Folder;
@@ -43,6 +46,7 @@ export const DroppableAndDraggableFolder: React.FC<
   const selectedFolder = useSelector(SelectedFolderSelector) as Folder;
   const allProjectFolders = useSelector(allProjectFoldersSelector);
   const user = useSelector(usersStateSelector);
+  const {deleteProjectStoredMeshData} = useStorageData()
   const [showRename, setShowRename] = useState(false);
   const [showSearchUser, setShowSearchUser] = useState(false);
 
@@ -221,6 +225,7 @@ export const DroppableAndDraggableFolder: React.FC<
                   folder.faunaDocumentId,
                   folder.parent,
                 );
+                takeAllProjectsInArrayOf([folder]).forEach(p => {deleteProjectStoredMeshData(p)})
                 dispatch(removeFolder(folder));
                 hideAll();
               }}

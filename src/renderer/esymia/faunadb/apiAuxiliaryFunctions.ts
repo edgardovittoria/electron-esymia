@@ -77,6 +77,7 @@ export const convertInProjectThis = (faunaProject: FaunaProject) => {
   const project: Project = {
     ...faunaProject.project,
     faunaDocumentId: faunaProject.id,
+    storage: faunaProject.project.storage,
     simulation:
       faunaProject.project.simulation === undefined ||
       faunaProject.project.simulation === null
@@ -94,6 +95,7 @@ export const convertInFaunaProjectThis = (project: Project) => {
     project: {
       name: project.name,
       description: project.description,
+      storage: project.storage,
       modelS3: project.modelS3,
       ports: project.ports,
       frequencies: project.frequencies,

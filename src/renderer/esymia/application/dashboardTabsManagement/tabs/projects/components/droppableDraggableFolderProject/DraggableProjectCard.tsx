@@ -15,23 +15,19 @@ import { useFaunaQuery, usersStateSelector } from 'cad-library';
 import {
   allProjectFoldersSelector,
   moveProject,
-  removeProject,
   SelectedFolderSelector,
 } from '../../../../../../store/projectSlice';
 import {
-  deleteSimulationProjectFromFauna,
   moveProjectInFauna,
 } from '../../../../../../faunadb/projectsFolderAPIs';
 import { RenameProject } from './RenameProject';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
 import {
   addProjectTab,
-  closeProjectTab,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { Folder, Project } from '../../../../../../model/esymiaModels';
 import { setModelInfoFromS3 } from '../../../shared/utilFunctions';
 import noResultsIconForProject from '../../../../../../../../../assets/noResultsIconForProject.png';
-import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
 import {
   useStorageData
 } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';

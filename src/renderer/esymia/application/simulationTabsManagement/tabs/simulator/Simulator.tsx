@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComponentEntity, Material } from 'cad-library';
 import {
   selectedProjectSelector,
-  setMeshGenerated,
 } from '../../../../store/projectSlice';
 import { SimulatorLeftPanelTab } from './SimulatorLeftPanelTab';
 import { RightPanelSimulator } from './rightPanelSimulator/RightPanelSimulator';
 import { MyPanel } from '../../sharedElements/MyPanel';
 import { Models } from '../../sharedElements/Models';
 import { ModelOutliner } from '../../sharedElements/ModelOutliner';
-import { s3 } from '../../../../aws/s3Config';
 import { ExternalGridsObject, Project } from '../../../../model/esymiaModels';
 import StatusBar from '../../sharedElements/StatusBar';
 import { CanvasSimulator } from './CanvasSimulator';
@@ -20,6 +18,8 @@ import { OriginaProportionsButton } from './OriginalProportionsButton';
 import { AlteredProportionsButton } from './AlteredProportionsButton';
 import { ImSpinner } from 'react-icons/im';
 import { useStorageData } from './rightPanelSimulator/hook/useStorageData';
+import { meshVisualizationSelector, setMeshVisualization } from '../../../../store/tabsAndMenuItemsSlice';
+import { LiaFeatherSolid, LiaWeightHangingSolid } from "react-icons/lia";
 
 
 interface SimulatorProps {
@@ -124,6 +124,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
         <ResetFocusButton toggleResetFocus={toggleResetFocus}/>
         <OriginaProportionsButton />
         <AlteredProportionsButton threshold={3}/>
+        <NormalMeshVisualizationButton />
+        <LightMeshVisualizationButton />
       </div>
     </>
   );
@@ -141,3 +143,43 @@ export function getMaterialListFrom(components: ComponentEntity[]) {
   });
   return materialList;
 }
+
+const NormalMeshVisualizationButton: FC<{}> = () => {
+  const dispatch = useDispatch()
+  const meshVisualization = useSelector(meshVisualizationSelector)
+  return (
+    <div
+      className='tooltip'
+      data-tip={
+        'Normal mesh visualization. It is the most detaild modality, but it can become heavy for big meshes.'
+      }
+    >
+      <button
+        className={`rounded p-2 ${meshVisualization !== 'normal' ? 'bg-white text-green-300 hover:text-secondaryColor' : 'bg-green-300 text-secondaryColor'}`}
+        onClick={() => dispatch(setMeshVisualization('normal'))}
+      >
+      <LiaWeightHangingSolid className='h-5 w-5'/>
+      </button>
+    </div>
+  );
+};
+
+const LightMeshVisualizationButton: FC<{}> = () => {
+  const dispatch = useDispatch()
+  const meshVisualization = useSelector(meshVisualizationSelector)
+  return (
+    <div
+      className='tooltip'
+      data-tip={
+        'Light mesh visualization. It is suggested for very big meshes, in order to keep a seamless navigation.'
+      }
+    >
+      <button
+        className={`rounded p-2 ${meshVisualization !== 'light' ? 'bg-white text-green-300 hover:text-secondaryColor' : 'bg-green-300 text-secondaryColor'}`}
+        onClick={() => dispatch(setMeshVisualization('light'))}
+      >
+      <LiaFeatherSolid className='h-5 w-5'/>
+      </button>
+    </div>
+  );
+};

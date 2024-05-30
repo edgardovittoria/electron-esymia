@@ -30,6 +30,7 @@ type TabsAndMenuItemsState = {
   },
   showCreateNewProjectModal: boolean
   scalingViewParamsOfMesh: ScalingViewParams
+  meshVisualization: 'normal' | 'light'
 }
 
 export const TabsAndMenuItemsSlice = createSlice({
@@ -47,7 +48,8 @@ export const TabsAndMenuItemsSlice = createSlice({
       isAlerted: false
     },
     showCreateNewProjectModal: false,
-    scalingViewParamsOfMesh: {x:1, y:1, z:1}
+    scalingViewParamsOfMesh: {x:1, y:1, z:1},
+    meshVisualization: 'normal'
   } as TabsAndMenuItemsState,
   reducers: {
     selectTab(state: TabsAndMenuItemsState, action: PayloadAction<string>) {
@@ -87,6 +89,9 @@ export const TabsAndMenuItemsSlice = createSlice({
     resetScalingViewParamsOfMesh(state: TabsAndMenuItemsState) {
       state.scalingViewParamsOfMesh = {x:1, y:1, z:1};
     },
+    setMeshVisualization(state: TabsAndMenuItemsState, action: PayloadAction<'normal'|'light'>) {
+      state.meshVisualization = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -107,7 +112,8 @@ export const {
   setIsConfirmedInfoModal,
   setShowCreateNewProjectModal,
   setScalingViewParamsOfMesh,
-  resetScalingViewParamsOfMesh
+  resetScalingViewParamsOfMesh,
+  setMeshVisualization
 } = TabsAndMenuItemsSlice.actions;
 
 
@@ -151,3 +157,7 @@ export const showCreateNewProjectModalSelector = (state: {
 export const scalingViewParamsOfMeshSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState
 }) => state.tabsAndMenuItems.scalingViewParamsOfMesh;
+
+export const meshVisualizationSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.meshVisualization

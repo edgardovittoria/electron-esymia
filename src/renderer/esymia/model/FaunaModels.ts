@@ -9,6 +9,7 @@ export type FaunaProject = {
 export type FaunaProjectDetails = {
     name: string,
     description: string,
+    storage: 'local' | 'online'
     modelS3?: string,
     ports: (Port | Probe)[],
     frequencies?: number[]
