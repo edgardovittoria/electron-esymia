@@ -49,7 +49,7 @@ export const TabsAndMenuItemsSlice = createSlice({
     },
     showCreateNewProjectModal: false,
     scalingViewParamsOfMesh: {x:1, y:1, z:1},
-    meshVisualization: 'normal'
+    meshVisualization: 'light'
   } as TabsAndMenuItemsState,
   reducers: {
     selectTab(state: TabsAndMenuItemsState, action: PayloadAction<string>) {

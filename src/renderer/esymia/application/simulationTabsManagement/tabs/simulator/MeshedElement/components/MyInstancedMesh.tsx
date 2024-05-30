@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { BackSide, FrontSide, InstancedMesh, Object3D } from 'three';
 import { FactoryShapes, Material } from 'cad-library';
 import { CellSize, OriginPoint, Project } from '../../../../../../model/esymiaModels';
@@ -27,6 +27,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
   let tempObject = new Object3D();
   const selectedProject = useSelector(selectedProjectSelector);
   const meshVisualization = useSelector(meshVisualizationSelector)
+  const [modelTranslationOffset, setModelTranslationOffset] = useState<THREE.Vector3>(new THREE.Vector3(0,0,0));
 
   let boxDims: [number, number, number] = [
     cellSize.cell_size_x * 1000 * scalingViewParams.x,
@@ -65,6 +66,10 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
       // edgeRef.current.geometry = meshRef.current.geometry
       // edgeRef.current.instanceMatrix = meshRef.current.instanceMatrix;
     }
+    if(meshVisualization === 'light' && selectedProject){
+      const boundingbox = calculateModelBoundingBox(selectedProject)
+      setModelTranslationOffset(boundingbox.min)
+    }
   }, [bricks, scalingViewParams, meshVisualization]);
 
 
@@ -87,9 +92,9 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
                 }}
                 key={uniqid()}
                 position={new THREE.Vector3(
-                  component.transformationParams.position[0]-(cellSize.cell_size_x*1000/2),
-                  component.transformationParams.position[1]-(cellSize.cell_size_y*1000/2),
-                  component.transformationParams.position[2]-(cellSize.cell_size_z*1000/2),
+                  (component.transformationParams.position[0] - modelTranslationOffset.x -(cellSize.cell_size_x*1000/2))*scalingViewParams.x,
+                  (component.transformationParams.position[1] - modelTranslationOffset.y -(cellSize.cell_size_y*1000/2))*scalingViewParams.y,
+                  (component.transformationParams.position[2] - modelTranslationOffset.z -(cellSize.cell_size_z*1000/2))*scalingViewParams.z,
                 )}
                 rotation={component.transformationParams.rotation}
                 scale={new THREE.Vector3(

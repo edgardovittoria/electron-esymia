@@ -103,10 +103,8 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
       if (event.data === 'Computing completed') {
         setMeshing(true);
       } else if ((event.data as string).startsWith('length')) {
-        console.log(parseInt((event.data as string).substring((event.data as string).indexOf(':') + 1)));
         setCheckProgressLength(parseInt((event.data as string).substring((event.data as string).indexOf(':') + 1)));
       } else {
-        console.log(event.data);
         setCheckProgressValue(event.data);
       }
     },
