@@ -90,6 +90,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   const [checkProgressLength, setCheckProgressLength] = useState<number>(0);
   const [checkProgressValue, setCheckProgressValue] = useState<number>(0);
   const [loadingData, setLoadingData] = useState<boolean>(false);
+  const [stopSpinner, setStopSpinner] = useState<boolean>(false);
   const { saveMeshData } = useStorageData();
   const { sendMessage } = useWebSocket(WS_URL, {
     onOpen: () => {
@@ -134,8 +135,9 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
 
   return (
     <div
-      className='p-5 bg-white rounded-xl flex flex-col gap-4 items-center justify-center w-full'>
-      <div className='flex flex-col gap-2 w-full'>
+      className={`p-5 bg-white rounded-xl flex flex-col gap-4 items-center justify-center w-full`}>
+      {stopSpinner && <ImSpinner className="animate-spin w-8 h-8 absolute top-1/2 left-1/2"/> }
+      <div className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'}`}>
         <span>Meshing</span>
         <div className='flex flex-row justify-between items-center w-full'>
           {meshing ? (
@@ -155,7 +157,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           )}
         </div>
       </div>
-      <div className='flex flex-col gap-2 w-full'>
+      <div className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'}`}>
         <span>Check mesh validity</span>
         <div className='flex flex-row justify-between items-center w-full'>
           {checkProgressLength > 0 ? (
@@ -174,7 +176,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           )}
         </div>
       </div>
-      <div className='flex flex-col gap-2 w-full'>
+      <div className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'}`}>
         <span>Loading Data</span>
         <div className='flex flex-row justify-between items-center w-full'>
           {loadingData && (
@@ -192,6 +194,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           );
           dispatch(setIsAlertInfoModal(false));
           dispatch(setShowInfoModal(true));
+          setStopSpinner(true)
         }}
       >
         Stop Meshing

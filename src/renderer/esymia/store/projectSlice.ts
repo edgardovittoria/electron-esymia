@@ -397,12 +397,12 @@ export const folderByID = (state: ProjectState, folderID: string | undefined) =>
 
 export const activeSimulationsSelector = (state: { projects: ProjectState }) => {
   let activeSimulations: { simulation: Simulation, freqNumber: number }[] = [];
-  state.projects.projects.projectList.forEach(p => {
+  takeAllProjectsIn(state.projects.projects).forEach(p => {
     if (p.simulation && p.simulation.status === 'Queued') {
       activeSimulations.push({ simulation: p.simulation, freqNumber: p.frequencies?.length as number });
     }
   });
-  state.projects.sharedElements.projectList.forEach(p => {
+  takeAllProjectsIn(state.projects.sharedElements).forEach(p => {
     if (p.simulation && p.simulation.status === 'Queued') {
       activeSimulations.push({ simulation: p.simulation, freqNumber: p.frequencies?.length as number });
     }
@@ -412,7 +412,7 @@ export const activeSimulationsSelector = (state: { projects: ProjectState }) => 
 
 export const activeMeshingSelector = (state: { projects: ProjectState }) => {
   let activeMeshing: { selectedProject: Project, allMaterials: Material[], quantum: [number, number, number], meshStatus: "Not Generated" | "Generated"}[] = [];
-  state.projects.projects.projectList.forEach(p => {
+  takeAllProjectsIn(state.projects.projects).forEach(p => {
     let allMaterials: Material[] = [];
     if (p?.model?.components) {
       allMaterials = getMaterialListFrom(
@@ -428,7 +428,7 @@ export const activeMeshingSelector = (state: { projects: ProjectState }) => {
       })
     }
   });
-  state.projects.sharedElements.projectList.forEach(p => {
+  takeAllProjectsIn(state.projects.sharedElements).forEach(p => {
     let allMaterials: Material[] = [];
     if (p?.model?.components) {
       allMaterials = getMaterialListFrom(

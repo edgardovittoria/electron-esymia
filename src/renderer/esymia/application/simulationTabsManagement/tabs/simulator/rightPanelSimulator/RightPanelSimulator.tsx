@@ -33,7 +33,7 @@ import { useEffectNotOnMount } from '../../../../../hook/useEffectNotOnMount';
 import { DebounceInput } from 'react-debounce-input';
 import {
   computeSuggestedQuantum,
-  launchMeshing, saveMeshAndExternalGridsToS3
+  launchMeshing
 } from './components/rightPanelFunctions';
 import MeshingStatusItem from './components/MeshingStatus';
 
@@ -158,7 +158,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   }
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
-                    dispatch(setPreviousMeshStatus({ status: selectedProject.meshData.meshGenerated, projectToUpdate: selectedProject.faunaDocumentId as string }));
+                    dispatch(setPreviousMeshStatus({ status: selectedProject.meshData.meshGenerated as "Not Generated" | "Generated", projectToUpdate: selectedProject.faunaDocumentId as string }));
                     dispatch(setMeshGenerated({ status: 'Generating', projectToUpdate: selectedProject.faunaDocumentId as string }));
                     dispatch(setQuantum({ quantum: quantumDimsInput, projectToUpdate: selectedProject.faunaDocumentId as string }))
                   }}
@@ -174,7 +174,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   className='button buttonPrimary w-full text-[12px] xl:text-base'
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
-                    dispatch(setPreviousMeshStatus({ status: selectedProject.meshData.meshGenerated, projectToUpdate: selectedProject.faunaDocumentId as string }));
+                    dispatch(setPreviousMeshStatus({ status: selectedProject.meshData.meshGenerated as "Not Generated" | "Generated", projectToUpdate: selectedProject.faunaDocumentId as string }));
                     dispatch(setMeshGenerated({ status: 'Generating', projectToUpdate: selectedProject.faunaDocumentId as string }));
                     dispatch(setQuantum({ quantum: quantumDimsInput, projectToUpdate: selectedProject.faunaDocumentId as string }))
                   }}

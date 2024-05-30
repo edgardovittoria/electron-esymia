@@ -64,7 +64,7 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
   axios
     .post('http://127.0.0.1:8003/meshing', objToSendToMesher)
     .then((res) => {
-      //console.log(res.data);
+      console.log(res.data);
       if (res.data.x) {
         dispatch(setMessageInfoModal(`the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`));
         dispatch(setIsAlertInfoModal(true));
@@ -92,12 +92,12 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
           status: previousMeshStatus,
           projectToUpdate: selectedProject.faunaDocumentId as string
         }));
-      } else if(res.data.mesh_is_valid.stopped == true){
+      } else if(res.data.mesh_is_valid.stopped === true){
         dispatch(setMeshGenerated({
           status: previousMeshStatus,
           projectToUpdate: selectedProject.faunaDocumentId as string
         }));
-      } else if (res.data.mesh_is_valid.valid == false) {
+      } else if (res.data.mesh_is_valid.valid === false) {
         dispatch(setMessageInfoModal('Error! Mesh not valid. Please adjust quantum along ' + res.data.mesh_is_valid.axis + ' axis.'));
         dispatch(setIsAlertInfoModal(true));
         dispatch(setShowInfoModal(true));
