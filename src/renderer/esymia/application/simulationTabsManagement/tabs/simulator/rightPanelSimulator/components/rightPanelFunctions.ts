@@ -149,7 +149,7 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
     });
 };
 
-export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: Material[], dispatch: AppDispatch, execQuery: Function, setSuggestedQuantumError: Function) => {
+export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: Material[], dispatch: AppDispatch, execQuery: Function, setSuggestedQuantumError: Function, setQuantumDimsInput: Function) => {
   const components = selectedProject?.model
     ?.components as ComponentEntity[];
   const objToSendToMesher = {
@@ -161,7 +161,22 @@ export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: 
   axios
     .post('http://127.0.0.1:8003/meshingAdvice', objToSendToMesher)
     .then(res => {
-      dispatch(setSuggestedQuantum(([parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))])));
+      if(selectedProject.frequencies){
+        dispatch(setSuggestedQuantum((
+          [
+            Math.min(3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40, parseFloat(res.data[0].toFixed(5))),
+            Math.min(3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40, parseFloat(res.data[1].toFixed(5))),
+            Math.min(3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40, parseFloat(res.data[2].toFixed(5))),
+          ]
+        )));
+        setQuantumDimsInput([
+          Math.min(3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40, parseFloat(res.data[0].toFixed(5))),
+          Math.min(3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40, parseFloat(res.data[1].toFixed(5))),
+          Math.min(3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40, parseFloat(res.data[2].toFixed(5))),
+        ])
+      }else{
+        dispatch(setSuggestedQuantum(([parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))])));
+      }
       execQuery(
         updateProjectInFauna,
         convertInFaunaProjectThis({

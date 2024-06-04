@@ -13,13 +13,7 @@ import { activeMeshingSelector, activeSimulationsSelector, setHomePat } from './
 import { HiOutlineLogout } from 'react-icons/hi';
 import { GiSettingsKnobs } from 'react-icons/gi';
 import { FaUser } from 'react-icons/fa';
-import {
-  createFolder,
-  deleteFile,
-  deleteFolder,
-  getDirContents,
-  uploadFile
-} from './fileSystemAPIs/fileSystemAPIs';
+
 
 
 export default function App() {
@@ -30,7 +24,9 @@ export default function App() {
     window.electron.ipcRenderer.invoke('getInstallationDir').then(res => dispatch(setHomePat(res)))
   }, []);
 
+
   const [tabsSelected, setTabsSelected] = useState<string>('home');
+  //console.log(join('esymiaProjects', 'mesherOutputs', tabsSelected, '.json'))
   const { user } = useAuth0();
   const [alert, setAlert] = useState<boolean>(false);
   const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);

@@ -16,6 +16,7 @@ import { useFaunaQuery } from 'cad-library';
 import { deleteFile, readLocalFile, uploadFile } from '../../../../../../../fileSystemAPIs/fileSystemAPIs';
 import { s3 } from '../../../../../../aws/s3Config';
 import { closeProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
+import { join } from 'path';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();
@@ -89,6 +90,7 @@ export const useStorageData = () => {
     mesherOutput: any,
     externalGrid: any
   ) => {
+    //join('esymiaProjects', 'mesherOutputs', selectedProject.faunaDocumentId as string, '.json')
     uploadFile('esymiaProjects/mesherOutputs/' + selectedProject.faunaDocumentId + '.json', mesherOutput).then(() => {
       uploadFile('esymiaProjects/externalGrids/' + selectedProject.faunaDocumentId + '.json', externalGrid)
         .then(() => {

@@ -2,7 +2,7 @@ import {
   Material,
   useFaunaQuery
 } from 'cad-library';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, Fragment, useEffect, useState } from 'react';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -15,27 +15,25 @@ import {
 import {
   infoModalSelector,
   selectMenuItem,
-  setIsAlertInfoModal,
-  setMessageInfoModal, setShowInfoModal
+  setIsAlertInfoModal, setIsConfirmedInfoModal,
+  setMessageInfoModal, setShowCreateNewProjectModal, setShowInfoModal
 } from '../../../../../store/tabsAndMenuItemsSlice';
 import {
   ExternalGridsObject,
   Project, Simulation, SolverOutput
 } from '../../../../../model/esymiaModels';
-import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFunctions';
 import {
   convergenceTresholdSelector, setConvergenceTreshold,
   setSolverIterations,
   solverIterationsSelector
 } from '../../../../../store/solverSlice';
-import { useEffectNotOnMount } from '../../../../../hook/useEffectNotOnMount';
 import { DebounceInput } from 'react-debounce-input';
 import {
   computeSuggestedQuantum,
   launchMeshing
 } from './components/rightPanelFunctions';
-import MeshingStatusItem from './components/MeshingStatus';
+import { LiaCubeSolid, LiaCubesSolid } from 'react-icons/lia';
+import { Dialog, Transition } from '@headlessui/react';
 
 interface RightPanelSimulatorProps {
   selectedProject: Project;
@@ -57,10 +55,12 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
   const quantumDimensionsLabels = ['X', 'Y', 'Z'];
   const [suggestedQuantumError, setSuggestedQuantumError] = useState(false);
+  const [showModalRefine, setShowModalRefine] = useState<boolean>(false);
+  const [refineMode, setRefineMode] = useState<'refine' | 'coarsen'>('refine');
 
   useEffect(() => {
-    if (!selectedProject?.suggestedQuantum && selectedProject.model.components) {
-      computeSuggestedQuantum(selectedProject, allMaterials as Material[], dispatch, execQuery, setSuggestedQuantumError);
+    if (selectedProject.model.components) {
+      computeSuggestedQuantum(selectedProject, allMaterials as Material[], dispatch, execQuery, setSuggestedQuantumError, setQuantumDimsInput);
     }
   }, []);
 
@@ -123,7 +123,8 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 (quantumComponent, indexQuantumComponent) => (
                   <QuantumDimsInput
                     dataTestId={'quantumInput' + indexQuantumComponent}
-                    disabled={selectedProject.simulation?.status === 'Completed' || selectedProject.model?.components === undefined}
+                    disabled={true}
+                    //disabled={selectedProject.simulation?.status === 'Completed' || selectedProject.model?.components === undefined}
                     key={indexQuantumComponent}
                     label={quantumDimensionsLabels[indexQuantumComponent]}
                     value={parseFloat(quantumComponent.toFixed(5))}
@@ -132,17 +133,41 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 )
               )}
             </div>
-            {selectedProject.suggestedQuantum &&
+            {/* {selectedProject.suggestedQuantum && selectedProject && selectedProject.frequencies &&
               <div className='text-[12px] xl:text-base font-semibold mt-2'>
                 Suggested:
-                [{selectedProject.suggestedQuantum[0].toFixed(5)}, {selectedProject.suggestedQuantum[1].toFixed(5)}, {selectedProject.suggestedQuantum[2].toFixed(5)}]
+                [
+                  {selectedProject.suggestedQuantum[0].toFixed(5)},
+                  {selectedProject.suggestedQuantum[1].toFixed(5)},
+                  {selectedProject.suggestedQuantum[2].toFixed(5)}
+                ]
               </div>
-            }
+            } */}
             {suggestedQuantumError &&
               <div className='text-[12px] xl:text-base font-semibold mt-2'>
                 Unable to suggest quantum: check mesher connection!
               </div>
             }
+            <div className='flex flex-row gap-4 items-center w-full mt-3'>
+              <div className='flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded'
+                   onClick={() => {
+                     setRefineMode('coarsen');
+                     setShowModalRefine(true);
+                   }}
+              >
+                <LiaCubeSolid size={25} />
+                <span>Coarsen</span>
+              </div>
+              <div className='flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded'
+                   onClick={() => {
+                     setRefineMode('refine');
+                     setShowModalRefine(true);
+                   }}
+              >
+                <LiaCubesSolid size={25} />
+                <span>Refine</span>
+              </div>
+            </div>
           </div>
         </div>
         <div className='w-[100%] pt-4'>
@@ -158,9 +183,18 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   }
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
-                    dispatch(setPreviousMeshStatus({ status: selectedProject.meshData.meshGenerated as "Not Generated" | "Generated", projectToUpdate: selectedProject.faunaDocumentId as string }));
-                    dispatch(setMeshGenerated({ status: 'Generating', projectToUpdate: selectedProject.faunaDocumentId as string }));
-                    dispatch(setQuantum({ quantum: quantumDimsInput, projectToUpdate: selectedProject.faunaDocumentId as string }))
+                    dispatch(setPreviousMeshStatus({
+                      status: selectedProject.meshData.meshGenerated as 'Not Generated' | 'Generated',
+                      projectToUpdate: selectedProject.faunaDocumentId as string
+                    }));
+                    dispatch(setMeshGenerated({
+                      status: 'Generating',
+                      projectToUpdate: selectedProject.faunaDocumentId as string
+                    }));
+                    dispatch(setQuantum({
+                      quantum: quantumDimsInput,
+                      projectToUpdate: selectedProject.faunaDocumentId as string
+                    }));
                   }}
                 >
                   Generate Mesh
@@ -174,9 +208,18 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   className='button buttonPrimary w-full text-[12px] xl:text-base'
                   disabled={!checkQuantumDimensionsValidity()}
                   onClick={() => {
-                    dispatch(setPreviousMeshStatus({ status: selectedProject.meshData.meshGenerated as "Not Generated" | "Generated", projectToUpdate: selectedProject.faunaDocumentId as string }));
-                    dispatch(setMeshGenerated({ status: 'Generating', projectToUpdate: selectedProject.faunaDocumentId as string }));
-                    dispatch(setQuantum({ quantum: quantumDimsInput, projectToUpdate: selectedProject.faunaDocumentId as string }))
+                    dispatch(setPreviousMeshStatus({
+                      status: selectedProject.meshData.meshGenerated as 'Not Generated' | 'Generated',
+                      projectToUpdate: selectedProject.faunaDocumentId as string
+                    }));
+                    dispatch(setMeshGenerated({
+                      status: 'Generating',
+                      projectToUpdate: selectedProject.faunaDocumentId as string
+                    }));
+                    dispatch(setQuantum({
+                      quantum: quantumDimsInput,
+                      projectToUpdate: selectedProject.faunaDocumentId as string
+                    }));
                   }}
                 >
                   Regenerate
@@ -316,6 +359,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           </button>
         )}
       </div>
+      <ModalRefineCoarse showModal={showModalRefine} mode={refineMode} setShowModal={setShowModalRefine}
+                         selectedProject={selectedProject} quantumDimsInput={quantumDimsInput}
+                         setQuantumDimsInput={setQuantumDimsInput} />
     </>
   );
 };
@@ -355,5 +401,233 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({
         onChange={onChange}
       />
     </div>
+  );
+};
+
+interface ModalRefineCoarseProps {
+  showModal: boolean,
+  setShowModal: (v: boolean) => void,
+  mode: 'refine' | 'coarsen',
+  selectedProject: Project,
+  quantumDimsInput: [number, number, number],
+  setQuantumDimsInput: Function
+}
+
+const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
+                                                         showModal,
+                                                         mode,
+                                                         setShowModal,
+                                                         selectedProject,
+                                                         quantumDimsInput,
+                                                         setQuantumDimsInput
+                                                       }) => {
+
+  const [xPercentage, setXPercentage] = useState<'No' | '10%' | '50%'>('No');
+  const [yPercentage, setYPercentage] = useState<'No' | '10%' | '50%'>('No');
+  const [zPercentage, setZPercentage] = useState<'No' | '10%' | '50%'>('No');
+
+  const dispatch = useDispatch();
+
+  return (
+    <Transition appear show={showModal} as={Fragment}>
+      <Dialog as='div' className='relative z-10' onClose={() => {
+      }}>
+        <Transition.Child
+          as={Fragment}
+          enter='ease-out duration-300'
+          enterFrom='opacity-0'
+          enterTo='opacity-100'
+          leave='ease-in duration-200'
+          leaveFrom='opacity-100'
+          leaveTo='opacity-0'
+        >
+          <div className='fixed inset-0 bg-black bg-opacity-25' />
+        </Transition.Child>
+
+        <div className='fixed inset-0 overflow-y-auto' data-testid='alert'>
+          <div className='flex min-h-full items-center justify-center p-4 text-center'>
+            <Transition.Child
+              as={Fragment}
+              enter='ease-out duration-300'
+              enterFrom='opacity-0 scale-95'
+              enterTo='opacity-100 scale-100'
+              leave='ease-in duration-200'
+              leaveFrom='opacity-100 scale-100'
+              leaveTo='opacity-0 scale-95'
+            >
+              <Dialog.Panel
+                className='w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all'>
+                <Dialog.Title
+                  as='h3'
+                  className='text-lg font-medium leading-6 text-gray-900'
+                >
+                  {mode.toUpperCase()}
+                </Dialog.Title>
+                <hr className='mt-2 mb-3' />
+                <div className='p-2 flex flex-col gap-4'>
+                  <span>Choose how to {mode === 'refine' ? 'reduce' : 'increase'} the quantum on the desired axes</span>
+                  <div className='flex flex-row gap-4'>
+                    <span className='font-semibold'>X: </span>
+                    <div className='flex flex-row gap-2 items-center'>
+                      <input type='radio' name='radio-10' className='radio radio-sm checked:bg-green-800'
+                             checked={xPercentage === 'No'}
+                             onClick={() => setXPercentage('No')}
+                      />
+                      <span>No {mode}</span>
+                    </div>
+                    <div className='flex flex-row gap-2 items-center'>
+                      <input type='radio' name='radio-10' className='radio radio-sm checked:bg-green-800'
+                             checked={xPercentage === '10%'}
+                             onClick={() => setXPercentage('10%')}
+                      />
+                      <span>10%</span>
+                    </div>
+                    <div className='flex flex-row gap-2 items-center'>
+                      <input type='radio' name='radio-10' className='radio radio-sm checked:bg-green-800'
+                             checked={xPercentage === '50%'}
+                             onClick={() => setXPercentage('50%')}
+                      />
+                      <span>50%</span>
+                    </div>
+                  </div>
+                  <div className='flex flex-row gap-4'>
+                    <span className='font-semibold'>Y: </span>
+                    <div className='flex flex-row gap-2 items-center'>
+                      <input type='radio' name='radio-11' className='radio radio-sm checked:bg-green-800'
+                             checked={yPercentage === 'No'}
+                             onClick={() => setYPercentage('No')}
+                      />
+                      <span>No {mode}</span>
+                    </div>
+                    <div className='flex flex-row gap-2 items-center'>
+                      <input type='radio' name='radio-11' className='radio radio-sm checked:bg-green-800'
+                             checked={yPercentage === '10%'}
+                             onClick={() => setYPercentage('10%')}
+                      />
+                      <span>10%</span>
+                    </div>
+                    <div className='flex flex-row gap-2 items-center'>
+                      <input type='radio' name='radio-11' className='radio radio-sm checked:bg-green-800'
+                             checked={yPercentage === '50%'}
+                             onClick={() => setYPercentage('50%')}
+                      />
+                      <span>50%</span>
+                    </div>
+                  </div>
+                  <div className='flex flex-row gap-4'>
+                    <span className='font-semibold'>Z: </span>
+                    <div className='flex flex-row gap-2 items-center'>
+                      <input type='radio' name='radio-12' className='radio radio-sm checked:bg-green-800'
+                             checked={zPercentage === 'No'}
+                             onClick={() => setZPercentage('No')}
+                      />
+                      <span>No {mode}</span>
+                    </div>
+                    <div className='flex flex-row gap-2 items-center'>
+                      <input type='radio' name='radio-12' className='radio radio-sm checked:bg-green-800'
+                             checked={zPercentage === '10%'}
+                             onClick={() => setZPercentage('10%')}
+                      />
+                      <span>10%</span>
+                    </div>
+                    <div className='flex flex-row gap-2 items-center'>
+                      <input type='radio' name='radio-12' className='radio radio-sm checked:bg-green-800'
+                             checked={zPercentage === '50%'}
+                             onClick={() => setZPercentage('50%')}
+                      />
+                      <span>50%</span>
+                    </div>
+                  </div>
+                  <div className='flex flex-row w-full items-center justify-between mt-4'>
+                    <button
+                      type='button'
+                      className='button bg-red-500 text-white'
+                      onClick={() => setShowModal(false)}
+                    >
+                      CANCEL
+                    </button>
+                    <button
+                      type='button'
+                      className='button buttonPrimary text-white'
+                      onClick={() => {
+                        let newQuantum: [number, number, number] = [...quantumDimsInput];
+                        if (xPercentage !== 'No') {
+                          if (xPercentage === '10%') {
+                            if (mode === 'refine') {
+                              newQuantum[0] = quantumDimsInput[0] - quantumDimsInput[0] * (10 / 100);
+                            } else {
+                              newQuantum[0] = quantumDimsInput[0] + quantumDimsInput[0] * (10 / 100);
+                            }
+                          }
+                          if (xPercentage === '50%') {
+                            if (mode === 'refine') {
+                              newQuantum[0] = quantumDimsInput[0] / 2;
+                            } else {
+                              newQuantum[0] = quantumDimsInput[0] * 2;
+                            }
+                          }
+                        }
+                        if (yPercentage !== 'No') {
+                          if (yPercentage === '10%') {
+                            if (mode === 'refine') {
+                              newQuantum[1] = quantumDimsInput[1] - quantumDimsInput[1] * (10 / 100);
+                            } else {
+                              newQuantum[1] = quantumDimsInput[1] + quantumDimsInput[1] * (10 / 100);
+                            }
+                          }
+                          if (yPercentage === '50%') {
+                            if (mode === 'refine') {
+                              newQuantum[1] = quantumDimsInput[1] / 2;
+                            } else {
+                              newQuantum[1] = quantumDimsInput[1] * 2;
+                            }
+                          }
+                        }
+                        if (zPercentage !== 'No') {
+                          if (zPercentage === '10%') {
+                            if (mode === 'refine') {
+                              newQuantum[2] = quantumDimsInput[2] - quantumDimsInput[2] * (10 / 100);
+                            } else {
+                              newQuantum[2] = quantumDimsInput[2] + quantumDimsInput[2] * (10 / 100);
+                            }
+                          }
+                          if (zPercentage === '50%') {
+                            if (mode === 'refine') {
+                              newQuantum[2] = quantumDimsInput[2] / 2;
+                            } else {
+                              newQuantum[2] = quantumDimsInput[2] * 2;
+                            }
+                          }
+                        }
+                        setQuantumDimsInput(newQuantum);
+                        dispatch(setPreviousMeshStatus({
+                          status: selectedProject.meshData.meshGenerated as 'Not Generated' | 'Generated',
+                          projectToUpdate: selectedProject.faunaDocumentId as string
+                        }));
+                        dispatch(setMeshGenerated({
+                          status: 'Generating',
+                          projectToUpdate: selectedProject.faunaDocumentId as string
+                        }));
+                        dispatch(setQuantum({
+                          quantum: newQuantum,
+                          projectToUpdate: selectedProject.faunaDocumentId as string
+                        }));
+                        setXPercentage('No');
+                        setYPercentage('No');
+                        setZPercentage('No');
+                        setShowModal(false);
+                      }}
+                    >
+                      {mode.toUpperCase()}
+                    </button>
+                  </div>
+
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
   );
 };
