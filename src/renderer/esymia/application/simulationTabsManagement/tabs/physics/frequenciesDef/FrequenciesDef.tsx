@@ -39,11 +39,18 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
           <DebounceInput
             data-testid="fmin"
             debounceTimeout={700}
+            min={0}
             disabled={disabled}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
             value={fMin}
-            onChange={(e) => setFMin(parseFloat("" + Number(e.target.value)))}
+            onChange={(e) => {
+              if(e.target.value.startsWith('-')){
+                setFMin(parseFloat("" + Number(e.target.value.substring(1))))
+              }else {
+                setFMin(parseFloat("" + Number(e.target.value)))
+              }
+            }}
           />
         </div>
         <div className='flex flex-col items-center gap-2'>
@@ -52,10 +59,17 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
             data-testid="fmax"
             disabled={disabled}
             debounceTimeout={700}
+            min={0}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
             value={fMax}
-            onChange={(e) => setFMax(parseFloat("" + Number(e.target.value)))}
+            onChange={(e) => {
+              if(e.target.value.startsWith('-')){
+                setFMax(parseFloat("" + Number(e.target.value.substring(1))))
+              }else {
+                setFMax(parseFloat("" + Number(e.target.value)))
+              }
+            }}
           />
         </div>
         <div className='flex flex-col items-center gap-2'>
@@ -63,13 +77,19 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
           <DebounceInput
             data-testid="fnum"
             debounceTimeout={700}
+            min={0}
             disabled={disabled}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
-            min={0}
             step={1}
             value={fNum}
-            onChange={(e) => setFNum(parseInt("" + Number(e.target.value)))}
+            onChange={(e) => {
+              if(e.target.value.startsWith('-')){
+                setFNum(parseFloat("" + Number(e.target.value.substring(1))))
+              }else {
+                setFNum(parseFloat("" + Number(e.target.value)))
+              }
+            }}
           />
         </div>
       </div>

@@ -20,15 +20,20 @@ const ScatteringParameter: React.FC<ScatteringParameterProps> = ({setSavedPortPa
             data-testid="scattering"
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
+            min={0}
             debounceTimeout={500}
             disabled={selectedProject?.simulation?.status === 'Completed'}
             step={0.1}
             value={selectedProject?.scatteringValue ? selectedProject.scatteringValue : 0.0}
             onChange={(event) => {
-              dispatch(setScatteringValue(parseFloat(event.target.value)))
+              if(event.target.value.startsWith('-')) {
+                dispatch(setScatteringValue(parseFloat(event.target.value.substring(1))))
+              }else {
+                dispatch(setScatteringValue(parseFloat(event.target.value)))
+              }
               setSavedPortParameters(false);
             }}
-            onWheel={(e: { currentTarget: { blur: () => any; }; }) => e.currentTarget.blur()}
+
           />
         </div>
       </div>

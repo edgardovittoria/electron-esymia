@@ -34,6 +34,7 @@ import {
 } from './components/rightPanelFunctions';
 import { LiaCubeSolid, LiaCubesSolid } from 'react-icons/lia';
 import { Dialog, Transition } from '@headlessui/react';
+import { MesherStatusSelector } from '../../../../../store/pluginsSlice';
 
 interface RightPanelSimulatorProps {
   selectedProject: Project;
@@ -57,12 +58,17 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const [suggestedQuantumError, setSuggestedQuantumError] = useState(false);
   const [showModalRefine, setShowModalRefine] = useState<boolean>(false);
   const [refineMode, setRefineMode] = useState<'refine' | 'coarsen'>('refine');
+  const mesherStatus = useSelector(MesherStatusSelector)
 
   useEffect(() => {
-    if (selectedProject.model.components) {
+    if (selectedProject.model.components && mesherStatus === 'ready') {
+      setSuggestedQuantumError(false)
       computeSuggestedQuantum(selectedProject, allMaterials as Material[], dispatch, execQuery, setSuggestedQuantumError, setQuantumDimsInput);
+    }else if(mesherStatus === "idle" || mesherStatus === "starting"){
+      setQuantumDimsInput([0,0,0])
+      setSuggestedQuantumError(true)
     }
-  }, []);
+  }, [mesherStatus]);
 
   function checkQuantumDimensionsValidity() {
     let validity = true;
@@ -114,7 +120,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         </div>
         <hr className='mt-1' />
         <div className='mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]'>
-          <h6 className='xl:text-base text-[12px]'>
+          <h6 className='xl:text-base text-center text-[12px]'>
             Set quantum&apos;s dimensions
           </h6>
           <div className='mt-2'>
@@ -148,26 +154,28 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 Unable to suggest quantum: check mesher connection!
               </div>
             }
-            <div className='flex flex-row gap-4 items-center w-full mt-3'>
-              <div className='flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded'
-                   onClick={() => {
-                     setRefineMode('coarsen');
-                     setShowModalRefine(true);
-                   }}
-              >
-                <LiaCubeSolid size={25} />
-                <span>Coarsen</span>
+            {meshGenerated === "Generated" &&
+              <div className='flex flex-row gap-4 justify-center items-center w-full mt-3'>
+                <div className='flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200'
+                     onClick={() => {
+                       setRefineMode('coarsen');
+                       setShowModalRefine(true);
+                     }}
+                >
+                  <LiaCubeSolid size={25} />
+                  <span>Coarsen</span>
+                </div>
+                <div className='flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200'
+                     onClick={() => {
+                       setRefineMode('refine');
+                       setShowModalRefine(true);
+                     }}
+                >
+                  <LiaCubesSolid size={25} />
+                  <span>Refine</span>
+                </div>
               </div>
-              <div className='flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded'
-                   onClick={() => {
-                     setRefineMode('refine');
-                     setShowModalRefine(true);
-                   }}
-              >
-                <LiaCubesSolid size={25} />
-                <span>Refine</span>
-              </div>
-            </div>
+            }
           </div>
         </div>
         <div className='w-[100%] pt-4'>
@@ -201,7 +209,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 </button>
               </div>
             )}
-            {((meshGenerated === 'Generated' && !meshApproved) ||
+            {/* {((meshGenerated === 'Generated' && !meshApproved) ||
               selectedProject.simulation?.status === 'Failed') && (
               <div className='flex justify-between'>
                 <button
@@ -225,7 +233,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   Regenerate
                 </button>
               </div>
-            )}
+            )} */}
           </div>
         </div>
         <div className='mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]'>
@@ -387,7 +395,7 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({
                                                        label
                                                      }) => {
   return (
-    <div className='xl:w-[30%] w-full'>
+    <div className='xl:w-[30%] w-full flex flex-col items-center'>
       <span className='text-[12px] xl:text-base'>{label}</span>
       <DebounceInput
         data-testid={dataTestId}

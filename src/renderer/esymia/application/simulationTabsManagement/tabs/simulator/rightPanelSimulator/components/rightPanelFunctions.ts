@@ -161,7 +161,7 @@ export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: 
   axios
     .post('http://127.0.0.1:8003/meshingAdvice', objToSendToMesher)
     .then(res => {
-      if(selectedProject.frequencies){
+      if(selectedProject.frequencies?.length && selectedProject.frequencies?.length > 0){
         dispatch(setSuggestedQuantum((
           [
             Math.min(3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40, parseFloat(res.data[0].toFixed(5))),
@@ -176,6 +176,7 @@ export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: 
         ])
       }else{
         dispatch(setSuggestedQuantum(([parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))])));
+        setQuantumDimsInput([parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))])
       }
       execQuery(
         updateProjectInFauna,

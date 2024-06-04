@@ -25,12 +25,21 @@ export const RLCParamsComponent: React.FC<RLCParamsProps> = ({
         value={selectedPort.rlcParams.resistance ? selectedPort.rlcParams.resistance : 0}
         label='Resistance'
         onChange={(event) => {
-          dispatch(
-            setRLCParams({
-              ...selectedPort.rlcParams,
-              resistance: parseFloat(event.target.value),
-            }) as RLCParams,
-          );
+          if(event.target.value.startsWith('-')){
+            dispatch(
+              setRLCParams({
+                ...selectedPort.rlcParams,
+                resistance: parseFloat(event.target.value.substring(1)),
+              }) as RLCParams,
+            );
+          }else {
+            dispatch(
+              setRLCParams({
+                ...selectedPort.rlcParams,
+                resistance: parseFloat(event.target.value),
+              }) as RLCParams,
+            );
+          }
           setSavedPortParameters(false);
         }}
       />
@@ -39,12 +48,21 @@ export const RLCParamsComponent: React.FC<RLCParamsProps> = ({
         value={selectedPort.rlcParams.inductance ? selectedPort.rlcParams.inductance : 0}
         label='Inductance'
         onChange={(event) => {
-          dispatch(
-            setRLCParams({
-              ...selectedPort.rlcParams,
-              inductance: parseFloat(event.target.value),
-            }) as RLCParams,
-          );
+          if(event.target.value.startsWith('-')){
+            dispatch(
+              setRLCParams({
+                ...selectedPort.rlcParams,
+                inductance: parseFloat(event.target.value.substring(1)),
+              }) as RLCParams,
+            );
+          }else {
+            dispatch(
+              setRLCParams({
+                ...selectedPort.rlcParams,
+                inductance: parseFloat(event.target.value),
+              }) as RLCParams,
+            );
+          }
           setSavedPortParameters(false);
         }}
       />
@@ -53,12 +71,21 @@ export const RLCParamsComponent: React.FC<RLCParamsProps> = ({
         value={selectedPort.rlcParams.capacitance ? selectedPort.rlcParams.capacitance : 0}
         label='Capacitance'
         onChange={(event) => {
-          dispatch(
-            setRLCParams({
-              ...selectedPort.rlcParams,
-              capacitance: parseFloat(event.target.value),
-            }) as RLCParams,
-          );
+          if(event.target.value.startsWith('-')){
+            dispatch(
+              setRLCParams({
+                ...selectedPort.rlcParams,
+                capacitance: parseFloat(event.target.value.substring(1)),
+              }) as RLCParams,
+            );
+          }else {
+            dispatch(
+              setRLCParams({
+                ...selectedPort.rlcParams,
+                capacitance: parseFloat(event.target.value),
+              }) as RLCParams,
+            );
+          }
           setSavedPortParameters(false);
         }}
       />
@@ -82,6 +109,7 @@ const RLCParamsInput: FC<RLCParamsInputProps> = ({disabled, debounceTimeoutMilli
         <DebounceInput
           className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
           type="number"
+          min={0}
           disabled={disabled}
           debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
           step={inputStep ? inputStep : 0.000001}
