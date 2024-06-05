@@ -6,12 +6,15 @@ import { useFaunaQuery, usersStateSelector } from 'cad-library';
 import axios from 'axios';
 import { SearchUser } from './components/SearchUser';
 import {
+  addProject,
   shareFolder,
-  shareProject,
+  shareProject
 } from '../../../../../../../store/projectSlice';
 import {
+  addIDInFolderProjectsList,
+  createSimulationProjectInFauna,
   recursiveUpdateSharingInfoFolderInFauna,
-  updateProjectInFauna,
+  updateProjectInFauna
 } from '../../../../../../../faunadb/projectsFolderAPIs';
 import {
   Folder,
@@ -20,6 +23,7 @@ import {
 } from '../../../../../../../model/esymiaModels';
 import { convertInFaunaProjectThis } from '../../../../../../../faunadb/apiAuxiliaryFunctions';
 import toast from 'react-hot-toast';
+import { addProjectTab, setShowCreateNewProjectModal } from '../../../../../../../store/tabsAndMenuItemsSlice';
 
 interface SearchUserAndShareProps {
   setShowSearchUser: (v: boolean) => void;
@@ -63,7 +67,6 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                 },
               )
               .then((res) => {
-                // console.log(res.data)
                 res.data.forEach((u: { name: string }) => {
                   usersList.push(u.name);
                 });
@@ -165,7 +168,39 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                         className="button buttonPrimary py-1 px-2 text-sm"
                         onClick={() => {
                           setShareDone(true);
-                          if (projectToShare) {
+                          let newProject: Project = {
+                            ...projectToShare as Project,
+                            simulation: undefined,
+                            meshData: {
+                              meshGenerated: "Not Generated",
+                              meshApproved: false,
+                              quantum: [0,0,0]
+                            },
+                            sharedWith: [
+                              ...(projectToShare?.sharedWith as sharingInfoUser[]),
+                              {
+                                userEmail: selected,
+                                read: true,
+                                write: true,
+                              } as sharingInfoUser,
+                            ],
+                          }
+                          execQuery(createSimulationProjectInFauna, newProject).then((res: any) => {
+                            newProject = {
+                              ...newProject,
+                              faunaDocumentId: res.ref.value.id
+                            } as Project;
+                          }).then(() => {
+                            setShowSearchUser(false);
+                            toast.success('Sharing Successful!!');
+                          })
+                            .catch((err) => {
+                              setShowSearchUser(false);
+                              toast.error(
+                                'Sharing Failed!! Please try again!',
+                              );
+                            });
+                          /* if (projectToShare) {
                             dispatch(
                               shareProject({
                                 projectToShare,
@@ -200,7 +235,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                                   'Sharing Failed!! Please try again!',
                                 );
                               });
-                          } else if (folderToShare) {
+                          } else  */if (folderToShare) {
                             dispatch(
                               shareFolder({
                                 folderToShare:

@@ -130,6 +130,7 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
                     .map((sb) => sb.id),
                   projectList: projects
                     .filter((p) => p.project.parentFolder === 'root')
+                    .filter((p) => p.project.sharedWith?.length === 0)
                     .map((pr) => pr.id),
                   parent: 'nobody',
                 },
