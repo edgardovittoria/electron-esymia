@@ -55,18 +55,26 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
   const quantumDimensionsLabels = ['X', 'Y', 'Z'];
-  const [suggestedQuantumError, setSuggestedQuantumError] = useState(false);
+  const [suggestedQuantumError, setSuggestedQuantumError] = useState<{active: boolean, type?: 'Mesher Not Active' | 'Frequencies not set'}>({ active: false });
   const [showModalRefine, setShowModalRefine] = useState<boolean>(false);
   const [refineMode, setRefineMode] = useState<'refine' | 'coarsen'>('refine');
   const mesherStatus = useSelector(MesherStatusSelector)
 
   useEffect(() => {
     if (selectedProject.model.components && mesherStatus === 'ready') {
-      setSuggestedQuantumError(false)
-      computeSuggestedQuantum(selectedProject, allMaterials as Material[], dispatch, execQuery, setSuggestedQuantumError, setQuantumDimsInput);
-    }else if(mesherStatus === "idle" || mesherStatus === "starting"){
-      setQuantumDimsInput([0,0,0])
-      setSuggestedQuantumError(true)
+      setSuggestedQuantumError({ active: false })
+      if(selectedProject.meshData.previousMeshStatus !== "Generated" && selectedProject.frequencies && selectedProject.frequencies.length > 0){
+        computeSuggestedQuantum(selectedProject, allMaterials as Material[], dispatch, execQuery, setSuggestedQuantumError, setQuantumDimsInput);
+      }else{
+        setSuggestedQuantumError({ active: true, type: 'Frequencies not set' })
+      }
+    }else if((mesherStatus === "idle" || mesherStatus === "starting")){
+      if(selectedProject.meshData.previousMeshStatus === "Generated"){
+        setQuantumDimsInput(selectedProject.meshData.quantum)
+      }else{
+        setQuantumDimsInput([0,0,0])
+      }
+      setSuggestedQuantumError({ active: true, type: 'Mesher Not Active' })
     }
   }, [mesherStatus]);
 
@@ -123,6 +131,14 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           <h6 className='xl:text-base text-center text-[12px]'>
             Set quantum&apos;s dimensions
           </h6>
+          <hr className='mt-2 border-[1px] border-gray-200' />
+          {
+            selectedProject.frequencies && selectedProject.frequencies.length > 0
+            && <div className="flex flex-col my-3 items-center">
+              <span className="text-sm">Max Frequency: <span className="font-bold">{selectedProject.frequencies[selectedProject.frequencies.length - 1].toExponential()}</span></span>
+              <span className="text-sm">Lambda Factor: <span className="font-bold">40</span></span>
+            </div>
+          }
           <div className='mt-2'>
             <div className='flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2'>
               {quantumDimsInput.map(
@@ -149,9 +165,12 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 ]
               </div>
             } */}
-            {suggestedQuantumError &&
+            {suggestedQuantumError.active &&
               <div className='text-[12px] xl:text-base font-semibold mt-2'>
-                Unable to suggest quantum: check mesher connection!
+                {suggestedQuantumError.type === 'Mesher Not Active'
+                  ? 'Unable to suggest quantum: check mesher connection!'
+                  : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'
+                }
               </div>
             }
             {meshGenerated === "Generated" &&
@@ -395,8 +414,8 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({
                                                        label
                                                      }) => {
   return (
-    <div className='xl:w-[30%] w-full flex flex-col items-center'>
-      <span className='text-[12px] xl:text-base'>{label}</span>
+    <div className='xl:w-[30%] w-full flex flex-col items-center relative'>
+      <span className='text-[12px] xl:text-sm absolute top-[-10px] left-1/2 translate-x-[-1/2] bg-[#f6f6f6] font-bold'>{label}</span>
       <DebounceInput
         data-testid={dataTestId}
         disabled={disabled}

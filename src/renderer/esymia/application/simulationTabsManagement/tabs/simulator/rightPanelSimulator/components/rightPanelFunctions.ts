@@ -174,10 +174,10 @@ export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: 
           Math.min(3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40, parseFloat(res.data[1].toFixed(5))),
           Math.min(3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40, parseFloat(res.data[2].toFixed(5))),
         ])
-      }else{
+      }/* else{
         dispatch(setSuggestedQuantum(([parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))])));
         setQuantumDimsInput([parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))])
-      }
+      } */
       execQuery(
         updateProjectInFauna,
         convertInFaunaProjectThis({

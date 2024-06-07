@@ -21,12 +21,13 @@ export default function App() {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    window.electron.ipcRenderer.invoke('getInstallationDir').then(res => dispatch(setHomePat(res)))
+    window.electron.ipcRenderer.invoke('getInstallationDir').then(res => {
+      dispatch(setHomePat(res))
+    })
   }, []);
 
 
   const [tabsSelected, setTabsSelected] = useState<string>('home');
-  //console.log(join('esymiaProjects', 'mesherOutputs', tabsSelected, '.json'))
   const { user } = useAuth0();
   const [alert, setAlert] = useState<boolean>(false);
   const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);

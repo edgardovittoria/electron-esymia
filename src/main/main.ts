@@ -237,12 +237,12 @@ ipcMain.handle('deleteFile', (e, args) => {
   unlinkSync(args[0])
 })
 
-/* ipcMain.handle('createFolder', (e, args) => {
+ipcMain.handle('createFolder', (e, args) => {
   let path = app.getPath('home')
   mkdir(path+"/"+args[0], null, () => {})
 })
 
 ipcMain.handle('deleteFolder', (e, args) => {
-  let path = app.getPath('home')+"/esymiaProjects"
+  let path = app.getPath('home')
   rmdir(path+"/"+args[0],  () => {})
-}) */
+})
