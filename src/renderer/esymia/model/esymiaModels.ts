@@ -123,7 +123,7 @@ export type SolverOutput = {
 }
 
 export type ExternalGridsObject = {
-  externalGrids: Brick[][],
+  externalGrids: Object,
   cell_size: CellSize,
   origin: OriginPoint,
   n_cells: CellsNumber

@@ -57,7 +57,8 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
       components &&
       allMaterials &&
       generateSTLListFromComponents(allMaterials, components),
-    quantum: quantumDimsInput
+    quantum: quantumDimsInput,
+    fileName: selectedProject.faunaDocumentId as string
   };
   // local meshing: http://127.0.0.1:8003/meshing
   // lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
@@ -91,13 +92,13 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
           status: previousMeshStatus,
           projectToUpdate: selectedProject.faunaDocumentId as string
         }));
-      } else if(res.data.mesh_is_valid.stopped === true){
+      } else if(res.data.isStopped === true){
         dispatch(setMeshGenerated({
           status: previousMeshStatus,
           projectToUpdate: selectedProject.faunaDocumentId as string
         }));
-      } else if (res.data.mesh_is_valid.valid === false) {
-        dispatch(setMessageInfoModal('Error! Mesh not valid. Please adjust quantum along ' + res.data.mesh_is_valid.axis + ' axis.'));
+      } else if (res.data.isValid.valid === false) {
+        dispatch(setMessageInfoModal('Error! Mesh not valid. Please adjust quantum along ' + res.data.isValid.axis + ' axis.'));
         dispatch(setIsAlertInfoModal(true));
         dispatch(setShowInfoModal(true));
         setAlert(true);
@@ -106,27 +107,51 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
           projectToUpdate: selectedProject.faunaDocumentId as string
         }));
       } else {
-        const grids: any[] = [];
-        for (const value of Object.values(res.data.mesher_matrices)) {
-          grids.push(value);
-        }
-        const grids_external = create_Grids_externals(grids);
-        const data = { ...res.data.mesher_matrices };
-        Object.keys(res.data.mesher_matrices).forEach((k, index) => {
-          data[k] = grids_external.data[index];
+        dispatch(setMeshGenerated({
+          status: 'Generated',
+          projectToUpdate: selectedProject.faunaDocumentId as string
+        }));
+        dispatch(setMesh({ mesh: res.data.mesh, projectToUpdate: selectedProject.faunaDocumentId as string }));
+        dispatch(setExternalGrids({
+          extGrids: res.data.grids,
+          projectToUpdate: selectedProject.faunaDocumentId as string
+        }));
+        execQuery(
+          updateProjectInFauna,
+          convertInFaunaProjectThis({
+            ...selectedProject,
+            meshData: {
+              ...selectedProject.meshData,
+              mesh: res.data.mesh,
+              externalGrids: res.data.grids,
+              meshGenerated: 'Generated'
+            }
+          })
+        ).then(() => {
         });
-        const extGrids = {
-          externalGrids: data,
-          cell_size: {
-            cell_size_x: res.data.cell_size.cell_size_x / 1000,
-            cell_size_y: res.data.cell_size.cell_size_y / 1000,
-            cell_size_z: res.data.cell_size.cell_size_z / 1000
-          },
-          origin: res.data.origin,
-          n_cells: res.data.n_cells
-        };
-        setLoadingData(true)
-        saveMeshData(res.data, extGrids)
+        return '';
+
+        // const grids: any[] = [];
+        // for (const value of Object.values(res.data.mesher_matrices)) {
+        //   grids.push(value);
+        // }
+        // const grids_external = create_Grids_externals(grids);
+        // const data = { ...res.data.mesher_matrices };
+        // Object.keys(res.data.mesher_matrices).forEach((k, index) => {
+        //   data[k] = grids_external.data[index];
+        // });
+        // const extGrids = {
+        //   externalGrids: data,
+        //   cell_size: {
+        //     cell_size_x: res.data.cell_size.cell_size_x / 1000,
+        //     cell_size_y: res.data.cell_size.cell_size_y / 1000,
+        //     cell_size_z: res.data.cell_size.cell_size_z / 1000
+        //   },
+        //   origin: res.data.origin,
+        //   n_cells: res.data.n_cells
+        // };
+        // setLoadingData(true)
+        // saveMeshData(res.data, extGrids)
         /* saveMeshAndExternalGridsToS3(res.data, extGrids, dispatch, selectedProject, execQuery)
           .then(() => {
             return '';

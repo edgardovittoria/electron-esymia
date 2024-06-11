@@ -1,5 +1,5 @@
 import { AppDispatch } from '../../../../../../store/store';
-import { ExternalGridsObject, Project } from '../../../../../../model/esymiaModels';
+import { CellSize, CellsNumber, ExternalGridsObject, OriginPoint, Project } from '../../../../../../model/esymiaModels';
 import { deleteFileS3, uploadFileS3 } from '../../../../../../aws/mesherAPIs';
 import {
   homePathSelector, removeProject,
@@ -17,6 +17,7 @@ import { deleteFile, readLocalFile, uploadFile } from '../../../../../../../file
 import { s3 } from '../../../../../../aws/s3Config';
 import { closeProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { join } from 'path';
+import { Brick } from '../components/createGridsExternals';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();
@@ -146,10 +147,26 @@ export const useStorageData = () => {
     );
   }
 
+  const externalGridsDecode = (extGridsJson: any) => {
+    let gridsPairs: [string, Brick[]][] = []
+    Object.entries(extGridsJson.externalGrids).forEach((material) => gridsPairs.push([material[0], (material[1] as string).split("$").map(brString => {
+      let coords = brString.split("-").map(c => parseInt(c))
+      return {x: coords[0], y: coords[1], z:coords[2]} as Brick
+    })]))
+    let externalGrids = Object.fromEntries(gridsPairs)
+    let cellSizeCoords = (extGridsJson.cell_size as string).split("-").map(c => parseFloat(c)/1000)
+    let cell_size = {cell_size_x: cellSizeCoords[0], cell_size_y: cellSizeCoords[1], cell_size_z: cellSizeCoords[2]} as CellSize
+    let nCellsCoords = (extGridsJson.n_cells as string).split("-").map(c => parseFloat(c))
+    let n_cells = {n_cells_x: nCellsCoords[0], n_cells_y: nCellsCoords[1], n_cells_z: nCellsCoords[2]} as CellsNumber
+    let originCoords = (extGridsJson.origin as string).split("-").map(c => parseFloat(c))
+    let origin = {origin_x: originCoords[0], origin_y: originCoords[1], origin_z: originCoords[2]} as OriginPoint
+    return {cell_size: cell_size, externalGrids: externalGrids, n_cells: n_cells, origin: origin} as ExternalGridsObject
+  }
+
   const loadDataFromLocal = (setSpinner: (v:boolean) => void, setExternalGrids: Function) => {
     readLocalFile(selectedProject.meshData.externalGrids as string).then((res) => {
-      setExternalGrids(JSON.parse(res) as ExternalGridsObject,);
-      dispatch(setMeshGenerated({ status: 'Generated', projectToUpdate: selectedProject.faunaDocumentId as string }));
+      setExternalGrids(externalGridsDecode(JSON.parse(res)));
+      // dispatch(setMeshGenerated({ status: 'Generated', projectToUpdate: selectedProject.faunaDocumentId as string }));
       setSpinner(false)
     })
 
