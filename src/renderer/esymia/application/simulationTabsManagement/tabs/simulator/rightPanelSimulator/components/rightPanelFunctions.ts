@@ -130,33 +130,6 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
         ).then(() => {
         });
         return '';
-
-        // const grids: any[] = [];
-        // for (const value of Object.values(res.data.mesher_matrices)) {
-        //   grids.push(value);
-        // }
-        // const grids_external = create_Grids_externals(grids);
-        // const data = { ...res.data.mesher_matrices };
-        // Object.keys(res.data.mesher_matrices).forEach((k, index) => {
-        //   data[k] = grids_external.data[index];
-        // });
-        // const extGrids = {
-        //   externalGrids: data,
-        //   cell_size: {
-        //     cell_size_x: res.data.cell_size.cell_size_x / 1000,
-        //     cell_size_y: res.data.cell_size.cell_size_y / 1000,
-        //     cell_size_z: res.data.cell_size.cell_size_z / 1000
-        //   },
-        //   origin: res.data.origin,
-        //   n_cells: res.data.n_cells
-        // };
-        // setLoadingData(true)
-        // saveMeshData(res.data, extGrids)
-        /* saveMeshAndExternalGridsToS3(res.data, extGrids, dispatch, selectedProject, execQuery)
-          .then(() => {
-            return '';
-          })
-          .catch((err: any) => console.log(err)); */
       }
     })
     .catch((err) => {
