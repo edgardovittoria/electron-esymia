@@ -148,14 +148,16 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
 };
 
 export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: Material[], dispatch: AppDispatch, execQuery: Function, setSuggestedQuantumError: Function, setQuantumDimsInput: Function) => {
-  const getEscalFrom = (unit: string) => {
+  const getEscalFrom = (unit?: string) => {
     let escal = 1.0
-    if (unit === "m") escal = 1.0
-    if (unit === "dm") escal = 1e1
-    if (unit === "cm") escal = 1e2
-    if (unit === "mm") escal = 1e3
-    if (unit === "microm") escal = 1e6
-    if (unit === "nanom") escal = 1e9
+    if (unit !== undefined){
+      if (unit === "m") escal = 1.0
+      if (unit === "dm") escal = 1e1
+      if (unit === "cm") escal = 1e2
+      if (unit === "mm") escal = 1e3
+      if (unit === "microm") escal = 1e6
+      if (unit === "nanom") escal = 1e9
+    }
     return escal
   }
   const components = selectedProject?.model
@@ -172,15 +174,15 @@ export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: 
       if(selectedProject.frequencies?.length && selectedProject.frequencies?.length > 0){
         dispatch(setSuggestedQuantum((
           [
-            Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit as string), parseFloat(res.data[0].toFixed(5))),
-            Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit as string), parseFloat(res.data[1].toFixed(5))),
-            Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit as string), parseFloat(res.data[2].toFixed(5))),
+            Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit), parseFloat(res.data[0].toFixed(5))),
+            Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit), parseFloat(res.data[1].toFixed(5))),
+            Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit), parseFloat(res.data[2].toFixed(5))),
           ]
         )));
         setQuantumDimsInput([
-          Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit as string), parseFloat(res.data[0].toFixed(5))),
-          Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit as string), parseFloat(res.data[1].toFixed(5))),
-          Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit as string), parseFloat(res.data[2].toFixed(5))),
+          Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit), parseFloat(res.data[0].toFixed(5))),
+          Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit), parseFloat(res.data[1].toFixed(5))),
+          Math.min((3e8/selectedProject.frequencies[selectedProject.frequencies?.length - 1]/40)*getEscalFrom(selectedProject.modelUnit), parseFloat(res.data[2].toFixed(5))),
         ])
       }/* else{
         dispatch(setSuggestedQuantum(([parseFloat(res.data[0].toFixed(5)), parseFloat(res.data[1].toFixed(5)), parseFloat(res.data[2].toFixed(5))])));
