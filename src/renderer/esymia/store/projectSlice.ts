@@ -446,3 +446,12 @@ export const activeMeshingSelector = (state: { projects: ProjectState }) => {
   });
   return activeMeshing;
 }
+
+
+export const suggestedQuantumSelector = (state: {
+  projects: ProjectState
+}) => (findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject) as Project).suggestedQuantum;
+export const findSuggestedQuantum = (folders: Folder[], projectID: string) => {
+  let project = findProjectByFaunaID(takeAllProjectsInArrayOf(folders), projectID) as Project
+  return project.suggestedQuantum
+}

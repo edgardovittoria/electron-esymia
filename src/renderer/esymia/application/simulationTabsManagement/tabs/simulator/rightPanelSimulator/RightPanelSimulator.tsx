@@ -7,9 +7,10 @@ import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
+  findSuggestedQuantum,
   meshGeneratedSelector,
   setMeshApproved,
-  setMeshGenerated, setPreviousMeshStatus, setQuantum,
+  setMeshGenerated, setPreviousMeshStatus, setQuantum, suggestedQuantumSelector,
   updateSimulation
 } from '../../../../../store/projectSlice';
 import {
@@ -35,6 +36,8 @@ import {
 import { LiaCubeSolid, LiaCubesSolid } from 'react-icons/lia';
 import { Dialog, Transition } from '@headlessui/react';
 import { MesherStatusSelector } from '../../../../../store/pluginsSlice';
+import { Client } from '@stomp/stompjs';
+import { client } from '../../../../../Esymia';
 
 interface RightPanelSimulatorProps {
   selectedProject: Project;
@@ -59,13 +62,19 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const [showModalRefine, setShowModalRefine] = useState<boolean>(false);
   const [refineMode, setRefineMode] = useState<'refine' | 'coarsen'>('refine');
   const mesherStatus = useSelector(MesherStatusSelector)
+  const suggestedQuantum = useSelector(suggestedQuantumSelector)
+
+  useEffect(() => {
+    (suggestedQuantum) && setQuantumDimsInput(suggestedQuantum)
+  }, [suggestedQuantum])
 
   useEffect(() => {
     if (selectedProject.model.components && mesherStatus === 'ready') {
       setSuggestedQuantumError({ active: false })
-      if(selectedProject.meshData.previousMeshStatus !== "Generated" && selectedProject.frequencies && selectedProject.frequencies.length > 0){
+      if(!selectedProject.suggestedQuantum && selectedProject.meshData.previousMeshStatus !== "Generated" && selectedProject.frequencies && selectedProject.frequencies.length > 0){
         computeSuggestedQuantum(selectedProject, allMaterials as Material[], dispatch, execQuery, setSuggestedQuantumError, setQuantumDimsInput);
-      }else{
+      }
+      if(!selectedProject.frequencies){
         setSuggestedQuantumError({ active: true, type: 'Frequencies not set' })
       }
     }else if((mesherStatus === "idle" || mesherStatus === "starting")){

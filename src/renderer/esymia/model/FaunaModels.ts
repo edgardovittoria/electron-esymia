@@ -22,7 +22,8 @@ export type FaunaProjectDetails = {
     parentFolder: string,
     boundingBoxDimension?: number,
     suggestedQuantum?: [number, number, number]
-    scatteringValue?: number
+    scatteringValue?: number,
+    modelUnit: string
 }
 
 export type FaunaFolder = {

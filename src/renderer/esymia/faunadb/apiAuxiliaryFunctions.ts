@@ -107,7 +107,8 @@ export const convertInFaunaProjectThis = (project: Project) => {
       sharedWith: project.sharedWith,
       parentFolder: project.parentFolder,
       scatteringValue: project.scatteringValue,
-      suggestedQuantum: project.suggestedQuantum
+      suggestedQuantum: project.suggestedQuantum,
+      modelUnit: project.modelUnit
     } as FaunaProjectDetails,
   };
   return faunaProject;

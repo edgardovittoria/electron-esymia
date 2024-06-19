@@ -8,9 +8,9 @@ import {
 } from './store/tabsAndMenuItemsSlice';
 import {
   activeMeshingSelector,
-  activeSimulationsSelector,
+  activeSimulationsSelector, findProjectByFaunaID, mainFolderSelector,
   selectFolder,
-  setProjectsFolderToUser
+  setProjectsFolderToUser, setSuggestedQuantum, sharedElementsFolderSelector
 } from './store/projectSlice';
 import {
   ActivePluginsSelector,
@@ -22,10 +22,10 @@ import {
 } from './store/pluginsSlice';
 import {
   getFoldersByOwner,
-  getSimulationProjectsByOwner,
+  getSimulationProjectsByOwner, updateProjectInFauna
 } from './faunadb/projectsFolderAPIs';
 import { FaunaFolder, FaunaProject } from './model/FaunaModels';
-import { constructFolderStructure } from './faunadb/apiAuxiliaryFunctions';
+import { constructFolderStructure, convertInFaunaProjectThis } from './faunadb/apiAuxiliaryFunctions';
 import { TabsContainer } from './application/TabsContainer';
 import { ImSpinner } from 'react-icons/im';
 import InfoModal from './application/sharedModals/InfoModal';
@@ -39,12 +39,37 @@ import Plugins from './plugin/Plugins';
 import MeshingStatus
   from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/MeshingStatus';
 import { createFolder, getDirContents, uploadFile } from '../fileSystemAPIs/fileSystemAPIs';
-
+import { Client } from '@stomp/stompjs';
+import { Folder, Project } from './model/esymiaModels';
+import {
+  takeAllProjectsIn,
+  takeAllProjectsInArrayOf
+} from './store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
+import { callback_mesher_results } from './application/rabbitMQFunctions';
 export interface EsymiaProps {
-  selectedTab: string
+  selectedTab: string;
 }
 
-const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
+export const client = new Client({
+  brokerURL: 'ws://localhost:15674/ws',
+  onConnect: () => {
+    //client.subscribe('management', callback_mgmt);
+    //client.subscribe('mesher_feedback', callback_mesher_feedback);
+  },
+});
+
+const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
+
+  const mainFolder = useSelector(mainFolderSelector)
+  const sharedElements = useSelector(sharedElementsFolderSelector)
+
+  const findProject = (projectID: string) => {
+    return findProjectByFaunaID(takeAllProjectsInArrayOf([mainFolder, sharedElements]), projectID)
+  }
+
+  const [loadedFolders, setLoadedFolders] = useState<boolean>(false);
+
+
   const dispatch = useDispatch();
   // SELECTORS
   const user = useSelector(usersStateSelector);
@@ -71,14 +96,15 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
   }, [activeMeshing.length]); */
 
   useEffect(() => {
-    getDirContents([]).then(res => {
-      if(res.filter((s: string) => s === 'esymiaProjects').length === 0){
-        createFolder('esymiaProjects')
-        createFolder('esymiaProjects/mesherOutputs')
-        createFolder('esymiaProjects/externalGrids')
+    if(loadedFolders){
+      if(client.connected){
+        client.subscribe('mesh_advices', (msg) => callback_mesher_results(msg, findProject, execQuery, dispatch), {'ack': 'client'})
+      }else{
+        client.activate()
       }
-    })
-  }, []);
+    }
+  }, [client.connected, loadedFolders]);
+
 
   const activePlugins = useSelector(ActivePluginsSelector);
   const [pluginsVisible, setPluginsVisible] = useState<boolean>(true);
@@ -143,6 +169,7 @@ const Esymia: React.FC<EsymiaProps> = ({selectedTab}) => {
               dispatch(setProjectsFolderToUser(folder));
               dispatch(selectFolder(folder.faunaDocumentId as string));
               setLoginSpinner(false);
+              setLoadedFolders(true)
             },
           );
         },

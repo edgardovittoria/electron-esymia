@@ -11,14 +11,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import useWebSocket from 'react-use-websocket';
 import { setMeshGenerated, setPreviousMeshStatus } from '../../../../../../store/projectSlice';
 import { Project, Simulation } from '../../../../../../model/esymiaModels';
-import { launchMeshing } from './rightPanelFunctions';
-import { Material, useFaunaQuery } from 'cad-library';
+import { generateSTLListFromComponents, launchMeshing } from './rightPanelFunctions';
+import { ComponentEntity, Material, useFaunaQuery } from 'cad-library';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { useEffectNotOnMount } from '../../../../../../hook/useEffectNotOnMount';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import { useStorageData } from '../hook/useStorageData';
+import { client } from '../../../../../../Esymia';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;
@@ -80,6 +81,19 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                                                                meshStatus,
                                                                setAlert
                                                              }) => {
+
+  const components = selectedProject?.model
+    ?.components as ComponentEntity[];
+  const objToSendToMesher = {
+    STLList:
+      components &&
+      allMaterials &&
+      generateSTLListFromComponents(allMaterials, components),
+    quantum: quantumDimsInput,
+    fileName: selectedProject.faunaDocumentId as string
+  };
+
+  //client.publish({ destination: 'management', body: JSON.stringify({message: 'compute mesh', body: objToSendToMesher}) });
 
   const dispatch = useDispatch();
   const WS_URL = 'ws://localhost:8081';
