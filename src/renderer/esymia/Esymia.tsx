@@ -25,7 +25,7 @@ import {
   getSimulationProjectsByOwner, updateProjectInFauna
 } from './faunadb/projectsFolderAPIs';
 import { FaunaFolder, FaunaProject } from './model/FaunaModels';
-import { constructFolderStructure, convertInFaunaProjectThis } from './faunadb/apiAuxiliaryFunctions';
+import { constructFolderStructure, convertInFaunaProjectThis, convertInProjectThis } from './faunadb/apiAuxiliaryFunctions';
 import { TabsContainer } from './application/TabsContainer';
 import { ImSpinner } from 'react-icons/im';
 import InfoModal from './application/sharedModals/InfoModal';
@@ -45,7 +45,7 @@ import {
   takeAllProjectsIn,
   takeAllProjectsInArrayOf
 } from './store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
-import { callback_mesher_results } from './application/rabbitMQFunctions';
+import { callback_mesh_advices, callback_mesher_feedback, callback_mesher_results } from './application/rabbitMQFunctions';
 export interface EsymiaProps {
   selectedTab: string;
 }
@@ -60,11 +60,9 @@ export const client = new Client({
 
 const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
 
-  const mainFolder = useSelector(mainFolderSelector)
-  const sharedElements = useSelector(sharedElementsFolderSelector)
-
-  const findProject = (projectID: string) => {
-    return findProjectByFaunaID(takeAllProjectsInArrayOf([mainFolder, sharedElements]), projectID)
+  const findProject = async (projectID: string) => {
+    let projects: FaunaProject[]  = await execQuery(getSimulationProjectsByOwner, user.email)
+    return convertInProjectThis(projects.filter(p => p.id === projectID)[0])
   }
 
   const [loadedFolders, setLoadedFolders] = useState<boolean>(false);
@@ -98,7 +96,9 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   useEffect(() => {
     if(loadedFolders){
       if(client.connected){
-        client.subscribe('mesh_advices', (msg) => callback_mesher_results(msg, findProject, execQuery, dispatch), {'ack': 'client'})
+        client.subscribe('mesh_advices', (msg) => callback_mesh_advices(msg, findProject, execQuery, dispatch))
+        client.subscribe('mesher_results', (msg) => callback_mesher_results(msg, findProject, execQuery, dispatch))
+        client.subscribe('mesher_feedback', (msg) => callback_mesher_feedback(msg, dispatch))
       }else{
         client.activate()
       }

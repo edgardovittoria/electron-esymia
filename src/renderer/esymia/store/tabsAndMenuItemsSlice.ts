@@ -30,7 +30,9 @@ type TabsAndMenuItemsState = {
   },
   showCreateNewProjectModal: boolean
   scalingViewParamsOfMesh: ScalingViewParams
-  meshVisualization: 'normal' | 'light'
+  meshVisualization: 'normal' | 'light',
+  mesherProgressLength: {length: number, id: string}[],
+  mesherProgress: {index: number, id: string}[]
 }
 
 export const TabsAndMenuItemsSlice = createSlice({
@@ -49,7 +51,9 @@ export const TabsAndMenuItemsSlice = createSlice({
     },
     showCreateNewProjectModal: false,
     scalingViewParamsOfMesh: {x:1, y:1, z:1},
-    meshVisualization: 'light'
+    meshVisualization: 'light',
+    mesherProgressLength: [],
+    mesherProgress: []
   } as TabsAndMenuItemsState,
   reducers: {
     selectTab(state: TabsAndMenuItemsState, action: PayloadAction<string>) {
@@ -91,6 +95,20 @@ export const TabsAndMenuItemsSlice = createSlice({
     },
     setMeshVisualization(state: TabsAndMenuItemsState, action: PayloadAction<'normal'|'light'>) {
       state.meshVisualization = action.payload;
+    },
+    setMeshProgressLength(state: TabsAndMenuItemsState, action: PayloadAction<{length: number, id: string}>){
+      state.mesherProgressLength = state.mesherProgressLength.filter(item => item.id !== action.payload.id)
+      state.mesherProgressLength.push(action.payload)
+    },
+    setMeshProgress(state: TabsAndMenuItemsState, action: PayloadAction<{index: number, id: string}>){
+      state.mesherProgress = state.mesherProgress.filter(item => item.id !== action.payload.id)
+      state.mesherProgress.push(action.payload)
+    },
+    unsetMeshProgressLength(state: TabsAndMenuItemsState, action: PayloadAction<string>){
+      state.mesherProgressLength = state.mesherProgressLength.filter(item => item.id !== action.payload)
+    },
+    unsetMeshProgress(state: TabsAndMenuItemsState, action: PayloadAction<string>){
+      state.mesherProgress = state.mesherProgress.filter(item => item.id !== action.payload)
     }
   },
   extraReducers: (builder) => {
@@ -113,7 +131,11 @@ export const {
   setShowCreateNewProjectModal,
   setScalingViewParamsOfMesh,
   resetScalingViewParamsOfMesh,
-  setMeshVisualization
+  setMeshVisualization,
+  setMeshProgressLength,
+  setMeshProgress,
+  unsetMeshProgressLength,
+  unsetMeshProgress
 } = TabsAndMenuItemsSlice.actions;
 
 
@@ -161,3 +183,9 @@ export const scalingViewParamsOfMeshSelector = (state: {
 export const meshVisualizationSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState
 }) => state.tabsAndMenuItems.meshVisualization
+export const mesherProgressLengthSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.mesherProgressLength;
+export const mesherProgressSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.mesherProgress;

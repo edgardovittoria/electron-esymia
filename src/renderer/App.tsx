@@ -135,7 +135,7 @@ export default function App() {
           feedbackMeshingVisible={feedbackMeshingVisible}
           setFeedbackMeshingVisible={setFeedbackMeshingVisible}
           activeMeshing={activeMeshing}
-          setAlert={setAlert}
+        
         />
       )}
 

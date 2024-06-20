@@ -3,23 +3,22 @@ import { ImSpinner } from 'react-icons/im';
 import {
   isAlertInfoModalSelector,
   isConfirmedInfoModalSelector,
+  mesherProgressLengthSelector,
+  mesherProgressSelector,
   setIsAlertInfoModal,
   setMessageInfoModal,
-  setShowInfoModal
+  setShowInfoModal,
+  unsetMeshProgress,
+  unsetMeshProgressLength
 } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import useWebSocket from 'react-use-websocket';
 import { setMeshGenerated, setPreviousMeshStatus } from '../../../../../../store/projectSlice';
-import { Project, Simulation } from '../../../../../../model/esymiaModels';
+import { Project } from '../../../../../../model/esymiaModels';
 import { generateSTLListFromComponents, launchMeshing } from './rightPanelFunctions';
-import { ComponentEntity, Material, useFaunaQuery } from 'cad-library';
+import { ComponentEntity, Material } from 'cad-library';
 import { TiArrowMinimise } from 'react-icons/ti';
-import { useEffectNotOnMount } from '../../../../../../hook/useEffectNotOnMount';
-import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
-import { useStorageData } from '../hook/useStorageData';
-import { client } from '../../../../../../Esymia';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;
@@ -30,14 +29,12 @@ export interface MeshingStatusProps {
     quantum: [number, number, number],
     meshStatus: 'Not Generated' | 'Generated'
   }[];
-  setAlert: (v: boolean) => void;
 }
 
 const MeshingStatus: React.FC<MeshingStatusProps> = ({
                                                        feedbackMeshingVisible,
                                                        setFeedbackMeshingVisible,
-                                                       activeMeshing,
-                                                       setAlert
+                                                       activeMeshing
                                                      }) => {
   return (
     <div
@@ -57,7 +54,7 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
       <div className='max-h-[600px] overflow-y-scroll w-full'>
         {activeMeshing.map((m) => (
           <MeshingStatusItem selectedProject={m.selectedProject} allMaterials={m.allMaterials}
-                             quantumDimsInput={m.quantum} setAlert={setAlert} meshStatus={m.meshStatus} />
+                             quantumDimsInput={m.quantum} />
         ))}
       </div>
     </div>
@@ -70,74 +67,35 @@ export interface MeshingStatusItemProps {
   selectedProject: Project,
   allMaterials: Material[],
   quantumDimsInput: [number, number, number],
-  setAlert: Function,
-  meshStatus: 'Not Generated' | 'Generated'
 }
 
 const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                                                                selectedProject,
                                                                allMaterials,
-                                                               quantumDimsInput,
-                                                               meshStatus,
-                                                               setAlert
+                                                               quantumDimsInput
                                                              }) => {
 
-  const components = selectedProject?.model
-    ?.components as ComponentEntity[];
-  const objToSendToMesher = {
-    STLList:
-      components &&
-      allMaterials &&
-      generateSTLListFromComponents(allMaterials, components),
-    quantum: quantumDimsInput,
-    fileName: selectedProject.faunaDocumentId as string
-  };
-
-  //client.publish({ destination: 'management', body: JSON.stringify({message: 'compute mesh', body: objToSendToMesher}) });
 
   const dispatch = useDispatch();
-  const WS_URL = 'ws://localhost:8081';
-  const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
+  const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector)
   const isAlert = useSelector(isAlertInfoModalSelector);
-  const { execQuery } = useFaunaQuery();
-  const [meshing, setMeshing] = useState<boolean>(false);
-  const [checkProgressLength, setCheckProgressLength] = useState<number>(0);
-  const [checkProgressValue, setCheckProgressValue] = useState<number>(0);
-  const [loadingData, setLoadingData] = useState<boolean>(false);
+  const checkProgressLength = useSelector(mesherProgressLengthSelector).filter(item => item.id === selectedProject.faunaDocumentId as string)[0]
+  const checkProgressValue = useSelector(mesherProgressSelector).filter(item => item.id === selectedProject.faunaDocumentId as string)[0]
   const [stopSpinner, setStopSpinner] = useState<boolean>(false);
-  const { saveMeshData } = useStorageData();
-  const { sendMessage } = useWebSocket(WS_URL, {
-    onOpen: () => {
-      console.log('WebSocket connection established.');
-      console.log('start request');
-      launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput, dispatch, saveMeshData, setAlert, meshStatus, execQuery, setLoadingData);
-    },
-    shouldReconnect: () => false,
-    onMessage: (event) => {
-      if (event.data === 'Computing completed') {
-        setMeshing(true);
-      } else if ((event.data as string).startsWith('length')) {
-        setCheckProgressLength(parseInt((event.data as string).substring((event.data as string).indexOf(':') + 1)));
-      } else {
-        setCheckProgressValue(event.data);
-      }
-    },
-    onClose: () => {
-      console.log('WebSocket connection closed.');
-      dispatch(setPreviousMeshStatus({ status: undefined, projectToUpdate: selectedProject.faunaDocumentId as string }));
-    },
-    onError: () => {
-      dispatch(setMessageInfoModal('Error while meshing, please start mesher on plugins section and try again'));
-      dispatch(setIsAlertInfoModal(true));
-      dispatch(setShowInfoModal(true));
-      dispatch(setMeshGenerated({ status: 'Not Generated', projectToUpdate: selectedProject.faunaDocumentId as string }));
+
+  useEffect(() => {
+    launchMeshing(selectedProject, allMaterials as Material[], quantumDimsInput);
+    return () => {
+      dispatch(unsetMeshProgressLength(selectedProject.faunaDocumentId as string))
+      dispatch(unsetMeshProgress(selectedProject.faunaDocumentId as string))
     }
-  });
+  }, [])
+  
 
   useEffect(() => {
     if (isAlertConfirmed) {
       if (!isAlert) {
-        sendMessage('Stop computation');
+        //sendMessage('Stop computation');
       } else {
         dispatch(setMeshGenerated({ status: 'Not Generated', projectToUpdate: selectedProject.faunaDocumentId as string }));
       }
@@ -152,7 +110,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
       <div className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'}`}>
         <span>Meshing</span>
         <div className='flex flex-row justify-between items-center w-full'>
-          {meshing ? (
+          {checkProgressLength && checkProgressLength.length > 0 ? (
             <div className='flex flex-row w-full justify-between items-center'>
               <progress
                 className='progress w-full mr-4'
@@ -172,14 +130,14 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
       <div className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'}`}>
         <span>Check mesh validity</span>
         <div className='flex flex-row justify-between items-center w-full'>
-          {checkProgressLength > 0 ? (
+          {checkProgressValue && checkProgressLength && checkProgressLength.length > 0 ? (
             <div className='flex flex-row w-full justify-between items-center'>
               <progress
                 className='progress w-full mr-4'
-                value={checkProgressValue}
-                max={checkProgressLength}
+                value={checkProgressValue.index}
+                max={checkProgressLength.length}
               />
-              {checkProgressValue === checkProgressLength &&
+              {checkProgressValue.index === checkProgressLength.length &&
                 <AiOutlineCheckCircle size='20px' className='text-green-500' />}
 
             </div>
@@ -188,14 +146,14 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           )}
         </div>
       </div>
-      <div className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'}`}>
+      {/* <div className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'}`}>
         <span>Loading Data</span>
         <div className='flex flex-row justify-between items-center w-full'>
           {loadingData && (
             <progress className='progress w-full' />
           )}
         </div>
-      </div>
+      </div> */}
       <div
         className='button w-full buttonPrimary text-center mt-4 mb-4'
         onClick={() => {

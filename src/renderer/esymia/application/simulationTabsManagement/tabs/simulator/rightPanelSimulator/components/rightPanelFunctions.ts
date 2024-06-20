@@ -51,7 +51,7 @@ export function generateSTLListFromComponents(
 
 
 
-export const launchMeshing = (selectedProject: Project, allMaterials: Material[], quantumDimsInput: [number, number, number], dispatch: AppDispatch, saveMeshData: Function, setAlert: Function, previousMeshStatus: 'Not Generated' | 'Generated', execQuery: Function, setLoadingData: Function) => {
+export const launchMeshing = (selectedProject: Project, allMaterials: Material[], quantumDimsInput: [number, number, number]) => {
   const components = selectedProject?.model
     ?.components as ComponentEntity[];
   const objToSendToMesher = {
@@ -64,89 +64,7 @@ export const launchMeshing = (selectedProject: Project, allMaterials: Material[]
   };
   // local meshing: http://127.0.0.1:8003/meshing
   // lambda aws meshing: https://wqil5wnkowc7eyvzkwczrmhlge0rmobd.lambda-url.eu-west-2.on.aws/
-  axios
-    .post('http://127.0.0.1:8003/meshing', objToSendToMesher)
-    .then((res) => {
-      if (res.data.x) {
-        dispatch(setMessageInfoModal(`the size of the quantum on x is too large compared to the size of the model on x. Please reduce the size of the quantum on x! x must be less than ${res.data.max_x}`));
-        dispatch(setIsAlertInfoModal(true));
-        dispatch(setShowInfoModal(true));
-        setAlert(true);
-        dispatch(setMeshGenerated({
-          status: previousMeshStatus,
-          projectToUpdate: selectedProject.faunaDocumentId as string
-        }));
-      } else if (res.data.y) {
-        dispatch(setMessageInfoModal(`the size of the quantum on y is too large compared to the size of the model on y. Please reduce the size of the quantum on y! y must be less than ${res.data.max_y}`));
-        dispatch(setIsAlertInfoModal(true));
-        dispatch(setShowInfoModal(true));
-        setAlert(true);
-        dispatch(setMeshGenerated({
-          status: previousMeshStatus,
-          projectToUpdate: selectedProject.faunaDocumentId as string
-        }));
-      } else if (res.data.z) {
-        dispatch(setMessageInfoModal(`the size of the quantum on z is too large compared to the size of the model on z. Please reduce the size of the quantum on z! z must be less than ${res.data.max_z}`));
-        dispatch(setIsAlertInfoModal(true));
-        dispatch(setShowInfoModal(true));
-        setAlert(true);
-        dispatch(setMeshGenerated({
-          status: previousMeshStatus,
-          projectToUpdate: selectedProject.faunaDocumentId as string
-        }));
-      } else if(res.data.isStopped === true){
-        dispatch(setMeshGenerated({
-          status: previousMeshStatus,
-          projectToUpdate: selectedProject.faunaDocumentId as string
-        }));
-      } else if (res.data.isValid.valid === false) {
-        dispatch(setMessageInfoModal('Error! Mesh not valid. Please adjust quantum along ' + res.data.isValid.axis + ' axis.'));
-        dispatch(setIsAlertInfoModal(true));
-        dispatch(setShowInfoModal(true));
-        setAlert(true);
-        dispatch(setMeshGenerated({
-          status: previousMeshStatus,
-          projectToUpdate: selectedProject.faunaDocumentId as string
-        }));
-      } else {
-        dispatch(setMeshGenerated({
-          status: 'Generated',
-          projectToUpdate: selectedProject.faunaDocumentId as string
-        }));
-        dispatch(setMesh({ mesh: res.data.mesh, projectToUpdate: selectedProject.faunaDocumentId as string }));
-        dispatch(setExternalGrids({
-          extGrids: res.data.grids,
-          projectToUpdate: selectedProject.faunaDocumentId as string
-        }));
-        execQuery(
-          updateProjectInFauna,
-          convertInFaunaProjectThis({
-            ...selectedProject,
-            meshData: {
-              ...selectedProject.meshData,
-              mesh: res.data.mesh,
-              externalGrids: res.data.grids,
-              meshGenerated: 'Generated'
-            }
-          })
-        ).then(() => {
-        });
-        return '';
-      }
-    })
-    .catch((err) => {
-      if (err) {
-        dispatch(setMessageInfoModal('Error while generating mesh, please start mesher on plugins section and try again'));
-        dispatch(setIsAlertInfoModal(true));
-        dispatch(setShowInfoModal(true));
-        setAlert(true);
-        dispatch(setMeshGenerated({
-          status: previousMeshStatus,
-          projectToUpdate: selectedProject.faunaDocumentId as string
-        }));
-        console.log(err);
-      }
-    });
+  client.publish({destination: "management", body: JSON.stringify({ message: "compute mesh", body: objToSendToMesher })})
 };
 
 export const computeSuggestedQuantum = (selectedProject: Project, allMaterials: Material[], dispatch: AppDispatch, execQuery: Function, setSuggestedQuantumError: Function, setQuantumDimsInput: Function) => {
