@@ -13,6 +13,11 @@ import { activeMeshingSelector, activeSimulationsSelector, setHomePat } from './
 import { HiOutlineLogout } from 'react-icons/hi';
 import { GiSettingsKnobs } from 'react-icons/gi';
 import { FaUser } from 'react-icons/fa';
+import { Client } from '@stomp/stompjs';
+
+export const client = new Client({
+  brokerURL: 'ws://localhost:15674/ws',
+});
 
 
 
@@ -24,6 +29,10 @@ export default function App() {
     window.electron.ipcRenderer.invoke('getInstallationDir').then(res => {
       dispatch(setHomePat(res))
     })
+    client.activate()
+    return () => {
+      client.deactivate()
+    }
   }, []);
 
 

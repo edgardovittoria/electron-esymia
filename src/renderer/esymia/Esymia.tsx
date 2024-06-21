@@ -7,11 +7,9 @@ import {
   tabSelectedSelector,
 } from './store/tabsAndMenuItemsSlice';
 import {
-  activeMeshingSelector,
-  activeSimulationsSelector, findProjectByFaunaID, mainFolderSelector,
+  
   selectFolder,
-  setProjectsFolderToUser, setSuggestedQuantum, sharedElementsFolderSelector
-} from './store/projectSlice';
+  setProjectsFolderToUser} from './store/projectSlice';
 import {
   ActivePluginsSelector,
   addActivePlugin,
@@ -22,10 +20,9 @@ import {
 } from './store/pluginsSlice';
 import {
   getFoldersByOwner,
-  getSimulationProjectsByOwner, updateProjectInFauna
-} from './faunadb/projectsFolderAPIs';
+  getSimulationProjectsByOwner} from './faunadb/projectsFolderAPIs';
 import { FaunaFolder, FaunaProject } from './model/FaunaModels';
-import { constructFolderStructure, convertInFaunaProjectThis, convertInProjectThis } from './faunadb/apiAuxiliaryFunctions';
+import { constructFolderStructure, convertInProjectThis } from './faunadb/apiAuxiliaryFunctions';
 import { TabsContainer } from './application/TabsContainer';
 import { ImSpinner } from 'react-icons/im';
 import InfoModal from './application/sharedModals/InfoModal';
@@ -33,40 +30,17 @@ import { CreateNewProjectModal } from './application/sharedModals/CreateNewProje
 import { MenuBar } from './application/MenuBar';
 import { DashboardTabsContentFactory } from './application/dashboardTabsManagement/DashboardTabsContentFactory';
 import { SimulationTabsContentFactory } from './application/simulationTabsManagement/SimulationTabsContentFactory';
-import SimulationStatus from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/SimulationStatus';
 import { BsPlugin } from 'react-icons/bs';
 import Plugins from './plugin/Plugins';
-import MeshingStatus
-  from './application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/MeshingStatus';
-import { createFolder, getDirContents, uploadFile } from '../fileSystemAPIs/fileSystemAPIs';
 import { Client } from '@stomp/stompjs';
-import { Folder, Project } from './model/esymiaModels';
-import {
-  takeAllProjectsIn,
-  takeAllProjectsInArrayOf
-} from './store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
-import { callback_mesh_advices, callback_mesher_feedback, callback_mesher_results } from './application/rabbitMQFunctions';
+import { client } from '../App';
+import { callback_mesh_advices } from './application/rabbitMQFunctions';
 export interface EsymiaProps {
   selectedTab: string;
 }
 
-export const client = new Client({
-  brokerURL: 'ws://localhost:15674/ws',
-  onConnect: () => {
-    //client.subscribe('management', callback_mgmt);
-    //client.subscribe('mesher_feedback', callback_mesher_feedback);
-  },
-});
 
 const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
-
-  const findProject = async (projectID: string) => {
-    let projects: FaunaProject[]  = await execQuery(getSimulationProjectsByOwner, user.email)
-    return convertInProjectThis(projects.filter(p => p.id === projectID)[0])
-  }
-
-  const [loadedFolders, setLoadedFolders] = useState<boolean>(false);
-
 
   const dispatch = useDispatch();
   // SELECTORS
@@ -92,18 +66,6 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
       setFeedbackMeshingVisible(true);
     }
   }, [activeMeshing.length]); */
-
-  useEffect(() => {
-    if(loadedFolders){
-      if(client.connected){
-        client.subscribe('mesh_advices', (msg) => callback_mesh_advices(msg, findProject, execQuery, dispatch))
-        client.subscribe('mesher_results', (msg) => callback_mesher_results(msg, findProject, execQuery, dispatch))
-        client.subscribe('mesher_feedback', (msg) => callback_mesher_feedback(msg, dispatch))
-      }else{
-        client.activate()
-      }
-    }
-  }, [client.connected, loadedFolders]);
 
 
   const activePlugins = useSelector(ActivePluginsSelector);
@@ -169,7 +131,6 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
               dispatch(setProjectsFolderToUser(folder));
               dispatch(selectFolder(folder.faunaDocumentId as string));
               setLoginSpinner(false);
-              setLoadedFolders(true)
             },
           );
         },

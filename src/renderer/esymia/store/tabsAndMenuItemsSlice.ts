@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Project } from '../model/esymiaModels';
+import { Project, SolverOutput } from '../model/esymiaModels';
 import { selectProject } from './projectSlice';
 
 const getMenuItemsArrayBasedOnTabType = (tabType: string) => {
@@ -32,7 +32,13 @@ type TabsAndMenuItemsState = {
   scalingViewParamsOfMesh: ScalingViewParams
   meshVisualization: 'normal' | 'light',
   mesherProgressLength: {length: number, id: string}[],
-  mesherProgress: {index: number, id: string}[]
+  mesherProgress: {index: number, id: string}[],
+  computingP: {done: boolean, id: string}[],
+  computingLp: {done: boolean, id: string}[],
+  iterations: {freqNumber: number, id: string}[],
+  meshAdvice: {id: string, quantum: [number, number, number]}[],
+  meshResults: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}}[],
+  solverResults: {id: string, matrices: SolverOutput, isStopped: boolean}[]
 }
 
 export const TabsAndMenuItemsSlice = createSlice({
@@ -53,7 +59,13 @@ export const TabsAndMenuItemsSlice = createSlice({
     scalingViewParamsOfMesh: {x:1, y:1, z:1},
     meshVisualization: 'light',
     mesherProgressLength: [],
-    mesherProgress: []
+    mesherProgress: [],
+    computingP: [],
+    computingLp: [],
+    iterations: [],
+    meshAdvice: [], 
+    meshResults: [],
+    solverResults: []
   } as TabsAndMenuItemsState,
   reducers: {
     selectTab(state: TabsAndMenuItemsState, action: PayloadAction<string>) {
@@ -109,7 +121,49 @@ export const TabsAndMenuItemsSlice = createSlice({
     },
     unsetMeshProgress(state: TabsAndMenuItemsState, action: PayloadAction<string>){
       state.mesherProgress = state.mesherProgress.filter(item => item.id !== action.payload)
-    }
+    },
+    setcomputingP(state: TabsAndMenuItemsState, action: PayloadAction<{done: boolean, id: string}>){
+      state.computingP = state.computingP.filter(item => item.id !== action.payload.id)
+      state.computingP.push(action.payload)
+    },
+    setcomputingLp(state: TabsAndMenuItemsState, action: PayloadAction<{done: boolean, id: string}>){
+      state.computingLp = state.computingLp.filter(item => item.id !== action.payload.id)
+      state.computingLp.push(action.payload)
+    },
+    setIterations(state: TabsAndMenuItemsState, action: PayloadAction<{freqNumber: number, id: string}>){
+      state.iterations = state.iterations.filter(item => item.id !== action.payload.id)
+      state.iterations.push(action.payload)
+    },
+    unsetComputingP(state: TabsAndMenuItemsState, action: PayloadAction<string>){
+      state.computingP = state.computingP.filter(item => item.id !== action.payload)
+    },
+    unsetComputingLp(state: TabsAndMenuItemsState, action: PayloadAction<string>){
+      state.computingLp = state.computingLp.filter(item => item.id !== action.payload)
+    },
+    unsetIterations(state: TabsAndMenuItemsState, action: PayloadAction<string>){
+      state.iterations = state.iterations.filter(item => item.id !== action.payload)
+    },
+    setMeshAdvice(state: TabsAndMenuItemsState, action: PayloadAction<{quantum: [number, number, number], id: string}>){
+      state.meshAdvice = state.meshAdvice.filter(item => item.id !== action.payload.id)
+      state.meshAdvice.push(action.payload)
+    },
+    setMesherResults(state: TabsAndMenuItemsState, action: PayloadAction<{gridsPath: string, meshPath: string, id: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}}>){
+      state.meshResults = state.meshResults.filter(item => item.id !== action.payload.id)
+      state.meshResults.push(action.payload)
+    },
+    setSolverResults(state: TabsAndMenuItemsState, action: PayloadAction<{matrices: SolverOutput, id: string, isStopped: boolean}>){
+      state.solverResults = state.solverResults.filter(item => item.id !== action.payload.id)
+      state.solverResults.push(action.payload)
+    },
+    unsetMeshAdvice(state: TabsAndMenuItemsState, action: PayloadAction<string>){
+      state.meshAdvice = state.meshAdvice.filter(item => item.id !== action.payload)
+    },
+    unsetMesherResults(state: TabsAndMenuItemsState, action: PayloadAction<string>){
+      state.meshResults = state.meshResults.filter(item => item.id !== action.payload)
+    },
+    unsetSolverResults(state: TabsAndMenuItemsState, action: PayloadAction<string>){
+      state.solverResults = state.solverResults.filter(item => item.id !== action.payload)
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -135,7 +189,19 @@ export const {
   setMeshProgressLength,
   setMeshProgress,
   unsetMeshProgressLength,
-  unsetMeshProgress
+  unsetMeshProgress,
+  setcomputingP,
+  setcomputingLp,
+  setIterations,
+  unsetComputingP,
+  unsetComputingLp,
+  unsetIterations,
+  setMeshAdvice,
+  setMesherResults,
+  setSolverResults,
+  unsetMeshAdvice,
+  unsetMesherResults,
+  unsetSolverResults
 } = TabsAndMenuItemsSlice.actions;
 
 
@@ -189,3 +255,27 @@ export const mesherProgressLengthSelector = (state: {
 export const mesherProgressSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState
 }) => state.tabsAndMenuItems.mesherProgress;
+
+export const computingPSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.computingP;
+
+export const computingLpSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.computingLp;
+
+export const iterationsSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.iterations;
+
+export const meshAdviceSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.meshAdvice;
+
+export const mesherResultsSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.meshResults;
+
+export const solverResultsSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.solverResults;

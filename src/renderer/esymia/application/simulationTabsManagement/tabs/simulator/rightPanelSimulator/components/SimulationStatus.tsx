@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import { Disclosure } from '@headlessui/react';
-import useWebSocket from 'react-use-websocket';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
 import { ComponentEntity, useFaunaQuery } from 'cad-library';
 import { Project, Simulation } from '../../../../../../model/esymiaModels';
 import {
@@ -14,23 +12,30 @@ import {
 } from '../../../../../../store/solverSlice';
 import {
   deleteSimulation,
-  findProjectByFaunaID,
-  projectsSelector,
   selectedProjectSelector,
   setMeshApproved,
-  sharedProjectsSelector,
   updateSimulation,
 } from '../../../../../../store/projectSlice';
-import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { getMaterialListFrom } from '../../Simulator';
 import {
+  computingLpSelector,
+  computingPSelector,
   isAlertInfoModalSelector,
   isConfirmedInfoModalSelector,
+  iterationsSelector,
   setIsAlertInfoModal,
   setMessageInfoModal,
   setShowInfoModal,
+  solverResultsSelector,
+  unsetComputingLp,
+  unsetComputingP,
+  unsetIterations,
+  unsetSolverResults,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
+import { callback_solver_feedback, callback_solver_results } from '../../../../../rabbitMQFunctions';
+import { client } from '../../../../../../../App';
+import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
+import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean;
@@ -43,6 +48,14 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
   setFeedbackSimulationVisible,
   activeSimulations,
 }) => {
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    client.subscribe('solver_results', (msg) => callback_solver_results(msg, dispatch), {ack: 'client'})
+    client.subscribe('solver_feedback', (msg) => callback_solver_feedback(msg, dispatch), {ack: 'client'})
+  }, [])
+
   return (
     <div
       className={`absolute right-10 w-1/4 bottom-16 flex flex-col justify-center items-center bg-white p-3 rounded ${
@@ -79,26 +92,22 @@ const SimulationStatusItem: React.FC<{
   frequenciesNumber: number;
   associatedProjectID: string;
 }> = ({ name, frequenciesNumber, associatedProjectID }) => {
-  const WS_URL = 'ws://localhost:8080';
-  const [computingP, setComputingP] = useState(false);
-  const [computingLpx, setComputingLpx] = useState(false);
-  const [iterations, setIterations] = useState(0);
-  const [computationCompleted, setComputationCompleted] = useState<boolean>(false);
   const selectedProject = useSelector(selectedProjectSelector) as Project;
+  const computingP = useSelector(computingPSelector).filter(item => item.id === selectedProject.faunaDocumentId as string)[0]
+  const computingLpx = useSelector(computingLpSelector).filter(item => item.id === selectedProject.faunaDocumentId as string)[0]
+  const iterations = useSelector(iterationsSelector).filter(item => item.id === selectedProject.faunaDocumentId as string)[0]
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
-  const allProjects = useSelector(projectsSelector);
-  const allSharedProjects = useSelector(sharedProjectsSelector);
   const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
   const isAlert = useSelector(isAlertInfoModalSelector);
-
+  const solverResults = useSelector(solverResultsSelector).filter(item => item.id === selectedProject.faunaDocumentId as string)[0]
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
 
   useEffect(() => {
     if (isAlertConfirmed) {
       if (!isAlert) {
-        sendMessage('Stop computation');
+        //sendMessage('Stop computation');
       } else {
         dispatch(deleteSimulation(associatedProjectID));
         dispatch(setMeshApproved({ approved: false, projectToUpdate: associatedProjectID }));
@@ -124,7 +133,7 @@ const SimulationStatusItem: React.FC<{
         frequencies: frequencyArray,
         /* signals: signalsValuesArray,
         powerPort: project && project.signal?.powerPort, */
-        unit: selectedProject.modelUnit,
+        unit: project.modelUnit,
         ports_scattering_value: project.scatteringValue,
       },
       solverAlgoParams: {
@@ -132,81 +141,58 @@ const SimulationStatusItem: React.FC<{
         outerIteration: solverIterations[0],
         convergenceThreshold,
       },
+      id: project.faunaDocumentId as string
     };
   };
 
-  const { sendMessage } = useWebSocket(WS_URL, {
-    onOpen: () => {
-      console.log('WebSocket connection established.');
-      // https://teemaserver.cloud/solving
-      console.log('start request');
-      axios
-        .post(
-          'http://127.0.0.1:8000/solving',
-          solverInputFrom(
-            selectedProject,
-            solverIterations,
-            convergenceThreshold,
-          ),
-        )
-        .then((res) => {
-          if (res.data === false) {
-            dispatch(deleteSimulation(associatedProjectID));
-            dispatch(setMeshApproved({ approved: false, projectToUpdate: associatedProjectID }));
-          } else {
-            // dispatch(setSolverOutput(res.data));
-            const simulationUpdated: Simulation = {
-              ...(selectedProject.simulation as Simulation),
-              results: res.data,
-              ended: Date.now().toString(),
-              status: 'Completed',
-            };
 
-            dispatch(updateSimulation(simulationUpdated));
-            execQuery(
-              updateProjectInFauna,
-              convertInFaunaProjectThis({
-                ...findProjectByFaunaID(
-                  [...allProjects, ...allSharedProjects],
-                  simulationUpdated.associatedProject,
-                ),
-                simulation: simulationUpdated,
-              } as Project),
-            ).then(() => {});
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          dispatch(
-            setMessageInfoModal('Error while solving, please try again'),
-          );
-          dispatch(setIsAlertInfoModal(true));
-          dispatch(setShowInfoModal(true));
-        });
-    },
-    shouldReconnect: () => false,
-    onMessage: (event) => {
-      if (event.data === 'P Computing Completed') {
-        setComputingP(true);
-      } else if (event.data === 'Lp Computing Completed') {
-        setComputingLpx(true);
-      } else if (event.data === 'Computation Completed') {
-        setComputationCompleted(true);
-      } else {
-        setIterations(event.data);
-      }
-    },
-    onClose: () => {
-      console.log('WebSocket connection closed.');
-    },
-    onError: () => {
-      dispatch(setMessageInfoModal('Error while solving, please start solver on plugins section and try again'))
-      dispatch(setIsAlertInfoModal(true))
-      dispatch(setShowInfoModal(true))
-      dispatch(deleteSimulation(associatedProjectID));
-      dispatch(setMeshApproved({approved: false, projectToUpdate: associatedProjectID}));
+  useEffect(() => {
+    
+    let objectToSendToSolver = solverInputFrom(
+      selectedProject,
+      solverIterations,
+      convergenceThreshold,
+    )
+    client.publish({destination: "management_solver", body: JSON.stringify({ message: "solving", body: objectToSendToSolver })})    
+    return () => {
+      dispatch(unsetComputingLp(selectedProject.faunaDocumentId as string))
+      dispatch(unsetComputingP(selectedProject.faunaDocumentId as string))
+      dispatch(unsetIterations(selectedProject.faunaDocumentId as string))
+      dispatch(unsetSolverResults(selectedProject.faunaDocumentId as string))
     }
-  });
+  }, [])
+
+  useEffect(() => {
+    if(solverResults){
+      if (solverResults.isStopped) {
+        dispatch(deleteSimulation(selectedProject.faunaDocumentId as string));
+        dispatch(
+          setMeshApproved({
+            approved: false,
+            projectToUpdate: selectedProject.faunaDocumentId as string,
+          }),
+        );
+      } else {
+        // dispatch(setSolverOutput(res.data));
+        const simulationUpdated: Simulation = {
+          ...(selectedProject.simulation as Simulation),
+          results: solverResults.matrices,
+          ended: Date.now().toString(),
+          status: 'Completed',
+        };
+    
+        dispatch(updateSimulation(simulationUpdated));
+        execQuery(
+          updateProjectInFauna,
+          convertInFaunaProjectThis({
+            ...selectedProject,
+            simulation: simulationUpdated,
+          } as Project),
+        ).then(() => {});
+      }
+    }
+  }, [solverResults])
+
 
   return (
     <div className="w-full px-4 pt-2">
@@ -227,7 +213,7 @@ const SimulationStatusItem: React.FC<{
                   <div className="flex flex-col gap-2">
                     <span>Computing P</span>
                     <div className="flex flex-row justify-between items-center w-full">
-                      {computingP ? (
+                      {computingP && computingP.done ? (
                         <div className="flex flex-row w-full justify-between items-center">
                           <progress
                             className="progress w-full mr-4"
@@ -248,7 +234,7 @@ const SimulationStatusItem: React.FC<{
                   <div className="flex flex-col gap-2 mt-2">
                     <span>Computing Lp</span>
                     <div className="flex flex-row justify-between items-center w-full">
-                      {computingLpx ? (
+                      {computingLpx && computingLpx.done ? (
                         <div className="flex flex-row justify-between items-center w-full">
                           <progress
                             className="progress w-full mr-4"
@@ -270,8 +256,8 @@ const SimulationStatusItem: React.FC<{
                     <span>Doing Iterations</span>
                     <progress
                       className="progress w-full"
-                      value={iterations}
-                      max={frequenciesNumber + 1}
+                      value={iterations ? iterations.freqNumber : 0}
+                      max={frequenciesNumber}
                     />
                   </div>
                 </div>
