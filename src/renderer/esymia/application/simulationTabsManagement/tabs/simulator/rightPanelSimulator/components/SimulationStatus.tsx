@@ -40,7 +40,7 @@ import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAP
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean;
   setFeedbackSimulationVisible: (v: boolean) => void;
-  activeSimulations: { simulation: Simulation; freqNumber: number }[];
+  activeSimulations: { simulation: Simulation; freqNumber: number, project: Project }[];
 }
 
 const SimulationStatus: React.FC<SimulationStatusProps> = ({
@@ -77,7 +77,8 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
             key={sim.simulation.name}
             name={sim.simulation.name}
             frequenciesNumber={sim.freqNumber}
-            associatedProjectID={sim.simulation.associatedProject}
+            associatedProject={sim.project}
+            simulation={sim.simulation}
           />
         ))}
       </div>
@@ -90,17 +91,17 @@ export default SimulationStatus;
 const SimulationStatusItem: React.FC<{
   name: string;
   frequenciesNumber: number;
-  associatedProjectID: string;
-}> = ({ name, frequenciesNumber, associatedProjectID }) => {
-  const selectedProject = useSelector(selectedProjectSelector) as Project;
-  const computingP = useSelector(computingPSelector).filter(item => item.id === selectedProject.faunaDocumentId as string)[0]
-  const computingLpx = useSelector(computingLpSelector).filter(item => item.id === selectedProject.faunaDocumentId as string)[0]
-  const iterations = useSelector(iterationsSelector).filter(item => item.id === selectedProject.faunaDocumentId as string)[0]
+  associatedProject: Project;
+  simulation: Simulation;
+}> = ({ name, frequenciesNumber, associatedProject, simulation }) => {
+  const computingP = useSelector(computingPSelector).filter(item => item.id === associatedProject.faunaDocumentId)[0]
+  const computingLpx = useSelector(computingLpSelector).filter(item => item.id === associatedProject.faunaDocumentId)[0]
+  const iterations = useSelector(iterationsSelector).filter(item => item.id === associatedProject.faunaDocumentId)[0]
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
   const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
   const isAlert = useSelector(isAlertInfoModalSelector);
-  const solverResults = useSelector(solverResultsSelector).filter(item => item.id === selectedProject.faunaDocumentId as string)[0]
+  const solverResults = useSelector(solverResultsSelector).filter(item => item.id === associatedProject.faunaDocumentId)[0]
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
 
@@ -109,8 +110,8 @@ const SimulationStatusItem: React.FC<{
       if (!isAlert) {
         //sendMessage('Stop computation');
       } else {
-        dispatch(deleteSimulation(associatedProjectID));
-        dispatch(setMeshApproved({ approved: false, projectToUpdate: associatedProjectID }));
+        dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
+        dispatch(setMeshApproved({ approved: false, projectToUpdate: associatedProject.faunaDocumentId as string }));
       }
     }
   }, [isAlertConfirmed]);
@@ -149,43 +150,42 @@ const SimulationStatusItem: React.FC<{
   useEffect(() => {
     
     let objectToSendToSolver = solverInputFrom(
-      selectedProject,
+      associatedProject,
       solverIterations,
       convergenceThreshold,
     )
     client.publish({destination: "management_solver", body: JSON.stringify({ message: "solving", body: objectToSendToSolver })})    
     return () => {
-      dispatch(unsetComputingLp(selectedProject.faunaDocumentId as string))
-      dispatch(unsetComputingP(selectedProject.faunaDocumentId as string))
-      dispatch(unsetIterations(selectedProject.faunaDocumentId as string))
-      dispatch(unsetSolverResults(selectedProject.faunaDocumentId as string))
+      dispatch(unsetComputingLp(associatedProject.faunaDocumentId as string))
+      dispatch(unsetComputingP(associatedProject.faunaDocumentId as string))
+      dispatch(unsetIterations(associatedProject.faunaDocumentId as string))
+      dispatch(unsetSolverResults(associatedProject.faunaDocumentId as string))
     }
   }, [])
 
   useEffect(() => {
     if(solverResults){
       if (solverResults.isStopped) {
-        dispatch(deleteSimulation(selectedProject.faunaDocumentId as string));
+        dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
         dispatch(
           setMeshApproved({
             approved: false,
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: associatedProject.faunaDocumentId as string,
           }),
         );
       } else {
         // dispatch(setSolverOutput(res.data));
         const simulationUpdated: Simulation = {
-          ...(selectedProject.simulation as Simulation),
+          ...simulation,
           results: solverResults.matrices,
           ended: Date.now().toString(),
           status: 'Completed',
         };
-    
         dispatch(updateSimulation(simulationUpdated));
         execQuery(
           updateProjectInFauna,
           convertInFaunaProjectThis({
-            ...selectedProject,
+            ...associatedProject,
             simulation: simulationUpdated,
           } as Project),
         ).then(() => {});

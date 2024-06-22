@@ -15,10 +15,7 @@ export const DashboardTabsContentFactory: React.FC<
 > = () => {
 
   const menuItemSelected = useSelector(selectedMenuItemSelector);
-  const dispatch = useDispatch()
-  useEffect(() => {
-    client.subscribe('mesh_advices', (msg) => callback_mesh_advices(msg, dispatch), {ack: 'client'})
-  }, [])
+  
 
   switch (menuItemSelected) {
     case 'Overview':

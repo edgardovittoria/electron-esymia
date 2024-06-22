@@ -14,11 +14,15 @@ import {
 import {BiExport, BiImport} from "react-icons/bi";
 import { exportToJsonFileThis } from "../../sharedElements/utilityFunctions";
 import { generateTerminationName, isTerminationNameValid } from "./portManagement/selectPorts/portLumpedProbeGenerator";
+import { useFaunaQuery } from "cad-library";
+import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
+import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
 
 export const ImportExportPhysicsSetup: FC<{}> = () => {
     const selectedProject = useSelector(selectedProjectSelector) as Project;
     const dispatch = useDispatch();
     const inputRefPhysics = useRef(null);
+    const { execQuery } = useFaunaQuery()
 
     const onImportPhysicsClick = () => {
         let input = inputRefPhysics.current;
@@ -55,6 +59,16 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                                 physics.frequencies && dispatch(setFrequencies(physics.frequencies));
                                 physics.portScatteringValue && dispatch(setScatteringValue(physics.portScatteringValue))
                                 e.target.value = ""
+                                execQuery(
+                                    updateProjectInFauna,
+                                    convertInFaunaProjectThis({
+                                      ...selectedProject,
+                                      frequencies: physics.frequencies,
+                                      ports: physics.ports,
+                                      scatteringValue: physics.portScatteringValue,
+                                      portKey: physics.portKey
+                                    } as Project),
+                                  ).then()
                             });
                         }}
                     />

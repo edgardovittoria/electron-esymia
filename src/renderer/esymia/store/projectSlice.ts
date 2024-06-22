@@ -396,15 +396,15 @@ export const folderByID = (state: ProjectState, folderID: string | undefined) =>
 };
 
 export const activeSimulationsSelector = (state: { projects: ProjectState }) => {
-  let activeSimulations: { simulation: Simulation, freqNumber: number }[] = [];
+  let activeSimulations: { simulation: Simulation, freqNumber: number, project: Project }[] = [];
   takeAllProjectsIn(state.projects.projects).forEach(p => {
     if (p.simulation && p.simulation.status === 'Queued') {
-      activeSimulations.push({ simulation: p.simulation, freqNumber: p.frequencies?.length as number });
+      activeSimulations.push({ simulation: p.simulation, freqNumber: p.frequencies?.length as number, project: p});
     }
   });
   takeAllProjectsIn(state.projects.sharedElements).forEach(p => {
     if (p.simulation && p.simulation.status === 'Queued') {
-      activeSimulations.push({ simulation: p.simulation, freqNumber: p.frequencies?.length as number });
+      activeSimulations.push({ simulation: p.simulation, freqNumber: p.frequencies?.length as number, project: p });
     }
   });
   return activeSimulations;
