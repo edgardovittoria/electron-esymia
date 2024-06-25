@@ -29,7 +29,10 @@ export default function App() {
     window.electron.ipcRenderer.invoke('getInstallationDir').then(res => {
       dispatch(setHomePat(res))
     })
-    client.activate()
+    window.electron.ipcRenderer.invoke('runBroker', []).then(() => {
+      client.activate()
+    })
+    
     return () => {
       client.deactivate()
     }

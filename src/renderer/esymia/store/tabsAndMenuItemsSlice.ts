@@ -57,7 +57,7 @@ export const TabsAndMenuItemsSlice = createSlice({
     },
     showCreateNewProjectModal: false,
     scalingViewParamsOfMesh: {x:1, y:1, z:1},
-    meshVisualization: 'light',
+    meshVisualization: 'normal',
     mesherProgressLength: [],
     mesherProgress: [],
     computingP: [],

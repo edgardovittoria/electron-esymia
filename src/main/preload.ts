@@ -21,6 +21,7 @@ export type Channels =
   | 'createFolder'
   | 'deleteFolder'
   | 'readFile'
+  | 'runBroker'
   ;
 
 const electronHandler = {

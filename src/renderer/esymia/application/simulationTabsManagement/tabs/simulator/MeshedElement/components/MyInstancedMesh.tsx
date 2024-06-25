@@ -92,9 +92,9 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
                 }}
                 key={uniqid()}
                 position={new THREE.Vector3(
-                  (component.transformationParams.position[0] - modelTranslationOffset.x -(cellSize.cell_size_x*1000/2))*scalingViewParams.x,
-                  (component.transformationParams.position[1] - modelTranslationOffset.y -(cellSize.cell_size_y*1000/2))*scalingViewParams.y,
-                  (component.transformationParams.position[2] - modelTranslationOffset.z -(cellSize.cell_size_z*1000/2))*scalingViewParams.z,
+                  (component.transformationParams.position[0] - modelTranslationOffset.x +(cellSize.cell_size_x*1000)/2)*scalingViewParams.x,
+                  (component.transformationParams.position[1] - modelTranslationOffset.y +(cellSize.cell_size_y*1000)/2)*scalingViewParams.y,
+                  (component.transformationParams.position[2] - modelTranslationOffset.z +(cellSize.cell_size_z*1000/2))*scalingViewParams.z,
                 )}
                 rotation={component.transformationParams.rotation}
                 scale={new THREE.Vector3(

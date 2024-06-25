@@ -16,8 +16,7 @@ import axios from 'axios';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import nodeChildProcess from 'child_process';
-import { mkdir, readdir, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync } from 'fs';
-
+import { mkdir, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync } from 'fs';
 
 class AppUpdater {
   constructor() {
@@ -246,3 +245,37 @@ ipcMain.handle('deleteFolder', (e, args) => {
   let path = app.getPath('home')
   rmdir(path+"/"+args[0],  () => {})
 })
+
+ipcMain.handle('runBroker', (e, args) => {
+  nodeChildProcess.spawn('bash', [getServerPath('BROKER.sh'), getServerPath()]).stdout.on('data', (data) => {
+    console.log(`${data}`);
+  })
+  // nodeChildProcess
+  //   .spawn('bash', [getServerPath('BROKER.sh')])
+  //   .stdout.on('data', (data) => {
+  //     if (`${data}` === 'brew not installed\n') {
+  //       var options = {
+  //         name: 'Electron',
+  //       };
+  //       sudo.exec(
+  //         '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" ',
+  //         options,
+  //         function (error, stdout, stderr) {
+  //           if (error) throw error;
+  //           console.log('stdout: ' + stdout);
+  //         },
+  //       );
+  //     }else{
+  //       console.log('2')
+  //     }
+  //   });
+  // var options = {
+  //   name: 'Electron'
+  // };
+  // sudo.exec('sh '+getServerPath('BROKER.sh'), options,
+  //   function(error, stdout, stderr) {
+  //     if (error) throw error;
+  //     console.log('stdout: ' + stdout);
+  //   }
+  // );
+});
