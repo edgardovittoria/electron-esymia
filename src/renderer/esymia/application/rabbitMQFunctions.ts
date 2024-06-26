@@ -1,26 +1,10 @@
-import { Folder, Project, Simulation, SolverOutput } from '../model/esymiaModels';
+import { SolverOutput } from '../model/esymiaModels';
 import {
-  deleteSimulation,
-  findProjectByFaunaID,
-  setExternalGrids,
-  setMesh,
-  setMeshApproved,
-  setMeshGenerated,
-  setSuggestedQuantum,
-  updateSimulation,
-} from '../store/projectSlice';
-import { takeAllProjectsInArrayOf } from '../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
-import { updateProjectInFauna } from '../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../faunadb/apiAuxiliaryFunctions';
-import {
-  setIsAlertInfoModal,
   setIterations,
   setMeshAdvice,
   setMeshProgress,
   setMeshProgressLength,
   setMesherResults,
-  setMessageInfoModal,
-  setShowInfoModal,
   setSolverResults,
   setcomputingLp,
   setcomputingP,

@@ -168,6 +168,15 @@ const SERVER_PATH = app.isPackaged
 const getServerPath = (...paths: string[]): string => {
   return path.join(SERVER_PATH, ...paths);
 };
+
+const DOCKER_PATH = app.isPackaged
+  ? path.join(process.resourcesPath, 'src/docker')
+  : path.join(__dirname, '../../src/docker');
+
+const getDockerPath = (...paths: string[]): string => {
+  return path.join(DOCKER_PATH, ...paths);
+};
+
 ipcMain.on('runMesher', (e, args) => {
   let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES/juliaMesher')]);
   serverProcesses.mesher = scriptMesher
@@ -247,35 +256,8 @@ ipcMain.handle('deleteFolder', (e, args) => {
 })
 
 ipcMain.handle('runBroker', (e, args) => {
-  nodeChildProcess.spawn('bash', [getServerPath('BROKER.sh'), getServerPath()]).stdout.on('data', (data) => {
+  nodeChildProcess.spawn('bash', [getDockerPath('BROKER.sh'), getDockerPath()]).stdout.on('data', (data) => {
     console.log(`${data}`);
+    //return {data: `${data}`}
   })
-  // nodeChildProcess
-  //   .spawn('bash', [getServerPath('BROKER.sh')])
-  //   .stdout.on('data', (data) => {
-  //     if (`${data}` === 'brew not installed\n') {
-  //       var options = {
-  //         name: 'Electron',
-  //       };
-  //       sudo.exec(
-  //         '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" ',
-  //         options,
-  //         function (error, stdout, stderr) {
-  //           if (error) throw error;
-  //           console.log('stdout: ' + stdout);
-  //         },
-  //       );
-  //     }else{
-  //       console.log('2')
-  //     }
-  //   });
-  // var options = {
-  //   name: 'Electron'
-  // };
-  // sudo.exec('sh '+getServerPath('BROKER.sh'), options,
-  //   function(error, stdout, stderr) {
-  //     if (error) throw error;
-  //     console.log('stdout: ' + stdout);
-  //   }
-  // );
 });
