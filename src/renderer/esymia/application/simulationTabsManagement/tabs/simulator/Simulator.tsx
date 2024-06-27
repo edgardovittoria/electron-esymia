@@ -20,8 +20,6 @@ import { ImSpinner } from 'react-icons/im';
 import { useStorageData } from './rightPanelSimulator/hook/useStorageData';
 import { meshVisualizationSelector, setMeshVisualization } from '../../../../store/tabsAndMenuItemsSlice';
 import { LiaFeatherSolid, LiaWeightHangingSolid } from "react-icons/lia";
-import { client } from '../../../../../App';
-import { callback_mesh_advices } from '../../../rabbitMQFunctions';
 
 
 interface SimulatorProps {
@@ -46,12 +44,12 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const toggleResetFocus = () => setResetFocus(!resetFocus)
   const { loadMeshData } = useStorageData()
 
-  useEffect(() => {
-    let subscription = client.subscribe('mesh_advices', (msg) => callback_mesh_advices(msg, dispatch), {ack: 'client'})
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [])
+  // useEffect(() => {
+  //   let subscription = client.subscribe('mesh_advices', (msg) => callback_mesh_advices(msg, dispatch), {ack: 'client'})
+  //   return () => {
+  //     subscription.unsubscribe()
+  //   }
+  // }, [])
 
   useEffect(() => {
     if (selectedProject?.meshData.mesh && selectedProject?.meshData.meshGenerated === "Generated") {

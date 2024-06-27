@@ -3,9 +3,8 @@ import { ImSpinner } from 'react-icons/im';
 import { useDispatch, useSelector } from 'react-redux';
 import { MesherStatusSelector, setMesherStatus, setSolverStatus, SolverStatusSelector } from '../../store/pluginsSlice';
 import { FaPlay, FaStop } from 'react-icons/fa';
-import { BiSolidDetail } from 'react-icons/bi';
 import { CgDetailsMore } from 'react-icons/cg';
-import { client } from '../../../App';
+import { publishMessage } from '../../../middleware/stompMiddleware';
 
 export interface ServerGUIProps{
 
@@ -134,12 +133,17 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                         className={`${solverStatus === 'idle' && 'text-gray-400'}`}
                         onClick={() => {
                           //window.electron.ipcRenderer.sendMessage('haltSolver', [])
-                          client.publish({
-                            destination: 'management_solver',
-                            body: JSON.stringify({
+                          dispatch(publishMessage({
+                            queue: 'management_solver',
+                            body: {
                               message: 'stop',
-                            }),
-                          });
+                            }}))
+                          // client.publish({
+                          //   destination: 'management_solver',
+                          //   body: JSON.stringify({
+                          //     message: 'stop',
+                          //   }),
+                          // });
                           dispatch(setSolverStatus('idle'))
                           setSolverLogs(["SOLVER HALTED"])
                         }}

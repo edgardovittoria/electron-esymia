@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, {  } from 'react';
+import { useSelector } from 'react-redux';
 import { Overview } from './tabs/Overview';
 import { Simulations } from './tabs/Simulations';
-import { CreateNewProjectModal } from '../sharedModals/CreateNewProjectModal';
 import { Projects } from './tabs/projects/Projects';
 import { selectedMenuItemSelector } from '../../store/tabsAndMenuItemsSlice';
-import { client } from '../../../App';
-import { callback_mesh_advices } from '../rabbitMQFunctions';
 
 interface DashboardTabsContentFactoryProps {}
 
@@ -15,7 +12,7 @@ export const DashboardTabsContentFactory: React.FC<
 > = () => {
 
   const menuItemSelected = useSelector(selectedMenuItemSelector);
-  
+
 
   switch (menuItemSelected) {
     case 'Overview':

@@ -14,27 +14,19 @@ import {
   unsetMesherResults,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import useWebSocket from 'react-use-websocket';
 import {
   setExternalGrids,
   setMesh,
   setMeshGenerated,
-  setPreviousMeshStatus,
 } from '../../../../../../store/projectSlice';
 import { Project } from '../../../../../../model/esymiaModels';
 import { generateSTLListFromComponents } from './rightPanelFunctions';
 import { ComponentEntity, Material, useFaunaQuery } from 'cad-library';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
-import { Client } from '@stomp/stompjs';
-import {
-  callback_mesh_advices,
-  callback_mesher_feedback,
-  callback_mesher_results,
-} from '../../../../../rabbitMQFunctions';
-import { client } from '../../../../../../../App';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
+import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;
@@ -54,18 +46,18 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    client.subscribe(
-      'mesher_results',
-      (msg) => callback_mesher_results(msg, dispatch),
-      { ack: 'client' },
-    );
-    client.subscribe(
-      'mesher_feedback',
-      (msg) => callback_mesher_feedback(msg, dispatch),
-      { ack: 'client' },
-    );
-  }, []);
+  // useEffect(() => {
+  //   client.subscribe(
+  //     'mesher_results',
+  //     (msg) => callback_mesher_results(msg, dispatch),
+  //     { ack: 'client' },
+  //   );
+  //   client.subscribe(
+  //     'mesher_feedback',
+  //     (msg) => callback_mesher_feedback(msg, dispatch),
+  //     { ack: 'client' },
+  //   );
+  // }, []);
 
   return (
     <div
@@ -132,13 +124,19 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
       quantum: quantumDimsInput,
       fileName: selectedProject.faunaDocumentId as string,
     };
-    client.publish({
-      destination: 'management',
-      body: JSON.stringify({
+    dispatch(publishMessage({
+      queue: 'management',
+      body: {
         message: 'compute mesh',
         body: objToSendToMesher,
-      }),
-    });
+      }}))
+    // client.publish({
+    //   destination: 'management',
+    //   body: JSON.stringify({
+    //     message: 'compute mesh',
+    //     body: objToSendToMesher,
+    //   }),
+    // });
 
     return () => {
       dispatch(

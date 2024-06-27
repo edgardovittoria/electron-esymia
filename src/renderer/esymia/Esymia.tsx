@@ -7,22 +7,19 @@ import {
   tabSelectedSelector,
 } from './store/tabsAndMenuItemsSlice';
 import {
-  
+
   selectFolder,
   setProjectsFolderToUser} from './store/projectSlice';
 import {
   ActivePluginsSelector,
-  addActivePlugin,
   MesherStatusSelector,
-  setMesherStatus,
-  setSolverStatus,
   SolverStatusSelector,
 } from './store/pluginsSlice';
 import {
   getFoldersByOwner,
   getSimulationProjectsByOwner} from './faunadb/projectsFolderAPIs';
 import { FaunaFolder, FaunaProject } from './model/FaunaModels';
-import { constructFolderStructure, convertInProjectThis } from './faunadb/apiAuxiliaryFunctions';
+import { constructFolderStructure } from './faunadb/apiAuxiliaryFunctions';
 import { TabsContainer } from './application/TabsContainer';
 import { ImSpinner } from 'react-icons/im';
 import InfoModal from './application/sharedModals/InfoModal';
@@ -32,9 +29,6 @@ import { DashboardTabsContentFactory } from './application/dashboardTabsManageme
 import { SimulationTabsContentFactory } from './application/simulationTabsManagement/SimulationTabsContentFactory';
 import { BsPlugin } from 'react-icons/bs';
 import Plugins from './plugin/Plugins';
-import { Client } from '@stomp/stompjs';
-import { client } from '../App';
-import { callback_mesh_advices } from './application/rabbitMQFunctions';
 export interface EsymiaProps {
   selectedTab: string;
 }
@@ -83,19 +77,19 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   const mesherStatus = useSelector(MesherStatusSelector);
   const solverStatus = useSelector(SolverStatusSelector);
 
-  useEffect(() => {
-    if (user.userName) {
-      dispatch(addActivePlugin('serverGUI'));
-      if (mesherStatus === 'idle') {
-        dispatch(setMesherStatus('starting'));
-        window.electron.ipcRenderer.sendMessage('runMesher', []);
-      }
-      if (solverStatus === 'idle') {
-        dispatch(setSolverStatus('starting'));
-        window.electron.ipcRenderer.sendMessage('runSolver', []);
-      }
-    }
-  }, [user.userName]);
+  // useEffect(() => {
+  //   if (user.userName) {
+  //     dispatch(addActivePlugin('serverGUI'));
+  //     if (mesherStatus === 'idle') {
+  //       dispatch(setMesherStatus('starting'));
+  //       window.electron.ipcRenderer.sendMessage('runMesher', []);
+  //     }
+  //     if (solverStatus === 'idle') {
+  //       dispatch(setSolverStatus('starting'));
+  //       window.electron.ipcRenderer.sendMessage('runSolver', []);
+  //     }
+  //   }
+  // }, [user.userName]);
 
   const { execQuery } = useFaunaQuery();
 

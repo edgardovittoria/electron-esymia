@@ -39,6 +39,7 @@ type TabsAndMenuItemsState = {
   meshAdvice: {id: string, quantum: [number, number, number]}[],
   meshResults: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}}[],
   solverResults: {id: string, matrices: SolverOutput, isStopped: boolean}[]
+  brokerConnected: boolean
 }
 
 export const TabsAndMenuItemsSlice = createSlice({
@@ -63,9 +64,10 @@ export const TabsAndMenuItemsSlice = createSlice({
     computingP: [],
     computingLp: [],
     iterations: [],
-    meshAdvice: [], 
+    meshAdvice: [],
     meshResults: [],
-    solverResults: []
+    solverResults: [],
+    brokerConnected: false
   } as TabsAndMenuItemsState,
   reducers: {
     selectTab(state: TabsAndMenuItemsState, action: PayloadAction<string>) {
@@ -164,6 +166,12 @@ export const TabsAndMenuItemsSlice = createSlice({
     unsetSolverResults(state: TabsAndMenuItemsState, action: PayloadAction<string>){
       state.solverResults = state.solverResults.filter(item => item.id !== action.payload)
     },
+    setBrokerConnected(state: TabsAndMenuItemsState){
+      state.brokerConnected = true
+    },
+    unsetBrokerConnected(state: TabsAndMenuItemsState){
+      state.brokerConnected = false
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -201,7 +209,9 @@ export const {
   setSolverResults,
   unsetMeshAdvice,
   unsetMesherResults,
-  unsetSolverResults
+  unsetSolverResults,
+  setBrokerConnected,
+  unsetBrokerConnected
 } = TabsAndMenuItemsSlice.actions;
 
 
@@ -279,3 +289,7 @@ export const mesherResultsSelector = (state: {
 export const solverResultsSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState
 }) => state.tabsAndMenuItems.solverResults;
+
+export const brokerConnectedSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.brokerConnected;

@@ -17,7 +17,6 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import nodeChildProcess from 'child_process';
 import { mkdir, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync } from 'fs';
-import fixPath from 'fix-path'
 
 class AppUpdater {
   constructor() {
@@ -36,7 +35,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
 });
 
 if (process.env.NODE_ENV === 'production') {
-  fixPath();
+  import("fix-path").then((fixPath) => fixPath.default())
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
@@ -134,7 +133,7 @@ app
   .whenReady()
   .then(() => {
     createWindow();
-    
+
     //window.electron.ipcRenderer.sendMessage('runServer', []);
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

@@ -18,6 +18,7 @@ import { ShapesToolbarSlice } from './cadmia/canvas/components/navBar/menuItems/
 import { ViewItemSlice } from './cadmia/canvas/components/navBar/menuItems/view/viewItemSlice';
 import { ModelSlice } from './cadmia/store/modelSlice';
 import { ObjectsDetailsSlice } from './cadmia/canvas/components/objectsDetailsBar/objectsDetailsSlice';
+import { stompMiddleware } from './middleware/stompMiddleware';
 
 
 
@@ -44,13 +45,14 @@ const rootReducer = combineReducers({
   modelSlice: ModelSlice.reducer,
 });
 
+
 export const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
       immutableCheck: false,
-    }),
+    }).concat(stompMiddleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>

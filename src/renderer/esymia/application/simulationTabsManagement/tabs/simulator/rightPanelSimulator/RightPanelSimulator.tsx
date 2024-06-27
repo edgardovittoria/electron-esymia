@@ -1,5 +1,5 @@
 import { ComponentEntity, Material, useFaunaQuery } from 'cad-library';
-import React, { FC, Fragment, useEffect, useRef, useState } from 'react';
+import React, { FC, Fragment, useEffect, useState } from 'react';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -34,11 +34,9 @@ import { LiaCubeSolid, LiaCubesSolid } from 'react-icons/lia';
 import { Dialog, Transition } from '@headlessui/react';
 import { MesherStatusSelector } from '../../../../../store/pluginsSlice';
 import { generateSTLListFromComponents } from './components/rightPanelFunctions';
-import { Client } from '@stomp/stompjs';
-import { callback_mesh_advices } from '../../../../rabbitMQFunctions';
-import { client } from '../../../../../../App';
 import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs';
+import { publishMessage } from '../../../../../../middleware/stompMiddleware';
 
 interface RightPanelSimulatorProps {
   selectedProject: Project;
@@ -94,13 +92,17 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             generateSTLListFromComponents(allMaterials, components),
           id: selectedProject.faunaDocumentId as string,
         };
-        client.publish({
-          destination: 'management',
-          body: JSON.stringify({
-            message: 'compute suggested quantum',
-            body: objToSendToMesher,
-          }),
-        });
+        dispatch(publishMessage({
+          queue: 'compute suggested quantum',
+          body: objToSendToMesher,
+        }))
+        // client.publish({
+        //   destination: 'management',
+        //   body: JSON.stringify({
+        //     message: 'compute suggested quantum',
+        //     body: objToSendToMesher,
+        //   }),
+        // });
       }
       if (!selectedProject.frequencies) {
         setSuggestedQuantumError({ active: true, type: 'Frequencies not set' });

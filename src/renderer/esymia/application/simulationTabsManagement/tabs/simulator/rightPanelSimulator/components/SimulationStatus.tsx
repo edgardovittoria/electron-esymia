@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import { Disclosure } from '@headlessui/react';
 import { TiArrowMinimise } from 'react-icons/ti';
@@ -12,7 +12,6 @@ import {
 } from '../../../../../../store/solverSlice';
 import {
   deleteSimulation,
-  selectedProjectSelector,
   setMeshApproved,
   updateSimulation,
 } from '../../../../../../store/projectSlice';
@@ -32,10 +31,9 @@ import {
   unsetIterations,
   unsetSolverResults,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { callback_solver_feedback, callback_solver_results } from '../../../../../rabbitMQFunctions';
-import { client } from '../../../../../../../App';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
+import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean;
@@ -51,10 +49,10 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
 
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    client.subscribe('solver_results', (msg) => callback_solver_results(msg, dispatch), {ack: 'client'})
-    client.subscribe('solver_feedback', (msg) => callback_solver_feedback(msg, dispatch), {ack: 'client'})
-  }, [])
+  // useEffect(() => {
+  //   client.subscribe('solver_results', (msg) => callback_solver_results(msg, dispatch), {ack: 'client'})
+  //   client.subscribe('solver_feedback', (msg) => callback_solver_feedback(msg, dispatch), {ack: 'client'})
+  // }, [])
 
   return (
     <div
@@ -148,13 +146,16 @@ const SimulationStatusItem: React.FC<{
 
 
   useEffect(() => {
-    
+
     let objectToSendToSolver = solverInputFrom(
       associatedProject,
       solverIterations,
       convergenceThreshold,
     )
-    client.publish({destination: "management_solver", body: JSON.stringify({ message: "solving", body: objectToSendToSolver })})    
+    dispatch(publishMessage({
+      queue: 'management_solver',
+      body: { message: "solving", body: objectToSendToSolver }}))
+    // client.publish({destination: "management_solver", body: JSON.stringify({ message: "solving", body: objectToSendToSolver })})
     return () => {
       dispatch(unsetComputingLp(associatedProject.faunaDocumentId as string))
       dispatch(unsetComputingP(associatedProject.faunaDocumentId as string))

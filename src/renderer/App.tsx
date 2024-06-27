@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Esymia from './esymia/Esymia';
 import Cadmia from './cadmia/Cadmia';
 import Home from './home/Home';
@@ -15,26 +15,27 @@ import {
 import { HiOutlineLogout } from 'react-icons/hi';
 import { GiSettingsKnobs } from 'react-icons/gi';
 import { FaUser } from 'react-icons/fa';
-import { Client } from '@stomp/stompjs';
+import { connectStomp, disconnectStomp } from './middleware/stompMiddleware';
 import { ImSpinner } from 'react-icons/im';
-import { any } from 'cypress/types/bluebird';
+import { brokerConnectedSelector } from './esymia/store/tabsAndMenuItemsSlice';
 
-export const client = new Client({
-  brokerURL: 'ws://localhost:15674/ws'
-});
+// export const client = new Client({
+//   brokerURL: 'ws://localhost:15674/ws'
+// });
 
 export default function App() {
   const dispatch = useDispatch();
-  const [brokerActive, setBrokerActive] = useState<boolean>(false);
-  const [progressBarValue, setProgressBarValue] = useState<number>(0)
+  const brokerActive = useSelector(brokerConnectedSelector)
+  // const [brokerActive, setBrokerActive] = useState<boolean>(false);
+  // const [progressBarValue, setProgressBarValue] = useState<number>(0)
   useEffect(() => {
     window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
       dispatch(setHomePat(res));
     });
     window.electron.ipcRenderer.sendMessage('runBroker', [])
-    client.activate();
+    dispatch(connectStomp())
     return () => {
-      client.deactivate();
+      dispatch(disconnectStomp());
     };
   }, []);
 
@@ -42,15 +43,15 @@ export default function App() {
     console.log((arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
   });
 
-  useEffect(() => {
-    if(progressBarValue !== 70){
-      setTimeout(() => {
-        setProgressBarValue(prev => prev+1)
-      }, 100);
-    }else if(progressBarValue === 70){
-      setBrokerActive(true)
-    }
-  }, [progressBarValue])
+  // useEffect(() => {
+  //   if(progressBarValue !== 70){
+  //     setTimeout(() => {
+  //       setProgressBarValue(prev => prev+1)
+  //     }, 100);
+  //   }else if(progressBarValue === 70){
+  //     setBrokerActive(true)
+  //   }
+  // }, [progressBarValue])
 
   const [tabsSelected, setTabsSelected] = useState<string>('home');
   const { user } = useAuth0();
@@ -78,8 +79,8 @@ export default function App() {
         <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
           <div className="flex flex-col items-center gap-2 p-3 bg-white rounded">
             <span>Starting Services...</span>
-            {/* <ImSpinner className="animate-spin w-8 h-8" /> */}
-            <progress className="progress w-full mr-4" value={progressBarValue} max={70} />
+            <ImSpinner className="animate-spin w-8 h-8" />
+            {/* <progress className="progress w-full mr-4" value={progressBarValue} max={70} /> */}
           </div>
         </div>
       ) : (
