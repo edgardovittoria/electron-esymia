@@ -31,14 +31,16 @@ export default function App() {
     window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
       dispatch(setHomePat(res));
     });
-    window.electron.ipcRenderer.invoke('runBroker', []).then((res:any) => {
-      client.activate();
-    });
-
+    window.electron.ipcRenderer.sendMessage('runBroker', [])
+    client.activate();
     return () => {
       client.deactivate();
     };
   }, []);
+
+  window.electron.ipcRenderer.on('runBroker', (arg) => {
+    console.log((arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
+  });
 
   useEffect(() => {
     if(progressBarValue !== 70){

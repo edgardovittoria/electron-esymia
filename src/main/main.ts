@@ -17,6 +17,7 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import nodeChildProcess from 'child_process';
 import { mkdir, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync } from 'fs';
+import fixPath from 'fix-path'
 
 class AppUpdater {
   constructor() {
@@ -35,6 +36,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
 });
 
 if (process.env.NODE_ENV === 'production') {
+  fixPath();
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
@@ -86,9 +88,8 @@ const createWindow = async () => {
       nodeIntegration: true
     },
   });
-
   mainWindow.loadURL(resolveHtmlPath('index.html'));
-
+  //mainWindow.webContents.openDevTools();
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
@@ -133,6 +134,7 @@ app
   .whenReady()
   .then(() => {
     createWindow();
+    
     //window.electron.ipcRenderer.sendMessage('runServer', []);
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
@@ -178,7 +180,7 @@ const getDockerPath = (...paths: string[]): string => {
 };
 
 ipcMain.on('runMesher', (e, args) => {
-  let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES/juliaMesher')]);
+  let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES/Mesher')]);
   serverProcesses.mesher = scriptMesher
   scriptMesher.stdout.on('data', (data: string) => {
     e.reply('runMesher', '' + data);
@@ -194,7 +196,7 @@ ipcMain.on('runMesher', (e, args) => {
 });
 
 ipcMain.on('runSolver', (e, args) => {
-  let scriptSolver = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverINIT.sh'), getServerPath('MSGUI/juliaCODES/juliaSolver')]);
+  let scriptSolver = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverINIT.sh'), getServerPath('MSGUI/juliaCODES/Solver')]);
   serverProcesses.solver = scriptSolver
   scriptSolver.stdout.on('data', (data: string) => {
     e.reply('runSolver', '' + data);
@@ -255,9 +257,21 @@ ipcMain.handle('deleteFolder', (e, args) => {
   rmdir(path+"/"+args[0],  () => {})
 })
 
-ipcMain.handle('runBroker', (e, args) => {
-  nodeChildProcess.spawn('bash', [getDockerPath('BROKER.sh'), getDockerPath()]).stdout.on('data', (data) => {
-    console.log(`${data}`);
-    //return {data: `${data}`}
-  })
+ipcMain.on('runBroker', (e, args) => {
+  let scriptBroker = nodeChildProcess.spawn('bash', [getDockerPath('BROKER.sh'), getDockerPath('')])
+  scriptBroker.stdout.on('data', (data: string) => {
+    e.reply('runBroker', '' + data);
+  });
+
+  scriptBroker.stderr.on('data', (err: string) => {
+    e.reply('runBroker', '' + err);
+  });
+
+  scriptBroker.on('exit', (code: string) => {
+    e.reply('runBroker', 'Exit Code: ' + code);
+  });
+  // .stdout.on('data', (data) => {
+  //   console.log(`${data}`);
+  //   //return {data: `${data}`}
+  // })
 });
