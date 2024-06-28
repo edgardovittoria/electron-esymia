@@ -93,8 +93,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           id: selectedProject.faunaDocumentId as string,
         };
         dispatch(publishMessage({
-          queue: 'compute suggested quantum',
-          body: objToSendToMesher,
+          queue: 'management',
+          body: {
+            message: 'compute suggested quantum',
+            body: objToSendToMesher
+          },
         }))
         // client.publish({
         //   destination: 'management',

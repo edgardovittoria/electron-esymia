@@ -15,7 +15,7 @@ import {
 import { HiOutlineLogout } from 'react-icons/hi';
 import { GiSettingsKnobs } from 'react-icons/gi';
 import { FaUser } from 'react-icons/fa';
-import { connectStomp, disconnectStomp } from './middleware/stompMiddleware';
+import { connectStomp, disconnectStomp, publishMessage } from './middleware/stompMiddleware';
 import { ImSpinner } from 'react-icons/im';
 import { brokerConnectedSelector } from './esymia/store/tabsAndMenuItemsSlice';
 
@@ -149,6 +149,14 @@ export default function App() {
                       window.electron.ipcRenderer.sendMessage('logout', [
                         process.env.REACT_APP_AUTH0_DOMAIN,
                       ]);
+                      dispatch(publishMessage({
+                        queue: "management",
+                        body: {message: 'stop'}
+                      }))
+                      dispatch(publishMessage({
+                        queue: "management_solver",
+                        body: {message: 'stop'}
+                      }))
                     }}
                   >
                     <HiOutlineLogout className="w-[20px] h-[20px] mr-[10px]" />
