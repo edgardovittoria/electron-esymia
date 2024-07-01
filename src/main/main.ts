@@ -17,6 +17,7 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import nodeChildProcess from 'child_process';
 import { mkdir, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync } from 'fs';
+import { event } from 'cypress/types/jquery';
 
 class AppUpdater {
   constructor() {
@@ -182,7 +183,10 @@ ipcMain.on('runMesher', (e, args) => {
   let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES/Mesher')]);
   serverProcesses.mesher = scriptMesher
   scriptMesher.stdout.on('data', (data: string) => {
-    e.reply('runMesher', '' + data);
+    if(data === "docker not installed"){
+      e.reply('runMesher', 'docker not installed');
+    }
+    //e.reply('runMesher', '' + data);
   });
 
   scriptMesher.stderr.on('data', (err: string) => {
