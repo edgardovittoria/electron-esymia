@@ -28,26 +28,25 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
     const usersList: string[] = [];
     setSpinner(true);
 
-    // axios.post(
-    //   'https://dev-i414-g1x.us.auth0.com/oauth/token',
-    //   {
-    //     'client_id': 'O9UcnheTXotdwF4HJwCmnXI62A2Skvma',
-    //     'client_secret': 'T4qhxbNpFfv2MeKQfxFZsG4CEXQ4zwf-OnK9LEqKzhs9LABYOZYtuG8KtONeyF2U',
-    //     'audience': 'https://dev-i414-g1x.us.auth0.com/api/v2/',
-    //     'grant_type': 'client_credentials'
-    //   },
-    //   {
-    //     headers: {
-    //       'content-type': 'application/json'
-    //     }
-    //   }
-    // ).then(res => console.log(res.data))
-    
-    axios
-      .get(`https://dev-i414-g1x.us.auth0.com/api/v2/roles`, {
-        // headers: {authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`}
+    axios.post(
+      'https://dev-i414-g1x.us.auth0.com/oauth/token',
+      {
+        'client_id': process.env.REACT_APP_AUTH0_MANAGEMENT_CLIENT_ID,
+        'client_secret': process.env.REACT_APP_AUTH0_MANAGEMENT_CLIENT_SECRET,
+        'audience': 'https://dev-i414-g1x.us.auth0.com/api/v2/',
+        'grant_type': 'client_credentials'
+      },
+      {
         headers: {
-          authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`,
+          'content-type': 'application/json'
+        }
+      }
+    ).then(response => {
+      axios
+      .get(`https://dev-i414-g1x.us.auth0.com/api/v2/roles`, {
+        // headers: {authorization: `Bearer ${response.data.access_token}`}
+        headers: {
+          authorization: `Bearer ${response.data.access_token}`,
         },
       })
       .then((res) => {
@@ -58,9 +57,9 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
               .get(
                 `https://dev-i414-g1x.us.auth0.com/api/v2/roles/${role.id}/users`,
                 {
-                  // headers: {authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`}
+                  // headers: {authorization: `Bearer ${response.data.access_token}`}
                   headers: {
-                    authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN}`,
+                    authorization: `Bearer ${response.data.access_token}`,
                   },
                 },
               )
@@ -76,6 +75,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
           });
       })
       .catch((err) => console.log(err));
+    })
   }, []);
 
   const dispatch = useDispatch();
