@@ -27,7 +27,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
   const dispatch = useDispatch();
   const selectedFolder = useSelector(SelectedFolderSelector)
 
-  const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
+  // const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
   const [pluginVisibility, setPluginVisibility] = useState<boolean>(false);
   const { loginWithPopup, isAuthenticated, loginWithRedirect } = useAuth0();
   const activePlugins = useSelector(ActivePluginsSelector)
@@ -118,7 +118,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                   className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
                   onClick={() => {
                     setPluginVisibility(!pluginVisibility)
-                    setUserDropdownVisibility(false)
+                    // setUserDropdownVisibility(false)
                   }}
                 />
                 <ul
