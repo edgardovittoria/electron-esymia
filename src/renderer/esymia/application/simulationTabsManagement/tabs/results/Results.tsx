@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deleteSimulation,
@@ -17,9 +17,6 @@ import {Project} from "../../../../model/esymiaModels";
 import { alertMessageStyle, emptyResultsMessage, runningSimulationMessageOnResults } from '../../../config/textMessages';
 import { resultsLeftPanelTitle } from '../../../config/panelTitles';
 import { Dataset } from "./sharedElements";
-import saveAs from "file-saver";
-import JSZip from "jszip";
-import { ExportToCsvZippedButton } from "./ExportToCsvZippedButton";
 
 interface ResultsProps {
   selectedTabLeftPanel: string;
@@ -43,6 +40,11 @@ export const Results: React.FC<ResultsProps> = ({
   const [graphToVisualize, setGraphToVisualize] = useState<"All Graph" | "Z" | "S" | "Y">("All Graph")
   const [graphDataToExport, setGraphDataToExport] = useState<{ data: { datasets: Dataset[]; labels: number[] }; options: {}, representedFunction: string }[]>([])
   const { execQuery } = useFaunaQuery();
+
+  useEffect(() => {
+    setSelectedLabel([{label: "All Ports", id: 0}])
+  }, [selectedProject])
+
 
   return (
     <div className="flex">
