@@ -183,10 +183,7 @@ ipcMain.on('runMesher', (e, args) => {
   let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES/Mesher')]);
   serverProcesses.mesher = scriptMesher
   scriptMesher.stdout.on('data', (data: string) => {
-    if(data === "docker not installed"){
-      e.reply('runMesher', 'docker not installed');
-    }
-    //e.reply('runMesher', '' + data);
+    e.reply('runMesher', '' + data);
   });
 
   scriptMesher.stderr.on('data', (err: string) => {
