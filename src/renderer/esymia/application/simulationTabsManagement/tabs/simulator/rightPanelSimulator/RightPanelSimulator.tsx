@@ -75,7 +75,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   }, [suggestedQuantum]);
 
   useEffect(() => {
-    if (selectedProject.model.components && mesherStatus === 'ready') {
+    if (selectedProject.model.components && mesherStatus === 'ready' && selectedProject.frequencies && selectedProject.frequencies.length > 0) {
       setSuggestedQuantumError({ active: false });
       if (
         !selectedProject.suggestedQuantum &&
@@ -107,9 +107,6 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         //   }),
         // });
       }
-      if (!selectedProject.frequencies) {
-        setSuggestedQuantumError({ active: true, type: 'Frequencies not set' });
-      }
     } else if (mesherStatus === 'idle' || mesherStatus === 'starting') {
       if (selectedProject.meshData.previousMeshStatus === 'Generated') {
         setQuantumDimsInput(selectedProject.meshData.quantum);
@@ -117,6 +114,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         setQuantumDimsInput([0, 0, 0]);
       }
       setSuggestedQuantumError({ active: true, type: 'Mesher Not Active' });
+    } else if (selectedProject.frequencies && selectedProject.frequencies.length === 0) {
+      console.log('qui')
+      setSuggestedQuantumError({ active: true, type: 'Frequencies not set' });
     }
   }, [mesherStatus]);
 
@@ -134,13 +134,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   };
 
   useEffect(() => {
-    console.log(meshAdvice);
     if (
       selectedProject.frequencies?.length &&
       selectedProject.frequencies?.length > 0 &&
       meshAdvice
     ) {
-      console.log('qui');
       dispatch(
         setSuggestedQuantum([
           Math.min(
@@ -292,11 +290,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             {suggestedQuantumError.active && (
               <div className="text-[12px] xl:text-base font-semibold mt-2">
                 {suggestedQuantumError.type === 'Mesher Not Active'
-                  ? 'Unable to suggest quantum: check mesher connection!'
+                  ? 'Mesher Down: start mesher or wait until started!'
                   : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
               </div>
             )}
-            {meshGenerated === 'Generated' && (
+            {meshGenerated === 'Generated' && !suggestedQuantumError.active && (
               <div className="flex flex-row gap-4 justify-center items-center w-full mt-3">
                 <div
                   className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200"
