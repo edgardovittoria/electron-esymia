@@ -1,4 +1,5 @@
 import { SolverOutput } from '../model/esymiaModels';
+import { setMesherStatus, setSolverStatus } from '../store/pluginsSlice';
 import {
   setIterations,
   setMeshAdvice,
@@ -17,9 +18,23 @@ export const callback_mesh_advices = function (
 ) {
   // called when the client receives a STOMP message from the server
   message.ack()
-  console.log(message)
   let res = JSON.parse(message.body);
   dispatch(setMeshAdvice({quantum: JSON.parse(res.quantum), id: res.id}))
+};
+
+export const callback_server_init = function (
+  message: any,
+  dispatch: Function,
+) {
+  // called when the client receives a STOMP message from the server
+  message.ack()
+  let res = JSON.parse(message.body);
+  if(res.target === "mesher"){
+    dispatch(setMesherStatus(res.status as "idle" | "starting" | "ready"))
+  }
+  else if(res.target === "solver"){
+    dispatch(setSolverStatus(res.status as "idle" | "starting" | "ready"))
+  }
 };
 
 export const callback_mesher_feedback = (

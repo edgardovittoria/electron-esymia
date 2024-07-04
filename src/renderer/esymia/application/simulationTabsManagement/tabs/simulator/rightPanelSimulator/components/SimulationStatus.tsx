@@ -106,7 +106,9 @@ const SimulationStatusItem: React.FC<{
   useEffect(() => {
     if (isAlertConfirmed) {
       if (!isAlert) {
-        //sendMessage('Stop computation');
+        dispatch(publishMessage({
+          queue: 'management_solver',
+          body: { message: "stop_computation" }}))
       } else {
         dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
         dispatch(setMeshApproved({ approved: false, projectToUpdate: associatedProject.faunaDocumentId as string }));

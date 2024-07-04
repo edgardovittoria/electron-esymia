@@ -1,6 +1,6 @@
 import { Middleware } from "@reduxjs/toolkit";
 import { Client } from "@stomp/stompjs";
-import { callback_mesh_advices, callback_mesher_feedback, callback_mesher_results, callback_solver_feedback, callback_solver_results } from "../esymia/application/rabbitMQFunctions";
+import { callback_mesh_advices, callback_mesher_feedback, callback_mesher_results, callback_server_init, callback_solver_feedback, callback_solver_results } from "../esymia/application/rabbitMQFunctions";
 import { setBrokerConnected, unsetBrokerConnected } from "../esymia/store/tabsAndMenuItemsSlice";
 
 export const stompMiddleware: Middleware = (dispatch) => {
@@ -20,6 +20,7 @@ export const stompMiddleware: Middleware = (dispatch) => {
   });
 
   client.onConnect = function (frame) {
+    client.subscribe('server_init', (msg) => callback_server_init(msg, dispatch.dispatch), {ack: 'client'});
     client.subscribe('mesh_advices', (msg) => callback_mesh_advices(msg, dispatch.dispatch), {ack: 'client'});
     client.subscribe(
       'mesher_results',
