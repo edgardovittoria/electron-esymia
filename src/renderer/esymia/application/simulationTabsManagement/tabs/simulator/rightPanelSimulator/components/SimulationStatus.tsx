@@ -180,9 +180,9 @@ const SimulationStatusItem: React.FC<{
         // dispatch(setSolverOutput(res.data));
         const simulationUpdated: Simulation = {
           ...simulation,
-          results: solverResults.matrices,
+          results: {...solverResults.matrices, freqIndex: solverResults.freqIndex},
           ended: Date.now().toString(),
-          status: 'Completed',
+          status: solverResults.partial ? "Queued" : "Completed",
         };
         dispatch(updateSimulation(simulationUpdated));
         execQuery(

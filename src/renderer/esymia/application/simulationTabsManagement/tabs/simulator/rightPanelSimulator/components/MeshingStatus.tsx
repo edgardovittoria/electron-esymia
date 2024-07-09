@@ -178,7 +178,24 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
-      } else {
+      } else if (mesherResults.error && mesherResults.error === "out of memory") {
+        dispatch(
+          setMessageInfoModal(
+            'Memory error, the requested mesh cannot be generated, try a larger quantum if possible!'
+          ),
+        );
+        dispatch(setIsAlertInfoModal(true));
+        dispatch(setShowInfoModal(true));
+        dispatch(
+          setMeshGenerated({
+            status: selectedProject.meshData.previousMeshStatus as
+              | 'Not Generated'
+              | 'Generated',
+            projectToUpdate: selectedProject.faunaDocumentId as string,
+          }),
+        );
+      }
+      else {
         dispatch(
           setMeshGenerated({
             status: 'Generated',

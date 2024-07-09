@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import axios from 'axios';
@@ -18,6 +18,7 @@ import { resolveHtmlPath } from './util';
 import nodeChildProcess from 'child_process';
 import { mkdir, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync } from 'fs';
 import { event } from 'cypress/types/jquery';
+import { url } from 'inspector';
 
 class AppUpdater {
   constructor() {
@@ -109,8 +110,9 @@ const createWindow = async () => {
   menuBuilder.buildMenu();
 
   // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler(() => {
-    return { action: 'allow' };
+  mainWindow.webContents.setWindowOpenHandler(({url}) => {
+    shell.openExternal(url)
+    return { action: url === "https://www.docker.com/get-started/" ? 'deny' : 'allow' };
   });
 
   // Remove this if your app does not use auto updates

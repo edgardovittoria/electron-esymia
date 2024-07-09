@@ -10,7 +10,7 @@ import {
   Tooltip,
   Legend
 } from "chart.js";
-import { Line } from "react-chartjs-2";
+import { Line, Scatter } from "react-chartjs-2";
 import { Port, Project, Simulation } from "../../../../model/esymiaModels";
 import { useSelector } from "react-redux";
 import { selectedProjectSelector } from "../../../../store/projectSlice";
@@ -35,7 +35,8 @@ ChartJS.register(
 interface ChartsListProps {
   graphToVisualize: "All Graph" | "Z" | "S" | "Y";
   selectedLabel: { label: string, id: number }[],
-  setGraphsData: Function
+  setGraphsData: Function,
+  currentFreIndexq?: number
 }
 
 interface ScaleMode {
@@ -64,7 +65,8 @@ const defaultShowGraphsSettings = (length:number) => {
 export const ChartsList: React.FC<ChartsListProps> = ({
   graphToVisualize,
   selectedLabel,
-   setGraphsData
+  setGraphsData,
+  currentFreIndexq
 }) => {
   const selectedProject = useSelector(selectedProjectSelector)
   const [showGraphsSettings, setShowGraphsSettings] = useState<boolean[]>(defaultShowGraphsSettings(11))
@@ -110,9 +112,10 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   }, [graphToVisualize, selectedProject, selectedLabel])
 
 
-  const optionsWithScaleMode = (options: any, scaleMode: ScaleMode) => {
+  const optionsWithScaleMode = (options: any, scaleMode: ScaleMode, type: "scatter"|"line") => {
     return {
       ...options,
+          type: type,
           scales: {
             x:
             { ...options.scale.x,
@@ -152,10 +155,19 @@ export const ChartsList: React.FC<ChartsListProps> = ({
               <ExportToCsvZippedButton buttonLabel="to CSV" graphDataToExport={[chartData]} zipFilename="graphs_data"/>
             </div>
             {showGraphsSettings[index] && <ScaleChartOptions index={index} scaleMode={scaleMode} setScaleMode={setScaleMode}/>}
-            <Line
-              options={optionsWithScaleMode(chartData.options, scaleMode[index])}
+            {selectedProject?.simulation && selectedProject.simulation.status === "Completed" ?
+              <Line
+              options={optionsWithScaleMode(chartData.options, scaleMode[index], "line")}
               data={chartData.data}
+            /> :
+            <Scatter
+              options={optionsWithScaleMode(chartData.options, scaleMode[index], "scatter")}
+              data={{
+                labels: chartData.data.labels.filter((d, index) => currentFreIndexq && index < currentFreIndexq),
+                datasets: chartData.data.datasets.filter((d, index) => currentFreIndexq && index < currentFreIndexq)
+              }}
             />
+            }
           </div>
         )
       })}

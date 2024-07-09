@@ -46,10 +46,12 @@ export default function App() {
   }, []);
 
   window.electron.ipcRenderer.on('runBroker', (arg) => {
-    if ((arg as string) === 'docker not installed\n') {
-      setDockerInstallationBox(true);
-    }
-    console.log((arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
+    (arg as string).split("\n").filter(s => {
+      if (s === 'docker not installed') {
+        setDockerInstallationBox(true);
+      }
+      console.log(s.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
+    })
   });
 
   // useEffect(() => {
@@ -90,7 +92,7 @@ export default function App() {
             <span className='text-2xl'>Docker Needed</span>
             <hr className="w-full border border-[.5px] border-black" />
             <span>Please Install Docker and restart the application</span>
-            <a href="https://www.docker.com/get-started/" className='font-bold text-blue-600 underline'>
+            <a href="https://www.docker.com/get-started/" target='_blank' className='font-bold text-blue-600 underline'>
               Get Started with Docker
             </a>
             {/* <progress className="progress w-full mr-4" value={progressBarValue} max={70} /> */}

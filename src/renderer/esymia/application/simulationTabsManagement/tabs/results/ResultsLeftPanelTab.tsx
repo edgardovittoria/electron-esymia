@@ -1,8 +1,12 @@
 import React from "react";
 import { GiPowerButton } from "react-icons/gi";
-import { useSelector } from "react-redux";
-import { selectedProjectSelector } from "../../../../store/projectSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteSimulation, selectedProjectSelector, setMeshApproved } from "../../../../store/projectSlice";
 import noResultsIcon from '../../../../../../../assets/noResultsIcon.png'
+import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
+import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
+import { useFaunaQuery } from "cad-library";
+import { Project } from "../../../../model/esymiaModels";
 
 interface ResultsLeftPanelTabProps {
   selectedPort: string;
@@ -14,7 +18,8 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
   setSelectedPort,
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
-
+  const dispatch = useDispatch()
+  const { execQuery } = useFaunaQuery()
   return (
     <>
       {selectedProject && selectedProject.simulation && selectedProject.simulation.status == 'Completed' ? (
@@ -34,6 +39,23 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                 {selectedProject.simulation.name}
               </span>
             </div>
+            {(selectedProject?.simulation && selectedProject.simulation.status == 'Completed') &&
+            <button
+              type="button"
+              className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60 text-sm"
+              onClick={() => {
+                dispatch(deleteSimulation(selectedProject.faunaDocumentId as string))
+                dispatch(setMeshApproved({ approved:false, projectToUpdate: selectedProject?.faunaDocumentId as string }));
+                execQuery(updateProjectInFauna,
+                  convertInFaunaProjectThis(
+                    { ...selectedProject, simulation: undefined, meshData: { ...selectedProject?.meshData, meshApproved: false } } as Project
+                  )
+                )
+              }
+              }
+            >
+              REMOVE RESULTS
+            </button>}
           </>
         </div>
       ) : (

@@ -4,7 +4,7 @@ import {
   deleteSimulation,
   findSelectedPort,
   selectedProjectSelector,
-  selectPort, setMeshApproved,
+  selectPort, selectProject, setMeshApproved,
 } from "../../../../store/projectSlice";
 import { ChartVisualizationMode } from "./ChartVisualizationMode";
 import {ChartsList} from "./ChartsList";
@@ -61,27 +61,10 @@ export const Results: React.FC<ResultsProps> = ({
               dispatch(selectPort(portName))
             }
           />
-          {(selectedProject?.simulation && selectedProject.simulation.status == 'Completed') &&
-            <button
-              type="button"
-              className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60 text-sm"
-              onClick={() => {
-                dispatch(deleteSimulation(selectedProject.faunaDocumentId as string))
-                dispatch(setMeshApproved({ approved:false, projectToUpdate: selectedProject?.faunaDocumentId as string }));
-                execQuery(updateProjectInFauna,
-                  convertInFaunaProjectThis(
-                    { ...selectedProject, simulation: undefined, meshData: { ...selectedProject?.meshData, meshApproved: false } } as Project
-                  )
-                )
-              }
-              }
-            >
-              REMOVE RESULTS
-            </button>}
         </MyPanel>
       </div>
       <div className="w-[78%]">
-        {selectedProject && selectedProject.simulation && selectedProject.simulation.status == 'Completed' ? (
+        {selectedProject && selectedProject.simulation && selectedProject.simulation.results.matrix_S ? (
             <>
               <ChartVisualizationMode
                 chartVisualizationMode={chartVisualizationMode}
@@ -98,6 +81,7 @@ export const Results: React.FC<ResultsProps> = ({
                   graphToVisualize={graphToVisualize}
                   selectedLabel={selectedLabel}
                   setGraphsData={setGraphDataToExport}
+                  currentFreIndexq={selectedProject.simulation.results.freqIndex}
                 />
               </div>
             </>

@@ -37,8 +37,8 @@ type TabsAndMenuItemsState = {
   computingLp: {done: boolean, id: string}[],
   iterations: {freqNumber: number, id: string}[],
   meshAdvice: {id: string, quantum: [number, number, number]}[],
-  meshResults: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}}[],
-  solverResults: {id: string, matrices: SolverOutput, isStopped: boolean}[]
+  meshResults: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}, error?: any}[],
+  solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number}[]
   brokerConnected: boolean
 }
 
@@ -149,11 +149,11 @@ export const TabsAndMenuItemsSlice = createSlice({
       state.meshAdvice = state.meshAdvice.filter(item => item.id !== action.payload.id)
       state.meshAdvice.push(action.payload)
     },
-    setMesherResults(state: TabsAndMenuItemsState, action: PayloadAction<{gridsPath: string, meshPath: string, id: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}}>){
+    setMesherResults(state: TabsAndMenuItemsState, action: PayloadAction<{gridsPath: string, meshPath: string, id: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}, error?: any}>){
       state.meshResults = state.meshResults.filter(item => item.id !== action.payload.id)
       state.meshResults.push(action.payload)
     },
-    setSolverResults(state: TabsAndMenuItemsState, action: PayloadAction<{matrices: SolverOutput, id: string, isStopped: boolean}>){
+    setSolverResults(state: TabsAndMenuItemsState, action: PayloadAction<{matrices: SolverOutput, id: string, isStopped: boolean, partial: boolean, freqIndex?: number}>){
       state.solverResults = state.solverResults.filter(item => item.id !== action.payload.id)
       state.solverResults.push(action.payload)
     },

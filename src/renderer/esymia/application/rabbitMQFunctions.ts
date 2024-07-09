@@ -19,6 +19,7 @@ export const callback_mesh_advices = function (
   // called when the client receives a STOMP message from the server
   message.ack()
   let res = JSON.parse(message.body);
+  console.log(res)
   dispatch(setMeshAdvice({quantum: JSON.parse(res.quantum), id: res.id}))
 };
 
@@ -60,7 +61,7 @@ export const callback_mesher_results = (
 ) => {
   message.ack();
   let res = JSON.parse(message.body);
-  dispatch(setMesherResults({id: res.id, gridsPath: res.grids, meshPath: res.mesh, isStopped: (res.isStopped) ? res.isStopped : false, isValid: res.isValid}))
+  dispatch(setMesherResults({id: res.id, gridsPath: res.grids, meshPath: res.mesh, isStopped: (res.isStopped) ? res.isStopped : false, isValid: res.isValid, error: res.error}))
 };
 
 export const callback_solver_feedback = (message: any, dispatch: Function) => {
@@ -85,5 +86,5 @@ export const callback_solver_results = (
 ) => {
   message.ack();
   let res = JSON.parse(message.body);
-  dispatch(setSolverResults({id: res.id, matrices: !res.isStopped ? res.matrices : {} as SolverOutput, isStopped: res.isStopped}))
+  dispatch(setSolverResults({id: res.id, matrices: !res.isStopped ? res.matrices : {} as SolverOutput, isStopped: res.isStopped, partial: res.partial, freqIndex: res.freqIndex }))
 };
