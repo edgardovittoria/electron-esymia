@@ -7,12 +7,12 @@ export const getDirContents = async (path: string[]) => {
   return contents.filter((s: string) => !s.startsWith('.'))
 }
 
-export const readLocalFile = (path: string) => {
+export const readLocalFile = (path: string, projectID: string) => {
   /* let pathString = ''
   path.forEach(p => {
     pathString = pathString + "/" + p
   }) */
-  return window.electron.ipcRenderer.invoke('readFile', [path])
+  return window.electron.ipcRenderer.invoke('readFile', [path, projectID])
 }
 
 export const uploadFile = async (name: string, input: any) => {

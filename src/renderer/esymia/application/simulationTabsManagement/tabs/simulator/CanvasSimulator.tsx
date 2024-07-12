@@ -5,7 +5,7 @@ import {OrbitControls, GizmoHelper, GizmoViewport, Edges} from "@react-three/dre
 import { MeshedElement } from './MeshedElement/MeshedElement';
 import { ExternalGridsObject } from '../../../../model/esymiaModels';
 import { Provider, ReactReduxContext, useSelector } from 'react-redux';
-import { selectedProjectSelector } from '../../../../store/projectSlice';
+import { pathToExternalGridsNotFoundSelector, selectedProjectSelector } from '../../../../store/projectSlice';
 import { FocusView } from '../../sharedElements/FocusView';
 import uniqid from 'uniqid';
 import { FactoryShapes } from 'cad-library';
@@ -22,6 +22,7 @@ interface CanvasSimulatorProps  {
 export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, selectedMaterials, resetFocus, setResetFocus}) => {
   const selectedProject = useSelector(selectedProjectSelector);
   let mesherOutput = selectedProject?.meshData.mesh;
+  const pathToExternalGridsNotFound = useSelector(pathToExternalGridsNotFoundSelector)
 
   return (
     <div className="flex justify-center">
@@ -41,7 +42,7 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
                   />
                   {/* paint models */}
                   <FocusView resetFocus={resetFocus}>
-                  {!mesherOutput ? selectedProject.model.components.map((component) => {
+                  {!mesherOutput || pathToExternalGridsNotFound ? selectedProject.model.components.map((component) => {
                     return (
                         <mesh
                           userData={{

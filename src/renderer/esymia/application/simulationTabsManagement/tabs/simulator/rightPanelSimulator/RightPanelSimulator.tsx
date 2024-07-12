@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {
   meshGeneratedSelector,
+  pathToExternalGridsNotFoundSelector,
   setMeshApproved,
   setMeshGenerated,
   setPreviousMeshStatus,
@@ -69,6 +70,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const meshAdvice = useSelector(meshAdviceSelector).filter(
     (item) => item.id === (selectedProject.faunaDocumentId as string),
   )[0];
+  const pathToExternalGridsNotFound = useSelector(pathToExternalGridsNotFoundSelector)
 
   useEffect(() => {
     suggestedQuantum && setQuantumDimsInput(suggestedQuantum);
@@ -294,7 +296,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
               </div>
             )}
-            {meshGenerated === 'Generated' && !suggestedQuantumError.active && (
+            {meshGenerated === 'Generated' && !suggestedQuantumError.active && !pathToExternalGridsNotFound && (
               <div className="flex flex-row gap-4 justify-center items-center w-full mt-3">
                 <div
                   className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200"
@@ -331,7 +333,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                       ? 'button buttonPrimary w-[100%]'
                       : 'button bg-gray-300 text-gray-600 opacity-70 w-[100%]'
                   }
-                  disabled={!checkQuantumDimensionsValidity()}
+                  disabled={!checkQuantumDimensionsValidity() || pathToExternalGridsNotFound}
                   onClick={() => {
                     dispatch(
                       setPreviousMeshStatus({
@@ -515,13 +517,13 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         ) : (
           <button
             data-testid="startSimulationButton"
-            className={`w-full mt-3 button text-[12px] xl:text-base
+            className={`w-full mt-3 button text-[12px] xl:text-base disabled:bg-gray-400
               ${
                 meshGenerated !== 'Generated'
                   ? 'bg-gray-300 text-gray-600 opacity-70'
                   : 'buttonPrimary'
               }`}
-            disabled={meshGenerated !== 'Generated'}
+            disabled={meshGenerated !== 'Generated' || pathToExternalGridsNotFound}
             onClick={() => {
               const simulation: Simulation = {
                 name: `${selectedProject?.name} - sim`,

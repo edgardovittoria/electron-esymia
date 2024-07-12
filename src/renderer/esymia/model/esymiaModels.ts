@@ -99,6 +99,7 @@ export type MeshData = {
   meshGenerated: "Not Generated" | "Generated" | "Generating",
   meshApproved: boolean,
   quantum: [number, number, number],
+  pathToExternalGridsNotFound: boolean
 }
 
 

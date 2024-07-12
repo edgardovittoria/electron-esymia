@@ -6,7 +6,8 @@ import {
   selectedProjectSelector,
   setExternalGrids,
   setMesh,
-  setMeshGenerated
+  setMeshGenerated,
+  setPathToExternalGridsNotFound
 } from '../../../../../../store/projectSlice';
 import { deleteSimulationProjectFromFauna, updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
@@ -164,12 +165,16 @@ export const useStorageData = () => {
   }
 
   const loadDataFromLocal = (setSpinner: (v:boolean) => void, setExternalGrids: Function) => {
-    readLocalFile(selectedProject.meshData.externalGrids as string).then((res) => {
-      setExternalGrids(externalGridsDecode(JSON.parse(res)));
-      // dispatch(setMeshGenerated({ status: 'Generated', projectToUpdate: selectedProject.faunaDocumentId as string }));
-      setSpinner(false)
+    readLocalFile(selectedProject.meshData.externalGrids as string, selectedProject.faunaDocumentId as string).then((res) => {
+      console.log(res)
+      if(res === 'path not found'){
+        dispatch(setPathToExternalGridsNotFound({ status: true, projectToUpdate: selectedProject.faunaDocumentId as string }));
+      }else{
+        setExternalGrids(externalGridsDecode(JSON.parse(res)));
+        dispatch(setPathToExternalGridsNotFound({ status: false, projectToUpdate: selectedProject.faunaDocumentId as string }));
+        setSpinner(false)
+      }
     })
-
   }
 
   const deleteMeshDataOnline = (project: Project) => {

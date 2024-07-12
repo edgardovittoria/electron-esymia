@@ -236,6 +236,10 @@ export const ProjectSlice = createSlice({
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.externalGrids = action.payload.extGrids;
     },
+    setPathToExternalGridsNotFound(state: ProjectState, action: PayloadAction<{ status:boolean, projectToUpdate: string }>){
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.pathToExternalGridsNotFound = action.payload.status;
+    },
     setMeshGenerated(state: ProjectState, action: PayloadAction<{ status: 'Not Generated' | 'Generated' | 'Generating', projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.meshGenerated = action.payload.status;
@@ -344,7 +348,8 @@ export const {
   setSuggestedQuantum,
   setScatteringValue,
   unsetScatteringValue,
-  setFrequencies
+  setFrequencies,
+  setPathToExternalGridsNotFound
 } = ProjectSlice.actions;
 
 const selectTabEffects = (state: ProjectState, tab: string) => {
@@ -373,6 +378,9 @@ export const selectedProjectSelector = (state: { projects: ProjectState }) => {
 export const meshGeneratedSelector = (state: {
   projects: ProjectState
 }) => (findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject) as Project).meshData.meshGenerated;
+export const pathToExternalGridsNotFoundSelector = (state: {
+  projects: ProjectState
+}) => (findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject) as Project).meshData.pathToExternalGridsNotFound;
 export const allProjectFoldersSelector = (state: { projects: ProjectState }) => {
   let allFolders: Folder[] = [];
   return recursiveFindFolders(state.projects.projects, allFolders);

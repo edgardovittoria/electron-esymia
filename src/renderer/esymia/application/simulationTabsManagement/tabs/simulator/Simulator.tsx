@@ -2,6 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComponentEntity, Material } from 'cad-library';
 import {
+  pathToExternalGridsNotFoundSelector,
   selectedProjectSelector,
 } from '../../../../store/projectSlice';
 import { SimulatorLeftPanelTab } from './SimulatorLeftPanelTab';
@@ -20,6 +21,7 @@ import { ImSpinner } from 'react-icons/im';
 import { useStorageData } from './rightPanelSimulator/hook/useStorageData';
 import { meshVisualizationSelector, setMeshVisualization } from '../../../../store/tabsAndMenuItemsSlice';
 import { LiaFeatherSolid, LiaWeightHangingSolid } from "react-icons/lia";
+import { BiInfoCircle } from 'react-icons/bi';
 
 
 interface SimulatorProps {
@@ -43,6 +45,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const [spinner, setSpinner] = useState<boolean>(false);
   const toggleResetFocus = () => setResetFocus(!resetFocus)
   const { loadMeshData } = useStorageData()
+  const pathToExternalGridsNotFound = useSelector(pathToExternalGridsNotFoundSelector)
 
   // useEffect(() => {
   //   let subscription = client.subscribe('mesh_advices', (msg) => callback_mesh_advices(msg, dispatch), {ack: 'client'})
@@ -97,9 +100,15 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
   return (
     <>
-      {spinner &&
+      {spinner && !pathToExternalGridsNotFound &&
         <div className="absolute top-1/2 left-1/2">
           <ImSpinner className="animate-spin w-8 h-8" />
+        </div>
+      }
+      {pathToExternalGridsNotFound &&
+        <div className="absolute bottom-16 right-1/2 translate-x-1/2 bg-white rounded-xl p-3 border border-orange-400 flex flex-row gap-2 justify-between items-center">
+          <BiInfoCircle className='text-orange-400' size={15}/>
+          <span className='font-semibold'>Mesh generated in another pc</span>
         </div>
       }
       <CanvasSimulator externalGrids={externalGrids} selectedMaterials={selectedMaterials} resetFocus={resetFocus} setResetFocus={toggleResetFocus}/>

@@ -22,6 +22,7 @@ export type Channels =
   | 'deleteFolder'
   | 'readFile'
   | 'runBroker'
+  | 'exportTouchstone'
   ;
 
 const electronHandler = {

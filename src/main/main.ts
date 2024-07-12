@@ -16,7 +16,7 @@ import axios from 'axios';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import nodeChildProcess from 'child_process';
-import { mkdir, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync } from 'fs';
+import { closeSync, ftruncate, mkdir, openSync, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync, writeSync } from 'fs';
 import { event } from 'cypress/types/jquery';
 import { url } from 'inspector';
 
@@ -241,9 +241,14 @@ ipcMain.handle('saveFile', (e, args) => {
 })
 
 ipcMain.handle('readFile', (e, args) => {
-  //let path = app.getPath('home')+"/esymiaProjects"+args[0]
-  return readFileSync(args[0], {encoding: 'utf8', flag: 'r'})
+  let pathExtGrids = path.join(app.getPath('home'), "esymiaProjects/externalGrids", args[1]+".json")
+  if(pathExtGrids === args[0]){
+    return readFileSync(args[0], {encoding: 'utf8', flag: 'r'})
+  }else{
+    return 'path not found'
+  }
 })
+
 ipcMain.handle('deleteFile', (e, args) => {
   //let path = app.getPath('home')+"/esymiaProjects"
   unlinkSync(args[0])
@@ -277,3 +282,62 @@ ipcMain.on('runBroker', (e, args) => {
   //   //return {data: `${data}`}
   // })
 });
+
+ipcMain.on('exportTouchstone', (e, args) => {
+  let fileName = path.join(app.getPath("home"), "Downloads", args[4] + `.s${args[3]}p`)
+  writeTouchstone(args[0], args[1], args[2], fileName)
+})
+
+function writeTouchstone(freq:number[], S:any, R_chiusura:number, fileNameComplete:string) {
+  const np = S.length;
+  const tab = '   ';
+  const fid = openSync(fileNameComplete, 'w');
+
+  const rowToWrite = `# hz S ma R ${numToStringAccurate(R_chiusura)} \n`;
+  writeSync(fid, rowToWrite);
+
+  for (let cf = 0; cf < freq.length; cf++) {
+      let rowToWrite = `\n${numToStringFreq(freq[cf])}${tab}`;
+      writeSync(fid, rowToWrite);
+      for (let i = 0; i < np; i++) {
+          const realPartS = S[i][0][cf][0];
+          const imPartS = S[i][0][cf][1];
+          let { modulo, phaseInDeg } = buildModPhaseScatteringParameter(realPartS, imPartS);
+          if (modulo > 1) {
+              modulo = 1;
+          }
+          if (isNaN(modulo) || !isFinite(modulo)) {
+              modulo = 0;
+              phaseInDeg = 0.0;
+          }
+          rowToWrite = `${numToStringAccurate(modulo)}${tab}${numToStringAccurate(phaseInDeg)}${tab}`;
+          writeSync(fid, rowToWrite);
+          if (np > 4 && (i+1)%(Math.sqrt(np)) === 0) {
+              writeSync(fid, '\n');
+              writeSync(fid, tab);
+          }
+      }
+  }
+  closeSync(fid);
+}
+
+function numToStringFreq(val:number) {
+  return val.toFixed(12);
+}
+
+function numToStringAccurate(val:number) {
+  return val.toFixed(12);
+}
+
+function buildModPhaseScatteringParameter(realPart:number, imPart:number) {
+  let phase = Math.atan(imPart / realPart);
+
+  if (realPart < 0) {
+      phase += Math.PI;
+  }
+
+  const modulo = Math.sqrt(realPart * realPart + imPart * imPart);
+  const phaseInDeg = 180 * phase / Math.PI;
+
+  return { modulo, phaseInDeg };
+}
