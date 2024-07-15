@@ -241,12 +241,13 @@ ipcMain.handle('saveFile', (e, args) => {
 })
 
 ipcMain.handle('readFile', (e, args) => {
-  let pathExtGrids = path.join(app.getPath('home'), "esymiaProjects/externalGrids", args[1]+".json")
-  if(pathExtGrids === args[0]){
-    return readFileSync(args[0], {encoding: 'utf8', flag: 'r'})
-  }else{
-    return 'path not found'
-  }
+  // let pathExtGrids = path.join(app.getPath('home'), "esymiaProjects/externalGrids", args[1]+".json")
+  // if(pathExtGrids === args[0]){
+
+  // }else{
+  //   return 'path not found'
+  // }
+  return readFileSync(args[0], {encoding: 'utf8', flag: 'r'})
 })
 
 ipcMain.handle('deleteFile', (e, args) => {

@@ -233,7 +233,9 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   useEffect(() => {
     if (isAlertConfirmed) {
       if (!isAlert) {
-        //sendMessage('Stop computation');
+        dispatch(publishMessage({
+          queue: 'management',
+          body: { message: "stop computation", id: selectedProject.faunaDocumentId as string }}))
       } else {
         dispatch(
           setMeshGenerated({
