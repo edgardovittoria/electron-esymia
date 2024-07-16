@@ -39,6 +39,7 @@ import {
   addModel,
   SelectedModelSelector,
   selectModel,
+  setLoadingSpinner,
   updateModel,
 } from '../../../../../store/modelSlice';
 import { deleteFileS3, uploadFileS3 } from '../../../../../aws/crud';
@@ -101,6 +102,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
     numberOfGeneratedKey: number,
     dispatch: Dispatch,
   ) => {
+    dispatch(setLoadingSpinner(true))
     const loader = new STLLoader();
 
     STLFile.arrayBuffer().then((value) => {
@@ -128,6 +130,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
         opacity: 1,
       };
       dispatch(addComponent(entity));
+      dispatch(setLoadingSpinner(false))
     });
   };
 
@@ -157,6 +160,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
                       <span
                         className={navbarDropdownItemStyle}
                         onClick={() => {
+                          dispatch(setLoadingSpinner(true))
                           deleteFileS3(
                             selectedModel?.components as string,
                           ).then(() => {
@@ -184,10 +188,12 @@ export const FileItem: React.FC<FileItemProps> = () => {
                                   .then(() => {
                                     dispatch(updateModel(newModel));
                                     toast.success('Model updated!');
+                                    dispatch(setLoadingSpinner(false))
                                   })
                                   .catch((err) => {
                                     console.log(err);
                                     toast.error('Model not updated!');
+                                    dispatch(setLoadingSpinner(false))
                                   });
                               }
                             });

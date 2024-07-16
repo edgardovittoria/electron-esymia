@@ -7,7 +7,7 @@ import { Transition, Dialog } from '@headlessui/react';
 import faunadb from 'faunadb';
 import { unitSelector } from '../../../../statusBar/statusBarSlice';
 import { uploadFileS3 } from '../../../../../../aws/crud';
-import { addModel } from '../../../../../../store/modelSlice';
+import { addModel, setLoadingSpinner } from '../../../../../../store/modelSlice';
 
 export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
   showModalSave,
@@ -44,6 +44,7 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
             err.message,
             err.errors()[0].description,
           );
+          dispatch(setLoadingSpinner(false))
           toast.error(
             'ERROR! Model not saved, please check the console log for more details.',
           );
@@ -58,7 +59,7 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
     const modelFile = new File([blobFile], `${name}.json`, {
       type: 'application/json',
     });
-
+    dispatch(setLoadingSpinner(true))
     uploadFileS3(modelFile).then((res) => {
       if (res) {
         const newModel = {
@@ -71,6 +72,7 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
           newModel.id = res.ref.id;
           dispatch(addModel(newModel));
           toast.success('Model has been saved!');
+          dispatch(setLoadingSpinner(false))
         });
       }
     });

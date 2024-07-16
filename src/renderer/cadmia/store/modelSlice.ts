@@ -5,6 +5,7 @@ export interface ModelState {
   models: FaunaCadModel[];
   sharedModels: FaunaCadModel[];
   selectedModel: FaunaCadModel | undefined;
+  loadingSpinner: boolean
 }
 
 export const ModelSlice = createSlice({
@@ -13,6 +14,7 @@ export const ModelSlice = createSlice({
     models: [],
     sharedModels: [],
     selectedModel: undefined,
+    loadingSpinner: false
   } as ModelState,
   reducers: {
     addModel(state: ModelState, action: PayloadAction<FaunaCadModel>) {
@@ -32,6 +34,9 @@ export const ModelSlice = createSlice({
     setSharedModel(state: ModelState, action: PayloadAction<FaunaCadModel[]>) {
       state.sharedModels = action.payload
     },
+    setLoadingSpinner(state: ModelState, action: PayloadAction<boolean>){
+      state.loadingSpinner = action.payload
+    }
   },
 });
 
@@ -41,6 +46,7 @@ export const {
   updateModel,
   selectModel,
   setSharedModel,
+  setLoadingSpinner,
 } = ModelSlice.actions;
 
 /* Selettori */
@@ -50,3 +56,5 @@ export const SelectedModelSelector = (state: { modelSlice: ModelState }) =>
   state.modelSlice.selectedModel;
 export const SharedModelsSelector = (state: { modelSlice: ModelState }) =>
   state.modelSlice.sharedModels;
+export const LoadingSpinnerSelector = (state: { modelSlice: ModelState }) =>
+  state.modelSlice.loadingSpinner;

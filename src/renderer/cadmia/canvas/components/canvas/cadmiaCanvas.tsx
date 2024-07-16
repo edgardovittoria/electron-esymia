@@ -1,5 +1,5 @@
-import React, { FC, ReactNode, useEffect, useLayoutEffect, useState } from 'react';
-import { Provider, ReactReduxContext, useDispatch, useSelector } from 'react-redux';
+import React, { FC, ReactNode, useEffect, useState } from 'react';
+import { Provider, ReactReduxContext, useSelector } from 'react-redux';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
@@ -7,7 +7,6 @@ import {
   componentseSelector,
   FactoryShapes,
   keySelectedComponenteSelector,
-  setComponentsOpacity,
 } from 'cad-library';
 import { Bounds, Edges, GizmoHelper, GizmoViewport, OrbitControls, useBounds } from '@react-three/drei';
 import { CanvasObject } from './components/canvasObject';

@@ -27,6 +27,7 @@ import { Dispatch } from "@reduxjs/toolkit";
 import { CheckIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { setModality } from "../cadmiaModality/cadmiaModalitySlice";
 import { toolbarIconsHeight, toolbarIconsWidth, toolbarsHintStyle } from '../../../config/styles';
+import { setLoadingSpinner } from "../../../store/modelSlice";
 
 interface BinaryOpsToolbarProps {
 }
@@ -179,6 +180,7 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
                         {entityKeysForBinaryOperations.length > 1 ? (
                             <CheckIcon className="text-green-600 w-8 h-8"
                                 onClick={() => {
+                                  dispatch(setLoadingSpinner(true))
                                     binaryOp &&
                                         makeBinaryOperation(
                                             binaryOp as BinaryOperationType,
@@ -187,6 +189,7 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
                                             dispatch
                                         );
                                     dispatch(setModality('NormalSelection' as CadmiaModality))
+                                    dispatch(setLoadingSpinner(false))
                                 }}
                             />
                         ) : (
