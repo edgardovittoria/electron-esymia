@@ -155,9 +155,10 @@ export const DroppableAndDraggableFolder: React.FC<
         {folder.owner.email === user.email && (
           <Menu id={folder.name}>
             <Submenu
+              className='hover:text-white  text-primaryColor'
               label={
                 <>
-                  <BsFillFolderSymlinkFill className="mr-4 text-primaryColor w-[20px] h-[20px]" />
+                  <BsFillFolderSymlinkFill className="mr-4 w-[20px] h-[20px]" />
                   Move
                 </>
               }
@@ -201,8 +202,9 @@ export const DroppableAndDraggableFolder: React.FC<
                 setShowRename(true);
                 hideAll();
               }}
+              className='hover:text-white  text-primaryColor'
             >
-              <BiRename className="mr-4 text-primaryColor w-[20px] h-[20px]" />
+              <BiRename className="mr-4 w-[20px] h-[20px]" />
               Rename
             </Item>
             <Separator />
@@ -212,8 +214,9 @@ export const DroppableAndDraggableFolder: React.FC<
                 setShowSearchUser(true);
                 hideAll();
               }}
+              className='hover:text-white  text-primaryColor'
             >
-              <BiShareAlt className="mr-4 text-primaryColor w-[20px] h-[20px]" />
+              <BiShareAlt className="mr-4 w-[20px] h-[20px]" />
               Share
             </Item>
             <Separator />
@@ -229,8 +232,9 @@ export const DroppableAndDraggableFolder: React.FC<
                 dispatch(removeFolder(folder));
                 hideAll();
               }}
+              className='hover:text-white  text-primaryColor'
             >
-              <BiTrash className="mr-4 text-primaryColor w-[20px] h-[20px]" />
+              <BiTrash className="mr-4 w-[20px] h-[20px]" />
               Delete
             </Item>
           </Menu>

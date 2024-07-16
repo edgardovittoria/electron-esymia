@@ -45,22 +45,22 @@ export const useStorage = () => {
       }
     );
   };
-  const loadProjectsLocal = (setLoginSpinner: (v: boolean) => void) => {
-    const folder = constructFolderStructureLocal(
-      'projectsDir',
-      [],
-      user,
-      homePath
-    );
-    console.log(folder);
-    dispatch(setProjectsFolderToUser({ ...folder, faunaDocumentId: 'root', parent: 'nobody', name: 'My Files' }));
-    dispatch(selectFolder(folder.faunaDocumentId as string));
-    setLoginSpinner(false);
+  // const loadProjectsLocal = (setLoginSpinner: (v: boolean) => void) => {
+  //   const folder = constructFolderStructureLocal(
+  //     'projectsDir',
+  //     [],
+  //     user,
+  //     homePath
+  //   );
+  //   console.log(folder);
+  //   dispatch(setProjectsFolderToUser({ ...folder, faunaDocumentId: 'root', parent: 'nobody', name: 'My Files' }));
+  //   dispatch(selectFolder(folder.faunaDocumentId as string));
+  //   setLoginSpinner(false);
 
-  };
+  // };
   const loadFolders = (setLoginSpinner: (v: boolean) => void) => {
     if (process.env.STORAGE_MODE === 'local') {
-      loadProjectsLocal(setLoginSpinner);
+      //loadProjectsLocal(setLoginSpinner);
     } else {
       loadProjectsOnline(setLoginSpinner);
     }
@@ -68,19 +68,19 @@ export const useStorage = () => {
   return { loadFolders };
 };
 
-const constructFolderStructureLocal = (name: string, parents: string[], user: UsersState, homePath: string) => {
-  let projects: Project[] =  getDirContents([homePath, ...parents, name]).filter((p: string) => p.endsWith('.json')).map((s: string) => JSON.parse(readLocalFile([homePath, ...parents, name, s]) as string) as Project);
-  let folders: Folder[] = getDirContents([...parents, name]).filter((f: string) => !f.endsWith('.json')).map((s: string) => {
-    return  constructFolderStructureLocal(s, [...parents, name], user, homePath);
-  });
+// const constructFolderStructureLocal = (name: string, parents: string[], user: UsersState, homePath: string) => {
+//   let projects: Project[] =  getDirContents([homePath, ...parents, name]).filter((p: string) => p.endsWith('.json')).map((s: string) => JSON.parse(readLocalFile([homePath, ...parents, name, s]) as string) as Project);
+//   let folders: Folder[] = getDirContents([...parents, name]).filter((f: string) => !f.endsWith('.json')).map((s: string) => {
+//     return  constructFolderStructureLocal(s, [...parents, name], user, homePath);
+//   });
 
-  return {
-    name: name,
-    faunaDocumentId: name,
-    owner: user,
-    parent: parents[parents.length - 1],
-    projectList: projects,
-    subFolders: folders,
-    sharedWith: []
-  } as Folder;
-};
+//   return {
+//     name: name,
+//     faunaDocumentId: name,
+//     owner: user,
+//     parent: parents[parents.length - 1],
+//     projectList: projects,
+//     subFolders: folders,
+//     sharedWith: []
+//   } as Folder;
+// };

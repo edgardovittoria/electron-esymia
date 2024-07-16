@@ -31,6 +31,7 @@ import noResultsIconForProject from '../../../../../../../../../assets/noResults
 import {
   useStorageData
 } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
+import { GrClone } from 'react-icons/gr';
 
 interface DraggableProjectCardProps {
   project: Project;
@@ -47,6 +48,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
   const user = useSelector(usersStateSelector);
   const [showRename, setShowRename] = useState(false);
   const [showSearchUser, setShowSearchUser] = useState(false);
+  const { cloneProject } = useStorageData()
 
   const [{ isDragging }, drag, dragPreview] = useDrag(
     () => ({
@@ -108,9 +110,10 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
         {project.owner.email === user.email && (
           <Menu id={project.name}>
             <Submenu
+              className='hover:text-white  text-primaryColor'
               label={
                 <>
-                  <BsFillFolderSymlinkFill className="mr-4 text-primaryColor w-[20px] h-[20px]" />
+                  <BsFillFolderSymlinkFill className="mr-4 w-[20px] h-[20px]" />
                   Move
                 </>
               }
@@ -154,11 +157,24 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                 setShowRename(true);
                 hideAll();
               }}
+              className='hover:text-white  text-primaryColor'
             >
-              <BiRename className="mr-4 text-primaryColor w-[20px] h-[20px]" />
+              <BiRename className="mr-4 w-[20px] h-[20px]" />
               Rename
             </Item>
             <Separator />
+            <Item
+              onClick={(p) => {
+                p.event.stopPropagation();
+                cloneProject(project, selectedFolder as Folder)
+                hideAll();
+              }}
+              disabled={user.userRole !== 'Premium'}
+              className='hover:text-white  text-primaryColor'
+            >
+              <GrClone className="mr-4 w-[20px] h-[20px]" />
+              Clone
+            </Item>
             <Item
               onClick={(p) => {
                 p.event.stopPropagation();
@@ -166,8 +182,9 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                 hideAll();
               }}
               disabled={user.userRole !== 'Premium'}
+              className='hover:text-white  text-primaryColor'
             >
-              <BiShareAlt className="mr-4 text-primaryColor w-[20px] h-[20px]" />
+              <BiShareAlt className="mr-4 w-[20px] h-[20px]" />
               Share
             </Item>
             <Separator />
@@ -178,8 +195,9 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                 deleteProject(project)
                 hideAll();
               }}
+              className='hover:text-white  text-primaryColor'
             >
-              <BiTrash className="mr-4 text-primaryColor w-[20px] h-[20px]" />
+              <BiTrash className="mr-4 w-[20px] h-[20px]" />
               Delete
             </Item>
           </Menu>

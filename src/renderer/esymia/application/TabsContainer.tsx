@@ -108,14 +108,12 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
             />
           </li>
         </ul>
-        <div className="flex flex-row items-center justify-center sm:col-span-1 col-span-2">
-          {/* <FaBell */}
-          {/*    className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"/> */}
+        <div className="flex flex-row items-center justify-end sm:col-span-1 col-span-2">
           {isAuthenticated ? (
             <>
               <div>
                 <BsPlugin
-                  className="w-[20px] h-[20px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
+                  className="w-[22px] h-[22px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
                   onClick={() => {
                     setPluginVisibility(!pluginVisibility)
                     // setUserDropdownVisibility(false)
