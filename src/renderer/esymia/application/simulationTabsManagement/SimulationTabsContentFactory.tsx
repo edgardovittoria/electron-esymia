@@ -36,7 +36,7 @@ export const SimulationTabsContentFactory: React.FC<
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
         />
       );
-    case 'Physics':
+    case 'Terminations':
       return (
         <Physics
           selectedTabLeftPanel={selectedTabLeftPanel}

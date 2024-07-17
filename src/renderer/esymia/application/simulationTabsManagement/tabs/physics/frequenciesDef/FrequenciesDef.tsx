@@ -20,7 +20,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
   const dispatch = useDispatch()
 
   return(
-    <div className='p-[10px] border-[1px] border-secondaryColor bg-[#f6f6f6] text-left overflow-y-scroll max-h-[300px]'>
+    <div className='p-[10px] mt-2 border-[1px] border-secondaryColor bg-[#f6f6f6] text-left overflow-y-scroll max-h-[800px]'>
       <h6 className="w-[100%] mb-3">Range Definition</h6>
       <div className='flex flex-row justify-between px-5'>
         <div className='flex flex-row items-center gap-2'>

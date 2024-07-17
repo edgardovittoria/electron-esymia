@@ -20,7 +20,7 @@ export const PortManagement: React.FC<PortManagementProps> = ({
   return (
     <>
       {selectedPort ? (
-        <div>
+        <div className='max-w-[350px] max-h-[400px]'>
           <div className="flex items-center gap-2 px-[5px]">
             <div className="col-1 pe-0 ps-0">
               <FaReact
@@ -29,10 +29,10 @@ export const PortManagement: React.FC<PortManagementProps> = ({
               />
             </div>
             <div className="col-6 text-start">
-              <h5 className="mb-0 xl:text-md text-sm">{selectedPort.name}</h5>
+              <h5 className="mb-0 xl:text-md text-sm font-bold">{selectedPort.name}</h5>
             </div>
           </div>
-          <div className="flex-col px-[20px] pb-[20px] max-h-[300px] overflow-y-scroll overflow-x-hidden">
+          <div className="flex-col px-[20px] pb-[20px] max-h-[400px] overflow-y-scroll overflow-x-hidden">
             {children}
           </div>
         </div>

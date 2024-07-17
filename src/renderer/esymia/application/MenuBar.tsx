@@ -47,7 +47,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
                   }
                 />
               )}
-              {item === 'Physics' && (
+              {item === 'Terminations' && (
                 <FaReact
                   size={25}
                   className={
