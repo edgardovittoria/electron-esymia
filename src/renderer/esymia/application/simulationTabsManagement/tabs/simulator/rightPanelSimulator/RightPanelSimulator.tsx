@@ -38,6 +38,8 @@ import { generateSTLListFromComponents } from './components/rightPanelFunctions'
 import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs';
 import { publishMessage } from '../../../../../../middleware/stompMiddleware';
+import { TbServerBolt } from 'react-icons/tb';
+import { GiCubeforce } from 'react-icons/gi';
 
 interface RightPanelSimulatorProps {
   selectedProject: Project;
@@ -70,14 +72,24 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const meshAdvice = useSelector(meshAdviceSelector).filter(
     (item) => item.id === (selectedProject.faunaDocumentId as string),
   )[0];
-  const pathToExternalGridsNotFound = useSelector(pathToExternalGridsNotFoundSelector)
+  const pathToExternalGridsNotFound = useSelector(
+    pathToExternalGridsNotFoundSelector,
+  );
+  const [sidebarItemSelected, setsidebarItemSelected] = useState<
+    string | undefined
+  >(undefined);
 
   useEffect(() => {
     suggestedQuantum && setQuantumDimsInput(suggestedQuantum);
   }, [suggestedQuantum]);
 
   useEffect(() => {
-    if (selectedProject.model.components && mesherStatus === 'ready' && selectedProject.frequencies && selectedProject.frequencies.length > 0) {
+    if (
+      selectedProject.model.components &&
+      mesherStatus === 'ready' &&
+      selectedProject.frequencies &&
+      selectedProject.frequencies.length > 0
+    ) {
       setSuggestedQuantumError({ active: false });
       if (
         !selectedProject.suggestedQuantum &&
@@ -94,13 +106,15 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             generateSTLListFromComponents(allMaterials, components),
           id: selectedProject.faunaDocumentId as string,
         };
-        dispatch(publishMessage({
-          queue: 'management',
-          body: {
-            message: 'compute suggested quantum',
-            body: objToSendToMesher
-          },
-        }))
+        dispatch(
+          publishMessage({
+            queue: 'management',
+            body: {
+              message: 'compute suggested quantum',
+              body: objToSendToMesher,
+            },
+          }),
+        );
         // client.publish({
         //   destination: 'management',
         //   body: JSON.stringify({
@@ -116,8 +130,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         setQuantumDimsInput([0, 0, 0]);
       }
       setSuggestedQuantumError({ active: true, type: 'Mesher Not Active' });
-    } else if (selectedProject.frequencies && selectedProject.frequencies.length === 0) {
-      console.log('qui')
+    } else if (
+      selectedProject.frequencies &&
+      selectedProject.frequencies.length === 0
+    ) {
+      console.log('qui');
       setSuggestedQuantumError({ active: true, type: 'Frequencies not set' });
     }
   }, [mesherStatus]);
@@ -220,66 +237,99 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         <MeshingStatusItem selectedProject={selectedProject} quantumDimsInput={quantumDimsInput} allMaterials={allMaterials as Material[]}
                        meshStatus={meshGenerated} setAlert={setAlert} />
       )} */}
-      <div
-        className={`${
-          (meshGenerated === 'Generating' ||
-            selectedProject.simulation?.status === 'Queued') &&
-          'opacity-40'
-        } flex-col absolute right-[2%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
-      >
-        <div className="flex">
-          <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
-          <h5 className="ml-2 text-[12px] xl:text-base">
-            Meshing and Solving Info
-          </h5>
+      <div className="absolute right-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+        <div
+          className={`p-2 tooltip rounded-t tooltip-left ${
+            sidebarItemSelected === 'Mesher'
+              ? 'text-white bg-primaryColor'
+              : 'text-primaryColor bg-white'
+          }`}
+          data-tip="Mesher"
+          onClick={() => {
+            if (sidebarItemSelected === 'Mesher') {
+              setsidebarItemSelected(undefined);
+            } else {
+              setsidebarItemSelected('Mesher');
+            }
+          }}
+        >
+          <GiCubeforce style={{ width: '25px', height: '25px' }} />
         </div>
-        <hr className="mt-1" />
-        <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
-          <h6 className="xl:text-base text-center text-[12px]">
-            Set quantum&apos;s dimensions
-          </h6>
-          <hr className="mt-2 border-[1px] border-gray-200" />
-          {selectedProject.frequencies &&
-            selectedProject.frequencies.length > 0 && (
-              <div className="flex flex-col my-3 items-center">
-                <span className="text-sm">
-                  Max Frequency:{' '}
-                  <span className="font-bold">
-                    {selectedProject.frequencies[
-                      selectedProject.frequencies.length - 1
-                    ].toExponential()}
+        <div
+          className={`p-2 tooltip rounded-t tooltip-left ${
+            sidebarItemSelected === 'Solver'
+              ? 'text-white bg-primaryColor'
+              : 'text-primaryColor bg-white'
+          }`}
+          data-tip="Solver"
+          onClick={() => {
+            if (sidebarItemSelected === 'Solver') {
+              setsidebarItemSelected(undefined);
+            } else {
+              setsidebarItemSelected('Solver');
+            }
+          }}
+        >
+          <TbServerBolt style={{ width: '25px', height: '25px' }} />
+        </div>
+      </div>
+      {sidebarItemSelected && sidebarItemSelected === 'Mesher' && (
+        <div
+          className={`${
+            meshGenerated === 'Generating' && 'opacity-40'
+          } flex-col absolute right-[5%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
+        >
+          <div className="flex">
+            <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
+            <h5 className="ml-2 text-[12px] xl:text-base">Meshing Info</h5>
+          </div>
+          <hr className="mt-1" />
+          <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
+            <h6 className="xl:text-base text-center text-[12px]">
+              Set quantum&apos;s dimensions
+            </h6>
+            <hr className="mt-2 border-[1px] border-gray-200" />
+            {selectedProject.frequencies &&
+              selectedProject.frequencies.length > 0 && (
+                <div className="flex flex-col my-3 items-center">
+                  <span className="text-sm">
+                    Max Frequency:{' '}
+                    <span className="font-bold">
+                      {selectedProject.frequencies[
+                        selectedProject.frequencies.length - 1
+                      ].toExponential()}
+                    </span>
                   </span>
-                </span>
-                <span className="text-sm">
-                  Lambda Factor: <span className="font-bold">40</span>
-                </span>
-              </div>
-            )}
-          <div className="mt-2">
-            <div className="flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2">
-              {quantumDimsInput.map(
-                (quantumComponent, indexQuantumComponent) => (
-                  <QuantumDimsInput
-                    dataTestId={'quantumInput' + indexQuantumComponent}
-                    disabled={true}
-                    //disabled={selectedProject.simulation?.status === 'Completed' || selectedProject.model?.components === undefined}
-                    key={indexQuantumComponent}
-                    label={quantumDimensionsLabels[indexQuantumComponent]}
-                    value={parseFloat(quantumComponent.toFixed(5))}
-                    onChange={(event) =>
-                      setQuantumDimsInput(
-                        quantumDimsInput.map((q, ind) =>
-                          ind === indexQuantumComponent
-                            ? parseFloat(event.target.value)
-                            : q,
-                        ) as [number, number, number],
-                      )
-                    }
-                  />
-                ),
+                  <span className="text-sm">
+                    Lambda Factor: <span className="font-bold">40</span>
+                  </span>
+                </div>
               )}
-            </div>
-            {/* {selectedProject.suggestedQuantum && selectedProject && selectedProject.frequencies &&
+            <div className="mt-2">
+              <div className="flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2">
+                {quantumDimsInput.map(
+                  (quantumComponent, indexQuantumComponent) => (
+                    <QuantumDimsInput
+                      dataTestId={'quantumInput' + indexQuantumComponent}
+                      disabled={true}
+                      //disabled={selectedProject.simulation?.status === 'Completed' || selectedProject.model?.components === undefined}
+                      key={indexQuantumComponent}
+                      label={quantumDimensionsLabels[indexQuantumComponent]}
+                      value={parseFloat(quantumComponent.toFixed(5))}
+                      onChange={(event) =>
+                        setQuantumDimsInput(
+                          quantumDimsInput.map((q, ind) =>
+                            ind === indexQuantumComponent
+                              ? parseFloat(event.target.value)
+                              : q,
+                          ) as [number, number, number],
+                        )
+                      }
+                    />
+                  ),
+                )}
+              </div>
+              {/* {selectedProject.suggestedQuantum && selectedProject && selectedProject.frequencies &&
               <div className='text-[12px] xl:text-base font-semibold mt-2'>
                 Suggested:
                 [
@@ -289,82 +339,87 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 ]
               </div>
             } */}
-            {suggestedQuantumError.active && (
-              <div className="text-[12px] xl:text-base font-semibold mt-2">
-                {suggestedQuantumError.type === 'Mesher Not Active'
-                  ? 'Mesher Down: start mesher or wait until started!'
-                  : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
-              </div>
-            )}
-            {meshGenerated === 'Generated' && !suggestedQuantumError.active && !pathToExternalGridsNotFound && (
-              <div className="flex flex-row gap-4 justify-center items-center w-full mt-3">
-                <div
-                  className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200"
-                  onClick={() => {
-                    setRefineMode('coarsen');
-                    setShowModalRefine(true);
-                  }}
-                >
-                  <LiaCubeSolid size={25} />
-                  <span>Coarsen</span>
+              {suggestedQuantumError.active && (
+                <div className="text-[12px] xl:text-base font-semibold mt-2">
+                  {suggestedQuantumError.type === 'Mesher Not Active'
+                    ? 'Mesher Down: start mesher or wait until started!'
+                    : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
                 </div>
-                <div
-                  className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200"
-                  onClick={() => {
-                    setRefineMode('refine');
-                    setShowModalRefine(true);
-                  }}
-                >
-                  <LiaCubesSolid size={25} />
-                  <span>Refine</span>
-                </div>
-              </div>
-            )}
+              )}
+              {meshGenerated === 'Generated' &&
+                !suggestedQuantumError.active &&
+                !pathToExternalGridsNotFound && (
+                  <div className="flex flex-row gap-4 justify-center items-center w-full mt-3">
+                    <div
+                      className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200"
+                      onClick={() => {
+                        setRefineMode('coarsen');
+                        setShowModalRefine(true);
+                      }}
+                    >
+                      <LiaCubeSolid size={25} />
+                      <span>Coarsen</span>
+                    </div>
+                    <div
+                      className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200"
+                      onClick={() => {
+                        setRefineMode('refine');
+                        setShowModalRefine(true);
+                      }}
+                    >
+                      <LiaCubesSolid size={25} />
+                      <span>Refine</span>
+                    </div>
+                  </div>
+                )}
+            </div>
           </div>
-        </div>
-        <div className="w-[100%] pt-4">
-          <div className="flex-column">
-            {meshGenerated === 'Not Generated' && (
-              <div>
-                <button
-                  data-testid="generateMeshButton"
-                  className={
-                    checkQuantumDimensionsValidity()
-                      ? 'button buttonPrimary w-[100%]'
-                      : 'button bg-gray-300 text-gray-600 opacity-70 w-[100%]'
-                  }
-                  disabled={!checkQuantumDimensionsValidity() || pathToExternalGridsNotFound}
-                  onClick={() => {
-                    dispatch(
-                      setPreviousMeshStatus({
-                        status: selectedProject.meshData.meshGenerated as
-                          | 'Not Generated'
-                          | 'Generated',
-                        projectToUpdate:
-                          selectedProject.faunaDocumentId as string,
-                      }),
-                    );
-                    dispatch(
-                      setMeshGenerated({
-                        status: 'Generating',
-                        projectToUpdate:
-                          selectedProject.faunaDocumentId as string,
-                      }),
-                    );
-                    dispatch(
-                      setQuantum({
-                        quantum: quantumDimsInput,
-                        projectToUpdate:
-                          selectedProject.faunaDocumentId as string,
-                      }),
-                    );
-                  }}
-                >
-                  Generate Mesh
-                </button>
-              </div>
-            )}
-            {/* {((meshGenerated === 'Generated' && !meshApproved) ||
+          <div className="w-[100%] pt-4">
+            <div className="flex-column">
+              {meshGenerated === 'Not Generated' && (
+                <div>
+                  <button
+                    data-testid="generateMeshButton"
+                    className={
+                      checkQuantumDimensionsValidity()
+                        ? 'button buttonPrimary w-[100%]'
+                        : 'button bg-gray-300 text-gray-600 opacity-70 w-[100%]'
+                    }
+                    disabled={
+                      !checkQuantumDimensionsValidity() ||
+                      pathToExternalGridsNotFound
+                    }
+                    onClick={() => {
+                      dispatch(
+                        setPreviousMeshStatus({
+                          status: selectedProject.meshData.meshGenerated as
+                            | 'Not Generated'
+                            | 'Generated',
+                          projectToUpdate:
+                            selectedProject.faunaDocumentId as string,
+                        }),
+                      );
+                      dispatch(
+                        setMeshGenerated({
+                          status: 'Generating',
+                          projectToUpdate:
+                            selectedProject.faunaDocumentId as string,
+                        }),
+                      );
+                      dispatch(
+                        setQuantum({
+                          quantum: quantumDimsInput,
+                          projectToUpdate:
+                            selectedProject.faunaDocumentId as string,
+                        }),
+                      );
+                    }}
+                  >
+                    Generate Mesh
+                  </button>
+                </div>
+              )}
+              {/* {((meshGenerated === 'Generated' && !meshApproved) ||
               selectedProject.simulation?.status === 'Failed') && (
               <div className='flex justify-between'>
                 <button
@@ -389,176 +444,200 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 </button>
               </div>
             )} */}
-          </div>
-        </div>
-        <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
-          <h6 className="text-[12px] xl:text-base">Solver Iterations</h6>
-          <div className="mt-2">
-            <div className="flex justify-between mt-2">
-              <div className="w-[45%]">
-                <span className="text-[12px] xl:text-base">Outer</span>
-                <input
-                  disabled={
-                    selectedProject.simulation?.status === 'Completed' ||
-                    meshGenerated !== 'Generated'
-                  }
-                  min={1}
-                  className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
-                  type="number"
-                  step={1}
-                  value={
-                    selectedProject.simulation
-                      ? isNaN(
-                          selectedProject.simulation.solverAlgoParams
-                            .innerIteration,
-                        )
-                        ? 0
-                        : selectedProject.simulation.solverAlgoParams
-                            .innerIteration
-                      : isNaN(solverIterations[0])
-                      ? 0
-                      : solverIterations[0]
-                  }
-                  onChange={(event) => {
-                    dispatch(
-                      setSolverIterations([
-                        parseInt(event.target.value),
-                        solverIterations[1],
-                      ]),
-                    );
-                  }}
-                />
-              </div>
-              <div className="w-[45%]">
-                <span className="text-[12px] xl:text-base">Inner</span>
-                <input
-                  disabled={
-                    selectedProject.simulation?.status === 'Completed' ||
-                    meshGenerated !== 'Generated'
-                  }
-                  min={1}
-                  className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
-                  type="number"
-                  step={1}
-                  value={
-                    selectedProject.simulation
-                      ? isNaN(
-                          selectedProject.simulation.solverAlgoParams
-                            .outerIteration,
-                        )
-                        ? 0
-                        : selectedProject.simulation.solverAlgoParams
-                            .outerIteration
-                      : isNaN(solverIterations[1])
-                      ? 0
-                      : solverIterations[1]
-                  }
-                  onChange={(event) => {
-                    dispatch(
-                      setSolverIterations([
-                        solverIterations[0],
-                        parseInt(event.target.value),
-                      ]),
-                    );
-                  }}
-                />
-              </div>
             </div>
           </div>
         </div>
-        <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
-          <h6 className="text-[12px] xl:text-base">Convergence Threshold</h6>
-          <div className="mt-2">
-            <div className="flex justify-between mt-2">
-              <div className="w-full">
-                <DebounceInput
-                  debounceTimeout={500}
-                  disabled={
-                    selectedProject.simulation?.status === 'Completed' ||
-                    meshGenerated !== 'Generated'
-                  }
-                  min={0.0001}
-                  max={0.1}
-                  className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
-                  type="number"
-                  step={0.0001}
-                  value={
-                    selectedProject.simulation
-                      ? isNaN(
-                          selectedProject.simulation.solverAlgoParams
-                            .convergenceThreshold,
-                        )
-                        ? 0
-                        : selectedProject.simulation.solverAlgoParams
-                            .convergenceThreshold
-                      : isNaN(convergenceThreshold)
-                      ? 0
-                      : convergenceThreshold
-                  }
-                  onChange={(event) => {
-                    dispatch(
-                      setConvergenceTreshold(parseFloat(event.target.value)),
-                    );
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        {selectedProject.simulation?.status === 'Completed' ? (
-          <button
-            className="button buttonPrimary w-[100%] mt-3 text-[12px] xl:text-base"
-            onClick={() => {
-              dispatch(selectMenuItem('Results'));
-            }}
+      )}
+      {sidebarItemSelected && sidebarItemSelected === 'Solver' && (
+        <>
+          <div
+            className={`${
+              selectedProject.simulation?.status === 'Queued' && 'opacity-40'
+            } flex-col absolute right-[5%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
           >
-            Results
-          </button>
-        ) : (
-          <button
-            data-testid="startSimulationButton"
-            className={`w-full mt-3 button text-[12px] xl:text-base disabled:bg-gray-400
+            <div className="flex">
+              <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
+              <h5 className="ml-2 text-[12px] xl:text-base">Solving Info</h5>
+            </div>
+            <hr className="mt-1" />
+            <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
+              <h6 className="text-[12px] xl:text-base">Solver Iterations</h6>
+              <div className="mt-2">
+                <div className="flex justify-between mt-2">
+                  <div className="w-[45%]">
+                    <span className="text-[12px] xl:text-base">Outer</span>
+                    <input
+                      disabled={
+                        selectedProject.simulation?.status === 'Completed' ||
+                        meshGenerated !== 'Generated'
+                      }
+                      min={1}
+                      className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
+                      type="number"
+                      step={1}
+                      value={
+                        selectedProject.simulation
+                          ? isNaN(
+                              selectedProject.simulation.solverAlgoParams
+                                .innerIteration,
+                            )
+                            ? 0
+                            : selectedProject.simulation.solverAlgoParams
+                                .innerIteration
+                          : isNaN(solverIterations[0])
+                          ? 0
+                          : solverIterations[0]
+                      }
+                      onChange={(event) => {
+                        dispatch(
+                          setSolverIterations([
+                            parseInt(event.target.value),
+                            solverIterations[1],
+                          ]),
+                        );
+                      }}
+                    />
+                  </div>
+                  <div className="w-[45%]">
+                    <span className="text-[12px] xl:text-base">Inner</span>
+                    <input
+                      disabled={
+                        selectedProject.simulation?.status === 'Completed' ||
+                        meshGenerated !== 'Generated'
+                      }
+                      min={1}
+                      className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
+                      type="number"
+                      step={1}
+                      value={
+                        selectedProject.simulation
+                          ? isNaN(
+                              selectedProject.simulation.solverAlgoParams
+                                .outerIteration,
+                            )
+                            ? 0
+                            : selectedProject.simulation.solverAlgoParams
+                                .outerIteration
+                          : isNaN(solverIterations[1])
+                          ? 0
+                          : solverIterations[1]
+                      }
+                      onChange={(event) => {
+                        dispatch(
+                          setSolverIterations([
+                            solverIterations[0],
+                            parseInt(event.target.value),
+                          ]),
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
+              <h6 className="text-[12px] xl:text-base">
+                Convergence Threshold
+              </h6>
+              <div className="mt-2">
+                <div className="flex justify-between mt-2">
+                  <div className="w-full">
+                    <DebounceInput
+                      debounceTimeout={500}
+                      disabled={
+                        selectedProject.simulation?.status === 'Completed' ||
+                        meshGenerated !== 'Generated'
+                      }
+                      min={0.0001}
+                      max={0.1}
+                      className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
+                      type="number"
+                      step={0.0001}
+                      value={
+                        selectedProject.simulation
+                          ? isNaN(
+                              selectedProject.simulation.solverAlgoParams
+                                .convergenceThreshold,
+                            )
+                            ? 0
+                            : selectedProject.simulation.solverAlgoParams
+                                .convergenceThreshold
+                          : isNaN(convergenceThreshold)
+                          ? 0
+                          : convergenceThreshold
+                      }
+                      onChange={(event) => {
+                        dispatch(
+                          setConvergenceTreshold(
+                            parseFloat(event.target.value),
+                          ),
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {selectedProject.simulation?.status === 'Completed' ? (
+              <button
+                className="button buttonPrimary w-[100%] mt-3 text-[12px] xl:text-base"
+                onClick={() => {
+                  dispatch(selectMenuItem('Results'));
+                }}
+              >
+                Results
+              </button>
+            ) : (
+              <button
+                data-testid="startSimulationButton"
+                className={`w-full mt-3 button text-[12px] xl:text-base disabled:bg-gray-400
               ${
                 meshGenerated !== 'Generated'
                   ? 'bg-gray-300 text-gray-600 opacity-70'
                   : 'buttonPrimary'
               }`}
-            disabled={meshGenerated !== 'Generated' || pathToExternalGridsNotFound}
-            onClick={() => {
-              const simulation: Simulation = {
-                name: `${selectedProject?.name} - sim`,
-                started: Date.now().toString(),
-                ended: '',
-                results: {} as SolverOutput,
-                status: 'Queued',
-                associatedProject: selectedProject?.faunaDocumentId as string,
-                solverAlgoParams: {
-                  innerIteration: solverIterations[0],
-                  outerIteration: solverIterations[1],
-                  convergenceThreshold,
-                },
-              };
-              dispatch(updateSimulation(simulation));
-              dispatch(
-                setMeshApproved({
-                  approved: true,
-                  projectToUpdate: selectedProject.faunaDocumentId as string,
-                }),
-              );
-            }}
-          >
-            Start Simulation
-          </button>
-        )}
-      </div>
+                disabled={
+                  meshGenerated !== 'Generated' || pathToExternalGridsNotFound
+                }
+                onClick={() => {
+                  const simulation: Simulation = {
+                    name: `${selectedProject?.name} - sim`,
+                    started: Date.now().toString(),
+                    ended: '',
+                    results: {} as SolverOutput,
+                    status: 'Queued',
+                    associatedProject:
+                      selectedProject?.faunaDocumentId as string,
+                    solverAlgoParams: {
+                      innerIteration: solverIterations[0],
+                      outerIteration: solverIterations[1],
+                      convergenceThreshold,
+                    },
+                  };
+                  dispatch(updateSimulation(simulation));
+                  dispatch(
+                    setMeshApproved({
+                      approved: true,
+                      projectToUpdate:
+                        selectedProject.faunaDocumentId as string,
+                    }),
+                  );
+                }}
+              >
+                Start Simulation
+              </button>
+            )}
+          </div>
+        </>
+      )}
       <ModalRefineCoarse
-        showModal={showModalRefine}
-        mode={refineMode}
-        setShowModal={setShowModalRefine}
-        selectedProject={selectedProject}
-        quantumDimsInput={quantumDimsInput}
-        setQuantumDimsInput={setQuantumDimsInput}
-      />
+            showModal={showModalRefine}
+            mode={refineMode}
+            setShowModal={setShowModalRefine}
+            selectedProject={selectedProject}
+            quantumDimsInput={quantumDimsInput}
+            setQuantumDimsInput={setQuantumDimsInput}
+          />
     </>
   );
 };

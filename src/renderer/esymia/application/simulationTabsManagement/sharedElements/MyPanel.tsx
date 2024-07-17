@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { tabTitles } from './modelerTabTitlesAndIcons';
 import { selectedProjectSelector } from '../../../store/projectSlice';
 import { modelerLeftPanelTitle, resultsLeftPanelTitle } from '../../config/panelTitles';
+import { classNames } from '../../../../cadmia/canvas/components/navBar/NavBar';
 
 interface DashBoardProps {
   tabs: string[];

@@ -323,9 +323,9 @@ const PhysicsRightSidebar: FC<{
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
   return (
     <>
-      <div className="absolute right-[2%] top-[180px] max-h-[500px] flex flex-col items-center gap-0 bg-white">
+      <div className="absolute right-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
         <div
-          className="p-2 tooltip tooltip-left"
+          className={`p-2 tooltip rounded-t tooltip-left ${selectedTabRightPanel === physicsRightPanelTitle.first ? 'text-white bg-primaryColor' : 'text-primaryColor bg-white'}`}
           data-tip="Terminations"
           onClick={() => {
             if (selectedTabRightPanel === physicsRightPanelTitle.first) {
@@ -335,10 +335,13 @@ const PhysicsRightSidebar: FC<{
             }
           }}
         >
-          <GiAtom color={'#184043'} style={{ width: '25px', height: '25px' }} />
+          <GiAtom
+            style={{ width: '25px', height: '25px' }}
+
+          />
         </div>
         <div
-          className="p-2 tooltip tooltip-left"
+          className={`p-2 tooltip rounded-b tooltip-left ${selectedTabRightPanel === physicsRightPanelTitle.second ? 'text-white bg-primaryColor' : 'text-primaryColor bg-white'}`}
           data-tip="Frequencies"
           onClick={() => {
             if (selectedTabRightPanel === physicsRightPanelTitle.second) {
@@ -349,13 +352,12 @@ const PhysicsRightSidebar: FC<{
           }}
         >
           <SiAzurefunctions
-            color={'#184043'}
             style={{ width: '25px', height: '25px' }}
           />
         </div>
       </div>
       {selectedTabRightPanel && (
-        <div className="bg-white p-3 absolute right-[4%] top-[180px]">
+        <div className="bg-white p-3 absolute right-[5%] top-[180px] rounded">
           {selectedTabRightPanel === physicsRightPanelTitle.first ? (
             <>
               {selectedPort?.category === 'lumped' ? (

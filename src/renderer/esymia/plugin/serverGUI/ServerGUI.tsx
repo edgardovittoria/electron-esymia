@@ -102,7 +102,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
           {mesherLogsVisibility &&
             <div className={`h-[150px] max-h-[150px] overflow-y-scroll border border-secondaryColor p-3 flex flex-col ${spinnerMesher ? 'items-center justify-center bg-gray-100 bg-opacity-30': 'bg-white'}`}>
               {spinnerMesher && <ImSpinner className='animate-spin w-12 h-12 z-50' />}
-              {mesherLogs.map((ml, index) => <div key={index} className="text-sm">{ml}</div>)}
+              {mesherLogs.map((ml, index) => <div key={index} className="text-[12px]">{ml}</div>)}
             </div>
           }
         </div>
@@ -166,7 +166,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
           {solverLogsVisibility &&
             <div className={`h-[150px] max-h-[150px] overflow-y-scroll border border-secondaryColor p-3 flex flex-col ${spinnerMesher ? 'items-center justify-center bg-gray-100 bg-opacity-30': 'bg-white'}`}>
               {spinnerSolver && <ImSpinner className='animate-spin w-12 h-12 z-50' />}
-              {solverLogs.map((ml, index) => <div key={index} className="text-sm">{ml}</div>)}
+              {solverLogs.map((ml, index) => <div key={index} className="text-[12px]">{ml}</div>)}
             </div>
           }
         </div>
