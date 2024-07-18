@@ -44,7 +44,6 @@ export default function App() {
   useEffect(() => {
     window.electron.ipcRenderer.invoke('getMac').then(res => {
       execQuery(getItemByMacAddress, res).then(item => {
-        console.log(item[0].item)
         if(item.length !== 0){
           console.log(new Date().getTime() - item[0].item.startTime)
           if(new Date().getTime() - item[0].item.startTime > 2628e9){
