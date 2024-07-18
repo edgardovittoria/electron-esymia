@@ -154,7 +154,7 @@ export default function App() {
                 </div>
                 {user && (
                   <div>
-                    <div>DEMO: {remainingDemoDays} days remaining</div>
+                    <span className='absolute top-0 left-0 text-center p-1 border-b-2 border-r-2 border-secondaryColor rounded-br-xl bg-white font-bold text-sm'>DEMO: {remainingDemoDays} days remaining</span>
                     <FaUser
                       id="profileIcon"
                       className="w-[20px] h-[20px] mr-4 text-black hover:opacity-40 hover:cursor-pointer"
