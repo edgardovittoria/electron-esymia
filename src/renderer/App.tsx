@@ -22,8 +22,7 @@ import {
 } from './middleware/stompMiddleware';
 import { ImSpinner } from 'react-icons/im';
 import { brokerConnectedSelector } from './esymia/store/tabsAndMenuItemsSlice';
-import { useFaunaQuery } from 'cad-library';
-import { createItemInMacAddresses, getItemByMacAddress } from './faunadb/manageMacAddressesAPI';
+import { useDemoMode } from './useDemoMode';
 
 // export const client = new Client({
 //   brokerURL: 'ws://localhost:15674/ws'
@@ -37,26 +36,9 @@ export default function App() {
     useState<boolean>(false);
   // const [brokerActive, setBrokerActive] = useState<boolean>(false);
   // const [progressBarValue, setProgressBarValue] = useState<number>(0)
-  const [allowedUser, setallowedUser] = useState<boolean>(true)
 
-  const { execQuery } = useFaunaQuery()
-
-  useEffect(() => {
-    window.electron.ipcRenderer.invoke('getMac').then(res => {
-      execQuery(getItemByMacAddress, res).then(item => {
-        if(item.length !== 0){
-          console.log(new Date().getTime() - item[0].item.startTime)
-          if(new Date().getTime() - item[0].item.startTime > 2628e9){
-            setallowedUser(false)
-            alert("The trial period has expired!")
-            window.close()
-          }
-        }else{
-          execQuery(createItemInMacAddresses, {macAddress: res, startTime: new Date().getTime()})
-        }
-      })
-    })
-  }, [])
+  // Uso del temporizzatore per la versione demo di 30 giorni. Commentare se si vuole disabilitare la modalità demo.
+  let {allowedUser, remainingDemoDays} = useDemoMode()
 
   useEffect(() => {
     window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
@@ -172,6 +154,7 @@ export default function App() {
                 </div>
                 {user && (
                   <div>
+                    <div>DEMO: {remainingDemoDays} days remaining</div>
                     <FaUser
                       id="profileIcon"
                       className="w-[20px] h-[20px] mr-4 text-black hover:opacity-40 hover:cursor-pointer"
