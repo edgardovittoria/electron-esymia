@@ -22,10 +22,13 @@ import {
 } from './middleware/stompMiddleware';
 import { ImSpinner } from 'react-icons/im';
 import { brokerConnectedSelector } from './esymia/store/tabsAndMenuItemsSlice';
+import { useFaunaQuery } from 'cad-library';
+import { createItemInMacAddresses, getItemByMacAddress } from './faunadb/manageMacAddressesAPI';
 
 // export const client = new Client({
 //   brokerURL: 'ws://localhost:15674/ws'
 // });
+
 
 export default function App() {
   const dispatch = useDispatch();
@@ -34,6 +37,28 @@ export default function App() {
     useState<boolean>(false);
   // const [brokerActive, setBrokerActive] = useState<boolean>(false);
   // const [progressBarValue, setProgressBarValue] = useState<number>(0)
+  const [allowedUser, setallowedUser] = useState<boolean>(true)
+
+  const { execQuery } = useFaunaQuery()
+
+  useEffect(() => {
+    window.electron.ipcRenderer.invoke('getMac').then(res => {
+      execQuery(getItemByMacAddress, res).then(item => {
+        console.log(item[0].item)
+        if(item.length !== 0){
+          console.log(new Date().getTime() - item[0].item.startTime)
+          if(new Date().getTime() - item[0].item.startTime > 2628e9){
+            setallowedUser(false)
+            alert("The trial period has expired!")
+            window.close()
+          }
+        }else{
+          execQuery(createItemInMacAddresses, {macAddress: res, startTime: new Date().getTime()})
+        }
+      })
+    })
+  }, [])
+
   useEffect(() => {
     window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
       dispatch(setHomePat(res));
@@ -86,7 +111,7 @@ export default function App() {
   }, [activeMeshing.length]);
   return (
     <>
-      {dockerInstallationBox && (
+      {dockerInstallationBox && allowedUser && (
         <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
           <div className="flex flex-col items-center gap-2 p-3 bg-white rounded border border-black">
             <span className='text-2xl'>Docker Needed</span>
@@ -99,7 +124,7 @@ export default function App() {
           </div>
         </div>
       )}
-      {!dockerInstallationBox && (
+      {!dockerInstallationBox && allowedUser && (
         <>
           {!brokerActive ? (
             <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">

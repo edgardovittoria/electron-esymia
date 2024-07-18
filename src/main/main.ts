@@ -19,6 +19,7 @@ import nodeChildProcess from 'child_process';
 import { closeSync, ftruncate, mkdir, openSync, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync, writeSync } from 'fs';
 import { event } from 'cypress/types/jquery';
 import { url } from 'inspector';
+import getmac from 'getmac'
 
 class AppUpdater {
   constructor() {
@@ -230,6 +231,10 @@ ipcMain.handle('getInstallationDir', (e, args) => {
   return app.getPath('home')
 });
 
+ipcMain.handle('getMac', (e, args) => {
+  return getmac()
+});
+
 ipcMain.handle('directoryContents', (e, args) => {
   let path = app.getPath('home')+args[0]
   return readdirSync(path, { withFileTypes: false })
@@ -288,6 +293,7 @@ ipcMain.on('exportTouchstone', (e, args) => {
   let fileName = path.join(app.getPath("home"), "Downloads", args[4] + `.s${args[3]}p`)
   writeTouchstone(args[0], args[1], args[2], fileName)
 })
+
 
 function writeTouchstone(freq:number[], S:any, R_chiusura:number, fileNameComplete:string) {
   const np = S.length;

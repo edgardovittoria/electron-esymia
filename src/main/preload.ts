@@ -23,6 +23,7 @@ export type Channels =
   | 'readFile'
   | 'runBroker'
   | 'exportTouchstone'
+  | 'getMac'
   ;
 
 const electronHandler = {
