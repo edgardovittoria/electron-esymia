@@ -79,8 +79,11 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                 <FaStop size={15}
                         className={`${mesherStatus === 'idle' && 'text-gray-400'}`}
                         onClick={() => {
-                          window.electron.ipcRenderer.sendMessage('haltMesher', [])
-                          dispatch(setMesherStatus('idle'))
+                          dispatch(publishMessage({
+                            queue: 'management',
+                            body: {
+                              message: 'stop',
+                            }}))
                           setMesherLogs(["MESHER HALTED"])
                         }}
                 />
@@ -144,7 +147,6 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
                           //     message: 'stop',
                           //   }),
                           // });
-                          dispatch(setSolverStatus('idle'))
                           setSolverLogs(["SOLVER HALTED"])
                         }}
                 />

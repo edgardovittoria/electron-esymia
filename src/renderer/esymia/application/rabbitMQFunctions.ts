@@ -1,6 +1,7 @@
 import { SolverOutput } from '../model/esymiaModels';
 import { setMesherStatus, setSolverStatus } from '../store/pluginsSlice';
 import {
+  setAWSExternalGridsData,
   setIterations,
   setMeshAdvice,
   setMeshProgress,
@@ -62,6 +63,18 @@ export const callback_mesher_results = (
   message.ack();
   let res = JSON.parse(message.body);
   dispatch(setMesherResults({id: res.id, gridsPath: res.grids, meshPath: res.mesh, isStopped: (res.isStopped) ? res.isStopped : false, isValid: res.isValid, error: res.error}))
+};
+
+
+export const callback_mesher_grids = (
+  message: any,
+  dispatch: Function,
+) => {
+  message.ack();
+  let res = JSON.parse(message.body);
+  console.log(res)
+  res.grids_exist && dispatch(setAWSExternalGridsData(res.grids))
+  // dispatch(setMesherResults({id: res.id, gridsPath: res.grids, meshPath: res.mesh, isStopped: (res.isStopped) ? res.isStopped : false, isValid: res.isValid, error: res.error}))
 };
 
 export const callback_solver_feedback = (message: any, dispatch: Function) => {

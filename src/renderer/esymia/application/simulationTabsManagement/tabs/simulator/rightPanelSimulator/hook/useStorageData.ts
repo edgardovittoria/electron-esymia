@@ -1,4 +1,3 @@
-import { AppDispatch } from '../../../../../../store/store';
 import {
   CellSize,
   CellsNumber,
@@ -7,42 +6,38 @@ import {
   OriginPoint,
   Project,
 } from '../../../../../../model/esymiaModels';
-import { deleteFileS3, uploadFileS3 } from '../../../../../../aws/mesherAPIs';
+import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
 import {
   addProject,
   homePathSelector,
   removeProject,
   selectedProjectSelector,
-  setExternalGrids,
-  setMesh,
   setMeshGenerated,
   setPathToExternalGridsNotFound,
 } from '../../../../../../store/projectSlice';
 import {
   createSimulationProjectInFauna,
   deleteSimulationProjectFromFauna,
-  updateProjectInFauna,
   addIDInFolderProjectsList
 } from '../../../../../../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFaunaQuery } from 'cad-library';
 import {
   deleteFile,
   readLocalFile,
-  uploadFile,
 } from '../../../../../../../fileSystemAPIs/fileSystemAPIs';
 import { s3 } from '../../../../../../aws/s3Config';
 import { addProjectTab, closeProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { join } from 'path';
 import { Brick } from '../components/createGridsExternals';
+import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();
   const selectedProject = useSelector(selectedProjectSelector) as Project;
   const homePath = useSelector(homePathSelector);
   const { execQuery } = useFaunaQuery();
+
   // const saveMeshAndExternalGridsToS3 = (
   //   mesherOutput: any,
   //   externalGrid: any,
@@ -293,6 +288,16 @@ export const useStorageData = () => {
     });
   };
 
+  const loadGridsFromS3 = (
+    setSpinner: (v: boolean) => void,
+    setExternalGrids: Function,
+  ) => {
+    dispatch(publishMessage({
+      queue: 'management',
+      body: { message: "get grids", grids_id: selectedProject.meshData.externalGrids as string }}))
+  };
+
+
   const deleteMeshDataOnline = (project: Project) => {
     project?.meshData.mesh &&
       deleteFileS3(project?.meshData.mesh as string).catch((err) =>
@@ -345,7 +350,7 @@ export const useStorageData = () => {
     setExternalGrids: Function,
   ) => {
     if (selectedProject.storage === 'local') {
-      loadDataFromLocal(setSpinner, setExternalGrids);
+      loadGridsFromS3(setSpinner, setExternalGrids);
     } else {
       loadDataFromS3(setSpinner, setExternalGrids);
     }

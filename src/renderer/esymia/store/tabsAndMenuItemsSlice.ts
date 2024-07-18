@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Project, SolverOutput } from '../model/esymiaModels';
+import { ExternalGridsObject, Project, SolverOutput } from '../model/esymiaModels';
 import { selectProject } from './projectSlice';
 
 const getMenuItemsArrayBasedOnTabType = (tabType: string) => {
@@ -38,7 +38,8 @@ type TabsAndMenuItemsState = {
   iterations: {freqNumber: number, id: string}[],
   meshAdvice: {id: string, quantum: [number, number, number]}[],
   meshResults: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}, error?: any}[],
-  solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number}[]
+  solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number}[],
+  externalGrids?: any
   brokerConnected: boolean
 }
 
@@ -153,9 +154,15 @@ export const TabsAndMenuItemsSlice = createSlice({
       state.meshResults = state.meshResults.filter(item => item.id !== action.payload.id)
       state.meshResults.push(action.payload)
     },
+    setAWSExternalGridsData(state: TabsAndMenuItemsState, action: PayloadAction<any>){
+      state.externalGrids = action.payload
+    },
     setSolverResults(state: TabsAndMenuItemsState, action: PayloadAction<{matrices: SolverOutput, id: string, isStopped: boolean, partial: boolean, freqIndex?: number}>){
       state.solverResults = state.solverResults.filter(item => item.id !== action.payload.id)
       state.solverResults.push(action.payload)
+    },
+    unsetAWSExternalGridsData(state: TabsAndMenuItemsState){
+      state.externalGrids = undefined
     },
     unsetMeshAdvice(state: TabsAndMenuItemsState, action: PayloadAction<string>){
       state.meshAdvice = state.meshAdvice.filter(item => item.id !== action.payload)
@@ -211,7 +218,9 @@ export const {
   unsetMesherResults,
   unsetSolverResults,
   setBrokerConnected,
-  unsetBrokerConnected
+  unsetBrokerConnected,
+  setAWSExternalGridsData,
+  unsetAWSExternalGridsData
 } = TabsAndMenuItemsSlice.actions;
 
 
@@ -293,3 +302,7 @@ export const solverResultsSelector = (state: {
 export const brokerConnectedSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState
 }) => state.tabsAndMenuItems.brokerConnected;
+
+export const AWSExternalGridsDataSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.externalGrids;

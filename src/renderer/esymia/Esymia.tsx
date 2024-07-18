@@ -77,8 +77,8 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   const showCreateNewProjectModal = useSelector(
     showCreateNewProjectModalSelector,
   );
-  const mesherStatus = useSelector(MesherStatusSelector);
-  const solverStatus = useSelector(SolverStatusSelector);
+  // const mesherStatus = useSelector(MesherStatusSelector);
+  // const solverStatus = useSelector(SolverStatusSelector);
 
   // useEffect(() => {
   //   if (user.userName) {
