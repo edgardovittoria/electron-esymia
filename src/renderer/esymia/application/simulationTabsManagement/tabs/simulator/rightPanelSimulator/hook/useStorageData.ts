@@ -358,7 +358,7 @@ export const useStorageData = () => {
 
   const deleteProject = (project: Project) => {
     if (project.storage === 'local') {
-      deleteProjectLocal(project);
+      deleteProjectOnline(project);
     } else {
       deleteProjectOnline(project);
     }
