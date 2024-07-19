@@ -18,7 +18,8 @@ import {
 import {
   createSimulationProjectInFauna,
   deleteSimulationProjectFromFauna,
-  addIDInFolderProjectsList
+  addIDInFolderProjectsList,
+  updateProjectInFauna
 } from '../../../../../../faunadb/projectsFolderAPIs';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,6 +32,7 @@ import { s3 } from '../../../../../../aws/s3Config';
 import { addProjectTab, closeProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { Brick } from '../components/createGridsExternals';
 import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
+import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();
@@ -372,7 +374,7 @@ export const useStorageData = () => {
     }
   };
 
-  const cloneProject = (project: Project, selectedFolder: Folder) => {
+  const cloneProject = (project: Project, selectedFolder: Folder, setCloning: (v:boolean) => void) => {
     let clonedProject = {
       ...project,
       meshData: {
@@ -381,24 +383,66 @@ export const useStorageData = () => {
         quantum: [0, 0, 0],
         pathToExternalGridsNotFound: false,
       },
-      simulation: undefined,
       name: `${project?.name}_copy`,
     } as Project;
     execQuery(createSimulationProjectInFauna, clonedProject).then(
       (res: any) => {
-        clonedProject = {
-          ...clonedProject,
-          faunaDocumentId: res.ref.value.id,
-        } as Project;
-        selectedFolder?.faunaDocumentId !== 'root' &&
-          execQuery(
-            addIDInFolderProjectsList,
-            clonedProject.faunaDocumentId,
-            selectedFolder,
-          );
-        dispatch(addProject(clonedProject));
-        dispatch(addProjectTab(clonedProject));
-        toast.success('Project Cloned!');
+        if(project.meshData.meshGenerated === "Generated"){
+          s3.copyObject({
+            Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+            CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
+            Key: `${res.ref.value.id}_mesh.json.gz`
+          }).promise().then(mesh => {
+            console.log(mesh)
+            s3.copyObject({
+              Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+              CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`,
+              Key: `${res.ref.value.id}_grids.json.gz`
+            }).promise().then(grids => {
+              clonedProject = {
+                ...clonedProject,
+                meshData: {
+                  ...project.meshData,
+                  mesh: `${res.ref.value.id}_mesh.json.gz`,
+                  externalGrids: `${res.ref.value.id}_grids.json.gz`
+                },
+                faunaDocumentId: res.ref.value.id,
+                simulation: project.simulation ? {
+                  ...project.simulation,
+                  name: `${project?.name}_copy - sim`,
+                  associatedProject: res.ref.value.id,
+                } : undefined
+              } as Project;
+              execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject)).then(() => {
+                selectedFolder?.faunaDocumentId !== 'root' &&
+                execQuery(
+                  addIDInFolderProjectsList,
+                  clonedProject.faunaDocumentId,
+                  selectedFolder,
+                );
+              dispatch(addProject(clonedProject));
+              dispatch(addProjectTab(clonedProject));
+              setCloning(false)
+              toast.success('Project Cloned!');
+              })
+            })
+          })
+        }else{
+          clonedProject = {
+            ...clonedProject,
+            faunaDocumentId: res.ref.value.id,
+          } as Project;
+          selectedFolder?.faunaDocumentId !== 'root' &&
+            execQuery(
+              addIDInFolderProjectsList,
+              clonedProject.faunaDocumentId,
+              selectedFolder,
+            );
+          dispatch(addProject(clonedProject));
+          dispatch(addProjectTab(clonedProject));
+          setCloning(false)
+          toast.success('Project Cloned!');
+        }
       },
     );
   };
