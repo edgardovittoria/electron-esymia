@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { ImSpinner } from 'react-icons/im';
 import {
+  compressSelector,
+  gridsCreationLengthSelector,
+  gridsCreationValueSelector,
   isAlertInfoModalSelector,
   isConfirmedInfoModalSelector,
   mesherProgressLengthSelector,
   mesherProgressSelector,
   mesherResultsSelector,
+  meshingProgressSelector,
   setIsAlertInfoModal,
   setMessageInfoModal,
   setShowInfoModal,
+  unsetCompress,
+  unsetGridsCreationValue,
   unsetMeshProgress,
   unsetMeshProgressLength,
   unsetMesherResults,
+  unsetMeshingProgress,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -109,6 +116,18 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   const checkProgressValue = useSelector(mesherProgressSelector).filter(
     (item) => item.id === (selectedProject.faunaDocumentId as string),
   )[0];
+  const meshingStep = useSelector(meshingProgressSelector).filter(
+    (item) => item.id === (selectedProject.faunaDocumentId as string),
+  )[0];
+  const gridsCreationLength = useSelector(gridsCreationLengthSelector).filter(
+    (item) => item.id === (selectedProject.faunaDocumentId as string),
+  )[0];
+  const gridsCreationValue = useSelector(gridsCreationValueSelector).filter(
+    (item) => item.id === (selectedProject.faunaDocumentId as string),
+  )[0];
+  const compress = useSelector(compressSelector).filter(
+    (item) => item.id === (selectedProject.faunaDocumentId as string),
+  )[0];
   const [stopSpinner, setStopSpinner] = useState<boolean>(false);
   const mesherResults = useSelector(mesherResultsSelector).filter(
     (item) => item.id === (selectedProject.faunaDocumentId as string),
@@ -124,12 +143,15 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
       quantum: quantumDimsInput,
       fileName: selectedProject.faunaDocumentId as string,
     };
-    dispatch(publishMessage({
-      queue: 'management',
-      body: {
-        message: 'compute mesh',
-        body: objToSendToMesher,
-      }}))
+    dispatch(
+      publishMessage({
+        queue: 'management',
+        body: {
+          message: 'compute mesh',
+          body: objToSendToMesher,
+        },
+      }),
+    );
     // client.publish({
     //   destination: 'management',
     //   body: JSON.stringify({
@@ -139,15 +161,19 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
     // });
 
     return () => {
+      dispatch(unsetMeshingProgress(selectedProject.faunaDocumentId as string));
       dispatch(
         unsetMeshProgressLength(selectedProject.faunaDocumentId as string),
       );
       dispatch(unsetMeshProgress(selectedProject.faunaDocumentId as string));
+      dispatch(unsetMeshProgressLength(selectedProject.faunaDocumentId as string));
+      dispatch(unsetGridsCreationValue(selectedProject.faunaDocumentId as string));
+      dispatch(unsetCompress(selectedProject.faunaDocumentId as string));
       dispatch(unsetMesherResults(selectedProject.faunaDocumentId as string));
     };
   }, []);
 
-  const { execQuery } = useFaunaQuery()
+  const { execQuery } = useFaunaQuery();
 
   useEffect(() => {
     if (mesherResults) {
@@ -178,10 +204,13 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
-      } else if (mesherResults.error && mesherResults.error === "out of memory") {
+      } else if (
+        mesherResults.error &&
+        mesherResults.error === 'out of memory'
+      ) {
         dispatch(
           setMessageInfoModal(
-            'Memory error, the requested mesh cannot be generated, try a larger quantum if possible!'
+            'Memory error, the requested mesh cannot be generated, try a larger quantum if possible!',
           ),
         );
         dispatch(setIsAlertInfoModal(true));
@@ -194,8 +223,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
-      }
-      else {
+      } else {
         dispatch(
           setMeshGenerated({
             status: 'Generated',
@@ -233,9 +261,15 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   useEffect(() => {
     if (isAlertConfirmed) {
       if (!isAlert) {
-        dispatch(publishMessage({
-          queue: 'management',
-          body: { message: "stop computation", id: selectedProject.faunaDocumentId as string }}))
+        dispatch(
+          publishMessage({
+            queue: 'management',
+            body: {
+              message: 'stop computation',
+              id: selectedProject.faunaDocumentId as string,
+            },
+          }),
+        );
       } else {
         dispatch(
           setMeshGenerated({
@@ -261,11 +295,28 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
       >
         <span>Meshing</span>
         <div className="flex flex-row justify-between items-center w-full">
-          {checkProgressLength && checkProgressLength.length > 0 ? (
-            <div className="flex flex-row w-full justify-between items-center">
-              <progress className="progress w-full mr-4" value={1} max={1} />
-              <AiOutlineCheckCircle size="20px" className="text-green-500" />
-            </div>
+          {meshingStep ? (
+            <>
+              {meshingStep.meshingStep === 4 ? (
+                <div className="flex flex-row w-full justify-between items-center">
+                  <progress
+                    className="progress w-full mr-4"
+                    value={1}
+                    max={1}
+                  />
+                  <AiOutlineCheckCircle
+                    size="20px"
+                    className="text-green-500"
+                  />
+                </div>
+              ) : (
+                <progress
+                  className="progress w-full"
+                  value={meshingStep.meshingStep}
+                  max={4}
+                />
+              )}
+            </>
           ) : (
             <progress className="progress w-full" />
           )}
@@ -287,10 +338,64 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                 value={checkProgressValue.index}
                 max={checkProgressLength.length}
               />
-              {checkProgressValue.index === checkProgressLength.length && (
+              {gridsCreationLength !== undefined && (
                 <AiOutlineCheckCircle size="20px" className="text-green-500" />
               )}
             </div>
+          ) : (
+            <progress className="progress w-full" />
+          )}
+        </div>
+      </div>
+      <div
+        className={`flex flex-col gap-2 w-full ${
+          stopSpinner ? 'opacity-40' : 'opacity-100'
+        }`}
+      >
+        <span>Grids creation</span>
+        <div className="flex flex-row justify-between items-center w-full">
+          {gridsCreationLength && gridsCreationValue ? (
+            <>
+              {compress !== undefined ? (
+                <div className="flex flex-row w-full justify-between items-center">
+                  <progress className="progress w-full mr-4" value={1} max={1}/>
+                  <AiOutlineCheckCircle
+                    size="20px"
+                    className="text-green-500"
+                  />
+                </div>
+              ) : (
+                <progress className="progress w-full" max={gridsCreationLength.gridsCreationLength}
+                  value={gridsCreationValue.gridsCreationValue}
+                />
+              )}
+            </>
+          ) : (
+            <progress className="progress w-full" />
+          )}
+        </div>
+      </div>
+      <div
+        className={`flex flex-col gap-2 w-full ${
+          stopSpinner ? 'opacity-40' : 'opacity-100'
+        }`}
+      >
+        <span>Loading Data</span>
+        <div className="flex flex-row justify-between items-center w-full">
+          {compress !== undefined ? (
+            <>
+              {!compress ? (
+                <div className="flex flex-row w-full justify-between items-center">
+                  <progress className="progress w-full mr-4" value={1} max={1} />
+                  <AiOutlineCheckCircle
+                    size="20px"
+                    className="text-green-500"
+                  />
+                </div>
+              ) : (
+                <progress className="progress w-full" />
+              )}
+            </>
           ) : (
             <progress className="progress w-full" />
           )}
