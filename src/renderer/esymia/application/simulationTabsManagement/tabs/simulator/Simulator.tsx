@@ -67,7 +67,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
     Object.entries(extGridsJson.externalGrids).forEach((material) =>
       gridsPairs.push([
         material[0],
-        (material[1] as string).split('$').map((brString) => {
+        (material[1] as string).split('A').map((brString) => {
           let coords = brString.split('-').map((c) => parseInt(c));
           return { x: coords[0], y: coords[1], z: coords[2] } as Brick;
         }),
