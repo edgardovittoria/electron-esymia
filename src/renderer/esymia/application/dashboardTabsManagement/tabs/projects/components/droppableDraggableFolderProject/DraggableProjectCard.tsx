@@ -32,6 +32,7 @@ import {
   useStorageData
 } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
 import { GrClone } from 'react-icons/gr';
+import { ImSpinner } from 'react-icons/im';
 
 interface DraggableProjectCardProps {
   project: Project;
@@ -49,6 +50,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
   const [showRename, setShowRename] = useState(false);
   const [showSearchUser, setShowSearchUser] = useState(false);
   const { cloneProject } = useStorageData()
+  const [cloning, setcloning] = useState(false)
 
   const [{ isDragging }, drag, dragPreview] = useDrag(
     () => ({
@@ -75,6 +77,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
 
   return (
     <>
+      {cloning && <ImSpinner className='animate-spin w-8 h-8 absolute top-1/2 right-1/2 z-100'/>}
       <div
         className="flex py-2 flex-col border-2 border-green-200 rounded-lg hover:cursor-pointer hover:border-secondaryColor shadow-xl"
         key={project.name}
@@ -166,7 +169,8 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
             <Item
               onClick={(p) => {
                 p.event.stopPropagation();
-                cloneProject(project, selectedFolder as Folder)
+                setcloning(true)
+                cloneProject(project, selectedFolder as Folder, setcloning)
                 hideAll();
               }}
               disabled={user.userRole !== 'Premium'}

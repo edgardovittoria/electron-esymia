@@ -338,7 +338,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                 value={checkProgressValue.index}
                 max={checkProgressLength.length}
               />
-              {gridsCreationLength !== undefined && (
+              {gridsCreationValue !== undefined && (
                 <AiOutlineCheckCircle size="20px" className="text-green-500" />
               )}
             </div>
