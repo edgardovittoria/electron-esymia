@@ -200,7 +200,7 @@ const SimulationStatusItem: React.FC<{
   return (
     <div className="w-full px-4 pt-2">
       <div className="mx-auto w-full max-w-md rounded-2xl bg-white p-2">
-        <Disclosure>
+        <Disclosure defaultOpen>
           {({ open }) => (
             <>
               <Disclosure.Button className="flex w-full justify-between rounded-lg border border-secondaryColor px-4 py-2 text-left text-sm font-medium text-secondaryColor hover:bg-green-100 focus:outline-none focus-visible:ring focus-visible:ring-green-500/75">

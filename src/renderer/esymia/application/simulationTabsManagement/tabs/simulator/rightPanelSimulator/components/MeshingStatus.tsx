@@ -10,15 +10,16 @@ import {
   mesherProgressSelector,
   mesherResultsSelector,
   meshingProgressSelector,
+  setCompress,
+  setGridsCreationLength,
+  setGridsCreationValue,
   setIsAlertInfoModal,
+  setMesherResults,
+  setMeshingProgress,
+  setMeshProgress,
+  setMeshProgressLength,
   setMessageInfoModal,
   setShowInfoModal,
-  unsetCompress,
-  unsetGridsCreationValue,
-  unsetMeshProgress,
-  unsetMeshProgressLength,
-  unsetMesherResults,
-  unsetMeshingProgress,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -34,6 +35,9 @@ import { AiOutlineCheckCircle } from 'react-icons/ai';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
+import { Disclosure } from '@headlessui/react';
+import { MdKeyboardArrowUp } from 'react-icons/md';
+import { PiClockCountdownBold } from 'react-icons/pi';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;
@@ -52,23 +56,76 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
   activeMeshing,
 }) => {
   const dispatch = useDispatch();
+  const [runningMesh, setrunningMesh] = useState<
+    | {
+        selectedProject: Project;
+        allMaterials: Material[];
+        quantum: [number, number, number];
+        meshStatus: 'Not Generated' | 'Generated';
+      }
+    | undefined
+  >(undefined);
 
-  // useEffect(() => {
-  //   client.subscribe(
-  //     'mesher_results',
-  //     (msg) => callback_mesher_results(msg, dispatch),
-  //     { ack: 'client' },
-  //   );
-  //   client.subscribe(
-  //     'mesher_feedback',
-  //     (msg) => callback_mesher_feedback(msg, dispatch),
-  //     { ack: 'client' },
-  //   );
-  // }, []);
+  const [queuedMesh, setqueuedMesh] = useState<
+    {
+      selectedProject: Project;
+      allMaterials: Material[];
+      quantum: [number, number, number];
+      meshStatus: 'Not Generated' | 'Generated';
+    }[]
+  >([]);
+
+  useEffect(() => {
+    activeMeshing.forEach((am) => {
+      if (am.selectedProject.meshData.meshGenerated === 'Generating') {
+        setrunningMesh(am);
+      } else if (am.selectedProject.meshData.meshGenerated === 'Queued') {
+        if (
+          queuedMesh.filter(
+            (qm) =>
+              qm.selectedProject.faunaDocumentId ===
+              am.selectedProject.faunaDocumentId,
+          ).length === 0
+        ) {
+          setqueuedMesh((prev) => [...prev, am]);
+        }
+      }
+    });
+    if (!runningMesh && queuedMesh.length > 0) {
+      let item = queuedMesh.pop();
+      dispatch(
+        setMeshGenerated({
+          status: 'Generating',
+          projectToUpdate: item
+            ? (item.selectedProject.faunaDocumentId as string)
+            : '',
+        }),
+      );
+      if (item) {
+        setqueuedMesh(
+          queuedMesh.filter(
+            (qm) =>
+              qm.selectedProject.faunaDocumentId !==
+              item.selectedProject.faunaDocumentId,
+          ),
+        );
+        setrunningMesh({
+          ...item,
+          selectedProject: {
+            ...item?.selectedProject,
+            meshData: {
+              ...item?.selectedProject.meshData,
+              meshGenerated: 'Generating',
+            },
+          },
+        });
+      }
+    }
+  }, [activeMeshing.length]);
 
   return (
     <div
-      className={`absolute right-10 w-1/4 bottom-6 flex flex-col justify-center items-center bg-white p-3 rounded ${
+      className={`absolute right-10 w-1/4 bottom-10 flex flex-col justify-center items-center bg-white p-3 rounded ${
         !feedbackMeshingVisible && 'hidden'
       }`}
     >
@@ -82,12 +139,25 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
       </div>
       <hr className="text-secondaryColor w-full mb-5 mt-3" />
       <div className="max-h-[600px] overflow-y-scroll w-full">
-        {activeMeshing.map((m) => (
+        {/* {runningMesh && runningMesh.map((m) => (
           <MeshingStatusItem
             selectedProject={m.selectedProject}
             allMaterials={m.allMaterials}
             quantumDimsInput={m.quantum}
+            activeMeshing={activeMeshing}
           />
+        ))} */}
+        {runningMesh && (
+          <MeshingStatusItem
+            selectedProject={runningMesh.selectedProject}
+            allMaterials={runningMesh.allMaterials}
+            quantumDimsInput={runningMesh.quantum}
+            activeMeshing={activeMeshing}
+            setrunningMesh={setrunningMesh}
+          />
+        )}
+        {queuedMesh.map((qm) => (
+          <QueuedMeshingStatusItem name={qm.selectedProject.name} />
         ))}
       </div>
     </div>
@@ -100,38 +170,33 @@ export interface MeshingStatusItemProps {
   selectedProject: Project;
   allMaterials: Material[];
   quantumDimsInput: [number, number, number];
+  activeMeshing: {
+    selectedProject: Project;
+    allMaterials: Material[];
+    quantum: [number, number, number];
+    meshStatus: 'Not Generated' | 'Generated';
+  }[];
+  setrunningMesh: Function;
 }
 
 const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   selectedProject,
   allMaterials,
   quantumDimsInput,
+  activeMeshing,
+  setrunningMesh,
 }) => {
   const dispatch = useDispatch();
   const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
   const isAlert = useSelector(isAlertInfoModalSelector);
-  const checkProgressLength = useSelector(mesherProgressLengthSelector).filter(
-    (item) => item.id === (selectedProject.faunaDocumentId as string),
-  )[0];
-  const checkProgressValue = useSelector(mesherProgressSelector).filter(
-    (item) => item.id === (selectedProject.faunaDocumentId as string),
-  )[0];
-  const meshingStep = useSelector(meshingProgressSelector).filter(
-    (item) => item.id === (selectedProject.faunaDocumentId as string),
-  )[0];
-  const gridsCreationLength = useSelector(gridsCreationLengthSelector).filter(
-    (item) => item.id === (selectedProject.faunaDocumentId as string),
-  )[0];
-  const gridsCreationValue = useSelector(gridsCreationValueSelector).filter(
-    (item) => item.id === (selectedProject.faunaDocumentId as string),
-  )[0];
-  const compress = useSelector(compressSelector).filter(
-    (item) => item.id === (selectedProject.faunaDocumentId as string),
-  )[0];
+  const checkProgressLength = useSelector(mesherProgressLengthSelector);
+  const checkProgressValue = useSelector(mesherProgressSelector);
+  const meshingStep = useSelector(meshingProgressSelector);
+  const gridsCreationLength = useSelector(gridsCreationLengthSelector);
+  const gridsCreationValue = useSelector(gridsCreationValueSelector);
+  const compress = useSelector(compressSelector);
   const [stopSpinner, setStopSpinner] = useState<boolean>(false);
-  const mesherResults = useSelector(mesherResultsSelector).filter(
-    (item) => item.id === (selectedProject.faunaDocumentId as string),
-  )[0];
+  const mesherResults = useSelector(mesherResultsSelector);
 
   useEffect(() => {
     const components = selectedProject?.model?.components as ComponentEntity[];
@@ -152,31 +217,28 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
         },
       }),
     );
-    // client.publish({
-    //   destination: 'management',
-    //   body: JSON.stringify({
-    //     message: 'compute mesh',
-    //     body: objToSendToMesher,
-    //   }),
-    // });
-
-    return () => {
-      dispatch(unsetMeshingProgress(selectedProject.faunaDocumentId as string));
-      dispatch(
-        unsetMeshProgressLength(selectedProject.faunaDocumentId as string),
-      );
-      dispatch(unsetMeshProgress(selectedProject.faunaDocumentId as string));
-      dispatch(unsetMeshProgressLength(selectedProject.faunaDocumentId as string));
-      dispatch(unsetGridsCreationValue(selectedProject.faunaDocumentId as string));
-      dispatch(unsetCompress(selectedProject.faunaDocumentId as string));
-      dispatch(unsetMesherResults(selectedProject.faunaDocumentId as string));
-    };
   }, []);
+
+  // useEffect(() => {
+  //   if (
+  //     activeMeshing.length > 1 &&
+  //     activeMeshing.filter(
+  //       (am) => am.selectedProject.meshData.meshGenerated === 'Generating',
+  //     ).length === 0
+  //   ) {
+  //     dispatch(
+  //       setMeshGenerated({
+  //         status: 'Generating',
+  //         projectToUpdate: selectedProject.faunaDocumentId as string,
+  //       }),
+  //     );
+  //   }
+  // }, [activeMeshing.length]);
 
   const { execQuery } = useFaunaQuery();
 
   useEffect(() => {
-    if (mesherResults) {
+    if (mesherResults && mesherResults.id === selectedProject.faunaDocumentId) {
       if (mesherResults.isStopped) {
         dispatch(
           setMeshGenerated({
@@ -255,6 +317,14 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           }),
         ).then(() => {});
       }
+      dispatch(setMeshingProgress(undefined));
+      dispatch(setMeshProgressLength(undefined));
+      dispatch(setMeshProgress(undefined));
+      dispatch(setGridsCreationValue(undefined));
+      dispatch(setGridsCreationLength(undefined));
+      dispatch(setCompress(undefined));
+      dispatch(setMesherResults(undefined));
+      setrunningMesh(undefined);
     }
   }, [mesherResults]);
 
@@ -282,143 +352,199 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   }, [isAlertConfirmed]);
 
   return (
-    <div
-      className={`p-5 bg-white rounded-xl flex flex-col gap-4 items-center justify-center w-full`}
-    >
-      {stopSpinner && (
-        <ImSpinner className="animate-spin w-8 h-8 absolute top-1/2 left-1/2" />
+    <Disclosure defaultOpen>
+      {({ open }) => (
+        <>
+          <Disclosure.Button className="flex w-full justify-between items-center rounded-lg border border-secondaryColor px-4 py-2 text-left text-sm font-medium text-secondaryColor hover:bg-green-100 focus:outline-none focus-visible:ring focus-visible:ring-green-500/75">
+            <span>{selectedProject.name}</span>
+            {selectedProject.meshData.meshGenerated === 'Generating' ? (
+              <div className="badge bg-green-500 text-white flex flex-row gap-2 items-center py-3">
+                <ImSpinner className="w-4 h-4 animate-spin" />
+                <span>generating</span>
+              </div>
+            ) : (
+              <div className="badge bg-amber-500 text-white flex flex-row gap-2 items-center py-3">
+                <PiClockCountdownBold className="w-4 h-4" />
+                <span>queued</span>
+              </div>
+            )}
+            <MdKeyboardArrowUp
+              className={`${
+                open ? 'rotate-180 transform' : ''
+              } h-5 w-5 text-secondaryColor`}
+            />
+          </Disclosure.Button>
+          <Disclosure.Panel className="px-4 pb-2 pt-4 text-sm text-gray-500">
+            {selectedProject.meshData.meshGenerated === 'Generating' ? (
+              <div
+                className={`p-5 bg-white rounded-xl flex flex-col gap-4 items-center justify-center w-full`}
+              >
+                {stopSpinner && (
+                  <ImSpinner className="animate-spin w-8 h-8 absolute top-1/2 left-1/2" />
+                )}
+                <div
+                  className={`flex flex-col gap-2 w-full ${
+                    stopSpinner ? 'opacity-40' : 'opacity-100'
+                  }`}
+                >
+                  <span>Meshing</span>
+                  <div className="flex flex-row justify-between items-center w-full">
+                    {meshingStep ? (
+                      <>
+                        {meshingStep.meshingStep === 4 ? (
+                          <div className="flex flex-row w-full justify-between items-center">
+                            <progress
+                              className="progress w-full mr-4"
+                              value={1}
+                              max={1}
+                            />
+                            <AiOutlineCheckCircle
+                              size="20px"
+                              className="text-green-500"
+                            />
+                          </div>
+                        ) : (
+                          <progress
+                            className="progress w-full"
+                            value={meshingStep.meshingStep}
+                            max={4}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <progress className="progress w-full" />
+                    )}
+                  </div>
+                </div>
+                <div
+                  className={`flex flex-col gap-2 w-full ${
+                    stopSpinner ? 'opacity-40' : 'opacity-100'
+                  }`}
+                >
+                  <span>Check mesh validity</span>
+                  <div className="flex flex-row justify-between items-center w-full">
+                    {checkProgressValue &&
+                    checkProgressLength &&
+                    checkProgressLength.length > 0 ? (
+                      <div className="flex flex-row w-full justify-between items-center">
+                        <progress
+                          className="progress w-full mr-4"
+                          value={checkProgressValue.index}
+                          max={checkProgressLength.length}
+                        />
+                        {gridsCreationValue !== undefined && (
+                          <AiOutlineCheckCircle
+                            size="20px"
+                            className="text-green-500"
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <progress className="progress w-full" />
+                    )}
+                  </div>
+                </div>
+                <div
+                  className={`flex flex-col gap-2 w-full ${
+                    stopSpinner ? 'opacity-40' : 'opacity-100'
+                  }`}
+                >
+                  <span>Grids creation</span>
+                  <div className="flex flex-row justify-between items-center w-full">
+                    {gridsCreationLength && gridsCreationValue ? (
+                      <>
+                        {compress !== undefined ? (
+                          <div className="flex flex-row w-full justify-between items-center">
+                            <progress
+                              className="progress w-full mr-4"
+                              value={1}
+                              max={1}
+                            />
+                            <AiOutlineCheckCircle
+                              size="20px"
+                              className="text-green-500"
+                            />
+                          </div>
+                        ) : (
+                          <progress
+                            className="progress w-full"
+                            max={gridsCreationLength.gridsCreationLength}
+                            value={gridsCreationValue.gridsCreationValue}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <progress className="progress w-full" />
+                    )}
+                  </div>
+                </div>
+                <div
+                  className={`flex flex-col gap-2 w-full ${
+                    stopSpinner ? 'opacity-40' : 'opacity-100'
+                  }`}
+                >
+                  <span>Loading Data</span>
+                  <div className="flex flex-row justify-between items-center w-full">
+                    {compress !== undefined ? (
+                      <>
+                        {!compress ? (
+                          <div className="flex flex-row w-full justify-between items-center">
+                            <progress
+                              className="progress w-full mr-4"
+                              value={1}
+                              max={1}
+                            />
+                            <AiOutlineCheckCircle
+                              size="20px"
+                              className="text-green-500"
+                            />
+                          </div>
+                        ) : (
+                          <progress className="progress w-full" />
+                        )}
+                      </>
+                    ) : (
+                      <progress className="progress w-full" />
+                    )}
+                  </div>
+                </div>
+                <div
+                  className="button w-full buttonPrimary text-center mt-4 mb-4"
+                  onClick={() => {
+                    dispatch(
+                      setMessageInfoModal('Are you sure to stop the meshing?'),
+                    );
+                    dispatch(setIsAlertInfoModal(false));
+                    dispatch(setShowInfoModal(true));
+                    setStopSpinner(true);
+                  }}
+                >
+                  Stop Meshing
+                </div>
+              </div>
+            ) : (
+              <span>Wait</span>
+            )}
+          </Disclosure.Panel>
+        </>
       )}
-      <div
-        className={`flex flex-col gap-2 w-full ${
-          stopSpinner ? 'opacity-40' : 'opacity-100'
-        }`}
-      >
-        <span>Meshing</span>
-        <div className="flex flex-row justify-between items-center w-full">
-          {meshingStep ? (
-            <>
-              {meshingStep.meshingStep === 4 ? (
-                <div className="flex flex-row w-full justify-between items-center">
-                  <progress
-                    className="progress w-full mr-4"
-                    value={1}
-                    max={1}
-                  />
-                  <AiOutlineCheckCircle
-                    size="20px"
-                    className="text-green-500"
-                  />
-                </div>
-              ) : (
-                <progress
-                  className="progress w-full"
-                  value={meshingStep.meshingStep}
-                  max={4}
-                />
-              )}
-            </>
-          ) : (
-            <progress className="progress w-full" />
-          )}
-        </div>
-      </div>
-      <div
-        className={`flex flex-col gap-2 w-full ${
-          stopSpinner ? 'opacity-40' : 'opacity-100'
-        }`}
-      >
-        <span>Check mesh validity</span>
-        <div className="flex flex-row justify-between items-center w-full">
-          {checkProgressValue &&
-          checkProgressLength &&
-          checkProgressLength.length > 0 ? (
-            <div className="flex flex-row w-full justify-between items-center">
-              <progress
-                className="progress w-full mr-4"
-                value={checkProgressValue.index}
-                max={checkProgressLength.length}
-              />
-              {gridsCreationValue !== undefined && (
-                <AiOutlineCheckCircle size="20px" className="text-green-500" />
-              )}
-            </div>
-          ) : (
-            <progress className="progress w-full" />
-          )}
-        </div>
-      </div>
-      <div
-        className={`flex flex-col gap-2 w-full ${
-          stopSpinner ? 'opacity-40' : 'opacity-100'
-        }`}
-      >
-        <span>Grids creation</span>
-        <div className="flex flex-row justify-between items-center w-full">
-          {gridsCreationLength && gridsCreationValue ? (
-            <>
-              {compress !== undefined ? (
-                <div className="flex flex-row w-full justify-between items-center">
-                  <progress className="progress w-full mr-4" value={1} max={1}/>
-                  <AiOutlineCheckCircle
-                    size="20px"
-                    className="text-green-500"
-                  />
-                </div>
-              ) : (
-                <progress className="progress w-full" max={gridsCreationLength.gridsCreationLength}
-                  value={gridsCreationValue.gridsCreationValue}
-                />
-              )}
-            </>
-          ) : (
-            <progress className="progress w-full" />
-          )}
-        </div>
-      </div>
-      <div
-        className={`flex flex-col gap-2 w-full ${
-          stopSpinner ? 'opacity-40' : 'opacity-100'
-        }`}
-      >
-        <span>Loading Data</span>
-        <div className="flex flex-row justify-between items-center w-full">
-          {compress !== undefined ? (
-            <>
-              {!compress ? (
-                <div className="flex flex-row w-full justify-between items-center">
-                  <progress className="progress w-full mr-4" value={1} max={1} />
-                  <AiOutlineCheckCircle
-                    size="20px"
-                    className="text-green-500"
-                  />
-                </div>
-              ) : (
-                <progress className="progress w-full" />
-              )}
-            </>
-          ) : (
-            <progress className="progress w-full" />
-          )}
-        </div>
-      </div>
-      {/* <div className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'}`}>
-        <span>Loading Data</span>
-        <div className='flex flex-row justify-between items-center w-full'>
-          {loadingData && (
-            <progress className='progress w-full' />
-          )}
-        </div>
-      </div> */}
-      <div
-        className="button w-full buttonPrimary text-center mt-4 mb-4"
-        onClick={() => {
-          dispatch(setMessageInfoModal('Are you sure to stop the meshing?'));
-          dispatch(setIsAlertInfoModal(false));
-          dispatch(setShowInfoModal(true));
-          setStopSpinner(true);
-        }}
-      >
-        Stop Meshing
+    </Disclosure>
+  );
+};
+
+export interface QueuedMeshingStatusItemProps {
+  name: string;
+}
+
+const QueuedMeshingStatusItem: React.FC<QueuedMeshingStatusItemProps> = ({
+  name,
+}) => {
+  return (
+    <div className="flex my-2 w-full justify-between items-center rounded-lg border border-secondaryColor px-4 py-2 text-left text-sm font-medium text-secondaryColor hover:bg-green-100 focus:outline-none focus-visible:ring focus-visible:ring-green-500/75">
+      <span>{name}</span>
+      <div className="badge bg-amber-500 text-white flex flex-row gap-2 items-center py-3">
+        <PiClockCountdownBold className="w-4 h-4" />
+        <span>queued</span>
       </div>
     </div>
   );

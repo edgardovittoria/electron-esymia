@@ -116,7 +116,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
   useEffect(() => {
     if (
       selectedProject?.meshData.mesh &&
-      selectedProject?.meshData.meshGenerated === 'Generated'
+      (selectedProject?.meshData.meshGenerated === 'Generated' || selectedProject?.meshData.meshGenerated === 'Queued' )
     ) {
       setExternalGrids(undefined);
       setSpinner(true);

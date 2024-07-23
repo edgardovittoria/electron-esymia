@@ -4,6 +4,7 @@ import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
+  activeMeshingSelector,
   meshGeneratedSelector,
   pathToExternalGridsNotFoundSelector,
   setMeshApproved,
@@ -60,6 +61,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const meshGenerated = useSelector(meshGeneratedSelector);
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
+  const activeMeshing = useSelector(activeMeshingSelector)
   const quantumDimensionsLabels = ['X', 'Y', 'Z'];
   const [suggestedQuantumError, setSuggestedQuantumError] = useState<{
     active: boolean;
@@ -223,20 +225,8 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
     }
   }, [externalGrids]);
 
-  /* const infoModal = useSelector(infoModalSelector);
-
-  useEffect(() => {
-    if (alert && infoModal.isConfirmed) {
-      setAlert(false);
-    }
-  }, [infoModal.isConfirmed]); */
-
   return (
     <>
-      {/* {meshGenerated === 'Generating' && (
-        <MeshingStatusItem selectedProject={selectedProject} quantumDimsInput={quantumDimsInput} allMaterials={allMaterials as Material[]}
-                       meshStatus={meshGenerated} setAlert={setAlert} />
-      )} */}
       <div className="absolute right-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
         <div
           className={`p-2 tooltip rounded-t tooltip-left ${
@@ -401,7 +391,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                       );
                       dispatch(
                         setMeshGenerated({
-                          status: 'Generating',
+                          status: activeMeshing.length > 0 ? "Queued" : "Generating",
                           projectToUpdate:
                             selectedProject.faunaDocumentId as string,
                         }),
@@ -419,31 +409,6 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   </button>
                 </div>
               )}
-              {/* {((meshGenerated === 'Generated' && !meshApproved) ||
-              selectedProject.simulation?.status === 'Failed') && (
-              <div className='flex justify-between'>
-                <button
-                  className='button buttonPrimary w-full text-[12px] xl:text-base'
-                  disabled={!checkQuantumDimensionsValidity()}
-                  onClick={() => {
-                    dispatch(setPreviousMeshStatus({
-                      status: selectedProject.meshData.meshGenerated as 'Not Generated' | 'Generated',
-                      projectToUpdate: selectedProject.faunaDocumentId as string
-                    }));
-                    dispatch(setMeshGenerated({
-                      status: 'Generating',
-                      projectToUpdate: selectedProject.faunaDocumentId as string
-                    }));
-                    dispatch(setQuantum({
-                      quantum: quantumDimsInput,
-                      projectToUpdate: selectedProject.faunaDocumentId as string
-                    }));
-                  }}
-                >
-                  Regenerate
-                </button>
-              </div>
-            )} */}
             </div>
           </div>
         </div>
@@ -637,6 +602,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             selectedProject={selectedProject}
             quantumDimsInput={quantumDimsInput}
             setQuantumDimsInput={setQuantumDimsInput}
+            activeMeshing={activeMeshing}
           />
     </>
   );
@@ -691,6 +657,12 @@ interface ModalRefineCoarseProps {
   selectedProject: Project;
   quantumDimsInput: [number, number, number];
   setQuantumDimsInput: Function;
+  activeMeshing: {
+    selectedProject: Project;
+    allMaterials: Material[];
+    quantum: [number, number, number];
+    meshStatus: "Not Generated" | "Generated";
+  }[]
 }
 
 const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
@@ -700,6 +672,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
   selectedProject,
   quantumDimsInput,
   setQuantumDimsInput,
+  activeMeshing
 }) => {
   const [xPercentage, setXPercentage] = useState<'No' | '10%' | '50%'>('No');
   const [yPercentage, setYPercentage] = useState<'No' | '10%' | '50%'>('No');
@@ -932,7 +905,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         );
                         dispatch(
                           setMeshGenerated({
-                            status: 'Generating',
+                            status: activeMeshing.length > 0 ? "Queued" : "Generating",
                             projectToUpdate:
                               selectedProject.faunaDocumentId as string,
                           }),

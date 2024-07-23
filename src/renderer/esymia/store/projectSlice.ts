@@ -240,7 +240,7 @@ export const ProjectSlice = createSlice({
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.pathToExternalGridsNotFound = action.payload.status;
     },
-    setMeshGenerated(state: ProjectState, action: PayloadAction<{ status: 'Not Generated' | 'Generated' | 'Generating', projectToUpdate: string }>) {
+    setMeshGenerated(state: ProjectState, action: PayloadAction<{ status: 'Not Generated' | 'Generated' | 'Generating' | 'Queued', projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.meshGenerated = action.payload.status;
     },
@@ -427,7 +427,7 @@ export const activeMeshingSelector = (state: { projects: ProjectState }) => {
         p?.model.components as ComponentEntity[],
       );
     }
-    if (p.meshData && p.meshData.meshGenerated === 'Generating') {
+    if (p.meshData && (p.meshData.meshGenerated === 'Generating' || p.meshData.meshGenerated === "Queued")) {
       activeMeshing.push({
         selectedProject: p,
         allMaterials: allMaterials,
@@ -443,7 +443,7 @@ export const activeMeshingSelector = (state: { projects: ProjectState }) => {
         p?.model.components as ComponentEntity[],
       );
     }
-    if (p.meshData && p.meshData.meshGenerated === 'Generating') {
+    if (p.meshData && (p.meshData.meshGenerated === 'Generating' || p.meshData.meshGenerated === "Queued")) {
       activeMeshing.push({
         selectedProject: p,
         allMaterials: allMaterials,

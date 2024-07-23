@@ -31,17 +31,17 @@ type TabsAndMenuItemsState = {
   showCreateNewProjectModal: boolean
   scalingViewParamsOfMesh: ScalingViewParams
   meshVisualization: 'normal' | 'light',
-  meshingProgress: {meshingStep: number, id: string}[],
-  mesherProgressLength: {length: number, id: string}[],
-  mesherProgress: {index: number, id: string}[],
-  gridCreationLength: {gridsCreationLength: number, id:string}[],
-  gridCreationValue: {gridsCreationValue: number, id:string}[],
-  compress: {compress: boolean, id:string}[],
+  meshingProgress?: {meshingStep: number, id: string},
+  mesherProgressLength?: {length: number, id: string},
+  mesherProgress?: {index: number, id: string},
+  gridCreationLength?: {gridsCreationLength: number, id:string},
+  gridCreationValue?: {gridsCreationValue: number, id:string},
+  compress?: {compress: boolean, id:string},
   computingP: {done: boolean, id: string}[],
   computingLp: {done: boolean, id: string}[],
   iterations: {freqNumber: number, id: string}[],
   meshAdvice: {id: string, quantum: [number, number, number]}[],
-  meshResults: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}, error?: any}[],
+  meshResults?: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}, error?: any},
   solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number}[],
   externalGrids?: any
   brokerConnected: boolean
@@ -64,17 +64,10 @@ export const TabsAndMenuItemsSlice = createSlice({
     showCreateNewProjectModal: false,
     scalingViewParamsOfMesh: {x:1, y:1, z:1},
     meshVisualization: 'normal',
-    meshingProgress: [],
-    mesherProgressLength: [],
-    mesherProgress: [],
-    gridCreationLength: [],
-    gridCreationValue: [],
-    compress: [],
     computingP: [],
     computingLp: [],
     iterations: [],
     meshAdvice: [],
-    meshResults: [],
     solverResults: [],
     brokerConnected: false
   } as TabsAndMenuItemsState,
@@ -119,47 +112,23 @@ export const TabsAndMenuItemsSlice = createSlice({
     setMeshVisualization(state: TabsAndMenuItemsState, action: PayloadAction<'normal'|'light'>) {
       state.meshVisualization = action.payload;
     },
-    setMeshingProgress(state: TabsAndMenuItemsState, action: PayloadAction<{meshingStep: number, id: string}>){
-      state.meshingProgress = state.meshingProgress.filter(item => item.id !== action.payload.id)
-      state.meshingProgress.push(action.payload)
+    setMeshingProgress(state: TabsAndMenuItemsState, action: PayloadAction<{meshingStep: number, id: string} | undefined>){
+      state.meshingProgress = action.payload
     },
-    unsetMeshingProgress(state: TabsAndMenuItemsState, action: PayloadAction<string>){
-      state.meshingProgress = state.meshingProgress.filter(item => item.id !== action.payload)
+    setMeshProgressLength(state: TabsAndMenuItemsState, action: PayloadAction<{length: number, id: string} | undefined>){
+      state.mesherProgressLength = action.payload
     },
-    setMeshProgressLength(state: TabsAndMenuItemsState, action: PayloadAction<{length: number, id: string}>){
-      state.mesherProgressLength = state.mesherProgressLength.filter(item => item.id !== action.payload.id)
-      state.mesherProgressLength.push(action.payload)
+    setMeshProgress(state: TabsAndMenuItemsState, action: PayloadAction<{index: number, id: string} | undefined>){
+      state.mesherProgress = action.payload
     },
-    setMeshProgress(state: TabsAndMenuItemsState, action: PayloadAction<{index: number, id: string}>){
-      state.mesherProgress = state.mesherProgress.filter(item => item.id !== action.payload.id)
-      state.mesherProgress.push(action.payload)
+    setGridsCreationLength(state: TabsAndMenuItemsState, action: PayloadAction<{gridsCreationLength: number, id: string} | undefined>){
+      state.gridCreationLength = action.payload
     },
-    setGridsCreationLength(state: TabsAndMenuItemsState, action: PayloadAction<{gridsCreationLength: number, id: string}>){
-      state.gridCreationLength = state.gridCreationLength.filter(item => item.id !== action.payload.id)
-      state.gridCreationLength.push(action.payload)
+    setGridsCreationValue(state: TabsAndMenuItemsState, action: PayloadAction<{gridsCreationValue: number, id: string} | undefined>){
+      state.gridCreationValue = action.payload
     },
-    setGridsCreationValue(state: TabsAndMenuItemsState, action: PayloadAction<{gridsCreationValue: number, id: string}>){
-      state.gridCreationValue = state.gridCreationValue.filter(item => item.id !== action.payload.id)
-      state.gridCreationValue.push(action.payload)
-    },
-    setCompress(state: TabsAndMenuItemsState, action: PayloadAction<{compress: boolean, id: string}>){
-      state.compress = state.compress.filter(item => item.id !== action.payload.id)
-      state.compress.push(action.payload)
-    },
-    unsetMeshProgressLength(state: TabsAndMenuItemsState, action: PayloadAction<string>){
-      state.mesherProgressLength = state.mesherProgressLength.filter(item => item.id !== action.payload)
-    },
-    unsetMeshProgress(state: TabsAndMenuItemsState, action: PayloadAction<string>){
-      state.mesherProgress = state.mesherProgress.filter(item => item.id !== action.payload)
-    },
-    unsetGridsCreationLength(state: TabsAndMenuItemsState, action: PayloadAction<string>){
-      state.gridCreationLength = state.gridCreationLength.filter(item => item.id !== action.payload)
-    },
-    unsetGridsCreationValue(state: TabsAndMenuItemsState, action: PayloadAction<string>){
-      state.gridCreationValue = state.gridCreationValue.filter(item => item.id !== action.payload)
-    },
-    unsetCompress(state: TabsAndMenuItemsState, action: PayloadAction<string>){
-      state.compress = state.compress.filter(item => item.id !== action.payload)
+    setCompress(state: TabsAndMenuItemsState, action: PayloadAction<{compress: boolean, id: string} | undefined>){
+      state.compress = action.payload
     },
     setcomputingP(state: TabsAndMenuItemsState, action: PayloadAction<{done: boolean, id: string}>){
       state.computingP = state.computingP.filter(item => item.id !== action.payload.id)
@@ -186,9 +155,8 @@ export const TabsAndMenuItemsSlice = createSlice({
       state.meshAdvice = state.meshAdvice.filter(item => item.id !== action.payload.id)
       state.meshAdvice.push(action.payload)
     },
-    setMesherResults(state: TabsAndMenuItemsState, action: PayloadAction<{gridsPath: string, meshPath: string, id: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}, error?: any}>){
-      state.meshResults = state.meshResults.filter(item => item.id !== action.payload.id)
-      state.meshResults.push(action.payload)
+    setMesherResults(state: TabsAndMenuItemsState, action: PayloadAction<{gridsPath: string, meshPath: string, id: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}, error?: any} | undefined>){
+      state.meshResults = action.payload
     },
     setAWSExternalGridsData(state: TabsAndMenuItemsState, action: PayloadAction<any>){
       state.externalGrids = action.payload
@@ -202,9 +170,6 @@ export const TabsAndMenuItemsSlice = createSlice({
     },
     unsetMeshAdvice(state: TabsAndMenuItemsState, action: PayloadAction<string>){
       state.meshAdvice = state.meshAdvice.filter(item => item.id !== action.payload)
-    },
-    unsetMesherResults(state: TabsAndMenuItemsState, action: PayloadAction<string>){
-      state.meshResults = state.meshResults.filter(item => item.id !== action.payload)
     },
     unsetSolverResults(state: TabsAndMenuItemsState, action: PayloadAction<string>){
       state.solverResults = state.solverResults.filter(item => item.id !== action.payload)
@@ -243,12 +208,6 @@ export const {
   setGridsCreationLength,
   setGridsCreationValue,
   setCompress,
-  unsetMeshingProgress,
-  unsetMeshProgressLength,
-  unsetMeshProgress,
-  unsetGridsCreationLength,
-  unsetGridsCreationValue,
-  unsetCompress,
   setcomputingP,
   setcomputingLp,
   setIterations,
@@ -259,7 +218,6 @@ export const {
   setMesherResults,
   setSolverResults,
   unsetMeshAdvice,
-  unsetMesherResults,
   unsetSolverResults,
   setBrokerConnected,
   unsetBrokerConnected,

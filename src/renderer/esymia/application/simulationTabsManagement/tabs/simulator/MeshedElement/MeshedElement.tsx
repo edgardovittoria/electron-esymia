@@ -28,7 +28,7 @@ export const MeshedElement: React.FC<MeshedElementProps> = ({
   const [modelMaterials, setModelMaterials] = useState<Material[]>([]);
 
   useEffect(() => {
-    if (meshGenerated === 'Generated' && externalGrids) {
+    if ((meshGenerated === 'Generated' || meshGenerated === "Queued") && externalGrids) {
       let matrices: (Brick[])[] = [];
       //let defaultSelectedEntries: [string, any][] = Object.entries(externalGrids.mesher_matrices)
       let selectedEntries: [string, Brick[]][] = Object.entries(externalGrids.externalGrids);

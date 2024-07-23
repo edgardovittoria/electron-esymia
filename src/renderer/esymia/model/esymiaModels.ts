@@ -96,7 +96,7 @@ export type MeshData = {
   mesh?: string,
   externalGrids?: string,
   previousMeshStatus?:  "Not Generated" | "Generated",
-  meshGenerated: "Not Generated" | "Generated" | "Generating",
+  meshGenerated: "Not Generated" | "Generated" | "Generating" | "Queued",
   meshApproved: boolean,
   quantum: [number, number, number],
   pathToExternalGridsNotFound: boolean

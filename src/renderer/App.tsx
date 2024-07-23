@@ -96,7 +96,7 @@ export default function App() {
         <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
           <div className="flex flex-col items-center gap-2 p-3 bg-white rounded border border-black">
             <span className='text-2xl'>Docker Needed</span>
-            <hr className="w-full border border-[.5px] border-black" />
+            <hr className="w-full border-[.5px] border-black" />
             <span>Please Install Docker and restart the application</span>
             <a href="https://www.docker.com/get-started/" target='_blank' className='font-bold text-blue-600 underline'>
               Get Started with Docker
