@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import { Disclosure } from '@headlessui/react';
 import { TiArrowMinimise } from 'react-icons/ti';
@@ -34,11 +34,18 @@ import {
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
+import { PiClockCountdownBold } from 'react-icons/pi';
+import { ImSpinner } from 'react-icons/im';
+import { TbTrashXFilled } from 'react-icons/tb';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean;
   setFeedbackSimulationVisible: (v: boolean) => void;
-  activeSimulations: { simulation: Simulation; freqNumber: number, project: Project }[];
+  activeSimulations: {
+    simulation: Simulation;
+    freqNumber: number;
+    project: Project;
+  }[];
 }
 
 const SimulationStatus: React.FC<SimulationStatusProps> = ({
@@ -46,13 +53,59 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
   setFeedbackSimulationVisible,
   activeSimulations,
 }) => {
-
-  const dispatch = useDispatch()
-
-  // useEffect(() => {
-  //   client.subscribe('solver_results', (msg) => callback_solver_results(msg, dispatch), {ack: 'client'})
-  //   client.subscribe('solver_feedback', (msg) => callback_solver_feedback(msg, dispatch), {ack: 'client'})
-  // }, [])
+  const dispatch = useDispatch();
+  const [runningSimulation, setRunningSimulation] = useState<
+    { simulation: Simulation; freqNumber: number; project: Project } | undefined
+  >(undefined);
+  const [queuedSimulations, setqueuedSimulations] = useState<
+    { simulation: Simulation; freqNumber: number; project: Project }[]
+  >([]);
+  useEffect(() => {
+    activeSimulations.forEach((sim) => {
+      if (sim.simulation.status === 'Running') {
+        setRunningSimulation(sim);
+      } else if (sim.simulation.status === 'Queued') {
+        if (
+          queuedSimulations.filter(
+            (qsim) =>
+              qsim.simulation.associatedProject ===
+              sim.simulation.associatedProject,
+          ).length === 0
+        ) {
+          setqueuedSimulations((prev) => [...prev, sim]);
+        }
+      }
+    });
+    if (!runningSimulation && queuedSimulations.length > 0) {
+      let item = queuedSimulations.pop();
+      if (item) {
+        const simulationUpdated: Simulation = {
+          ...item?.simulation,
+          status: 'Running',
+        };
+        dispatch(
+          updateSimulation({
+            associatedProject: simulationUpdated.associatedProject,
+            value: simulationUpdated,
+          }),
+        );
+        setqueuedSimulations(
+          queuedSimulations.filter(
+            (qsim) =>
+              qsim.simulation.associatedProject !==
+              item.simulation.associatedProject,
+          ),
+        );
+        setRunningSimulation({
+          ...item,
+          simulation: {
+            ...item.simulation,
+            status: 'Running',
+          },
+        });
+      }
+    }
+  }, [activeSimulations.length]);
 
   return (
     <div
@@ -70,13 +123,21 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
       </div>
       <hr className="text-secondaryColor w-full mb-5 mt-3" />
       <div className="max-h-[600px] overflow-y-scroll w-full">
-        {activeSimulations.map((sim) => (
+        {runningSimulation && (
           <SimulationStatusItem
-            key={sim.simulation.name}
-            name={sim.simulation.name}
-            frequenciesNumber={sim.freqNumber}
-            associatedProject={sim.project}
-            simulation={sim.simulation}
+            key={runningSimulation.simulation.name}
+            name={runningSimulation.simulation.name}
+            frequenciesNumber={runningSimulation.freqNumber}
+            associatedProject={runningSimulation.project}
+            simulation={runningSimulation.simulation}
+            setRunningSimulation={setRunningSimulation}
+          />
+        )}
+        {queuedSimulations.map((qs) => (
+          <QueuedSimulationStatusItem
+            name={qs.simulation.name}
+            associatedProject={qs.simulation.associatedProject}
+            setqueuedSimulations={setqueuedSimulations}
           />
         ))}
       </div>
@@ -91,27 +152,53 @@ const SimulationStatusItem: React.FC<{
   frequenciesNumber: number;
   associatedProject: Project;
   simulation: Simulation;
-}> = ({ name, frequenciesNumber, associatedProject, simulation }) => {
-  const computingP = useSelector(computingPSelector).filter(item => item.id === associatedProject.faunaDocumentId)[0]
-  const computingLpx = useSelector(computingLpSelector).filter(item => item.id === associatedProject.faunaDocumentId)[0]
-  const iterations = useSelector(iterationsSelector).filter(item => item.id === associatedProject.faunaDocumentId)[0]
+  setRunningSimulation: Function;
+}> = ({
+  name,
+  frequenciesNumber,
+  associatedProject,
+  simulation,
+  setRunningSimulation,
+}) => {
+  const computingP = useSelector(computingPSelector).filter(
+    (item) => item.id === associatedProject.faunaDocumentId,
+  )[0];
+  const computingLpx = useSelector(computingLpSelector).filter(
+    (item) => item.id === associatedProject.faunaDocumentId,
+  )[0];
+  const iterations = useSelector(iterationsSelector).filter(
+    (item) => item.id === associatedProject.faunaDocumentId,
+  )[0];
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
   const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
   const isAlert = useSelector(isAlertInfoModalSelector);
-  const solverResults = useSelector(solverResultsSelector).filter(item => item.id === associatedProject.faunaDocumentId)[0]
+  const solverResults = useSelector(solverResultsSelector).filter(
+    (item) => item.id === associatedProject.faunaDocumentId,
+  )[0];
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
 
   useEffect(() => {
     if (isAlertConfirmed) {
       if (!isAlert) {
-        dispatch(publishMessage({
-          queue: 'management_solver',
-          body: { message: "stop_computation", id: associatedProject.faunaDocumentId as string }}))
+        dispatch(
+          publishMessage({
+            queue: 'management_solver',
+            body: {
+              message: 'stop_computation',
+              id: associatedProject.faunaDocumentId as string,
+            },
+          }),
+        );
       } else {
         dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
-        dispatch(setMeshApproved({ approved: false, projectToUpdate: associatedProject.faunaDocumentId as string }));
+        dispatch(
+          setMeshApproved({
+            approved: false,
+            projectToUpdate: associatedProject.faunaDocumentId as string,
+          }),
+        );
       }
     }
   }, [isAlertConfirmed]);
@@ -142,32 +229,33 @@ const SimulationStatusItem: React.FC<{
         outerIteration: solverIterations[0],
         convergenceThreshold,
       },
-      id: project.faunaDocumentId as string
+      id: project.faunaDocumentId as string,
     };
   };
 
-
   useEffect(() => {
-
     let objectToSendToSolver = solverInputFrom(
       associatedProject,
       solverIterations,
       convergenceThreshold,
-    )
-    dispatch(publishMessage({
-      queue: 'management_solver',
-      body: { message: "solving", body: objectToSendToSolver }}))
+    );
+    dispatch(
+      publishMessage({
+        queue: 'management_solver',
+        body: { message: 'solving', body: objectToSendToSolver },
+      }),
+    );
     // client.publish({destination: "management_solver", body: JSON.stringify({ message: "solving", body: objectToSendToSolver })})
     return () => {
-      dispatch(unsetComputingLp(associatedProject.faunaDocumentId as string))
-      dispatch(unsetComputingP(associatedProject.faunaDocumentId as string))
-      dispatch(unsetIterations(associatedProject.faunaDocumentId as string))
-      dispatch(unsetSolverResults(associatedProject.faunaDocumentId as string))
-    }
-  }, [])
+      dispatch(unsetComputingLp(associatedProject.faunaDocumentId as string));
+      dispatch(unsetComputingP(associatedProject.faunaDocumentId as string));
+      dispatch(unsetIterations(associatedProject.faunaDocumentId as string));
+      dispatch(unsetSolverResults(associatedProject.faunaDocumentId as string));
+    };
+  }, []);
 
   useEffect(() => {
-    if(solverResults){
+    if (solverResults) {
       if (solverResults.isStopped) {
         dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
         dispatch(
@@ -180,11 +268,19 @@ const SimulationStatusItem: React.FC<{
         // dispatch(setSolverOutput(res.data));
         const simulationUpdated: Simulation = {
           ...simulation,
-          results: {...solverResults.matrices, freqIndex: solverResults.freqIndex},
+          results: {
+            ...solverResults.matrices,
+            freqIndex: solverResults.freqIndex,
+          },
           ended: Date.now().toString(),
-          status: solverResults.partial ? "Queued" : "Completed",
+          status: solverResults.partial ? 'Running' : 'Completed',
         };
-        dispatch(updateSimulation(simulationUpdated));
+        dispatch(
+          updateSimulation({
+            associatedProject: simulation.associatedProject,
+            value: simulationUpdated,
+          }),
+        );
         execQuery(
           updateProjectInFauna,
           convertInFaunaProjectThis({
@@ -192,10 +288,12 @@ const SimulationStatusItem: React.FC<{
             simulation: simulationUpdated,
           } as Project),
         ).then(() => {});
+        if (!solverResults.partial) {
+          setRunningSimulation(undefined);
+        }
       }
     }
-  }, [solverResults])
-
+  }, [solverResults]);
 
   return (
     <div className="w-full px-4 pt-2">
@@ -205,6 +303,10 @@ const SimulationStatusItem: React.FC<{
             <>
               <Disclosure.Button className="flex w-full justify-between rounded-lg border border-secondaryColor px-4 py-2 text-left text-sm font-medium text-secondaryColor hover:bg-green-100 focus:outline-none focus-visible:ring focus-visible:ring-green-500/75">
                 <span>{name}</span>
+                <div className="badge bg-green-500 text-white flex flex-row gap-2 items-center py-3">
+                  <ImSpinner className="w-4 h-4 animate-spin" />
+                  <span>solving</span>
+                </div>
                 <MdKeyboardArrowUp
                   className={`${
                     open ? 'rotate-180 transform' : ''
@@ -282,6 +384,57 @@ const SimulationStatusItem: React.FC<{
             </>
           )}
         </Disclosure>
+      </div>
+    </div>
+  );
+};
+
+export interface QueuedSimulationStatusItemProps {
+  name: string;
+  associatedProject: string;
+  setqueuedSimulations: React.Dispatch<
+    React.SetStateAction<
+      {
+        simulation: Simulation;
+        freqNumber: number;
+        project: Project;
+      }[]
+    >
+  >;
+}
+
+const QueuedSimulationStatusItem: React.FC<QueuedSimulationStatusItemProps> = ({
+  name,
+  associatedProject,
+  setqueuedSimulations,
+}) => {
+  const dispatch = useDispatch();
+
+  return (
+    <div className="flex my-2 w-full justify-between items-center rounded-lg border border-secondaryColor px-4 py-2 text-left text-sm font-medium text-secondaryColor hover:bg-green-100 focus:outline-none focus-visible:ring focus-visible:ring-green-500/75">
+      <span>{name}</span>
+      <div className="badge bg-amber-500 text-white flex flex-row gap-2 items-center py-3">
+        <PiClockCountdownBold className="w-4 h-4" />
+        <span>queued</span>
+      </div>
+      <div
+        className="tooltip tooltip-left hover:cursor-pointer"
+        data-tip="Remuove queued simulation"
+        onClick={() => {
+          setqueuedSimulations((prev) =>
+            prev.filter(
+              (item) => item.simulation.associatedProject !== associatedProject,
+            ),
+          );
+          dispatch(
+            updateSimulation({
+              associatedProject: associatedProject,
+              value: undefined,
+            }),
+          );
+        }}
+      >
+        <TbTrashXFilled className="w-6 h-6 text-red-500 hover:text-red-800" />
       </div>
     </div>
   );

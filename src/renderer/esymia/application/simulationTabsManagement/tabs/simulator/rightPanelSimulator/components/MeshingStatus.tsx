@@ -38,6 +38,7 @@ import { publishMessage } from '../../../../../../../middleware/stompMiddleware'
 import { Disclosure } from '@headlessui/react';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { PiClockCountdownBold } from 'react-icons/pi';
+import { TbTrashXFilled } from 'react-icons/tb';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;
@@ -152,12 +153,11 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
             selectedProject={runningMesh.selectedProject}
             allMaterials={runningMesh.allMaterials}
             quantumDimsInput={runningMesh.quantum}
-            activeMeshing={activeMeshing}
             setrunningMesh={setrunningMesh}
           />
         )}
         {queuedMesh.map((qm) => (
-          <QueuedMeshingStatusItem name={qm.selectedProject.name} />
+          <QueuedMeshingStatusItem project={qm} setqueuedMeshing={setqueuedMesh} />
         ))}
       </div>
     </div>
@@ -170,12 +170,6 @@ export interface MeshingStatusItemProps {
   selectedProject: Project;
   allMaterials: Material[];
   quantumDimsInput: [number, number, number];
-  activeMeshing: {
-    selectedProject: Project;
-    allMaterials: Material[];
-    quantum: [number, number, number];
-    meshStatus: 'Not Generated' | 'Generated';
-  }[];
   setrunningMesh: Function;
 }
 
@@ -183,7 +177,6 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   selectedProject,
   allMaterials,
   quantumDimsInput,
-  activeMeshing,
   setrunningMesh,
 }) => {
   const dispatch = useDispatch();
@@ -357,17 +350,10 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
         <>
           <Disclosure.Button className="flex w-full justify-between items-center rounded-lg border border-secondaryColor px-4 py-2 text-left text-sm font-medium text-secondaryColor hover:bg-green-100 focus:outline-none focus-visible:ring focus-visible:ring-green-500/75">
             <span>{selectedProject.name}</span>
-            {selectedProject.meshData.meshGenerated === 'Generating' ? (
-              <div className="badge bg-green-500 text-white flex flex-row gap-2 items-center py-3">
-                <ImSpinner className="w-4 h-4 animate-spin" />
-                <span>generating</span>
-              </div>
-            ) : (
-              <div className="badge bg-amber-500 text-white flex flex-row gap-2 items-center py-3">
-                <PiClockCountdownBold className="w-4 h-4" />
-                <span>queued</span>
-              </div>
-            )}
+            <div className="badge bg-green-500 text-white flex flex-row gap-2 items-center py-3">
+              <ImSpinner className="w-4 h-4 animate-spin" />
+              <span>generating</span>
+            </div>
             <MdKeyboardArrowUp
               className={`${
                 open ? 'rotate-180 transform' : ''
@@ -533,18 +519,56 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
 };
 
 export interface QueuedMeshingStatusItemProps {
-  name: string;
+  project: {
+    selectedProject: Project;
+    allMaterials: Material[];
+    quantum: [number, number, number];
+    meshStatus: 'Not Generated' | 'Generated';
+  };
+  setqueuedMeshing: React.Dispatch<
+    React.SetStateAction<
+      {
+        selectedProject: Project;
+        allMaterials: Material[];
+        quantum: [number, number, number];
+        meshStatus: 'Not Generated' | 'Generated';
+      }[]
+    >
+  >;
 }
 
 const QueuedMeshingStatusItem: React.FC<QueuedMeshingStatusItemProps> = ({
-  name,
+  project,
+  setqueuedMeshing,
 }) => {
+  const dispatch = useDispatch();
+
   return (
     <div className="flex my-2 w-full justify-between items-center rounded-lg border border-secondaryColor px-4 py-2 text-left text-sm font-medium text-secondaryColor hover:bg-green-100 focus:outline-none focus-visible:ring focus-visible:ring-green-500/75">
-      <span>{name}</span>
+      <span>{project.selectedProject.name}</span>
       <div className="badge bg-amber-500 text-white flex flex-row gap-2 items-center py-3">
         <PiClockCountdownBold className="w-4 h-4" />
         <span>queued</span>
+      </div>
+      <div
+        className="tooltip tooltip-left hover:cursor-pointer"
+        data-tip="Remuove queued meshing"
+        onClick={() => {
+          setqueuedMeshing((prev) =>
+            prev.filter(
+              (item) =>
+                item.selectedProject.faunaDocumentId !== project.selectedProject.faunaDocumentId,
+            ),
+          );
+          dispatch(
+            setMeshGenerated({
+              status: project.meshStatus,
+              projectToUpdate: project.selectedProject.faunaDocumentId as string,
+            }),
+          );
+        }}
+      >
+        <TbTrashXFilled className="w-6 h-6 text-red-500 hover:text-red-800" />
       </div>
     </div>
   );

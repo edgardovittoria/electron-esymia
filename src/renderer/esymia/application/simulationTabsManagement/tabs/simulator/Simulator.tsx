@@ -120,7 +120,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
     ) {
       setExternalGrids(undefined);
       setSpinner(true);
-      loadMeshData(setSpinner, setExternalGrids);
+      loadMeshData(setExternalGrids);
     }
   }, [selectedProject?.meshData.meshGenerated]);
 
@@ -217,6 +217,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
         selectedProject={selectedProject as Project}
         allMaterials={allMaterials}
         externalGrids={externalGrids}
+        spinnerLoadData={spinner}
       />
       <div className="absolute lg:left-[48%] left-[38%] gap-2 top-[180px] flex flex-row">
         <ResetFocusButton toggleResetFocus={toggleResetFocus} />

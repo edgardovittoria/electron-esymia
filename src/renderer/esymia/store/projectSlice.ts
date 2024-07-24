@@ -150,9 +150,9 @@ export const ProjectSlice = createSlice({
         selectedProject.modelUnit = action.payload;
       }
     },
-    updateSimulation(state: ProjectState, action: PayloadAction<Simulation>) {
+    updateSimulation(state: ProjectState, action: PayloadAction<{associatedProject: string, value: Simulation | undefined}>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.associatedProject);
-      if (selectedProject) selectedProject.simulation = action.payload;
+      if (selectedProject) selectedProject.simulation = action.payload.value;
     },
     deleteSimulation(state: ProjectState, action: PayloadAction<string>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload);
@@ -406,12 +406,12 @@ export const folderByID = (state: ProjectState, folderID: string | undefined) =>
 export const activeSimulationsSelector = (state: { projects: ProjectState }) => {
   let activeSimulations: { simulation: Simulation, freqNumber: number, project: Project }[] = [];
   takeAllProjectsIn(state.projects.projects).forEach(p => {
-    if (p.simulation && p.simulation.status === 'Queued') {
+    if (p.simulation && (p.simulation.status === 'Queued' || p.simulation.status === "Running")) {
       activeSimulations.push({ simulation: p.simulation, freqNumber: p.frequencies?.length as number, project: p});
     }
   });
   takeAllProjectsIn(state.projects.sharedElements).forEach(p => {
-    if (p.simulation && p.simulation.status === 'Queued') {
+    if (p.simulation && (p.simulation.status === 'Queued' || p.simulation.status === "Running")) {
       activeSimulations.push({ simulation: p.simulation, freqNumber: p.frequencies?.length as number, project: p });
     }
   });

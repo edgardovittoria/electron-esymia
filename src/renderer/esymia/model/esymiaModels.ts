@@ -107,7 +107,7 @@ export type Simulation = {
   name: string,
   started: string,
   ended: string,
-  status: 'Queued' | 'Paused' | 'Completed' | 'Failed'
+  status: 'Queued' | 'Running' | 'Completed' | 'Failed'
   results: SolverOutput,
   associatedProject: string,
   solverAlgoParams: {

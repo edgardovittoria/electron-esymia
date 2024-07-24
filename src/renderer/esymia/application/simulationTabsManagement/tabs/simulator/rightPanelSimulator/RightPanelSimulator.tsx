@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {
   activeMeshingSelector,
+  activeSimulationsSelector,
   meshGeneratedSelector,
   pathToExternalGridsNotFoundSelector,
   setMeshApproved,
@@ -46,12 +47,14 @@ interface RightPanelSimulatorProps {
   selectedProject: Project;
   allMaterials?: Material[];
   externalGrids?: ExternalGridsObject;
+  spinnerLoadData: boolean
 }
 
 export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   selectedProject,
   allMaterials,
   externalGrids,
+  spinnerLoadData
 }) => {
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
@@ -62,6 +65,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
   const activeMeshing = useSelector(activeMeshingSelector)
+  const activeSimulations = useSelector(activeSimulationsSelector)
   const quantumDimensionsLabels = ['X', 'Y', 'Z'];
   const [suggestedQuantumError, setSuggestedQuantumError] = useState<{
     active: boolean;
@@ -266,7 +270,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
       {sidebarItemSelected && sidebarItemSelected === 'Mesher' && (
         <div
           className={`${
-            meshGenerated === 'Generating' && 'opacity-40'
+            (meshGenerated === 'Generating' || meshGenerated === 'Queued' || spinnerLoadData) && 'opacity-40'
           } flex-col absolute right-[5%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
         >
           <div className="flex">
@@ -336,7 +340,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
                 </div>
               )}
-              {meshGenerated === 'Generated' &&
+              {meshGenerated === 'Generated' && !spinnerLoadData && !selectedProject.simulation &&
                 !suggestedQuantumError.active &&
                 !pathToExternalGridsNotFound && (
                   <div className="flex flex-row gap-4 justify-center items-center w-full mt-3">
@@ -417,7 +421,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         <>
           <div
             className={`${
-              selectedProject.simulation?.status === 'Queued' && 'opacity-40'
+              (selectedProject.simulation?.status === 'Queued' || selectedProject.simulation?.status === "Running") && 'opacity-40'
             } flex-col absolute right-[5%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
           >
             <div className="flex">
@@ -570,7 +574,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     started: Date.now().toString(),
                     ended: '',
                     results: {} as SolverOutput,
-                    status: 'Queued',
+                    status: activeSimulations.length === 0 ? 'Running' : 'Queued',
                     associatedProject:
                       selectedProject?.faunaDocumentId as string,
                     solverAlgoParams: {
@@ -579,7 +583,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                       convergenceThreshold,
                     },
                   };
-                  dispatch(updateSimulation(simulation));
+                  dispatch(updateSimulation({associatedProject: simulation.associatedProject ,value:simulation}));
                   dispatch(
                     setMeshApproved({
                       approved: true,

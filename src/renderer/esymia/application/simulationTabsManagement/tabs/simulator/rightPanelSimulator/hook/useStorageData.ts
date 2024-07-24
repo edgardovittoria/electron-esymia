@@ -194,7 +194,6 @@ export const useStorageData = () => {
   // };
 
   const loadDataFromS3 = (
-    setSpinner: (v: boolean) => void,
     setExternalGrids: Function,
   ) => {
     s3.getObject(
@@ -215,7 +214,6 @@ export const useStorageData = () => {
             projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
-        setSpinner(false);
       },
     );
   };
@@ -291,7 +289,6 @@ export const useStorageData = () => {
   };
 
   const loadGridsFromS3 = (
-    setSpinner: (v: boolean) => void,
     setExternalGrids: Function,
   ) => {
     dispatch(publishMessage({
@@ -348,13 +345,12 @@ export const useStorageData = () => {
   // };
 
   const loadMeshData = (
-    setSpinner: (v: boolean) => void,
     setExternalGrids: Function,
   ) => {
     if (selectedProject.storage === 'local') {
-      loadGridsFromS3(setSpinner, setExternalGrids);
+      loadGridsFromS3(setExternalGrids);
     } else {
-      loadDataFromS3(setSpinner, setExternalGrids);
+      loadDataFromS3(setExternalGrids);
     }
   };
 
