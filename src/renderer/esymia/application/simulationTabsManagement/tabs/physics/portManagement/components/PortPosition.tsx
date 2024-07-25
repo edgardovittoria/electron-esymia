@@ -249,7 +249,7 @@ const TerminationPositionInput: FC<TerminationPositionInputProps> = ({dataTestId
 									type="number"
                   //debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
 									step={inputStep ? inputStep : 0.000001}
-									defaultValue={isNaN(value) ? 0 : value}
+									defaultValue={parseFloat(value.toFixed(6))}
 									onChange={onChange}
 								/>
 							</div>

@@ -52,14 +52,17 @@ export const DroppableAndDraggableFolder: React.FC<
 
   const [dragDone, setDragDone] = useState(false);
   const [dropTargetFolder, setDropTargetFolder] = useState({} as Folder);
+  const [dragItem, setdragItem] = useState<Folder | Project>({} as Folder | Project)
 
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: ['PROJECT', 'FOLDER'],
       collect: (monitor) => ({
         isOver: monitor.isOver(),
+        canDrop: monitor.canDrop()
       }),
-      drop() {
+      drop(item) {
+        setdragItem(item as Project | Folder)
         setDropTargetFolder(folder);
         setDragDone(true);
       },
@@ -82,10 +85,9 @@ export const DroppableAndDraggableFolder: React.FC<
 
   useEffect(() => {
     if (dragDone) {
-      const objectToMove: Project | Folder = dragAndDropManager
-        .getMonitor()
-        .getItem();
-      if (objectToMove.faunaDocumentId !== dropTargetFolder.faunaDocumentId) {
+      //console.log(dragItem)
+      const objectToMove: Project | Folder = dragItem
+      if (objectToMove && objectToMove.faunaDocumentId !== dropTargetFolder.faunaDocumentId) {
         if ('model' in objectToMove) {
           dispatch(
             moveProject({

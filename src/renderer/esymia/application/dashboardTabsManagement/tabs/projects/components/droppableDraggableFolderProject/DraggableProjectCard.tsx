@@ -58,6 +58,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
       type: 'PROJECT',
       item: project,
       collect: (monitor) => ({
+        item: monitor.getItem(),
         isDragging: monitor.isDragging(),
       }),
     }),
@@ -73,7 +74,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
     show({ event: e, props: { key: 'value' } });
   }
 
-  console.log(project)
+  //console.log(project)
 
   return (
     <>

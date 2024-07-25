@@ -18,6 +18,7 @@ import {
 } from '../../../store/tabsAndMenuItemsSlice';
 import { Folder, Simulation } from '../../../model/esymiaModels';
 import noresultfound from '../../../../../../assets/noresultfound.png';
+import { ImSpinner } from 'react-icons/im';
 
 interface SimulationsProps {
   maxH: string
@@ -56,8 +57,8 @@ export const Simulations: React.FC<SimulationsProps> = ({maxH}) => {
         return <FaCheck color="#1aa33c" />;
       case 'Failed':
         return <TiDelete color="#ec0c0c" />;
-      case 'Paused':
-        return <FaPauseCircle color="#ec0c0c" />;
+      case 'Running':
+        return <ImSpinner className='w-6 h-6 animate-spin text-green-400'/>
       case 'Queued':
         return <MdWatchLater color="#ffcc00" />;
       default:
