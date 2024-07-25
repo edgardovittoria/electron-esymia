@@ -81,6 +81,14 @@ export const TabsAndMenuItemsSlice = createSlice({
       }
       setTab(state, action.payload.faunaDocumentId as string);
     },
+    updateProjectTab(state: TabsAndMenuItemsState, action: PayloadAction<Project>) {
+      state.projectsTabs = state.projectsTabs.map(pt => {
+        if(pt.faunaDocumentId === action.payload.faunaDocumentId){
+          pt = action.payload
+        }
+        return pt
+      })
+    },
     closeProjectTab(state: TabsAndMenuItemsState, action: PayloadAction<string>) {
       state.projectsTabs = state.projectsTabs.filter((projectTab) => projectTab.faunaDocumentId !== action.payload);
       if (state.menuItemSelected !== 'Projects') setTab(state, 'DASHBOARD');
@@ -192,6 +200,7 @@ export const TabsAndMenuItemsSlice = createSlice({
 export const {
   selectTab,
   addProjectTab,
+  updateProjectTab,
   closeProjectTab,
   selectMenuItem,
   setShowInfoModal,

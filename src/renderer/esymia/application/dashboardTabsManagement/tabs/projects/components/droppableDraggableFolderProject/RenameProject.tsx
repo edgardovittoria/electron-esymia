@@ -6,6 +6,7 @@ import { renameProject } from '../../../../../../store/projectSlice';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { Project } from '../../../../../../model/esymiaModels';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
+import { updateProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
 
 
 interface RenameProjectProps {
@@ -79,6 +80,10 @@ export const RenameProject: React.FC<RenameProjectProps> = (
                                                 dispatch(renameProject({
                                                     projectToRename: projectToRename.faunaDocumentId as string,
                                                     name: name
+                                                }))
+                                                dispatch(updateProjectTab({
+                                                  ...projectToRename,
+                                                  name: name
                                                 }))
                                                 execQuery(updateProjectInFauna, convertInFaunaProjectThis({
                                                     ...projectToRename,
