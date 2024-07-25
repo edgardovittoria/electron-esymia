@@ -39,3 +39,13 @@ export type FaunaFolderDetails = {
     subFolders: string[],
     parent: string,
 }
+
+export type FaunaUserSessionInfo = {
+  id: string,
+  userSessionInfo: UserSessionInfo
+}
+
+export type UserSessionInfo = {
+  email: string,
+  logged: boolean
+}

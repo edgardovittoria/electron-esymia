@@ -5,6 +5,8 @@ import {
   FaunaFolderDetails,
   FaunaProject,
   FaunaProjectDetails,
+  FaunaUserSessionInfo,
+  UserSessionInfo,
 } from '../model/FaunaModels';
 import {
   recursiveFindFolders,
@@ -626,4 +628,97 @@ export const recursiveUpdateSharingInfoFolderInFauna = async (
   allProjects.forEach((p) =>
     updateProjectInFauna(faunaClient, faunaQuery, convertInFaunaProjectThis(p)),
   );
+};
+
+
+export const getUserSessionInfo = async (
+  faunaClient: faunadb.Client,
+  faunaQuery: typeof faunadb.query,
+  user: string,
+) => {
+  const response = await faunaClient
+    .query(
+      faunaQuery.Select(
+        'data',
+        faunaQuery.Map(
+          faunaQuery.Paginate(
+            faunaQuery.Match(
+              faunaQuery.Index('get_user_session_info_by_email'),
+              user,
+            ),
+          ),
+          faunaQuery.Lambda('userSessionInfo', {
+            id: faunaQuery.Select(
+              ['ref', 'id'],
+              faunaQuery.Get(faunaQuery.Var('userSessionInfo')),
+            ),
+            userSessionInfo: faunaQuery.Select(
+              ['data'],
+              faunaQuery.Get(faunaQuery.Var('userSessionInfo')),
+            ),
+          }),
+        ),
+      ),
+    )
+    .catch((err) =>
+      console.error(
+        'Error: [%s] %s: %s',
+        err.name,
+        err.message,
+        err.errors()[0].description,
+      ),
+    );
+  return response as FaunaProject[];
+};
+
+
+export const updateUserSessionInfo = async (
+  faunaClient: faunadb.Client,
+  faunaQuery: typeof faunadb.query,
+  userSessionInfo: FaunaUserSessionInfo
+) => {
+  const response = await faunaClient
+    .query(
+      faunaQuery.Update(
+        faunaQuery.Ref(
+          faunaQuery.Collection('UserSessionManagement'),
+          userSessionInfo.id,
+        ),
+        {
+          data: userSessionInfo.userSessionInfo,
+        },
+      ),
+    )
+    .catch((err) =>
+      console.error(
+        'Error: [%s] %s: %s',
+        err.name,
+        err.message,
+        err.errors()[0].description,
+      ),
+    );
+  return response;
+};
+
+
+export const createUserSessionInfo = async (
+  faunaClient: faunadb.Client,
+  faunaQuery: typeof faunadb.query,
+  userSessionInfo: UserSessionInfo,
+) => {
+  const response = await faunaClient
+    .query(
+      faunaQuery.Create(faunaQuery.Collection('UserSessionManagement'), {
+        data: userSessionInfo
+      }),
+    )
+    .catch((err) =>
+      console.error(
+        'Error: [%s] %s: %s',
+        err.name,
+        err.message,
+        err.errors()[0].description,
+      ),
+    );
+  return response;
 };

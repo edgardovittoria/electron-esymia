@@ -23,6 +23,7 @@ import {
 import { ImSpinner } from 'react-icons/im';
 import { brokerConnectedSelector } from './esymia/store/tabsAndMenuItemsSlice';
 import { useDemoMode } from './useDemoMode';
+import { useAllowSingleSessionUser } from './useAllowSingleSessionUser';
 
 // export const client = new Client({
 //   brokerURL: 'ws://localhost:15674/ws'
@@ -39,6 +40,9 @@ export default function App() {
 
   // Uso del temporizzatore per la versione demo di 30 giorni. Commentare se si vuole disabilitare la modalità demo.
   let {allowedUser, remainingDemoDays} = useDemoMode()
+
+  // Permette ad ogni utente di avere un'unica sessione attiva per volta. Commentare per disabilitare questo vincolo.
+  let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
 
   useEffect(() => {
     window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
@@ -182,6 +186,7 @@ export default function App() {
                           window.electron.ipcRenderer.sendMessage('logout', [
                             process.env.REACT_APP_AUTH0_DOMAIN,
                           ]);
+                          closeUserSessionOnFauna()
                           dispatch(
                             publishMessage({
                               queue: 'management',
