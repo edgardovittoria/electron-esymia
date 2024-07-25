@@ -106,16 +106,17 @@ const RLCParamsInput: FC<RLCParamsInputProps> = ({disabled, debounceTimeoutMilli
   return (
     <div className="mt-2">
         <span className="lg:text-base text-[12px]">{label}</span>
-        <DebounceInput
+        <input
           className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
           type="number"
           min={0}
           disabled={disabled}
-          debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
+          //debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
+          onKeyDown={(evt) => ["+", "-"].includes(evt.key) && evt.preventDefault()}
           step={inputStep ? inputStep : 0.000001}
-          value={isNaN(value) ? 0 : value}
+          defaultValue={isNaN(value) ? 0 : value}
           onChange={onChange}
-          onWheel={(e: { currentTarget: { blur: () => any; }; }) => e.currentTarget.blur()}
+          //onWheel={(e: { currentTarget: { blur: () => any; }; }) => e.currentTarget.blur()}
         />
       </div>
   )

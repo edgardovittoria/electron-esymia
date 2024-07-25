@@ -33,11 +33,11 @@ export const PortPosition: FC<PortPositionProps> = ({
                 value={selectedPort.inputElement.transformationParams.position[0]}
                 onChange={(event) => {
                   let newPosition = [
-                    parseFloat(event.target.value),
-                    selectedPort.inputElement.transformationParams
-                      .position[1],
-                    selectedPort.inputElement.transformationParams
-                      .position[2],
+                    parseFloat(parseFloat(event.target.value).toFixed(6)),
+                    parseFloat(selectedPort.inputElement.transformationParams
+                      .position[1].toFixed(6)),
+                    parseFloat(selectedPort.inputElement.transformationParams
+                      .position[2].toFixed(6)),
                   ];
                   dispatch(
                     updatePortPosition({
@@ -56,7 +56,7 @@ export const PortPosition: FC<PortPositionProps> = ({
                   let newPosition = [
                     selectedPort.inputElement.transformationParams
                       .position[0],
-                    parseFloat(event.target.value),
+                    parseFloat(parseFloat(event.target.value).toFixed(6)),
                     selectedPort.inputElement.transformationParams
                       .position[2],
                   ];
@@ -75,11 +75,11 @@ export const PortPosition: FC<PortPositionProps> = ({
                 value={selectedPort.inputElement.transformationParams.position[2]}
                 onChange={(event) => {
                   let newPosition = [
-                    selectedPort.inputElement.transformationParams
-                      .position[0],
-                    selectedPort.inputElement.transformationParams
-                      .position[1],
-                    parseFloat(event.target.value),
+                    parseFloat(selectedPort.inputElement.transformationParams
+                      .position[0].toFixed(6)),
+                    parseFloat(selectedPort.inputElement.transformationParams
+                      .position[1].toFixed(6)),
+                    parseFloat(parseFloat(event.target.value).toFixed(6))
                   ];
                   dispatch(
                     updatePortPosition({
@@ -101,11 +101,11 @@ export const PortPosition: FC<PortPositionProps> = ({
                   value={selectedPort.outputElement.transformationParams.position[0]}
                   onChange={(event) => {
                     let newPosition = [
-                      parseFloat(event.target.value),
-                      selectedPort.outputElement.transformationParams
-                        .position[1],
-                      selectedPort.outputElement.transformationParams
-                        .position[2],
+                      parseFloat(parseFloat(event.target.value).toFixed(6)),
+                      parseFloat(selectedPort.outputElement.transformationParams
+                        .position[1].toFixed(6)),
+                      parseFloat(selectedPort.outputElement.transformationParams
+                        .position[2].toFixed(6)),
                     ];
                     dispatch(
                       updatePortPosition({
@@ -122,11 +122,11 @@ export const PortPosition: FC<PortPositionProps> = ({
                   value={selectedPort.outputElement.transformationParams.position[1]}
                   onChange={(event) => {
 										let newPosition = [
-											selectedPort.outputElement.transformationParams
-												.position[0],
-											parseFloat(event.target.value),
-											selectedPort.outputElement.transformationParams
-												.position[2],
+											parseFloat(selectedPort.outputElement.transformationParams
+												.position[0].toFixed(6)),
+											parseFloat(parseFloat(event.target.value).toFixed(6)),
+											parseFloat(selectedPort.outputElement.transformationParams
+												.position[2].toFixed(6)),
 										];
 										dispatch(
 											updatePortPosition({
@@ -143,11 +143,11 @@ export const PortPosition: FC<PortPositionProps> = ({
                   value={selectedPort.outputElement.transformationParams.position[2]}
                   onChange={(event) => {
 										let newPosition = [
-											selectedPort.outputElement.transformationParams
-												.position[0],
-											selectedPort.outputElement.transformationParams
-												.position[1],
-											parseFloat(event.target.value),
+											parseFloat(selectedPort.outputElement.transformationParams
+												.position[0].toFixed(6)),
+											parseFloat(selectedPort.outputElement.transformationParams
+												.position[1].toFixed(6)),
+                      parseFloat(parseFloat(event.target.value).toFixed(6)),
 										];
 										dispatch(
 											updatePortPosition({
@@ -242,16 +242,15 @@ interface TerminationPositionInputProps {
 const TerminationPositionInput: FC<TerminationPositionInputProps> = ({dataTestId, disabled, debounceTimeoutMilliSecs, inputStep, value, onChange}) => {
   return (
     <div className="lg:w-[30%] w-full">
-								<DebounceInput
+								<input
                   id={dataTestId}
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
 									type="number"
-                  debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
+                  //debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
 									step={inputStep ? inputStep : 0.000001}
-									value={isNaN(value) ? 0 : value}
+									defaultValue={isNaN(value) ? 0 : value}
 									onChange={onChange}
-									onWheel={(e: { target: { blur: () => any; }; }) => e.target.blur()}
 								/>
 							</div>
   )

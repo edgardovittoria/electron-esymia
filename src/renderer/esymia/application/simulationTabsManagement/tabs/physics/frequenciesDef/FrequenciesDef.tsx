@@ -36,14 +36,14 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
       <div className='flex flex-row justify-between gap-2 mt-5'>
         <div className='flex flex-col items-center gap-2'>
           <span>{'f min'}</span>
-          <DebounceInput
+          <input
             data-testid="fmin"
-            debounceTimeout={700}
+            //debounceTimeout={700}
             min={0}
             disabled={disabled}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
-            value={fMin}
+            onKeyDown={(evt) => ["+", "-"].includes(evt.key) && evt.preventDefault()}
             onChange={(e) => {
               if(e.target.value.startsWith('-')){
                 setFMin(parseFloat("" + Number(e.target.value.substring(1))))
@@ -55,14 +55,14 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         </div>
         <div className='flex flex-col items-center gap-2'>
           <span>{'f max'}</span>
-          <DebounceInput
+          <input
             data-testid="fmax"
             disabled={disabled}
-            debounceTimeout={700}
+            //debounceTimeout={700}
             min={0}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
-            value={fMax}
+            onKeyDown={(evt) => ["+", "-"].includes(evt.key) && evt.preventDefault()}
             onChange={(e) => {
               if(e.target.value.startsWith('-')){
                 setFMax(parseFloat("" + Number(e.target.value.substring(1))))
@@ -74,15 +74,15 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         </div>
         <div className='flex flex-col items-center gap-2'>
           <span>f num</span>
-          <DebounceInput
+          <input
             data-testid="fnum"
-            debounceTimeout={700}
+            //debounceTimeout={700}
             min={0}
             disabled={disabled}
             className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
             type="number"
             step={1}
-            value={fNum}
+            onKeyDown={(evt) => ["+", "-", "e", "E"].includes(evt.key) && evt.preventDefault()}
             onChange={(e) => {
               if(e.target.value.startsWith('-')){
                 setFNum(parseFloat("" + Number(e.target.value.substring(1))))
@@ -98,7 +98,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
         className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
         disabled={(fNum === 0 || fMax <= fMin)}
         onClick={() => {
-          scaleType === 0 ? dispatch(setFrequencies(logSpace(log10(fMin), log10(fMax), fNum))) : dispatch(setFrequencies(linSpace(fMin, fMax, fNum)))
+          scaleType === 0 ? dispatch(setFrequencies(logSpace(log10(fMin), log10(fMax), fNum))) : dispatch(setFrequencies([].slice.call(linSpace(fMin, fMax, fNum))))
           setSavedPhysicsParameters(false)
         }}
       >
