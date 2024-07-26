@@ -30,7 +30,9 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   return (
     <>
       {selectedProject && selectedProject.ports.length !== 0 ? (
-        <div className="text-center lg:max-h-[150px] xl:max-h-[200px] xl:h-[200px] overflow-y-scroll">
+        <div className="lg:max-h-[150px] xl:max-h-[200px] xl:h-[200px] w-[300px] overflow-y-scroll">
+          <span className='font-bold'>Terminations</span>
+          <hr className='border-[1px] border-gray-300 w-full mb-2 mt-1'/>
           <ul className="list-none pl-3 mb-0">
             {selectedProject.ports &&
               selectedProject.ports.map((port) => {

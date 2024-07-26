@@ -13,10 +13,12 @@ export const Materials: React.FC<MaterialsProps> = () => {
     <>
       {selectedProject && selectedProject.model?.components !== undefined ? (
         <div>
+          <span className='font-bold'>Materials</span>
+          <hr className='border-[1px] border-gray-300 w-full mb-2 mt-1'/>
           <ul className="ml-0 pl-3">
             {selectedProject.model.components.map((component, index) => {
               return (
-                <li key={index} className="mt-2">
+                <li key={index} className="">
                   <div className="flex">
                     <div className="flex w-[10%] items-center">
                       <FaCircle

@@ -35,9 +35,10 @@ import {
 import { LiaFeatherSolid, LiaWeightHangingSolid } from 'react-icons/lia';
 import { BiInfoCircle } from 'react-icons/bi';
 import { Brick } from './rightPanelSimulator/components/createGridsExternals';
+import { GiAtomicSlashes, GiCubeforce } from 'react-icons/gi';
 
 interface SimulatorProps {
-  selectedTabLeftPanel: string;
+  selectedTabLeftPanel: string | undefined;
   setSelectedTabLeftPanel: Function;
 }
 
@@ -116,7 +117,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
   useEffect(() => {
     if (
       selectedProject?.meshData.mesh &&
-      (selectedProject?.meshData.meshGenerated === 'Generated' || selectedProject?.meshData.meshGenerated === 'Queued' )
+      (selectedProject?.meshData.meshGenerated === 'Generated' ||
+        selectedProject?.meshData.meshGenerated === 'Queued')
     ) {
       setExternalGrids(undefined);
       setSpinner(true);
@@ -136,8 +138,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
       setSpinner(false);
     }
     return () => {
-      dispatch(unsetAWSExternalGridsData())
-    }
+      dispatch(unsetAWSExternalGridsData());
+    };
   }, [awsExternalGridsData]);
 
   useEffect(() => {
@@ -175,6 +177,10 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const [selectedMaterials, setSelectedMaterials] =
     useState<string[]>(materialsNames);
 
+  const [sidebarItemSelected, setsidebarItemSelected] = useState<
+    string | undefined
+  >(undefined);
+
   return (
     <>
       {spinner && !pathToExternalGridsNotFound && (
@@ -195,7 +201,72 @@ export const Simulator: React.FC<SimulatorProps> = ({
         setResetFocus={toggleResetFocus}
       />
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
-      <MyPanel
+      <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+        <div
+          className={`p-2 tooltip rounded-t tooltip-right ${
+            selectedTabLeftPanel === simulatorLeftPanelTitle.first
+              ? 'text-white bg-primaryColor'
+              : 'text-primaryColor bg-white'
+          }`}
+          data-tip="Modeler"
+          onClick={() => {
+            if (selectedTabLeftPanel === simulatorLeftPanelTitle.first) {
+              setSelectedTabLeftPanel(undefined);
+            } else {
+              setSelectedTabLeftPanel(simulatorLeftPanelTitle.first);
+            }
+            setsidebarItemSelected(undefined)
+          }}
+        >
+          <GiCubeforce style={{ width: '25px', height: '25px' }} />
+        </div>
+        <div
+          className={`p-2 tooltip rounded-b tooltip-right ${
+            selectedTabLeftPanel === simulatorLeftPanelTitle.second
+              ? 'text-white bg-primaryColor'
+              : 'text-primaryColor bg-white'
+          }`}
+          data-tip="Materials"
+          onClick={() => {
+            if (selectedTabLeftPanel === simulatorLeftPanelTitle.second) {
+              setSelectedTabLeftPanel(undefined);
+            } else {
+              setSelectedTabLeftPanel(simulatorLeftPanelTitle.second);
+            }
+            setsidebarItemSelected(undefined)
+          }}
+        >
+          <GiAtomicSlashes style={{ width: '25px', height: '25px' }} />
+        </div>
+      </div>
+      {selectedTabLeftPanel && (
+        <>
+          <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[15%]">
+            {selectedTabLeftPanel === simulatorLeftPanelTitle.first && (
+              <Models>
+                <ModelOutliner />
+              </Models>
+            )}
+            {selectedTabLeftPanel === simulatorLeftPanelTitle.second && (
+              <SimulatorLeftPanelTab
+                allMaterials={allMaterials}
+                selectedMaterials={selectedMaterials}
+                setSelectedMaterials={setSelectedMaterials}
+              />
+            )}
+          </div>
+        </>
+      )}
+      <RightPanelSimulator
+        selectedProject={selectedProject as Project}
+        allMaterials={allMaterials}
+        externalGrids={externalGrids}
+        spinnerLoadData={spinner}
+        setsidebarItemSelected={setsidebarItemSelected}
+        sidebarItemSelected={sidebarItemSelected}
+        setSelectedTabLeftPanel={setSelectedTabLeftPanel}
+      />
+      {/* <MyPanel
         tabs={[simulatorLeftPanelTitle.first, simulatorLeftPanelTitle.second]}
         selectedTab={selectedTabLeftPanel}
         setSelectedTab={setSelectedTabLeftPanel}
@@ -212,13 +283,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
             <ModelOutliner />
           </Models>
         )}
-      </MyPanel>
-      <RightPanelSimulator
-        selectedProject={selectedProject as Project}
-        allMaterials={allMaterials}
-        externalGrids={externalGrids}
-        spinnerLoadData={spinner}
-      />
+      </MyPanel> */}
+
       <div className="absolute lg:left-[48%] left-[38%] gap-2 top-[180px] flex flex-row">
         <ResetFocusButton toggleResetFocus={toggleResetFocus} />
         <OriginaProportionsButton />

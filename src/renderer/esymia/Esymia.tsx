@@ -138,9 +138,9 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   // MEMOIZED COMPONENTS
   const memoizedTabsContainer = useMemo(
     () => (
-      <TabsContainer user={user} setPluginModalVisible={setPluginsVisible} />
+      <TabsContainer user={user} setPluginModalVisible={setPluginsVisible} pluginModalVisible={pluginsVisible} />
     ),
-    [user],
+    [user, pluginsVisible],
   );
 
   return (
@@ -196,14 +196,14 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
                 setAlert={setAlert}
               />
             )} */}
-            {activePlugins && activePlugins.length > 0 && !pluginsVisible && (
+            {/* {activePlugins && activePlugins.length > 0 && !pluginsVisible && (
               <button
                 className="absolute bottom-40 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
                 onClick={() => setPluginsVisible(true)}
               >
                 <BsPlugin size={22} />
               </button>
-            )}
+            )} */}
             {activePlugins && activePlugins.length > 0 && (
               <Plugins
                 pluginsVisible={pluginsVisible}

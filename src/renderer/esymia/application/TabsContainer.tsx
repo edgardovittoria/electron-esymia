@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaPlus, FaTimes, FaUser } from 'react-icons/fa';
 import { MdOutlineDashboard } from 'react-icons/md';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -19,20 +19,17 @@ import { ActivePluginsSelector, addActivePlugin } from '../store/pluginsSlice';
 interface TabsContainerProps {
   user: UsersState;
   setPluginModalVisible: (v: boolean) => void
+  pluginModalVisible: boolean
 }
 
-export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginModalVisible }) => {
+export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginModalVisible, pluginModalVisible }) => {
   const tabSelected = useSelector(tabSelectedSelector);
   const projectsTabs = useSelector(projectsTabsSelector);
   const dispatch = useDispatch();
   const selectedFolder = useSelector(SelectedFolderSelector)
 
-  // const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
-  const [pluginVisibility, setPluginVisibility] = useState<boolean>(false);
   const { loginWithPopup, isAuthenticated, loginWithRedirect } = useAuth0();
   const activePlugins = useSelector(ActivePluginsSelector)
-
-
 
   return (
     <>
@@ -41,7 +38,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
         <span className="xl:col-span-1 sm:col-span-2 col-span-3 text-secondaryColor text-2xl font-semibold mr-4 ml-4 flex justify-center">
           ESimIA
         </span>
-        <ul className="flex xl:col-span-10 sm:col-span-9 col-span-7 flex-row gap-1 pl-0 mb-0 overflow-auto w-full">
+        <ul className="flex xl:col-span-9 sm:col-span-7 col-span-7 flex-row gap-1 pl-0 mb-0 overflow-auto w-full">
           <li
             data-testid="dashboard"
             className={
@@ -108,35 +105,23 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
             />
           </li>
         </ul>
-        <div className="flex flex-row items-center justify-end sm:col-span-1 col-span-2">
+        <div className="flex flex-row items-center justify-end xl:col-span-2 sm:col-span-3 col-span-4 ">
           {isAuthenticated ? (
             <>
-              <div>
-                <BsPlugin
-                  className="w-[22px] h-[22px] mr-4 text-primaryColor hover:text-secondaryColor hover:cursor-pointer"
-                  onClick={() => {
-                    setPluginVisibility(!pluginVisibility)
-                    // setUserDropdownVisibility(false)
-                  }}
-                />
-                <ul
-                  style={{ display: !pluginVisibility ? 'none' : 'block' }}
-                  className="px-4 py-2 bg-white rounded list-none absolute right-[10px] mt-[8px] w-max shadow z-[10000]"
-                >
-                  <div className="flex items-center p-[5px] hover:bg-opacity-40 hover:bg-green-200 hover:cursor-pointer"
-                      onClick={() => {
-                        if(activePlugins.filter(p => p === "serverGUI").length > 0) {
-                          setPluginModalVisible(true)
-                        }else {
-                          dispatch(addActivePlugin("serverGUI"))
-                        }
-                        setPluginVisibility(false)
-                      }}
-                  >
-                    <VscServerProcess className="w-[20px] h-[20px] mr-[10px] text-primaryColor" />
+              <div className="px-3 py-1 mb-[-2px] bg-white rounded-t list-none mr-10 hover:bg-secondaryColor hover:text-white hover:cursor-pointer z-[1000]"
+                onClick={() => {
+                  if(activePlugins.filter(p => p === "serverGUI").length === 0) {
+                    dispatch(addActivePlugin("serverGUI"))
+                    setPluginModalVisible(true)
+                  }
+                  setPluginModalVisible(!pluginModalVisible)
+                }}
+              >
+                  <div className="flex items-center p-[5px]">
+                    <VscServerProcess className="w-[20px] h-[20px] mr-[10px]" />
                     <li>Mesher & Solver</li>
                   </div>
-                </ul>
+
               </div>
               {/* <div>
                 <FaUser

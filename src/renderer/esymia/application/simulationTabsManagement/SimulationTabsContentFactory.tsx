@@ -13,7 +13,7 @@ interface SimulationTabsContentFactoryProps {}
 export const SimulationTabsContentFactory: React.FC<
   SimulationTabsContentFactoryProps
 > = () => {
-  const [selectedTabLeftPanel, setSelectedTabLeftPanel] = useState('Modeler');
+  const [selectedTabLeftPanel, setSelectedTabLeftPanel] = useState<string | undefined>(undefined);
   const menuItemSelected = useSelector(selectedMenuItemSelector);
 
   const windowInnerWidth = useWindowInnerWidth();

@@ -26,6 +26,8 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
         <>
             {(selectedProject && selectedProject.model?.components !== undefined) ?
                 <div className="max-h-[400px] overflow-auto">
+                  <span className='font-bold'>Materials</span>
+                  <hr className='border-[1px] border-gray-300 w-full mb-2 mt-1'/>
                     {allMaterials.map((material, index) => {
                         return (
                             <Disclosure>

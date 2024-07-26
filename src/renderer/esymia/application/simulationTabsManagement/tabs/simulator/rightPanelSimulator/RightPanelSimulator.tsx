@@ -41,20 +41,26 @@ import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFu
 import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs';
 import { publishMessage } from '../../../../../../middleware/stompMiddleware';
 import { TbServerBolt } from 'react-icons/tb';
-import { GiCubeforce } from 'react-icons/gi';
+import { GiCubeforce, GiMeshBall } from 'react-icons/gi';
 
 interface RightPanelSimulatorProps {
   selectedProject: Project;
   allMaterials?: Material[];
   externalGrids?: ExternalGridsObject;
-  spinnerLoadData: boolean
+  spinnerLoadData: boolean,
+  sidebarItemSelected: string | undefined,
+  setsidebarItemSelected: Function,
+  setSelectedTabLeftPanel: Function
 }
 
 export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   selectedProject,
   allMaterials,
   externalGrids,
-  spinnerLoadData
+  spinnerLoadData,
+  setsidebarItemSelected,
+  sidebarItemSelected,
+  setSelectedTabLeftPanel
 }) => {
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
@@ -81,9 +87,6 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const pathToExternalGridsNotFound = useSelector(
     pathToExternalGridsNotFoundSelector,
   );
-  const [sidebarItemSelected, setsidebarItemSelected] = useState<
-    string | undefined
-  >(undefined);
 
   useEffect(() => {
     suggestedQuantum && setQuantumDimsInput(suggestedQuantum);
@@ -231,9 +234,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
 
   return (
     <>
-      <div className="absolute right-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+      <div className="absolute left-[2%] top-[270px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
         <div
-          className={`p-2 tooltip rounded-t tooltip-left ${
+          className={`p-2 tooltip rounded-t tooltip-right ${
             sidebarItemSelected === 'Mesher'
               ? 'text-white bg-primaryColor'
               : 'text-primaryColor bg-white'
@@ -245,12 +248,13 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             } else {
               setsidebarItemSelected('Mesher');
             }
+            setSelectedTabLeftPanel(undefined)
           }}
         >
-          <GiCubeforce style={{ width: '25px', height: '25px' }} />
+          <GiMeshBall style={{ width: '25px', height: '25px' }} />
         </div>
         <div
-          className={`p-2 tooltip rounded-t tooltip-left ${
+          className={`p-2 tooltip rounded-t tooltip-right ${
             sidebarItemSelected === 'Solver'
               ? 'text-white bg-primaryColor'
               : 'text-primaryColor bg-white'
@@ -262,6 +266,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             } else {
               setsidebarItemSelected('Solver');
             }
+            setSelectedTabLeftPanel(undefined)
           }}
         >
           <TbServerBolt style={{ width: '25px', height: '25px' }} />
@@ -271,7 +276,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         <div
           className={`${
             (meshGenerated === 'Generating' || meshGenerated === 'Queued' || spinnerLoadData) && 'opacity-40'
-          } flex-col absolute right-[5%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
+          } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
         >
           <div className="flex">
             <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
@@ -422,7 +427,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           <div
             className={`${
               (selectedProject.simulation?.status === 'Queued' || selectedProject.simulation?.status === "Running") && 'opacity-40'
-            } flex-col absolute right-[5%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
+            } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
           >
             <div className="flex">
               <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />

@@ -42,7 +42,7 @@ export default function App() {
   let {allowedUser, remainingDemoDays} = useDemoMode()
 
   // Permette ad ogni utente di avere un'unica sessione attiva per volta. Commentare per disabilitare questo vincolo.
-  let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
+  //let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
 
   useEffect(() => {
     window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
@@ -186,7 +186,7 @@ export default function App() {
                           window.electron.ipcRenderer.sendMessage('logout', [
                             process.env.REACT_APP_AUTH0_DOMAIN,
                           ]);
-                          closeUserSessionOnFauna()
+                          //closeUserSessionOnFauna()
                           dispatch(
                             publishMessage({
                               queue: 'management',

@@ -8,7 +8,7 @@ import { classNames } from '../../../../cadmia/canvas/components/navBar/NavBar';
 
 interface DashBoardProps {
   tabs: string[];
-  selectedTab: string;
+  selectedTab: string | undefined;
   setSelectedTab: Function;
   children: ReactNode;
   className?: string

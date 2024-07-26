@@ -35,9 +35,11 @@ import { FaReact } from 'react-icons/fa';
 import { SiAzurefunctions } from 'react-icons/si';
 import { GiAtom } from 'react-icons/gi';
 import { GrStatusInfo } from 'react-icons/gr';
+import { RiListIndefinite } from "react-icons/ri";
+
 
 interface PhysicsProps {
-  selectedTabLeftPanel: string;
+  selectedTabLeftPanel: string | undefined;
   setSelectedTabLeftPanel: Function;
 }
 
@@ -81,6 +83,10 @@ export const Physics: React.FC<PhysicsProps> = ({
     }
   }, []);
 
+  useEffect(() => {
+    setSelectedTabLeftPanel(undefined)
+  },[])
+
   return (
     <>
       <CanvasPhysics
@@ -116,10 +122,10 @@ export const Physics: React.FC<PhysicsProps> = ({
           </>
         )}
       </div>
-      <PhysicsLeftPanel
+      {/* <PhysicsLeftPanel
         selectedTabLeftPanel={selectedTabLeftPanel}
         setSelectedTabLeftPanel={setSelectedTabLeftPanel}
-      />
+      /> */}
 
       {/* <PhysicsRightPanel
         selectedTabRightPanel={selectedTabRightPanel}
@@ -132,6 +138,8 @@ export const Physics: React.FC<PhysicsProps> = ({
         setSelectedTabRightPanel={setSelectedTabRightPanel}
         savedPhysicsParameters={savedPhysicsParameters}
         setSavedPhysicsParameters={setSavedPhysicsParameters}
+        selectedTabLeftPanel={selectedTabLeftPanel}
+        setSelectedTabLeftPanel={setSelectedTabLeftPanel}
       />
       <StatusBar />
     </>
@@ -312,27 +320,50 @@ const PhysicsRightSidebar: FC<{
   setSelectedTabRightPanel: Function;
   savedPhysicsParameters: boolean;
   setSavedPhysicsParameters: Function;
+  selectedTabLeftPanel: string | undefined;
+  setSelectedTabLeftPanel: Function;
 }> = ({
   selectedTabRightPanel,
   setSelectedTabRightPanel,
   savedPhysicsParameters,
   setSavedPhysicsParameters,
+  selectedTabLeftPanel,
+  setSelectedTabLeftPanel
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
   return (
     <>
-      <div className="absolute right-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+    {/* <PhysicsLeftPanelTab /> */}
+      <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
         <div
-          className={`p-2 tooltip rounded-t tooltip-left ${selectedTabRightPanel === physicsRightPanelTitle.first ? 'text-white bg-primaryColor' : 'text-primaryColor bg-white'}`}
-          data-tip="Terminations"
+          className={`p-2 tooltip rounded-t tooltip-right ${selectedTabLeftPanel === "Termination List" ? 'text-white bg-primaryColor' : 'text-primaryColor bg-white'}`}
+          data-tip="Terminations List"
+          onClick={() => {
+            if (selectedTabLeftPanel === "Termination List") {
+              setSelectedTabLeftPanel(undefined);
+            } else {
+              setSelectedTabLeftPanel("Termination List");
+            }
+            setSelectedTabRightPanel(undefined);
+          }}
+        >
+          <RiListIndefinite
+            style={{ width: '25px', height: '25px' }}
+
+          />
+        </div>
+        <div
+          className={`p-2 tooltip rounded-t tooltip-right ${selectedTabRightPanel === physicsRightPanelTitle.first ? 'text-white bg-primaryColor' : 'text-primaryColor bg-white'}`}
+          data-tip="Terminations Settings"
           onClick={() => {
             if (selectedTabRightPanel === physicsRightPanelTitle.first) {
               setSelectedTabRightPanel(undefined);
             } else {
               setSelectedTabRightPanel(physicsRightPanelTitle.first);
             }
+            setSelectedTabLeftPanel(undefined);
           }}
         >
           <GiAtom
@@ -341,7 +372,7 @@ const PhysicsRightSidebar: FC<{
           />
         </div>
         <div
-          className={`p-2 tooltip rounded-b tooltip-left ${selectedTabRightPanel === physicsRightPanelTitle.second ? 'text-white bg-primaryColor' : 'text-primaryColor bg-white'}`}
+          className={`p-2 tooltip rounded-b tooltip-right ${selectedTabRightPanel === physicsRightPanelTitle.second ? 'text-white bg-primaryColor' : 'text-primaryColor bg-white'}`}
           data-tip="Frequencies"
           onClick={() => {
             if (selectedTabRightPanel === physicsRightPanelTitle.second) {
@@ -349,6 +380,7 @@ const PhysicsRightSidebar: FC<{
             } else {
               setSelectedTabRightPanel(physicsRightPanelTitle.second);
             }
+            setSelectedTabLeftPanel(undefined);
           }}
         >
           <SiAzurefunctions
@@ -356,9 +388,10 @@ const PhysicsRightSidebar: FC<{
           />
         </div>
       </div>
-      {selectedTabRightPanel && (
-        <div className="bg-white p-3 absolute right-[5%] top-[180px] rounded">
-          {selectedTabRightPanel === physicsRightPanelTitle.first ? (
+      {(selectedTabRightPanel || selectedTabLeftPanel) && (
+        <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded">
+          {selectedTabLeftPanel === "Termination List" && <PhysicsLeftPanelTab />}
+          {selectedTabRightPanel === physicsRightPanelTitle.first &&
             <>
               {selectedPort?.category === 'lumped' ? (
                 <PortManagement selectedPort={selectedPort}>
@@ -407,19 +440,20 @@ const PhysicsRightSidebar: FC<{
                 </PortManagement>
               )}
             </>
-          ) : (
+          }
+          {selectedTabRightPanel === physicsRightPanelTitle.second &&
             <div className="flex-col px-[20px] pb-[5px] overflow-x-hidden max-w-[350px]">
-              <span className="font-bold">Frequencies Definition</span>
-              <FrequenciesDef
+            <span className="font-bold">Frequencies Definition</span>
+            <FrequenciesDef
+              disabled={selectedProject?.simulation?.status === 'Completed'}
+              setSavedPhysicsParameters={setSavedPhysicsParameters}
+            />
+            {/* <InputSignal
                 disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPhysicsParameters={setSavedPhysicsParameters}
-              />
-              {/* <InputSignal
-                  disabled={selectedProject?.simulation?.status === 'Completed'}
-                  selectedProject={selectedProject as Project}
-                /> */}
-            </div>
-          )}
+                selectedProject={selectedProject as Project}
+              /> */}
+          </div>
+          }
           {(selectedTabRightPanel === physicsRightPanelTitle.second ||
             (selectedTabRightPanel === physicsRightPanelTitle.first &&
               selectedPort)) && (
