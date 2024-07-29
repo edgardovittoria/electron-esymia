@@ -6,6 +6,7 @@ import { BiHide, BiShow } from 'react-icons/bi';
 import {
   boundingBoxDimensionSelector,
   findSelectedPort,
+  SelectedFolderSelector,
   selectedProjectSelector,
   setBoundingBoxDimension,
 } from '../../../../store/projectSlice';
@@ -17,7 +18,7 @@ import { PortPosition } from './portManagement/components/PortPosition';
 import { RLCParamsComponent } from './portManagement/components/RLCParamsComponent';
 import { ModalSelectPortType } from './portManagement/ModalSelectPortType';
 import { MyPanel } from '../../sharedElements/MyPanel';
-import { Port, Project, TempLumped } from '../../../../model/esymiaModels';
+import { Folder, Port, Project, TempLumped } from '../../../../model/esymiaModels';
 import { ImportExportPhysicsSetup } from './ImportExportPhysicsSetup';
 import StatusBar from '../../sharedElements/StatusBar';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
@@ -34,8 +35,10 @@ import { calculateModelBoundingBox } from '../../sharedElements/utilityFunctions
 import { FaReact } from 'react-icons/fa';
 import { SiAzurefunctions } from 'react-icons/si';
 import { GiAtom } from 'react-icons/gi';
-import { GrStatusInfo } from 'react-icons/gr';
+import { GrClone, GrStatusInfo } from 'react-icons/gr';
 import { RiListIndefinite } from "react-icons/ri";
+import { ImSpinner } from 'react-icons/im';
+import { useStorageData } from '../simulator/rightPanelSimulator/hook/useStorageData';
 
 
 interface PhysicsProps {
@@ -47,7 +50,10 @@ export const Physics: React.FC<PhysicsProps> = ({
   selectedTabLeftPanel,
   setSelectedTabLeftPanel,
 }) => {
-  const selectedProject = useSelector(selectedProjectSelector);
+  const { cloneProject } = useStorageData()
+  const [cloning, setcloning] = useState<boolean>(false)
+  const selectedProject = useSelector(selectedProjectSelector)
+  const selectedFolder = useSelector(SelectedFolderSelector)
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
   const [savedPhysicsParameters, setSavedPhysicsParameters] = useState(true);
@@ -141,6 +147,20 @@ export const Physics: React.FC<PhysicsProps> = ({
         selectedTabLeftPanel={selectedTabLeftPanel}
         setSelectedTabLeftPanel={setSelectedTabLeftPanel}
       />
+      <div className="absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+        <button
+          disabled={selectedProject && selectedProject.simulation && selectedProject.simulation.status === "Running"}
+          className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
+          data-tip="Clone Project"
+          onClick={() => {
+            setcloning(true)
+            cloneProject(selectedProject as Project, selectedFolder as Folder, setcloning)
+          }}
+        >
+          <GrClone style={{ width: '25px', height: '25px' }} className={`${cloning ? 'opacity-20' : 'opacity-100'}`} />
+          {cloning && <ImSpinner className="absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5" />}
+        </button>
+      </div>
       <StatusBar />
     </>
   );

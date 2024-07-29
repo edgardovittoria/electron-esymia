@@ -149,12 +149,12 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
           </ul>
         </div>
       </div>
-      <ExportToCsvZippedButton
+      {/* <ExportToCsvZippedButton
         buttonLabel="Export all graphs to csv"
         graphDataToExport={graphDataToExport}
         zipFilename="graphs_data"
-      />
-      <ExportTouchstoneButton selectedProject={selectedProject as Project} />
+      /> */}
+      {/* <ExportTouchstoneButton selectedProject={selectedProject as Project} /> */}
     </div>
   );
 };

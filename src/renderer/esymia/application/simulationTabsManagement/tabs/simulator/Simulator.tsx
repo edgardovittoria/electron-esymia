@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ComponentEntity, Material } from 'cad-library';
 import {
   pathToExternalGridsNotFoundSelector,
+  SelectedFolderSelector,
   selectedProjectSelector,
   setPathToExternalGridsNotFound,
 } from '../../../../store/projectSlice';
@@ -15,6 +16,7 @@ import {
   CellSize,
   CellsNumber,
   ExternalGridsObject,
+  Folder,
   OriginPoint,
   Project,
 } from '../../../../model/esymiaModels';
@@ -36,6 +38,7 @@ import { LiaFeatherSolid, LiaWeightHangingSolid } from 'react-icons/lia';
 import { BiInfoCircle } from 'react-icons/bi';
 import { Brick } from './rightPanelSimulator/components/createGridsExternals';
 import { GiAtomicSlashes, GiCubeforce } from 'react-icons/gi';
+import { GrClone } from 'react-icons/gr';
 
 interface SimulatorProps {
   selectedTabLeftPanel: string | undefined;
@@ -52,12 +55,14 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const [voxelsPainted, setVoxelsPainted] = useState(0);
   const [totalVoxels, setTotalVoxels] = useState(0);
 
-  const selectedProject = useSelector(selectedProjectSelector);
+  const [cloning, setcloning] = useState<boolean>(false)
+  const selectedProject = useSelector(selectedProjectSelector)
+  const selectedFolder = useSelector(SelectedFolderSelector)
   const dispatch = useDispatch();
   const [resetFocus, setResetFocus] = useState(false);
   const [spinner, setSpinner] = useState<boolean>(false);
   const toggleResetFocus = () => setResetFocus(!resetFocus);
-  const { loadMeshData } = useStorageData();
+  const { loadMeshData, cloneProject } = useStorageData();
   const pathToExternalGridsNotFound = useSelector(
     pathToExternalGridsNotFoundSelector,
   );
@@ -181,6 +186,10 @@ export const Simulator: React.FC<SimulatorProps> = ({
     string | undefined
   >(undefined);
 
+  useEffect(() => {
+    setSelectedTabLeftPanel(undefined)
+  },[])
+
   return (
     <>
       {spinner && !pathToExternalGridsNotFound && (
@@ -266,6 +275,20 @@ export const Simulator: React.FC<SimulatorProps> = ({
         sidebarItemSelected={sidebarItemSelected}
         setSelectedTabLeftPanel={setSelectedTabLeftPanel}
       />
+      <div className="absolute left-[2%] top-[370px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+        <button
+          disabled={selectedProject && selectedProject.simulation && selectedProject.simulation.status === "Running"}
+          className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
+          data-tip="Clone Project"
+          onClick={() => {
+            setcloning(true)
+            cloneProject(selectedProject as Project, selectedFolder as Folder, setcloning)
+          }}
+        >
+          <GrClone style={{ width: '25px', height: '25px' }} className={`${cloning ? 'opacity-20' : 'opacity-100'}`} />
+          {cloning && <ImSpinner className="absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5" />}
+        </button>
+      </div>
       {/* <MyPanel
         tabs={[simulatorLeftPanelTitle.first, simulatorLeftPanelTitle.second]}
         selectedTab={selectedTabLeftPanel}

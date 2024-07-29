@@ -108,7 +108,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
             </li>
           ))}
         </ul>
-        <div className='flex flex-row gap-4 items-center'>
+        {/* <div className='flex flex-row gap-4 items-center'>
           {selectedProject && (
             <button
               className="flex flex-row items-center gap-3 btn btn-sm text-sm bg-white text-black border-gray-300 hover:bg-secondaryColor hover:text-white"
@@ -122,7 +122,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
             </button>
           )}
           {cloning && <ImSpinner className="animate-spin w-5 h-5" />}
-        </div>
+        </div> */}
       </div>
     </div>
   );

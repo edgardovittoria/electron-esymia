@@ -53,7 +53,7 @@ export const SimulationTabsContentFactory: React.FC<
     case 'Results':
       return (
         <Results
-          selectedTabLeftPanel={resultsLeftPanelTitle.first}
+          selectedTabLeftPanel={selectedTabLeftPanel}
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
         />
       );

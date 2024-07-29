@@ -20,6 +20,7 @@ import saveAs from "file-saver";
 import { Dataset, pairs } from "./sharedElements";
 import { ExportToCsvZippedButton } from "./ExportToCsvZippedButton";
 import { BsGrid3X3Gap } from 'react-icons/bs';
+import { ChartVisualizationMode } from './ChartVisualizationMode';
 
 ChartJS.register(
   CategoryScale,
@@ -36,7 +37,8 @@ interface ChartsListProps {
   graphToVisualize: "All Graph" | "Z" | "S" | "Y";
   selectedLabel: { label: string, id: number }[],
   setGraphsData: Function,
-  currentFreIndexq?: number
+  currentFreIndexq?: number,
+  ChartVisualizationMode: string
 }
 
 interface ScaleMode {
@@ -66,7 +68,8 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   graphToVisualize,
   selectedLabel,
   setGraphsData,
-  currentFreIndexq
+  currentFreIndexq,
+  ChartVisualizationMode
 }) => {
   const selectedProject = useSelector(selectedProjectSelector)
   const [showGraphsSettings, setShowGraphsSettings] = useState<boolean[]>(defaultShowGraphsSettings(11))
@@ -142,7 +145,8 @@ export const ChartsList: React.FC<ChartsListProps> = ({
         return (
           <div className="box w-full" key={index}>
             <div className="flex flex-row justify-between items-center">
-              <div
+              {ChartVisualizationMode === "full" &&
+                <div
                 className={`box p-[5px] flex flex-col items-center border text-[#0fb25b] border-[#0fb25b] hover:cursor-pointer hover:bg-[#0fb25b] hover:text-white`}
                 onClick={() => {
                   let shows = [...showGraphsSettings]
@@ -152,7 +156,8 @@ export const ChartsList: React.FC<ChartsListProps> = ({
               >
                 <VscSettings size={15} />
               </div>
-              <ExportToCsvZippedButton buttonLabel="to CSV" graphDataToExport={[chartData]} zipFilename="graphs_data"/>
+              }
+              {/* <ExportToCsvZippedButton buttonLabel="to CSV" graphDataToExport={[chartData]} zipFilename="graphs_data"/> */}
             </div>
             {showGraphsSettings[index] && <ScaleChartOptions index={index} scaleMode={scaleMode} setScaleMode={setScaleMode}/>}
             {selectedProject?.simulation && selectedProject.simulation.status === "Completed" ?
