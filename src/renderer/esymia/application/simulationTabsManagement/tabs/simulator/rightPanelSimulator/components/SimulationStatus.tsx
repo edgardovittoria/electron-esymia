@@ -60,6 +60,16 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
   const [queuedSimulations, setqueuedSimulations] = useState<
     { simulation: Simulation; freqNumber: number; project: Project }[]
   >([]);
+
+
+  useEffect(() => {
+    window.electron.ipcRenderer.sendMessage('solvingComputation', [true])
+    return () => {
+      window.electron.ipcRenderer.sendMessage('solvingComputation', [false])
+    }
+  }, [])
+
+
   useEffect(() => {
     activeSimulations.forEach((sim) => {
       if (sim.simulation.status === 'Running') {

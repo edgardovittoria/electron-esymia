@@ -23,7 +23,6 @@ import {
 import { ImSpinner } from 'react-icons/im';
 import { brokerConnectedSelector } from './esymia/store/tabsAndMenuItemsSlice';
 import { useDemoMode } from './useDemoMode';
-import { useAllowSingleSessionUser } from './useAllowSingleSessionUser';
 
 // export const client = new Client({
 //   brokerURL: 'ws://localhost:15674/ws'

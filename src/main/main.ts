@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import axios from 'axios';
@@ -30,6 +30,9 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+
+let meshingComputations = false
+let solvingComputations = false
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -103,8 +106,18 @@ const createWindow = async () => {
     }
   });
 
+  mainWindow.on("close", (e) => {
+    e.preventDefault()
+    if(meshingComputations || solvingComputations){
+      dialog.showErrorBox('PAY ATTENTION', 'You have pending operations server side, complete or stop them before quit the application.')
+    }
+    else{
+      mainWindow?.destroy()
+    }
+  });
+
   mainWindow.on('closed', () => {
-    mainWindow = null;
+      mainWindow = null;
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
@@ -129,7 +142,7 @@ app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (process.platform !== 'darwin') {
-    app.quit();
+      app.quit();
   }
 });
 
@@ -227,6 +240,15 @@ ipcMain.on('haltSolver', (e, args) => {
     nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverHALT.sh'), getServerPath('MSGUI/juliaCODES/juliaSolver')]);
   }
 });
+
+ipcMain.on('meshingComputation', (e, args) => {
+  meshingComputations = args[0]
+});
+
+ipcMain.on('solvingComputation', (e, args) => {
+  solvingComputations = args[0]
+});
+
 ipcMain.handle('getInstallationDir', (e, args) => {
   return app.getPath('home')
 });

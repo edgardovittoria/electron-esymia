@@ -77,6 +77,14 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
   >([]);
 
   useEffect(() => {
+    window.electron.ipcRenderer.sendMessage('meshingComputation', [true])
+    return () => {
+      window.electron.ipcRenderer.sendMessage('meshingComputation', [false])
+    }
+  }, [])
+
+
+  useEffect(() => {
     activeMeshing.forEach((am) => {
       if (am.selectedProject.meshData.meshGenerated === 'Generating') {
         setrunningMesh(am);

@@ -24,6 +24,8 @@ export type Channels =
   | 'runBroker'
   | 'exportTouchstone'
   | 'getMac'
+  | 'meshingComputation'
+  | 'solvingComputation'
   ;
 
 const electronHandler = {
