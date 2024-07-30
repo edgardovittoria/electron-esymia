@@ -68,6 +68,7 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                                       scatteringValue: physics.portScatteringValue,
                                       portKey: physics.portKey
                                     } as Project),
+                                    dispatch
                                   ).then()
                             });
                         }}

@@ -68,7 +68,6 @@ export const Results: React.FC<ResultsProps> = ({
       representedFunction: string;
     }[]
   >([]);
-  const { execQuery } = useFaunaQuery();
 
   useEffect(() => {
     setSelectedLabel([{ label: 'All Ports', id: 0 }]);

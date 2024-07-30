@@ -1,5 +1,7 @@
 import faunadb from 'faunadb';
 import { FaunaCadModel } from 'cad-library';
+import { Dispatch } from '@reduxjs/toolkit';
+import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../esymia/store/tabsAndMenuItemsSlice';
 
 type FaunaModelDetails = {
   id: string;
@@ -16,12 +18,23 @@ export async function deleteFaunadbModel(
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   modelToDelete: string,
+  dispatch: Dispatch
 ) {
   try {
     await faunaClient.query(
       faunaQuery.Delete(
         faunaQuery.Ref(faunaQuery.Collection('CadModels'), modelToDelete),
       ),
+    ).catch((err) =>
+      {
+        dispatch(
+          setMessageInfoModal(
+            'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+          ),
+        );
+        dispatch(setIsAlertInfoModal(false));
+        dispatch(setShowInfoModal(true));
+      }
     );
   } catch (e) {
     console.log(e);
@@ -32,6 +45,7 @@ export const updateModelInFauna = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   modelToUpdate: FaunaCadModel,
+  dispatch: Dispatch
 ) => {
   const response = await faunaClient
     .query(
@@ -43,12 +57,15 @@ export const updateModelInFauna = async (
       ),
     )
     .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
+      {
+        dispatch(
+          setMessageInfoModal(
+            'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+          ),
+        );
+        dispatch(setIsAlertInfoModal(false));
+        dispatch(setShowInfoModal(true));
+      }
     );
   return response;
 };
@@ -57,6 +74,7 @@ export const getSharedModels = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   user: string,
+  dispatch: Dispatch
 ) => {
   const response = await faunaClient
     .query(
@@ -80,12 +98,15 @@ export const getSharedModels = async (
       ),
     )
     .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
+      {
+        dispatch(
+          setMessageInfoModal(
+            'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+          ),
+        );
+        dispatch(setIsAlertInfoModal(false));
+        dispatch(setShowInfoModal(true));
+      }
     );
   return (response as FaunaModelDetails[]).map((el) =>
     faunaModelDetailsToFaunaCadModel(el),

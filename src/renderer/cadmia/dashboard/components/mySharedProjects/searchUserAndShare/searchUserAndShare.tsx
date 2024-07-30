@@ -186,7 +186,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                               ? [...modelToShare.userSharingWith, selected]
                               : [selected],
                           };
-                          execQuery(updateModelInFauna, newModel)
+                          execQuery(updateModelInFauna, newModel, dispatch)
                             .then(() => {
                               dispatch(updateModel(newModel));
                               toast.success('Sharing Successfully!');

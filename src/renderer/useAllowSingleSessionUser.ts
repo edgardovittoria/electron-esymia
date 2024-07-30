@@ -10,6 +10,7 @@ import {
   FaunaUserSessionInfo,
   UserSessionInfo,
 } from './esymia/model/FaunaModels';
+import { useDispatch } from 'react-redux';
 
 export const useAllowSingleSessionUser = () => {
   const { user } = useAuth0();
@@ -17,10 +18,11 @@ export const useAllowSingleSessionUser = () => {
   const [loggedUser, setLoggedUser] = useState<
     FaunaUserSessionInfo | undefined
   >(undefined);
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (user) {
-      execQuery(getUserSessionInfo, user.email as string).then((item) => {
+      execQuery(getUserSessionInfo, user.email as string, dispatch).then((item) => {
         if (item.length !== 0) {
           let logged = item[0].userSessionInfo.logged;
           if (!logged) {
@@ -31,7 +33,7 @@ export const useAllowSingleSessionUser = () => {
             execQuery(updateUserSessionInfo, {
               ...item[0],
               userSessionInfo: newSessionInfo,
-            } as FaunaUserSessionInfo);
+            } as FaunaUserSessionInfo, dispatch);
             setLoggedUser({
               ...item[0],
               userSessionInfo: newSessionInfo,
@@ -49,7 +51,7 @@ export const useAllowSingleSessionUser = () => {
             email: user.email as string,
             logged: true,
           } as UserSessionInfo;
-          execQuery(createUserSessionInfo, newUserSessionInfo).then(
+          execQuery(createUserSessionInfo, newUserSessionInfo, dispatch).then(
             (ret: any) => {
               setLoggedUser({
                 id: ret.ref.value.id,
@@ -71,7 +73,7 @@ export const useAllowSingleSessionUser = () => {
       execQuery(updateUserSessionInfo, {
         id: loggedUser.id,
         userSessionInfo: newSessionInfo,
-      } as FaunaUserSessionInfo);
+      } as FaunaUserSessionInfo, dispatch);
     }
     setLoggedUser(undefined)
   };

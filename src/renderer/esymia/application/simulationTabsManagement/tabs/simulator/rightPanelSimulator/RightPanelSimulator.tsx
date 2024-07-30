@@ -208,6 +208,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             parseFloat(meshAdvice.quantum[2].toFixed(5)),
           ],
         } as Project),
+        dispatch
       ).then();
     }
   }, [meshAdvice]);
@@ -736,7 +737,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         name="radio-10"
                         className="radio radio-sm checked:bg-green-800"
                         checked={xPercentage === 'No'}
-                        onClick={() => setXPercentage('No')}
+                        onChange={() => setXPercentage('No')}
                       />
                       <span>No {mode}</span>
                     </div>
@@ -746,7 +747,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         name="radio-10"
                         className="radio radio-sm checked:bg-green-800"
                         checked={xPercentage === '10%'}
-                        onClick={() => setXPercentage('10%')}
+                        onChange={() => setXPercentage('10%')}
                       />
                       <span>10%</span>
                     </div>
@@ -756,7 +757,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         name="radio-10"
                         className="radio radio-sm checked:bg-green-800"
                         checked={xPercentage === '50%'}
-                        onClick={() => setXPercentage('50%')}
+                        onChange={() => setXPercentage('50%')}
                       />
                       <span>50%</span>
                     </div>
@@ -769,7 +770,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         name="radio-11"
                         className="radio radio-sm checked:bg-green-800"
                         checked={yPercentage === 'No'}
-                        onClick={() => setYPercentage('No')}
+                        onChange={() => setYPercentage('No')}
                       />
                       <span>No {mode}</span>
                     </div>
@@ -779,7 +780,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         name="radio-11"
                         className="radio radio-sm checked:bg-green-800"
                         checked={yPercentage === '10%'}
-                        onClick={() => setYPercentage('10%')}
+                        onChange={() => setYPercentage('10%')}
                       />
                       <span>10%</span>
                     </div>
@@ -789,7 +790,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         name="radio-11"
                         className="radio radio-sm checked:bg-green-800"
                         checked={yPercentage === '50%'}
-                        onClick={() => setYPercentage('50%')}
+                        onChange={() => setYPercentage('50%')}
                       />
                       <span>50%</span>
                     </div>
@@ -802,7 +803,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         name="radio-12"
                         className="radio radio-sm checked:bg-green-800"
                         checked={zPercentage === 'No'}
-                        onClick={() => setZPercentage('No')}
+                        onChange={() => setZPercentage('No')}
                       />
                       <span>No {mode}</span>
                     </div>
@@ -812,7 +813,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         name="radio-12"
                         className="radio radio-sm checked:bg-green-800"
                         checked={zPercentage === '10%'}
-                        onClick={() => setZPercentage('10%')}
+                        onChange={() => setZPercentage('10%')}
                       />
                       <span>10%</span>
                     </div>
@@ -822,7 +823,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         name="radio-12"
                         className="radio radio-sm checked:bg-green-800"
                         checked={zPercentage === '50%'}
-                        onClick={() => setZPercentage('50%')}
+                        onChange={() => setZPercentage('50%')}
                       />
                       <span>50%</span>
                     </div>

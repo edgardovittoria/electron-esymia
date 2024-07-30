@@ -13,9 +13,9 @@ export const useStorage = () => {
   const dispatch = useDispatch();
   const homePath = useSelector(homePathSelector)
   const loadProjectsOnline = (setLoginSpinner: (v: boolean) => void) => {
-    execQuery(getFoldersByOwner, user.email).then(
+    execQuery(getFoldersByOwner, user.email, dispatch).then(
       (folders: FaunaFolder[]) => {
-        execQuery(getSimulationProjectsByOwner, user.email).then(
+        execQuery(getSimulationProjectsByOwner, user.email, dispatch).then(
           (projects: FaunaProject[]) => {
             const rootFaunaFolder = {
               id: 'root',

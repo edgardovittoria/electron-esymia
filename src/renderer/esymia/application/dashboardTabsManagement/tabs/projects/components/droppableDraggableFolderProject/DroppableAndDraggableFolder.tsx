@@ -102,6 +102,7 @@ export const DroppableAndDraggableFolder: React.FC<
               parentFolder: dropTargetFolder.faunaDocumentId,
             } as Project,
             objectToMove.parentFolder,
+            dispatch
           );
         } else {
           dispatch(
@@ -117,6 +118,7 @@ export const DroppableAndDraggableFolder: React.FC<
               parent: dropTargetFolder.faunaDocumentId,
             } as Folder,
             (objectToMove as Folder).parent,
+            dispatch
           );
         }
       }
@@ -187,6 +189,7 @@ export const DroppableAndDraggableFolder: React.FC<
                             moveFolderInFauna,
                             { ...folder, parent: f.faunaDocumentId } as Folder,
                             folder.parent,
+                            dispatch
                           );
                           hideAll();
                         }}
@@ -229,6 +232,7 @@ export const DroppableAndDraggableFolder: React.FC<
                   deleteFolderFromFauna,
                   folder.faunaDocumentId,
                   folder.parent,
+                  dispatch
                 );
                 takeAllProjectsInArrayOf([folder]).forEach(p => {deleteProjectStoredMeshData(p)})
                 dispatch(removeFolder(folder));

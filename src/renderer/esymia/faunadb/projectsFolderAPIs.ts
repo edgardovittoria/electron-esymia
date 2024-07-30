@@ -16,6 +16,12 @@ import {
   convertInFaunaFolderDetailsThis,
   convertInFaunaProjectThis,
 } from './apiAuxiliaryFunctions';
+import {
+  setIsAlertInfoModal,
+  setMessageInfoModal,
+  setShowInfoModal,
+} from '../store/tabsAndMenuItemsSlice';
+import { Dispatch } from '@reduxjs/toolkit';
 
 /* export const execQueryCustom = async (queryFunction: (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, ...params: any) => Promise<any>, token: string, ...queryParams: any) => {
   try {
@@ -31,6 +37,7 @@ export const getFoldersByOwner = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   owner: string,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -53,14 +60,15 @@ export const getFoldersByOwner = async (
         ),
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response as FaunaFolder[];
 };
 
@@ -68,6 +76,7 @@ export const getFoldersByOwnerUsername = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   owner: string,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -93,14 +102,15 @@ export const getFoldersByOwnerUsername = async (
         ),
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response as FaunaFolder[];
 };
 
@@ -108,6 +118,7 @@ export const getSimulationProjectsByOwner = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   owner: string,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -133,14 +144,15 @@ export const getSimulationProjectsByOwner = async (
         ),
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response as FaunaProject[];
 };
 
@@ -148,6 +160,7 @@ export const createFolderInFauna = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   folderToSave: Folder,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -159,14 +172,15 @@ export const createFolderInFauna = async (
         } as FaunaFolderDetails,
       }),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response;
 };
 
@@ -175,6 +189,7 @@ export const deleteFolderFromFauna = async (
   faunaQuery: typeof faunadb.query,
   folderToDelete: string,
   oldParent: string,
+  dispatch: Dispatch
 ) => {
   faunaClient
     .query(faunaQuery.Call('get_all_subfolders_of_folder', folderToDelete))
@@ -214,6 +229,15 @@ export const deleteFolderFromFauna = async (
                 oldParent,
               ),
             );
+        })
+        .catch((err) => {
+          dispatch(
+            setMessageInfoModal(
+              'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+            ),
+          );
+          dispatch(setIsAlertInfoModal(false));
+          dispatch(setShowInfoModal(true));
         });
     });
 };
@@ -223,6 +247,7 @@ export const addIDInSubFoldersList = async (
   faunaQuery: typeof faunadb.query,
   folderFaunaID: string,
   selectedFolder: Folder,
+  dispatch: Dispatch,
 ) => {
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
@@ -240,14 +265,15 @@ export const addIDInSubFoldersList = async (
         },
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response;
 };
 
@@ -256,6 +282,7 @@ export const removeIDInSubFoldersList = async (
   faunaQuery: typeof faunadb.query,
   folderFaunaID: string,
   selectedFolder: Folder,
+  dispatch: Dispatch,
 ) => {
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
@@ -275,14 +302,15 @@ export const removeIDInSubFoldersList = async (
         },
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response;
 };
 
@@ -291,6 +319,7 @@ export const deleteSimulationProjectFromFauna = async (
   faunaQuery: typeof faunadb.query,
   projectToDelete: string,
   parentFolder: string,
+  dispatch: Dispatch,
 ) => {
   faunaClient
     .query(
@@ -318,6 +347,7 @@ export const removeIDInFolderProjectsList = async (
   faunaQuery: typeof faunadb.query,
   projectFaunaID: string,
   selectedFolder: Folder,
+  dispatch: Dispatch,
 ) => {
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
@@ -337,14 +367,15 @@ export const removeIDInFolderProjectsList = async (
         },
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response;
 };
 
@@ -352,6 +383,7 @@ export const createSimulationProjectInFauna = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   projectToSave: Project,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -359,14 +391,15 @@ export const createSimulationProjectInFauna = async (
         data: { ...projectToSave } as FaunaProjectDetails,
       }),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response;
 };
 
@@ -375,6 +408,7 @@ export const addIDInFolderProjectsList = async (
   faunaQuery: typeof faunadb.query,
   projectFaunaID: string,
   selectedFolder: Folder,
+  dispatch: Dispatch,
 ) => {
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
@@ -392,14 +426,15 @@ export const addIDInFolderProjectsList = async (
         },
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response;
 };
 
@@ -407,6 +442,7 @@ export const updateProjectInFauna = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   projectToUpdate: FaunaProject,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -420,14 +456,15 @@ export const updateProjectInFauna = async (
         },
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response;
 };
 
@@ -435,6 +472,7 @@ export const updateFolderInFauna = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   folderToUpdate: Folder,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -448,14 +486,15 @@ export const updateFolderInFauna = async (
         },
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response;
 };
 
@@ -464,6 +503,7 @@ export const moveFolderInFauna = async (
   faunaQuery: typeof faunadb.query,
   folderToMove: Folder,
   oldParent: string,
+  dispatch: Dispatch
 ) => {
   faunaClient
     .query(
@@ -494,6 +534,15 @@ export const moveFolderInFauna = async (
             folderToMove.parent,
           ),
         );
+    })
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
     });
 };
 
@@ -502,6 +551,7 @@ export const moveProjectInFauna = async (
   faunaQuery: typeof faunadb.query,
   projectToUpdate: Project,
   oldParent: string,
+  dispatch: Dispatch
 ) => {
   faunaClient
     .query(
@@ -534,6 +584,15 @@ export const moveProjectInFauna = async (
             projectToUpdate.parentFolder,
           ),
         );
+    })
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
     });
 };
 
@@ -541,6 +600,7 @@ export const getSharedSimulationProjects = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   user: string,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -566,14 +626,15 @@ export const getSharedSimulationProjects = async (
         ),
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response as FaunaProject[];
 };
 
@@ -581,6 +642,7 @@ export const getSharedFolders = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   user: string,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -606,14 +668,15 @@ export const getSharedFolders = async (
         ),
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response as FaunaFolder[];
 };
 
@@ -621,20 +684,28 @@ export const recursiveUpdateSharingInfoFolderInFauna = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   folderToUpdate: Folder,
+  dispatch: Dispatch,
 ) => {
   const allFolders = recursiveFindFolders(folderToUpdate, []);
-  allFolders.forEach((f) => updateFolderInFauna(faunaClient, faunaQuery, f));
+  allFolders.forEach((f) =>
+    updateFolderInFauna(faunaClient, faunaQuery, f, dispatch),
+  );
   const allProjects = takeAllProjectsIn(folderToUpdate);
   allProjects.forEach((p) =>
-    updateProjectInFauna(faunaClient, faunaQuery, convertInFaunaProjectThis(p)),
+    updateProjectInFauna(
+      faunaClient,
+      faunaQuery,
+      convertInFaunaProjectThis(p),
+      dispatch,
+    ),
   );
 };
-
 
 export const getUserSessionInfo = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   user: string,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -660,22 +731,23 @@ export const getUserSessionInfo = async (
         ),
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response as FaunaProject[];
 };
-
 
 export const updateUserSessionInfo = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
-  userSessionInfo: FaunaUserSessionInfo
+  userSessionInfo: FaunaUserSessionInfo,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
@@ -689,36 +761,38 @@ export const updateUserSessionInfo = async (
         },
       ),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response;
 };
-
 
 export const createUserSessionInfo = async (
   faunaClient: faunadb.Client,
   faunaQuery: typeof faunadb.query,
   userSessionInfo: UserSessionInfo,
+  dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
       faunaQuery.Create(faunaQuery.Collection('UserSessionManagement'), {
-        data: userSessionInfo
+        data: userSessionInfo,
       }),
     )
-    .catch((err) =>
-      console.error(
-        'Error: [%s] %s: %s',
-        err.name,
-        err.message,
-        err.errors()[0].description,
-      ),
-    );
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
   return response;
 };

@@ -106,7 +106,7 @@ const MyProject: React.FC<ContextMenuProps> = ({
               deleteFileS3(model.components)
                 .then(() => {
                   // cancellare documento fauna
-                  execQuery(deleteFaunadbModel, model.id as string)
+                  execQuery(deleteFaunadbModel, model.id as string, dispatch)
                     .then(() => {
                       deleteModel(model);
                       return 'deleted';

@@ -44,8 +44,8 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 
 	useEffect(() => {
     setSpinner(true)
-		execQuery(getSharedFolders, user.email).then((folders: FaunaFolder[]) => {
-			execQuery(getSharedSimulationProjects, user.email).then(
+		execQuery(getSharedFolders, user.email, dispatch).then((folders: FaunaFolder[]) => {
+			execQuery(getSharedSimulationProjects, user.email, dispatch).then(
 				(projects: FaunaProject[]) => {
 					const sharedElementsRootFolder = {
 						id: 'shared_root',

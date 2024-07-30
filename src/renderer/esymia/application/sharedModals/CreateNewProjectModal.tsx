@@ -59,7 +59,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         sharedWith: (selectedFolder?.faunaDocumentId === 'root') ? [] as sharingInfoUser[] : selectedFolder?.sharedWith as sharingInfoUser[],
         parentFolder: selectedFolder?.faunaDocumentId as string
       };
-      execQuery(createSimulationProjectInFauna, newProject).then((res: any) => {
+      execQuery(createSimulationProjectInFauna, newProject, dispatch).then((res: any) => {
         newProject = {
           ...newProject,
           faunaDocumentId: res.ref.value.id

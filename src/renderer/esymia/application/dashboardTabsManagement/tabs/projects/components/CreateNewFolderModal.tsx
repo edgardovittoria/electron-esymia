@@ -39,10 +39,10 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
                 subFolders: [],
                 parent: selectedFolder.faunaDocumentId as string,
             }
-            execQuery(createFolderInFauna, newFolder).then((ret: any) => {
+            execQuery(createFolderInFauna, newFolder, dispatch).then((ret: any) => {
                 newFolder = { ...newFolder, faunaDocumentId: ret.ref.value.id }
                 dispatch(addFolder(newFolder));
-                (selectedFolder.faunaDocumentId !== 'root') && execQuery(addIDInSubFoldersList, newFolder.faunaDocumentId, selectedFolder)
+                (selectedFolder.faunaDocumentId !== 'root') && execQuery(addIDInSubFoldersList, newFolder.faunaDocumentId, selectedFolder, dispatch)
             })
             setShowNewFolderModal(false)
         } else {

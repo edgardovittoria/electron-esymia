@@ -90,7 +90,7 @@ const RenameModal: FC<{
                               ...model,
                               name,
                             };
-                            execQuery(updateModelInFauna, newModel)
+                            execQuery(updateModelInFauna, newModel, dispatch)
                               .then(() => {
                                 dispatch(updateModel(newModel));
                                 toast.success('Model Name Updated!');

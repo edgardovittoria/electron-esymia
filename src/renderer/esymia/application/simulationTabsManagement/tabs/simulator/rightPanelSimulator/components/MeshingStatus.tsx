@@ -316,6 +316,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
               meshGenerated: 'Generated',
             },
           }),
+          dispatch
         ).then(() => {});
       }
       dispatch(setMeshingProgress(undefined));

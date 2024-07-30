@@ -184,7 +184,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
                                   ...selectedModel,
                                   components: res.key,
                                 };
-                                execQuery(updateModelInFauna, newModel)
+                                execQuery(updateModelInFauna, newModel, dispatch)
                                   .then(() => {
                                     dispatch(updateModel(newModel));
                                     toast.success('Model updated!');

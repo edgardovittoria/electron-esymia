@@ -76,6 +76,7 @@ export const Physics: React.FC<PhysicsProps> = ({
       execQuery(
         updateProjectInFauna,
         convertInFaunaProjectThis(selectedProject),
+        dispatch
       ).then(() => {});
     }
   }, [savedPhysicsParameters]);

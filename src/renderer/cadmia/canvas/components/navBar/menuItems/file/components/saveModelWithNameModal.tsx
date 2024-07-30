@@ -8,6 +8,7 @@ import faunadb from 'faunadb';
 import { unitSelector } from '../../../../statusBar/statusBarSlice';
 import { uploadFileS3 } from '../../../../../../aws/crud';
 import { addModel, setLoadingSpinner } from '../../../../../../store/modelSlice';
+import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../../../../../../esymia/store/tabsAndMenuItemsSlice';
 
 export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
   showModalSave,
@@ -38,16 +39,13 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
           message: any;
           errors: () => { description: any }[];
         }) => {
-          console.error(
-            'Error: [%s] %s: %s',
-            err.name,
-            err.message,
-            err.errors()[0].description,
-          );
           dispatch(setLoadingSpinner(false))
           toast.error(
-            'ERROR! Model not saved, please check the console log for more details.',
+            'ERROR! Model not saved.',
           );
+          dispatch(setMessageInfoModal('Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.'));
+          dispatch(setIsAlertInfoModal(false));
+          dispatch(setShowInfoModal(true));
         },
       );
     return response;

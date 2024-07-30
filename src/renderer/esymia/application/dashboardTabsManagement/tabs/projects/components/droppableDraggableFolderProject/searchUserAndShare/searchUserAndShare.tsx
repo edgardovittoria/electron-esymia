@@ -100,7 +100,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
 
   useEffect(() => {
     if (shareDone) {
-      execQuery(recursiveUpdateSharingInfoFolderInFauna, folderToShare)
+      execQuery(recursiveUpdateSharingInfoFolderInFauna, folderToShare, dispatch)
         .then(() => {
           setShowSearchUser(false);
           toast.success('Sharing Successful!');
@@ -192,7 +192,8 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                             meshData: {
                               meshGenerated: "Not Generated",
                               meshApproved: false,
-                              quantum: [0,0,0]
+                              quantum: [0,0,0],
+                              pathToExternalGridsNotFound: false
                             },
                             sharedWith: [
                               ...(projectToShare?.sharedWith as sharingInfoUser[]),
@@ -203,7 +204,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                               } as sharingInfoUser,
                             ],
                           }
-                          execQuery(createSimulationProjectInFauna, newProject).then((res: any) => {
+                          execQuery(createSimulationProjectInFauna, newProject, dispatch).then((res: any) => {
                             newProject = {
                               ...newProject,
                               faunaDocumentId: res.ref.value.id

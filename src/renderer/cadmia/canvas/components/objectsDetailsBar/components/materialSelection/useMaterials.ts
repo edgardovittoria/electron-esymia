@@ -2,11 +2,14 @@ import { Material, useFaunaQuery } from "cad-library";
 import {useEffect, useState} from "react";
 import faunadb from 'faunadb'
 import { useAuth0 } from "@auth0/auth0-react";
+import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from "../../../../../../esymia/store/tabsAndMenuItemsSlice";
+import { useDispatch } from "react-redux";
 
 export const useMaterials = () => {
     const {user} = useAuth0()
     const [availableMaterials, setAvailableMaterials] = useState<Material[]>([]);
     const {execQuery} = useFaunaQuery()
+    const dispatch = useDispatch()
     async function getMaterials(faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query) {
         const response = await faunaClient.query(
             faunaQuery.Select("data",
@@ -16,12 +19,15 @@ export const useMaterials = () => {
                 )
             )
         )
-            .catch((err) => console.error(
-                'Error: [%s] %s: %s',
-                err.name,
-                err.message,
-                err.errors()[0].description,
-            ));
+            .catch((err) => {
+              dispatch(
+                setMessageInfoModal(
+                  'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+                ),
+              );
+              dispatch(setIsAlertInfoModal(false));
+              dispatch(setShowInfoModal(true));
+            });
         return response as Material[]
     }
 

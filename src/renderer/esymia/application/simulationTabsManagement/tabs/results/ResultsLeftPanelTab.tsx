@@ -68,6 +68,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                             meshApproved: false,
                           },
                         } as Project),
+                        dispatch
                       );
                     }}
                   >

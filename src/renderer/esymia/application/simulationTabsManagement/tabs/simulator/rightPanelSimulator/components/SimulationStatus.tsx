@@ -297,6 +297,7 @@ const SimulationStatusItem: React.FC<{
             ...associatedProject,
             simulation: simulationUpdated,
           } as Project),
+          dispatch
         ).then(() => {});
         if (!solverResults.partial) {
           setRunningSimulation(undefined);

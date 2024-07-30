@@ -88,7 +88,7 @@ export const RenameProject: React.FC<RenameProjectProps> = (
                                                 execQuery(updateProjectInFauna, convertInFaunaProjectThis({
                                                     ...projectToRename,
                                                     name: name
-                                                } as Project))
+                                                } as Project), dispatch)
                                                 handleClose()
                                             }}
                                         >

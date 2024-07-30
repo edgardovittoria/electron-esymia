@@ -322,6 +322,7 @@ export const useStorageData = () => {
       deleteSimulationProjectFromFauna,
       project.faunaDocumentId,
       project.parentFolder,
+      dispatch
     );
   };
 
@@ -333,6 +334,7 @@ export const useStorageData = () => {
       deleteSimulationProjectFromFauna,
       project.faunaDocumentId,
       project.parentFolder,
+      dispatch
     );
   };
 
@@ -381,7 +383,7 @@ export const useStorageData = () => {
       },
       name: `${project?.name}_copy`,
     } as Project;
-    execQuery(createSimulationProjectInFauna, clonedProject).then(
+    execQuery(createSimulationProjectInFauna, clonedProject, dispatch).then(
       (res: any) => {
         if(project.meshData.meshGenerated === "Generated"){
           s3.copyObject({
@@ -409,12 +411,13 @@ export const useStorageData = () => {
                   associatedProject: res.ref.value.id,
                 } : undefined
               } as Project;
-              execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject)).then(() => {
+              execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
                 selectedFolder?.faunaDocumentId !== 'root' &&
                 execQuery(
                   addIDInFolderProjectsList,
                   clonedProject.faunaDocumentId,
                   selectedFolder,
+                  dispatch
                 );
               dispatch(addProject(clonedProject));
               dispatch(addProjectTab(clonedProject));
@@ -433,6 +436,7 @@ export const useStorageData = () => {
               addIDInFolderProjectsList,
               clonedProject.faunaDocumentId,
               selectedFolder,
+              dispatch
             );
           dispatch(addProject(clonedProject));
           dispatch(addProjectTab(clonedProject));

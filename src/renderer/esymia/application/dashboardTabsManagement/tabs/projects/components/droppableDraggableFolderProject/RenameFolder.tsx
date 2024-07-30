@@ -80,7 +80,7 @@ export const RenameFolder: React.FC<RenameFolderProps> = (
                                                 execQuery(updateFolderInFauna, {
                                                     ...folderToRename,
                                                     name: name
-                                                } as Folder)
+                                                } as Folder, dispatch)
                                                 handleClose()
                                             }}
                                         >

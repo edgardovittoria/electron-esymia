@@ -145,6 +145,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                               parentFolder: f.faunaDocumentId,
                             } as Project,
                             project.parentFolder,
+                            dispatch
                           );
                           hideAll();
                         }}

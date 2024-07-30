@@ -52,7 +52,7 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
         })
         .catch((err) => console.log(err));
       if (selectedMenuItem === 'MSP') {
-        execQuery(getSharedModels, user.email)
+        execQuery(getSharedModels, user.email, dispatch)
           .then((mods) => {
             dispatch(setSharedModel(mods));
           })
