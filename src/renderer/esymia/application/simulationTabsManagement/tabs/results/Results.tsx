@@ -161,7 +161,7 @@ export const Results: React.FC<ResultsProps> = ({
         </div>
         {selectedTabLeftPanel && (
           <>
-            <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[15%]">
+            <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]">
               {selectedTabLeftPanel === resultsLeftPanelTitle.first && (
                 <ResultsLeftPanelTab
                   selectedPort={selectedPort ? selectedPort.name : 'undefined'}

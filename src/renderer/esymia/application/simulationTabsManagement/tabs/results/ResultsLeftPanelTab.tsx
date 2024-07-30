@@ -33,13 +33,70 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
           <div>
             <>
               <div
-                className="flex mb-2 p-[5px] border-2 border-gray-200 rounded-xl gap-2"
+                className="flex mb-2 p-[5px] border-b-2 border-gray-200 gap-2"
                 key={selectedProject.simulation.name}
               >
-                <span className="w-[90%] text-left text-sm">
+                <span className="w-[90%] text-left text-sm font-bold">
                   {selectedProject.simulation.name}
                 </span>
               </div>
+              {selectedProject.simulation && selectedProject.simulation.status === "Completed" && (
+                <div className="mt-5 flex flex-col items-start gap-2">
+                  <div className="relative w-full px-3 pt-5 pb-2 flex flex-col gap-2 items-start border rounded border-gray-800">
+                    <span className="absolute top-[-13px] font-bold bg-white px-1">
+                      Time Info
+                    </span>
+                    <span>
+                      Started:{' '}
+                      <span className="font-semibold">
+                        {new Date(
+                          parseInt(selectedProject.simulation.started),
+                        ).toLocaleString()}
+                      </span>
+                    </span>
+                    <span>
+                      Ended:{' '}
+                      <span className="font-semibold">
+                        {new Date(
+                          parseInt(selectedProject.simulation.ended),
+                        ).toLocaleString()}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="relative w-full mt-3 mb-3 px-3 pt-5 pb-2 flex flex-col gap-2 items-start border rounded border-gray-800">
+                    <span className="absolute top-[-13px] font-bold bg-white px-1">
+                      Server Params
+                    </span>
+                    <span>
+                      Inner Iter.:{' '}
+                      <span className="font-semibold">
+                        {
+                          selectedProject.simulation.solverAlgoParams
+                            .innerIteration
+                        }
+                      </span>
+                    </span>
+                    <span>
+                      Outer Iter.:{' '}
+                      <span className="font-semibold">
+                        {
+                          selectedProject.simulation.solverAlgoParams
+                            .outerIteration
+                        }
+                      </span>
+                    </span>
+                    <span>
+                      Convergence treshold:{' '}
+                      <span className="font-semibold">
+                        {
+                          selectedProject.simulation.solverAlgoParams
+                            .convergenceThreshold
+                        }
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              )}
               {selectedProject?.simulation &&
                 selectedProject.simulation.status == 'Completed' && (
                   <button
@@ -68,7 +125,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                             meshApproved: false,
                           },
                         } as Project),
-                        dispatch
+                        dispatch,
                       );
                     }}
                   >
