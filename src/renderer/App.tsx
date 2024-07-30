@@ -23,6 +23,7 @@ import {
 import { ImSpinner } from 'react-icons/im';
 import { brokerConnectedSelector } from './esymia/store/tabsAndMenuItemsSlice';
 import { useDemoMode } from './useDemoMode';
+import { MesherStatusSelector, SolverStatusSelector } from './esymia/store/pluginsSlice';
 
 // export const client = new Client({
 //   brokerURL: 'ws://localhost:15674/ws'
@@ -34,6 +35,9 @@ export default function App() {
   const brokerActive = useSelector(brokerConnectedSelector);
   const [dockerInstallationBox, setDockerInstallationBox] =
     useState<boolean>(false);
+  const mesherStatus = useSelector(MesherStatusSelector)
+  const solverStatus = useSelector(SolverStatusSelector)
+  const [logout, setLogout] = useState(false)
   // const [brokerActive, setBrokerActive] = useState<boolean>(false);
   // const [progressBarValue, setProgressBarValue] = useState<number>(0)
 
@@ -44,9 +48,9 @@ export default function App() {
   //let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
 
   useEffect(() => {
-    window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
-      dispatch(setHomePat(res));
-    });
+    // window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
+    //   dispatch(setHomePat(res));
+    // });
     window.electron.ipcRenderer.sendMessage('runBroker', []);
     dispatch(connectStomp());
     return () => {
@@ -62,6 +66,38 @@ export default function App() {
       console.log(s.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
     })
   });
+
+  window.electron.ipcRenderer.on('checkLogout', (arg) => {
+    if((arg as string) == 'allowed'){
+      if(mesherStatus != 'idle'){
+        dispatch(
+          publishMessage({
+            queue: 'management',
+            body: { message: 'stop' },
+          }),
+        );
+      }
+      if(solverStatus != 'idle'){
+        dispatch(
+          publishMessage({
+            queue: 'management_solver',
+            body: { message: 'stop' },
+          }),
+        );
+      }
+      setLogout(true)
+    }
+  });
+
+  useEffect(() => {
+    if(logout){
+      window.electron.ipcRenderer.sendMessage('logout', [
+        process.env.REACT_APP_AUTH0_DOMAIN,
+      ]);
+      setLogout(false)
+    }
+  }, [logout])
+
 
   // useEffect(() => {
   //   if(progressBarValue !== 70){
@@ -79,6 +115,7 @@ export default function App() {
   const activeSimulations = useSelector(activeSimulationsSelector);
   const [feedbackSimulationVisible, setFeedbackSimulationVisible] =
     useState<boolean>(false);
+
   useEffect(() => {
     if (activeSimulations.length > 0) {
       setFeedbackSimulationVisible(true);
@@ -93,6 +130,8 @@ export default function App() {
       setFeedbackMeshingVisible(true);
     }
   }, [activeMeshing.length]);
+
+
   return (
     <>
       {dockerInstallationBox && allowedUser && (
@@ -182,22 +221,8 @@ export default function App() {
                       <div
                         className="flex items-center p-[5px] hover:bg-black hover:text-white hover:cursor-pointer"
                         onClick={() => {
-                          window.electron.ipcRenderer.sendMessage('logout', [
-                            process.env.REACT_APP_AUTH0_DOMAIN,
-                          ]);
+                          window.electron.ipcRenderer.sendMessage('checkLogout');
                           //closeUserSessionOnFauna()
-                          dispatch(
-                            publishMessage({
-                              queue: 'management',
-                              body: { message: 'stop' },
-                            }),
-                          );
-                          dispatch(
-                            publishMessage({
-                              queue: 'management_solver',
-                              body: { message: 'stop' },
-                            }),
-                          );
                         }}
                       >
                         <HiOutlineLogout className="w-[20px] h-[20px] mr-[10px]" />

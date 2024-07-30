@@ -26,6 +26,7 @@ export type Channels =
   | 'getMac'
   | 'meshingComputation'
   | 'solvingComputation'
+  | 'checkLogout'
   ;
 
 const electronHandler = {

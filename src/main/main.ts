@@ -165,6 +165,15 @@ ipcMain.handle('api:call', async (e, args) => {
   return response.data;
 });
 
+ipcMain.on('checkLogout', (e, args) => {
+  if (meshingComputations || solvingComputations){
+    dialog.showErrorBox('PAY ATTENTION', 'You have pending operations server side, complete or stop them before logout.')
+  }
+  else {
+    e.reply("checkLogout", 'allowed')
+  }
+});
+
 ipcMain.on('logout', (e, args) => {
   BrowserWindow.getAllWindows().forEach((win) => {
     win
