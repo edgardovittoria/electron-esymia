@@ -7,6 +7,7 @@ export const stompMiddleware: Middleware = (dispatch) => {
 
   const client = new Client({
     brokerURL: 'ws://localhost:15674/ws'
+    //brokerURL: 'ws://104.197.212.45:15674/ws'
     // connectHeaders: {
     //   login: 'user',
     //   passcode: 'password',

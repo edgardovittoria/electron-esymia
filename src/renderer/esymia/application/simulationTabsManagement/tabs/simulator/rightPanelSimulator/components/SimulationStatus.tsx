@@ -61,14 +61,12 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
     { simulation: Simulation; freqNumber: number; project: Project }[]
   >([]);
 
-
   useEffect(() => {
-    window.electron.ipcRenderer.sendMessage('solvingComputation', [true])
+    window.electron.ipcRenderer.sendMessage('solvingComputation', [true]);
     return () => {
-      window.electron.ipcRenderer.sendMessage('solvingComputation', [false])
-    }
-  }, [])
-
+      window.electron.ipcRenderer.sendMessage('solvingComputation', [false]);
+    };
+  }, []);
 
   useEffect(() => {
     activeSimulations.forEach((sim) => {
@@ -291,15 +289,15 @@ const SimulationStatusItem: React.FC<{
             value: simulationUpdated,
           }),
         );
-        execQuery(
-          updateProjectInFauna,
-          convertInFaunaProjectThis({
-            ...associatedProject,
-            simulation: simulationUpdated,
-          } as Project),
-          dispatch
-        ).then(() => {});
         if (!solverResults.partial) {
+          execQuery(
+            updateProjectInFauna,
+            convertInFaunaProjectThis({
+              ...associatedProject,
+              simulation: simulationUpdated,
+            } as Project),
+            dispatch,
+          ).then(() => {});
           setRunningSimulation(undefined);
         }
       }
