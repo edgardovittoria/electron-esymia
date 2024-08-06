@@ -12,11 +12,13 @@ import {
   selectedProjectSelector,
 } from '../../../../store/projectSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { classNames } from '../../../../../cadmia/canvas/components/navBar/NavBar';
 import {
   generateTerminationName,
   getDefaultLumped,
   getDefaultPort,
 } from './portManagement/selectPorts/portLumpedProbeGenerator';
+import { BsFiletypeCsv } from 'react-icons/bs';
 
 const GREY = '#CCC';
 const GREY_LIGHT = 'rgba(255, 255, 255, 0.4)';
@@ -30,20 +32,23 @@ const GREY_DIM = '#686868';
 const styles = {
   zone: {
     alignItems: 'center',
-    border: `2px dashed ${GREY}`,
-    borderRadius: 20,
+    borderRadius: 5,
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
     justifyContent: 'center',
-    padding: 20,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 6,
+    paddingBottom: 6,
+    background: 'white',
   } as CSSProperties,
   file: {
     background: 'linear-gradient(to bottom, #EEE, #DDD)',
-    borderRadius: 20,
+    borderRadius: 10,
     display: 'flex',
-    height: 120,
-    width: 120,
+    height: 100,
+    width: '100%',
     position: 'relative',
     zIndex: 10,
     flexDirection: 'column',
@@ -53,20 +58,20 @@ const styles = {
     alignItems: 'center',
     display: 'flex',
     flexDirection: 'column',
-    paddingLeft: 10,
-    paddingRight: 10,
+    marginLeft: 10,
+    marginRight: 10,
   } as CSSProperties,
   size: {
-    backgroundColor: GREY_LIGHT,
-    borderRadius: 3,
     marginBottom: '0.5em',
     justifyContent: 'center',
     display: 'flex',
+    fontSize: 12,
   } as CSSProperties,
   name: {
     backgroundColor: GREY_LIGHT,
     borderRadius: 3,
-    fontSize: 12,
+    padding: 9,
+    fontSize: 10,
     marginBottom: '0.5em',
   } as CSSProperties,
   progressBar: {
@@ -197,6 +202,7 @@ export const LumpedImportFromCSV: FC = () => {
         <>
           <div
             {...getRootProps()}
+            className='hover:cursor-pointer'
             style={Object.assign(
               {},
               styles.zone,
@@ -232,7 +238,11 @@ export const LumpedImportFromCSV: FC = () => {
                 </div>
               </>
             ) : (
-              'Lumped from CSV'
+              <div className='flex flex-row gap-2 items-center'>
+                <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
+                <span >Import Lumped</span>
+              </div>
+
             )}
           </div>
         </>

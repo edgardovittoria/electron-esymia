@@ -17,6 +17,7 @@ import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
 import { isTerminationNameValid } from './portManagement/selectPorts/portLumpedProbeGenerator';
 import { DebounceInput } from 'react-debounce-input';
 import toast from 'react-hot-toast';
+import { MdDeleteSweep } from 'react-icons/md';
 
 interface PhysicsLeftPanelTabProps {}
 
@@ -33,35 +34,39 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   return (
     <>
       {selectedProject && selectedProject.ports.length !== 0 ? (
-        <div className="lg:max-h-[150px] xl:max-h-[200px] xl:h-[200px] w-[300px] overflow-y-scroll">
+        <div className="lg:max-h-[150px] xl:max-h-[200px] xl:h-[200px] overflow-y-scroll">
+          <div className="flex flex-row items-center justify-between pt-3">
           <span className="font-bold">Terminations</span>
-          <hr className="border-[1px] border-gray-300 w-full mb-2 mt-1" />
-          <div className='row'>
+          <div className='flex flex-row items-center gap-8'>
             <div
-              className="w-[15%] tooltip"
+              className="w-[15%] tooltip tooltip-left hover:cursor-pointer"
               data-tip="Delete all ports"
               onClick={() => {
                 dispatch(deleteAllPorts());
               }}
             >
-              <IoTrashOutline
+              <MdDeleteSweep
                 color="#d80233"
                 style={{ width: '20px', height: '20px' }}
+                className='hover:opacity-50'
               />
             </div>
             <div
-              className="w-[15%] tooltip"
+              className="w-[15%] tooltip tooltip-left hover:cursor-pointer"
               data-tip="Delete all lumped"
               onClick={() => {
                 dispatch(deleteAllLumped());
               }}
             >
-              <IoTrashOutline
-                color="#d80233"
+              <MdDeleteSweep
+                color="violet"
                 style={{ width: '20px', height: '20px' }}
+                className='hover:opacity-50'
               />
             </div>
           </div>
+          </div>
+          <hr className="border-[1px] border-gray-300 w-full mb-2 mt-1" />
           <ul className="list-none pl-3 mb-0">
             {selectedProject.ports &&
               selectedProject.ports.map((port) => {
@@ -179,15 +184,15 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
           </ul>
         </div>
       ) : (
-        <div className="text-center lg:max-h-[150px] xl:max-h-[300px] xl:h-[300px] lg:overflow-y-scroll xl:overflow-y-hidden">
+        <div className="text-center">
           <img
             src={noPhysicsIcon}
-            className="mx-auto xl:mt-[20px] w-1/2"
+            className="mx-auto xl:mt-[20px] w-1/4"
             alt="No Physics"
           />
           <h5 className="lg:text-sm xl:text-xl">No Physics applied</h5>
           <p className="mt-[20px] text-sm">
-            Select a tool from the Physics Toolbar and apply it to geometry in
+            Add ports or lumpeds and apply them to geometry in
             the 3D View.
           </p>
         </div>

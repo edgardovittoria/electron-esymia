@@ -109,7 +109,7 @@ export const Physics: React.FC<PhysicsProps> = ({
         setSavedPortParameters={setSavedPhysicsParameters}
         setSurfaceAdvices={setSurfaceAdvices}
       />
-      <div className="absolute lg:left-[42%] left-[38%] gap-2 top-[180px] flex flex-row">
+      <div className="absolute lg:left-[32%] left-[28%] gap-2 top-[180px] flex flex-row">
         {selectedProject?.model.components && (
           <>
             <CreatePorts
@@ -435,7 +435,7 @@ const PhysicsRightSidebar: FC<{
         </div>
       </div>
       {(selectedTabRightPanel || selectedTabLeftPanel) && (
-        <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded">
+        <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded w-1/5">
           {selectedTabLeftPanel === 'Termination List' && (
             <PhysicsLeftPanelTab />
           )}
