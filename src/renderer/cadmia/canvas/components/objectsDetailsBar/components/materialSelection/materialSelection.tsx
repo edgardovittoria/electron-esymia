@@ -25,6 +25,7 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
   const [showDetails, setShowDetails] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log(availableMaterials)
     setMaterialSelected(defaultMaterial)
   }, [defaultMaterial])
 

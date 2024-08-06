@@ -18,7 +18,12 @@ import { PortPosition } from './portManagement/components/PortPosition';
 import { RLCParamsComponent } from './portManagement/components/RLCParamsComponent';
 import { ModalSelectPortType } from './portManagement/ModalSelectPortType';
 import { MyPanel } from '../../sharedElements/MyPanel';
-import { Folder, Port, Project, TempLumped } from '../../../../model/esymiaModels';
+import {
+  Folder,
+  Port,
+  Project,
+  TempLumped,
+} from '../../../../model/esymiaModels';
 import { ImportExportPhysicsSetup } from './ImportExportPhysicsSetup';
 import StatusBar from '../../sharedElements/StatusBar';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
@@ -36,10 +41,11 @@ import { FaReact } from 'react-icons/fa';
 import { SiAzurefunctions } from 'react-icons/si';
 import { GiAtom } from 'react-icons/gi';
 import { GrClone, GrStatusInfo } from 'react-icons/gr';
-import { RiListIndefinite } from "react-icons/ri";
+import { RiListIndefinite } from 'react-icons/ri';
 import { ImSpinner } from 'react-icons/im';
 import { useStorageData } from '../simulator/rightPanelSimulator/hook/useStorageData';
-
+import { LumpedImportFromCSV } from './LumpedImportFromCSV';
+import { PortImportFromCSV } from './PortImportFromCSV';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string | undefined;
@@ -50,10 +56,10 @@ export const Physics: React.FC<PhysicsProps> = ({
   selectedTabLeftPanel,
   setSelectedTabLeftPanel,
 }) => {
-  const { cloneProject } = useStorageData()
-  const [cloning, setcloning] = useState<boolean>(false)
-  const selectedProject = useSelector(selectedProjectSelector)
-  const selectedFolder = useSelector(SelectedFolderSelector)
+  const { cloneProject } = useStorageData();
+  const [cloning, setcloning] = useState<boolean>(false);
+  const selectedProject = useSelector(selectedProjectSelector);
+  const selectedFolder = useSelector(SelectedFolderSelector);
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
   const [savedPhysicsParameters, setSavedPhysicsParameters] = useState(true);
@@ -76,7 +82,7 @@ export const Physics: React.FC<PhysicsProps> = ({
       execQuery(
         updateProjectInFauna,
         convertInFaunaProjectThis(selectedProject),
-        dispatch
+        dispatch,
       ).then(() => {});
     }
   }, [savedPhysicsParameters]);
@@ -91,8 +97,8 @@ export const Physics: React.FC<PhysicsProps> = ({
   }, []);
 
   useEffect(() => {
-    setSelectedTabLeftPanel(undefined)
-  },[])
+    setSelectedTabLeftPanel(undefined);
+  }, []);
 
   return (
     <>
@@ -115,6 +121,8 @@ export const Physics: React.FC<PhysicsProps> = ({
               surfaceAdvices={surfaceAdvices}
               setSurfaceAdvices={setSurfaceAdvices}
             />
+            <PortImportFromCSV />
+            <LumpedImportFromCSV />
             <ResetFocusButton toggleResetFocus={toggleResetFocus} />
             <div className="">
               <div
@@ -150,16 +158,29 @@ export const Physics: React.FC<PhysicsProps> = ({
       />
       <div className="absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
         <button
-          disabled={selectedProject && selectedProject.simulation && selectedProject.simulation.status === "Running"}
+          disabled={
+            selectedProject &&
+            selectedProject.simulation &&
+            selectedProject.simulation.status === 'Running'
+          }
           className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
           data-tip="Clone Project"
           onClick={() => {
-            setcloning(true)
-            cloneProject(selectedProject as Project, selectedFolder as Folder, setcloning)
+            setcloning(true);
+            cloneProject(
+              selectedProject as Project,
+              selectedFolder as Folder,
+              setcloning,
+            );
           }}
         >
-          <GrClone style={{ width: '25px', height: '25px' }} className={`${cloning ? 'opacity-20' : 'opacity-100'}`} />
-          {cloning && <ImSpinner className="absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5" />}
+          <GrClone
+            style={{ width: '25px', height: '25px' }}
+            className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
+          />
+          {cloning && (
+            <ImSpinner className="absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5" />
+          )}
         </button>
       </div>
       <StatusBar />
@@ -349,34 +370,39 @@ const PhysicsRightSidebar: FC<{
   savedPhysicsParameters,
   setSavedPhysicsParameters,
   selectedTabLeftPanel,
-  setSelectedTabLeftPanel
+  setSelectedTabLeftPanel,
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
   return (
     <>
-    {/* <PhysicsLeftPanelTab /> */}
+      {/* <PhysicsLeftPanelTab /> */}
       <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
         <div
-          className={`p-2 tooltip rounded-t tooltip-right ${selectedTabLeftPanel === "Termination List" ? 'text-white bg-primaryColor' : 'text-primaryColor bg-white'}`}
+          className={`p-2 tooltip rounded-t tooltip-right ${
+            selectedTabLeftPanel === 'Termination List'
+              ? 'text-white bg-primaryColor'
+              : 'text-primaryColor bg-white'
+          }`}
           data-tip="Terminations List"
           onClick={() => {
-            if (selectedTabLeftPanel === "Termination List") {
+            if (selectedTabLeftPanel === 'Termination List') {
               setSelectedTabLeftPanel(undefined);
             } else {
-              setSelectedTabLeftPanel("Termination List");
+              setSelectedTabLeftPanel('Termination List');
             }
             setSelectedTabRightPanel(undefined);
           }}
         >
-          <RiListIndefinite
-            style={{ width: '25px', height: '25px' }}
-
-          />
+          <RiListIndefinite style={{ width: '25px', height: '25px' }} />
         </div>
         <div
-          className={`p-2 tooltip rounded-t tooltip-right ${selectedTabRightPanel === physicsRightPanelTitle.first ? 'text-white bg-primaryColor' : 'text-primaryColor bg-white'}`}
+          className={`p-2 tooltip rounded-t tooltip-right ${
+            selectedTabRightPanel === physicsRightPanelTitle.first
+              ? 'text-white bg-primaryColor'
+              : 'text-primaryColor bg-white'
+          }`}
           data-tip="Terminations Settings"
           onClick={() => {
             if (selectedTabRightPanel === physicsRightPanelTitle.first) {
@@ -387,13 +413,14 @@ const PhysicsRightSidebar: FC<{
             setSelectedTabLeftPanel(undefined);
           }}
         >
-          <GiAtom
-            style={{ width: '25px', height: '25px' }}
-
-          />
+          <GiAtom style={{ width: '25px', height: '25px' }} />
         </div>
         <div
-          className={`p-2 tooltip rounded-b tooltip-right ${selectedTabRightPanel === physicsRightPanelTitle.second ? 'text-white bg-primaryColor' : 'text-primaryColor bg-white'}`}
+          className={`p-2 tooltip rounded-b tooltip-right ${
+            selectedTabRightPanel === physicsRightPanelTitle.second
+              ? 'text-white bg-primaryColor'
+              : 'text-primaryColor bg-white'
+          }`}
           data-tip="Frequencies"
           onClick={() => {
             if (selectedTabRightPanel === physicsRightPanelTitle.second) {
@@ -404,15 +431,15 @@ const PhysicsRightSidebar: FC<{
             setSelectedTabLeftPanel(undefined);
           }}
         >
-          <SiAzurefunctions
-            style={{ width: '25px', height: '25px' }}
-          />
+          <SiAzurefunctions style={{ width: '25px', height: '25px' }} />
         </div>
       </div>
       {(selectedTabRightPanel || selectedTabLeftPanel) && (
         <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded">
-          {selectedTabLeftPanel === "Termination List" && <PhysicsLeftPanelTab />}
-          {selectedTabRightPanel === physicsRightPanelTitle.first &&
+          {selectedTabLeftPanel === 'Termination List' && (
+            <PhysicsLeftPanelTab />
+          )}
+          {selectedTabRightPanel === physicsRightPanelTitle.first && (
             <>
               {selectedPort?.category === 'lumped' ? (
                 <PortManagement selectedPort={selectedPort}>
@@ -461,20 +488,20 @@ const PhysicsRightSidebar: FC<{
                 </PortManagement>
               )}
             </>
-          }
-          {selectedTabRightPanel === physicsRightPanelTitle.second &&
+          )}
+          {selectedTabRightPanel === physicsRightPanelTitle.second && (
             <div className="flex-col px-[20px] pb-[5px] overflow-x-hidden max-w-[350px]">
-            <span className="font-bold">Frequencies Definition</span>
-            <FrequenciesDef
-              disabled={selectedProject?.simulation?.status === 'Completed'}
-              setSavedPhysicsParameters={setSavedPhysicsParameters}
-            />
-            {/* <InputSignal
+              <span className="font-bold">Frequencies Definition</span>
+              <FrequenciesDef
+                disabled={selectedProject?.simulation?.status === 'Completed'}
+                setSavedPhysicsParameters={setSavedPhysicsParameters}
+              />
+              {/* <InputSignal
                 disabled={selectedProject?.simulation?.status === 'Completed'}
                 selectedProject={selectedProject as Project}
               /> */}
-          </div>
-          }
+            </div>
+          )}
           {(selectedTabRightPanel === physicsRightPanelTitle.second ||
             (selectedTabRightPanel === physicsRightPanelTitle.first &&
               selectedPort)) && (

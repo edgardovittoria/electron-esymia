@@ -4,6 +4,8 @@ import { IoTrashOutline } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 import { BiRename } from 'react-icons/bi';
 import {
+  deleteAllLumped,
+  deleteAllPorts,
   deletePort,
   selectedProjectSelector,
   selectPort,
@@ -24,15 +26,42 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   const [portRename, setPortRename] = useState('');
 
   useEffectNotOnMount(() => {
-    selectedProject?.ports.filter(p => p.category === "port").length === 0 && dispatch(unsetScatteringValue())
-  }, [selectedProject?.ports.length])
+    selectedProject?.ports.filter((p) => p.category === 'port').length === 0 &&
+      dispatch(unsetScatteringValue());
+  }, [selectedProject?.ports.length]);
 
   return (
     <>
       {selectedProject && selectedProject.ports.length !== 0 ? (
         <div className="lg:max-h-[150px] xl:max-h-[200px] xl:h-[200px] w-[300px] overflow-y-scroll">
-          <span className='font-bold'>Terminations</span>
-          <hr className='border-[1px] border-gray-300 w-full mb-2 mt-1'/>
+          <span className="font-bold">Terminations</span>
+          <hr className="border-[1px] border-gray-300 w-full mb-2 mt-1" />
+          <div className='row'>
+            <div
+              className="w-[15%] tooltip"
+              data-tip="Delete all ports"
+              onClick={() => {
+                dispatch(deleteAllPorts());
+              }}
+            >
+              <IoTrashOutline
+                color="#d80233"
+                style={{ width: '20px', height: '20px' }}
+              />
+            </div>
+            <div
+              className="w-[15%] tooltip"
+              data-tip="Delete all lumped"
+              onClick={() => {
+                dispatch(deleteAllLumped());
+              }}
+            >
+              <IoTrashOutline
+                color="#d80233"
+                style={{ width: '20px', height: '20px' }}
+              />
+            </div>
+          </div>
           <ul className="list-none pl-3 mb-0">
             {selectedProject.ports &&
               selectedProject.ports.map((port) => {
@@ -51,7 +80,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                         : 'mt-[5px] hover:bg-gray-200 hover:cursor-pointer hover:rounded'
                     }
                     onClick={() => {
-                      dispatch(selectPort(port.name))
+                      dispatch(selectPort(port.name));
                     }}
                   >
                     <div className="flex items-center">
@@ -64,75 +93,85 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                       <div className="w-[75%] text-start">
                         <h5 className="text-[15px] font-normal">{port.name}</h5>
                       </div>
-                      {port.isSelected && !selectedProject.simulation?.results && (
-                        <div className="flex">
-                          <div
-                            className="w-[15%] tooltip mr-5"
-                            data-tip="Rename"
-                          >
-                            <label
-                              htmlFor="modalRename"
-                              onClick={() => setPortRename(port.name)}
+                      {port.isSelected &&
+                        !selectedProject.simulation?.results && (
+                          <div className="flex">
+                            <div
+                              className="w-[15%] tooltip mr-5"
+                              data-tip="Rename"
                             >
-                              <BiRename
-                                color="#464847"
-                                style={{ width: '20px', height: '20px' }}
-                              />
-                            </label>
-                          </div>
-                          <input
-                            type="checkbox"
-                            id="modalRename"
-                            className="modal-toggle"
-                          />
-                          <div className="modal">
-                            <div className="modal-box">
-                              <h3 className="font-bold text-lg">Rename Port</h3>
-                              <div className="flex justify-center items-center py-5">
-                                <DebounceInput
-                                  debounceTimeout={500}
-                                  type="text"
-                                  placeholder="Type here"
-                                  className="input input-bordered w-full max-w-xs"
-                                  value={portRename}
-                                  onChange={(e) =>
-                                    setPortRename(e.target.value)
-                                  }
+                              <label
+                                htmlFor="modalRename"
+                                onClick={() => setPortRename(port.name)}
+                              >
+                                <BiRename
+                                  color="#464847"
+                                  style={{ width: '20px', height: '20px' }}
                                 />
-                              </div>
-                              <div className="modal-action flex justify-between">
-                                <label
-                                  htmlFor="modalRename"
-                                  className="btn h-[2rem] min-h-[2rem] bg-red-500 border-red-500"
-                                >
-                                  Cancel
-                                </label>
-                                <label
-                                  htmlFor="modalRename"
-                                  className="btn h-[2rem] min-h-[2rem]"
-                                  onClick={() =>
-                                    isTerminationNameValid(portRename, selectedProject.ports) ? dispatch(setPortName(portRename)) : toast.error('Name already set! Please choose another one')
-                                  }
-                                >
-                                  Rename
-                                </label>
+                              </label>
+                            </div>
+                            <input
+                              type="checkbox"
+                              id="modalRename"
+                              className="modal-toggle"
+                            />
+                            <div className="modal">
+                              <div className="modal-box">
+                                <h3 className="font-bold text-lg">
+                                  Rename Port
+                                </h3>
+                                <div className="flex justify-center items-center py-5">
+                                  <DebounceInput
+                                    debounceTimeout={500}
+                                    type="text"
+                                    placeholder="Type here"
+                                    className="input input-bordered w-full max-w-xs"
+                                    value={portRename}
+                                    onChange={(e) =>
+                                      setPortRename(e.target.value)
+                                    }
+                                  />
+                                </div>
+                                <div className="modal-action flex justify-between">
+                                  <label
+                                    htmlFor="modalRename"
+                                    className="btn h-[2rem] min-h-[2rem] bg-red-500 border-red-500"
+                                  >
+                                    Cancel
+                                  </label>
+                                  <label
+                                    htmlFor="modalRename"
+                                    className="btn h-[2rem] min-h-[2rem]"
+                                    onClick={() =>
+                                      isTerminationNameValid(
+                                        portRename,
+                                        selectedProject.ports,
+                                      )
+                                        ? dispatch(setPortName(portRename))
+                                        : toast.error(
+                                            'Name already set! Please choose another one',
+                                          )
+                                    }
+                                  >
+                                    Rename
+                                  </label>
+                                </div>
                               </div>
                             </div>
+                            <div
+                              className="w-[15%] tooltip"
+                              data-tip="Delete"
+                              onClick={() => {
+                                dispatch(deletePort(port.name));
+                              }}
+                            >
+                              <IoTrashOutline
+                                color="#d80233"
+                                style={{ width: '20px', height: '20px' }}
+                              />
+                            </div>
                           </div>
-                          <div
-                            className="w-[15%] tooltip"
-                            data-tip="Delete"
-                            onClick={() => {
-                              dispatch(deletePort(port.name));
-                            }}
-                          >
-                            <IoTrashOutline
-                              color="#d80233"
-                              style={{ width: '20px', height: '20px' }}
-                            />
-                          </div>
-                        </div>
-                      )}
+                        )}
                     </div>
                   </li>
                 );

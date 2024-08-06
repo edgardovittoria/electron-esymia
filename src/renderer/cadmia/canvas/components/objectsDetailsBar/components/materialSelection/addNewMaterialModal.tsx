@@ -65,11 +65,11 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
         let error = undefined
         if (name === "") {
             error = "You must insert a valid name for the new material."
-        } else if (!permeability) {
+        } else if (permeability === undefined) {
             error = "You must insert a permeability value."
-        } else if (!permittivity) {
+        } else if (permittivity === undefined) {
             error = "You must insert a permittivity value."
-        } else if (!conductivity) {
+        } else if (conductivity === undefined) {
             error = "You must insert a conductivity value."
         }
 
@@ -102,13 +102,13 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
                 color: color,
                 permeability: permeability,
                 tangent_delta_permeability: tangentDeltaPermeability,
-                custom_permeability: customPermeability ? customPermeability : undefined,
+                custom_permeability: customPermeability.frequencies.length !== 0 ? customPermeability : undefined,
                 permittivity: permittivity,
                 tangent_delta_permittivity: tangentDeltaPermittivity,
-                custom_permittivity: customPermittivity ? customPermittivity : undefined,
+                custom_permittivity: customPermittivity.frequencies.length !== 0 ? customPermittivity : undefined,
                 conductivity: conductivity,
                 tangent_delta_conductivity: tangentDeltaConductivity,
-                custom_conductivity: customConductivity ? customConductivity : undefined
+                custom_conductivity: customConductivity.frequencies.length !== 0 ? customConductivity : undefined
             } as FaunaMaterial).then(() => updateMaterials())
         }
     }, [saveMaterialFlag])
@@ -228,7 +228,7 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
                                         className="border border-black rounded shadow p-1 w-[60%] text-black text-left text-sm"
                                     />
                                 </MaterialOptionMainStyle>
-                                <MaterialOptionMainStyle label="Custom Permeability">
+                                <MaterialOptionMainStyle label="Custom Permittivity">
                                     <button
                                         className="btn w-[59%] h-[2rem] min-h-[2rem] hover:cursor-pointer hover:opacity-70"
                                         onClick={() => setShowModalCustomPermittivity(true)}

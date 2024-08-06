@@ -133,6 +133,7 @@
     "react-draggable": "^4.4.4",
     "react-hot-toast": "^2.2.0",
     "react-icons": "^5.0.0",
+    "react-papaparse": "^4.4.0",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.16.0",
     "react-screen-capture": "^1.1.1",

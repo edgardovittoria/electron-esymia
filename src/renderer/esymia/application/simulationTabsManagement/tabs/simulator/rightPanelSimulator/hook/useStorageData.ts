@@ -193,30 +193,30 @@ export const useStorageData = () => {
   //   });
   // };
 
-  const loadDataFromS3 = (
-    setExternalGrids: Function,
-  ) => {
-    s3.getObject(
-      {
-        Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-        Key: selectedProject.meshData.externalGrids as string,
-      },
-      (err, data) => {
-        if (err) {
-          console.log(err);
-        }
-        setExternalGrids(
-          JSON.parse(data.Body?.toString() as string) as ExternalGridsObject,
-        );
-        dispatch(
-          setMeshGenerated({
-            status: 'Generated',
-            projectToUpdate: selectedProject.faunaDocumentId as string,
-          }),
-        );
-      },
-    );
-  };
+  // const loadDataFromS3 = (
+  //   setExternalGrids: Function,
+  // ) => {
+  //   s3.getObject(
+  //     {
+  //       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+  //       Key: selectedProject.meshData.externalGrids as string,
+  //     },
+  //     (err, data) => {
+  //       if (err) {
+  //         console.log(err);
+  //       }
+  //       setExternalGrids(
+  //         JSON.parse(data.Body?.toString() as string) as ExternalGridsObject,
+  //       );
+  //       dispatch(
+  //         setMeshGenerated({
+  //           status: 'Generated',
+  //           projectToUpdate: selectedProject.faunaDocumentId as string,
+  //         }),
+  //       );
+  //     },
+  //   );
+  // };
 
   const externalGridsDecode = (extGridsJson: any) => {
     let gridsPairs: [string, Brick[]][] = [];
@@ -288,9 +288,7 @@ export const useStorageData = () => {
     });
   };
 
-  const loadGridsFromS3 = (
-    setExternalGrids: Function,
-  ) => {
+  const loadGridsFromS3 = () => {
     dispatch(publishMessage({
       queue: 'management',
       body: { message: "get grids", grids_id: selectedProject.meshData.externalGrids as string }}))
@@ -346,13 +344,11 @@ export const useStorageData = () => {
   //   }
   // };
 
-  const loadMeshData = (
-    setExternalGrids: Function,
-  ) => {
+  const loadMeshData = () => {
     if (selectedProject.storage === 'local') {
-      loadGridsFromS3(setExternalGrids);
+      loadGridsFromS3();
     } else {
-      loadDataFromS3(setExternalGrids);
+      loadGridsFromS3();
     }
   };
 

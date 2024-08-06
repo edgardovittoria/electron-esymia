@@ -127,7 +127,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
     ) {
       setExternalGrids(undefined);
       setSpinner(true);
-      loadMeshData(setExternalGrids);
+      loadMeshData();
     }
   }, [selectedProject?.meshData.meshGenerated]);
 

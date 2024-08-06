@@ -175,6 +175,20 @@ export const ProjectSlice = createSlice({
         selectedProject.ports = updatedPortsArray;
       }
     },
+    deleteAllPorts(state: ProjectState) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      let updatedPortsArray = selectedProject?.ports.filter(port => port.category !== 'port');
+      if (selectedProject && updatedPortsArray) {
+        selectedProject.ports = updatedPortsArray;
+      }
+    },
+    deleteAllLumped(state: ProjectState) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      let updatedPortsArray = selectedProject?.ports.filter(port => port.category !== 'lumped');
+      if (selectedProject && updatedPortsArray) {
+        selectedProject.ports = updatedPortsArray;
+      }
+    },
     setPortType(state: ProjectState, action: PayloadAction<{ name: string, type: number }>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       selectedProject?.ports.forEach(port => {
@@ -349,7 +363,9 @@ export const {
   setScatteringValue,
   unsetScatteringValue,
   setFrequencies,
-  setPathToExternalGridsNotFound
+  setPathToExternalGridsNotFound,
+  deleteAllLumped,
+  deleteAllPorts
 } = ProjectSlice.actions;
 
 const selectTabEffects = (state: ProjectState, tab: string) => {
