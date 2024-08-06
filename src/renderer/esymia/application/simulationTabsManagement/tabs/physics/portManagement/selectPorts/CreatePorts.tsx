@@ -19,7 +19,6 @@ interface SelectPortsProps {
 export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, cameraPosition}) => {
 
     const dispatch = useDispatch()
-    const size = useSelector(boundingBoxDimensionSelector)
 
     return (
         <>
@@ -57,7 +56,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
-                                            let port = getDefaultPort(generateTerminationName(selectedProject.ports, 'port'), size as number, cameraPosition)
+                                            let port = getDefaultPort(generateTerminationName(selectedProject.ports, 'port'), cameraPosition)
                                             dispatch(addPorts(port))
                                             dispatch(selectPort(port.name))
                                         }}
@@ -74,7 +73,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                                             active ? 'bg-green-200' : 'text-gray-900'
                                         } group flex w-full items-center rounded-md px-2 py-2 text-base no-underline`}
                                         onClick={() => {
-                                            let lumped = getDefaultLumped(generateTerminationName(selectedProject.ports, 'lumped'), size as number, cameraPosition)
+                                            let lumped = getDefaultLumped(generateTerminationName(selectedProject.ports, 'lumped'), cameraPosition)
                                             dispatch(addPorts(lumped))
                                             dispatch(selectPort(lumped.name))
                                         }}
