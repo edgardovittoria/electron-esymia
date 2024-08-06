@@ -32,7 +32,7 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
     };
     return (
         <>
-            <div className="tooltip" data-tip="Import Physics">
+            {/* <div className="tooltip" data-tip="Import Physics">
                 <button
                     disabled={selectedProject.simulation?.status === "Completed"}
                     className={`bg-white rounded p-2 ${selectedProject.simulation?.status === "Completed" && 'opacity-40'}`}
@@ -74,14 +74,15 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                         }}
                     />
                 </button>
-            </div>
+            </div> */}
             <div className="tooltip" data-tip="Export Physics">
                 <button
-                    disabled={
-                        !(selectedProject &&
-                            (selectedProject.ports.length > 0 || selectedProject.frequencies))
-                    }
-                    className="bg-white rounded p-2"
+                    // disabled={
+                    //     !(selectedProject &&
+                    //         (selectedProject.ports.length > 0 || selectedProject.frequencies))
+                    // }
+                    disabled={true}
+                    className="bg-white rounded p-2 disabled:opacity-50"
                     onClick={() => {
                         let physics = {
                             ports: selectedProject.ports,
