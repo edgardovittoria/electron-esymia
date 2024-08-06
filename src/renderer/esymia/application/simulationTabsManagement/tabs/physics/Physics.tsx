@@ -21,10 +21,11 @@ import { MyPanel } from '../../sharedElements/MyPanel';
 import {
   Folder,
   Port,
+  Probe,
   Project,
   TempLumped,
 } from '../../../../model/esymiaModels';
-import { ImportExportPhysicsSetup } from './ImportExportPhysicsSetup';
+import { ExportPhisicsToCSV, ImportExportPhysicsSetup } from './ImportExportPhysicsSetup';
 import StatusBar from '../../sharedElements/StatusBar';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
@@ -44,8 +45,7 @@ import { GrClone, GrStatusInfo } from 'react-icons/gr';
 import { RiListIndefinite } from 'react-icons/ri';
 import { ImSpinner } from 'react-icons/im';
 import { useStorageData } from '../simulator/rightPanelSimulator/hook/useStorageData';
-import { LumpedImportFromCSV } from './LumpedImportFromCSV';
-import { PortImportFromCSV } from './PortImportFromCSV';
+import { FrequenciesImportFromCSV, LumpedImportFromCSV, PortImportFromCSV } from './ImportPhysicsFromCSV';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string | undefined;
@@ -116,13 +116,20 @@ export const Physics: React.FC<PhysicsProps> = ({
               selectedProject={selectedProject}
               cameraPosition={cameraPosition}
             />
-            <ImportExportPhysicsSetup />
+            <ExportPhisicsToCSV dataToExport={{
+              ports: selectedProject.ports.filter(p => p.category === 'port') as Port[],
+              lumped: selectedProject.ports.filter(p => p.category === 'lumped') as TempLumped[],
+              probe: selectedProject.ports.filter(p => p.category === 'probe') as Probe[],
+              frequencies : (selectedProject.frequencies !== undefined) ? selectedProject.frequencies : [],
+              scatteringValue: (selectedProject.scatteringValue !== undefined) ? selectedProject.scatteringValue : 0
+              }}/>
             <SurfaceAdvicesButton
               surfaceAdvices={surfaceAdvices}
               setSurfaceAdvices={setSurfaceAdvices}
             />
             <PortImportFromCSV />
             <LumpedImportFromCSV />
+            <FrequenciesImportFromCSV />
             <ResetFocusButton toggleResetFocus={toggleResetFocus} />
             <div className="">
               <div

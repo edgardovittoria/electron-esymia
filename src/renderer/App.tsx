@@ -48,10 +48,10 @@ export default function App() {
   //let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
 
   useEffect(() => {
-    window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
-      dispatch(setHomePat(res));
-    });
-    window.electron.ipcRenderer.sendMessage('runBroker', []);
+    // window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
+    //   dispatch(setHomePat(res));
+    // });
+    // window.electron.ipcRenderer.sendMessage('runBroker', []);
     dispatch(connectStomp());
     return () => {
       dispatch(disconnectStomp());

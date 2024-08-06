@@ -1,38 +1,45 @@
-import {FC, useRef} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import { FC, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
-    Port,
-    Probe,
-    Project,
-    TempLumped,
-} from "../../../../model/esymiaModels";
+  Port,
+  Probe,
+  Project,
+  TempLumped,
+} from '../../../../model/esymiaModels';
 import {
-    addPorts,
-    selectedProjectSelector, setFrequencies,
-    setScatteringValue
+  addPorts,
+  selectedProjectSelector,
+  setFrequencies,
+  setScatteringValue,
 } from '../../../../store/projectSlice';
-import {BiExport, BiImport} from "react-icons/bi";
-import { exportToJsonFileThis } from "../../sharedElements/utilityFunctions";
-import { generateTerminationName, isTerminationNameValid } from "./portManagement/selectPorts/portLumpedProbeGenerator";
-import { useFaunaQuery } from "cad-library";
-import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
-import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
+import { BiExport, BiImport } from 'react-icons/bi';
+import { exportToJsonFileThis } from '../../sharedElements/utilityFunctions';
+import {
+  generateTerminationName,
+  isTerminationNameValid,
+} from './portManagement/selectPorts/portLumpedProbeGenerator';
+import { useFaunaQuery } from 'cad-library';
+import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
+import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
+import JSZip from 'jszip';
+import saveAs from 'file-saver';
+import { jsonToCSV } from 'react-papaparse';
 
 export const ImportExportPhysicsSetup: FC<{}> = () => {
-    const selectedProject = useSelector(selectedProjectSelector) as Project;
-    const dispatch = useDispatch();
-    const inputRefPhysics = useRef(null);
-    const { execQuery } = useFaunaQuery()
+  const selectedProject = useSelector(selectedProjectSelector) as Project;
+  const dispatch = useDispatch();
+  const inputRefPhysics = useRef(null);
+  const { execQuery } = useFaunaQuery();
 
-    const onImportPhysicsClick = () => {
-        let input = inputRefPhysics.current;
-        if (input) {
-            (input as HTMLInputElement).click();
-        }
-    };
-    return (
-        <>
-            {/* <div className="tooltip" data-tip="Import Physics">
+  const onImportPhysicsClick = () => {
+    let input = inputRefPhysics.current;
+    if (input) {
+      (input as HTMLInputElement).click();
+    }
+  };
+  return (
+    <>
+      {/* <div className="tooltip" data-tip="Import Physics">
                 <button
                     disabled={selectedProject.simulation?.status === "Completed"}
                     className={`bg-white rounded p-2 ${selectedProject.simulation?.status === "Completed" && 'opacity-40'}`}
@@ -75,26 +82,124 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
                     />
                 </button>
             </div> */}
-            <div className="tooltip" data-tip="Export Physics">
-                <button
-                    // disabled={
-                    //     !(selectedProject &&
-                    //         (selectedProject.ports.length > 0 || selectedProject.frequencies))
-                    // }
-                    disabled={true}
-                    className="bg-white rounded p-2 disabled:opacity-50"
-                    onClick={() => {
-                        let physics = {
-                            ports: selectedProject.ports,
-                            frequencies: selectedProject.frequencies,
-                            portScatteringValue: selectedProject.scatteringValue
-                        };
-                        exportToJsonFileThis(physics, selectedProject.name + "_physics.json");
-                    }}>
-                    <BiExport className={`h-5 w-5 text-green-300 hover:text-secondaryColor
-                    ${!(selectedProject.ports.length > 0 || selectedProject.frequencies) && 'opacity-40'}`}/>
-                </button>
-            </div>
-        </>
-    );
+      <div className="tooltip" data-tip="Export Physics">
+        {/* <button
+          // disabled={
+          //     !(selectedProject &&
+          //         (selectedProject.ports.length > 0 || selectedProject.frequencies))
+          // }
+          disabled={true}
+          className="bg-white rounded p-2 disabled:opacity-50"
+          onClick={() => {
+            let physics = {
+              ports: selectedProject.ports,
+              frequencies: selectedProject.frequencies,
+              portScatteringValue: selectedProject.scatteringValue,
+            };
+            exportToJsonFileThis(
+              physics,
+              selectedProject.name + '_physics.json',
+            );
+          }}
+        >
+          <BiExport
+            className={`h-5 w-5 text-green-300 hover:text-secondaryColor
+                    ${
+                      !(
+                        selectedProject.ports.length > 0 ||
+                        selectedProject.frequencies
+                      ) && 'opacity-40'
+                    }`}
+          />
+        </button> */}
+      </div>
+    </>
+  );
+};
+
+interface ExportPhysicsToCSVProps {
+  dataToExport: {
+    ports: Port[];
+    lumped: TempLumped[];
+    probe: Probe[];
+    frequencies: number[];
+    scatteringValue: number;
+  };
+  className?: string;
+}
+
+export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
+  dataToExport,
+  className
+}) => {
+  return (
+    <button
+      className={
+        className
+          ? className
+          : 'btn btn-sm text-sm bg-white text-black capitalize border-[#0fb25b] hover:bg-[#0fb25b] hover:text-white'
+      }
+      onClick={() => {
+        const zip = new JSZip();
+        if (dataToExport.ports.length > 0) {
+          let results = [
+            ['name', 'x1', 'y1', 'z1', 'x2', 'y2', 'z2', 'scattering'],
+            ...dataToExport.ports.map((port) => [
+              port.name,
+              port.inputElement[0],
+              port.inputElement[1],
+              port.inputElement[2],
+              port.outputElement[0],
+              port.outputElement[1],
+              port.outputElement[2],
+              dataToExport.scatteringValue,
+            ]),
+          ]
+            .map((e) => e.join(','))
+            .join('\n');
+          const blob = new Blob([results]);
+          zip.file('ports.csv', blob);
+        }
+        if (dataToExport.lumped.length > 0) {
+          let results = [
+            ['name', 'x1', 'y1', 'z1', 'x2', 'y2', 'z2', 'type', 'R', 'L', 'C'],
+            ...dataToExport.lumped.map((lump) => [
+              lump.name,
+              lump.inputElement[0],
+              lump.inputElement[1],
+              lump.inputElement[2],
+              lump.outputElement[0],
+              lump.outputElement[1],
+              lump.outputElement[2],
+              lump.type,
+              (lump.rlcParams.resistance) !== undefined ? lump.rlcParams.resistance : 0,
+              (lump.rlcParams.inductance) !== undefined ? lump.rlcParams.inductance : 0,
+              (lump.rlcParams.capacitance) !== undefined ? lump.rlcParams.capacitance : 0,
+            ])
+          ]
+            .map((e) => e.join(','))
+            .join('\n');
+          const blob = new Blob([results]);
+          zip.file('lumped.csv', blob);
+        }
+        if (dataToExport.frequencies.length > 0) {
+          let results = [
+            ['Frequencies'],
+            ...dataToExport.frequencies.map((freq) => [
+             freq
+            ])
+          ]
+            .map((e) => e.join(','))
+            .join('\n');
+          const blob = new Blob([results]);
+          zip.file('frequencies.csv', blob);
+        }
+        zip.generateAsync({ type: 'blob' }).then(function (content) {
+          saveAs(content, 'physics');
+        });
+      }}
+    >
+      Export physics to CSV
+    </button>
+  );
 };
