@@ -100,7 +100,6 @@ export const PortImportFromCSV:FC = () => {
   const [removeHoverColor, setRemoveHoverColor] = useState(
     DEFAULT_REMOVE_HOVER_COLOR,
   );
-  const size = useSelector(boundingBoxDimensionSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
 
@@ -139,25 +138,14 @@ export const PortImportFromCSV:FC = () => {
                 pdata.name !== undefined
                   ? pdata.name
                   : generateTerminationName(selectedProject.ports, 'port'),
-                size as number,
                 new Vector3(0, 0, 0),
               );
-              port.inputElement.transformationParams.position = [
+              port.inputElement = [
                 parseFloat(pdata.x1),
                 parseFloat(pdata.y1),
                 parseFloat(pdata.z1),
               ];
-              port.inputElement.previousTransformationParams.position = [
-                parseFloat(pdata.x1),
-                parseFloat(pdata.y1),
-                parseFloat(pdata.z1),
-              ];
-              port.outputElement.transformationParams.position = [
-                parseFloat(pdata.x2),
-                parseFloat(pdata.y2),
-                parseFloat(pdata.z2),
-              ];
-              port.outputElement.previousTransformationParams.position = [
+              port.outputElement = [
                 parseFloat(pdata.x2),
                 parseFloat(pdata.y2),
                 parseFloat(pdata.z2),

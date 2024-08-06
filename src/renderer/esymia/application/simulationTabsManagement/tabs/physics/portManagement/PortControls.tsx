@@ -72,19 +72,19 @@ export const PortControls: FC<PortControlsProps> = (
             {selectedPort &&
                 <>
                     <TransformControls
-                        object={scene.getObjectByName((selectedPort as Port).inputElement.name)}
+                        object={scene.getObjectByName("inputPort" + (selectedPort as Port).name)}
                         ref={transformationFirst}
                         enabled={!disabled}
-                        position={selectedPort.inputElement.transformationParams.position}
+                        position={selectedPort.inputElement}
                         showX={selectedPort.isSelected}
                         showY={selectedPort.isSelected}
                         showZ={selectedPort.isSelected}
                     />
                     <TransformControls
-                        object={scene.getObjectByName((selectedPort as Port).outputElement.name)}
+                        object={scene.getObjectByName("outputPort" + (selectedPort as Port).name)}
                         ref={transformationLast}
                         enabled={!disabled}
-                        position={selectedPort.outputElement.transformationParams.position}
+                        position={selectedPort.outputElement}
                         showX={selectedPort.isSelected}
                         showY={selectedPort.isSelected}
                         showZ={selectedPort.isSelected}

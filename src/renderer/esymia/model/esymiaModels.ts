@@ -47,8 +47,8 @@ export type TempLumped = {
   name: string,
   category: 'port' | 'lumped',
   type: number,
-  inputElement: ComponentEntity,
-  outputElement: ComponentEntity,
+  inputElement: [number, number, number],
+  outputElement: [number, number, number],
   isSelected: boolean,
   rlcParams: RLCParams,
   value: number
@@ -57,8 +57,8 @@ export type TempLumped = {
 export type Port = {
   name: string,
   category: 'port' | 'lumped',
-  inputElement: ComponentEntity,
-  outputElement: ComponentEntity,
+  inputElement: [number, number, number],
+  outputElement: [number, number, number],
   isSelected: boolean,
 }
 

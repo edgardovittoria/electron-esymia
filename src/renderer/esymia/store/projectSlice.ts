@@ -215,7 +215,7 @@ export const ProjectSlice = createSlice({
       let selectedPort = findSelectedPort(findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject));
       if (selectedPort) {
         if (selectedPort.category === 'port' || selectedPort.category === 'lumped') {
-          (action.payload.type === 'first') ? selectedPort.inputElement.transformationParams.position = action.payload.position : selectedPort.outputElement.transformationParams.position = action.payload.position;
+          (action.payload.type === 'first') ? selectedPort.inputElement = action.payload.position : selectedPort.outputElement = action.payload.position;
         } else if (action.payload.type === 'probe') {
           (selectedPort as Probe).groupPosition = action.payload.position;
         }

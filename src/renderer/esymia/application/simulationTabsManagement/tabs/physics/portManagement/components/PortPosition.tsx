@@ -30,14 +30,12 @@ export const PortPosition: FC<PortPositionProps> = ({
               <TerminationPositionInput
                 dataTestId="inputPositionX"
                 disabled={disabled}
-                value={selectedPort.inputElement.transformationParams.position[0]}
+                value={selectedPort.inputElement[0]}
                 onChange={(event) => {
                   let newPosition = [
                     parseFloat(parseFloat(event.target.value).toFixed(6)),
-                    parseFloat(selectedPort.inputElement.transformationParams
-                      .position[1].toFixed(6)),
-                    parseFloat(selectedPort.inputElement.transformationParams
-                      .position[2].toFixed(6)),
+                    parseFloat(selectedPort.inputElement[1].toFixed(6)),
+                    parseFloat(selectedPort.inputElement[2].toFixed(6)),
                   ];
                   dispatch(
                     updatePortPosition({
@@ -51,14 +49,12 @@ export const PortPosition: FC<PortPositionProps> = ({
               <TerminationPositionInput
                 dataTestId="inputPositionY"
                 disabled={disabled}
-                value={selectedPort.inputElement.transformationParams.position[1]}
+                value={selectedPort.inputElement[1]}
                 onChange={(event) => {
                   let newPosition = [
-                    selectedPort.inputElement.transformationParams
-                      .position[0],
+                    selectedPort.inputElement[0],
                     parseFloat(parseFloat(event.target.value).toFixed(6)),
-                    selectedPort.inputElement.transformationParams
-                      .position[2],
+                    selectedPort.inputElement[2],
                   ];
                   dispatch(
                     updatePortPosition({
@@ -72,13 +68,11 @@ export const PortPosition: FC<PortPositionProps> = ({
               <TerminationPositionInput
                 dataTestId="inputPositionZ"
                 disabled={disabled}
-                value={selectedPort.inputElement.transformationParams.position[2]}
+                value={selectedPort.inputElement[2]}
                 onChange={(event) => {
                   let newPosition = [
-                    parseFloat(selectedPort.inputElement.transformationParams
-                      .position[0].toFixed(6)),
-                    parseFloat(selectedPort.inputElement.transformationParams
-                      .position[1].toFixed(6)),
+                    parseFloat(selectedPort.inputElement[0].toFixed(6)),
+                    parseFloat(selectedPort.inputElement[1].toFixed(6)),
                     parseFloat(parseFloat(event.target.value).toFixed(6))
                   ];
                   dispatch(
@@ -98,14 +92,12 @@ export const PortPosition: FC<PortPositionProps> = ({
               <TerminationPositionInput
                   dataTestId="outputPositionX"
                   disabled={disabled}
-                  value={selectedPort.outputElement.transformationParams.position[0]}
+                  value={selectedPort.outputElement[0]}
                   onChange={(event) => {
                     let newPosition = [
                       parseFloat(parseFloat(event.target.value).toFixed(6)),
-                      parseFloat(selectedPort.outputElement.transformationParams
-                        .position[1].toFixed(6)),
-                      parseFloat(selectedPort.outputElement.transformationParams
-                        .position[2].toFixed(6)),
+                      parseFloat(selectedPort.outputElement[1].toFixed(6)),
+                      parseFloat(selectedPort.outputElement[2].toFixed(6)),
                     ];
                     dispatch(
                       updatePortPosition({
@@ -119,14 +111,12 @@ export const PortPosition: FC<PortPositionProps> = ({
               <TerminationPositionInput
                   dataTestId="outputPositionY"
                   disabled={disabled}
-                  value={selectedPort.outputElement.transformationParams.position[1]}
+                  value={selectedPort.outputElement[1]}
                   onChange={(event) => {
 										let newPosition = [
-											parseFloat(selectedPort.outputElement.transformationParams
-												.position[0].toFixed(6)),
+											parseFloat(selectedPort.outputElement[0].toFixed(6)),
 											parseFloat(parseFloat(event.target.value).toFixed(6)),
-											parseFloat(selectedPort.outputElement.transformationParams
-												.position[2].toFixed(6)),
+											parseFloat(selectedPort.outputElement[2].toFixed(6)),
 										];
 										dispatch(
 											updatePortPosition({
@@ -140,13 +130,11 @@ export const PortPosition: FC<PortPositionProps> = ({
 							<TerminationPositionInput
                   dataTestId="outputPositionZ"
                   disabled={disabled}
-                  value={selectedPort.outputElement.transformationParams.position[2]}
+                  value={selectedPort.outputElement[2]}
                   onChange={(event) => {
 										let newPosition = [
-											parseFloat(selectedPort.outputElement.transformationParams
-												.position[0].toFixed(6)),
-											parseFloat(selectedPort.outputElement.transformationParams
-												.position[1].toFixed(6)),
+											parseFloat(selectedPort.outputElement[0].toFixed(6)),
+											parseFloat(selectedPort.outputElement[1].toFixed(6)),
                       parseFloat(parseFloat(event.target.value).toFixed(6)),
 										];
 										dispatch(
