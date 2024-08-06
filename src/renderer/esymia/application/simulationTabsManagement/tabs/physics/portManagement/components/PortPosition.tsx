@@ -16,6 +16,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 	setSavedPortParameters
 }) => {
 	const dispatch = useDispatch();
+  console.log(selectedPort)
 
 	return (
 		<>
@@ -237,7 +238,7 @@ const TerminationPositionInput: FC<TerminationPositionInputProps> = ({dataTestId
 									type="number"
                   //debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
 									step={inputStep ? inputStep : 0.000001}
-									defaultValue={parseFloat(value.toFixed(6))}
+									value={parseFloat(value.toFixed(6))}
 									onChange={onChange}
 								/>
 							</div>
