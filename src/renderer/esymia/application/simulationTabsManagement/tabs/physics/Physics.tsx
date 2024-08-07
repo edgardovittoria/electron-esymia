@@ -25,7 +25,10 @@ import {
   Project,
   TempLumped,
 } from '../../../../model/esymiaModels';
-import { ExportPhisicsToCSV, ImportExportPhysicsSetup } from './ImportExportPhysicsSetup';
+import {
+  ExportPhisicsToCSV,
+  ImportExportPhysicsSetup,
+} from './ImportExportPhysicsSetup';
 import StatusBar from '../../sharedElements/StatusBar';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
@@ -45,7 +48,11 @@ import { GrClone, GrStatusInfo } from 'react-icons/gr';
 import { RiListIndefinite } from 'react-icons/ri';
 import { ImSpinner } from 'react-icons/im';
 import { useStorageData } from '../simulator/rightPanelSimulator/hook/useStorageData';
-import { FrequenciesImportFromCSV, LumpedImportFromCSV, PortImportFromCSV } from './ImportPhysicsFromCSV';
+import {
+  FrequenciesImportFromCSV,
+  LumpedImportFromCSV,
+  PortImportFromCSV,
+} from './ImportPhysicsFromCSV';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string | undefined;
@@ -109,34 +116,42 @@ export const Physics: React.FC<PhysicsProps> = ({
         setSavedPortParameters={setSavedPhysicsParameters}
         setSurfaceAdvices={setSurfaceAdvices}
       />
-      <div className="absolute lg:left-[32%] left-[28%] gap-2 top-[180px] flex flex-row">
-        {selectedProject?.model.components && (
-          <>
-            <CreatePorts
-              selectedProject={selectedProject}
-              cameraPosition={cameraPosition}
-            />
-            <ExportPhisicsToCSV />
-            <SurfaceAdvicesButton
-              surfaceAdvices={surfaceAdvices}
-              setSurfaceAdvices={setSurfaceAdvices}
-            />
-            <PortImportFromCSV />
-            <LumpedImportFromCSV />
-            <FrequenciesImportFromCSV />
-            <ResetFocusButton toggleResetFocus={toggleResetFocus} />
-            <div className="">
-              <div
-                className="tooltip tooltip-right bg-white p-2 "
-                data-tip="Port Positioning Info"
-                onClick={() => setShowAdvices(!showAdvices)}
-              >
-                <GrStatusInfo size={18} color="blue" />
+      <div className="absolute lg:left-[32%] left-[28%] gap-2 top-[180px] flex flex-col items-center">
+        <div className="gap-2 flex flex-row">
+          {selectedProject?.model.components && (
+            <>
+              <CreatePorts
+                selectedProject={selectedProject}
+                cameraPosition={cameraPosition}
+              />
+              <SurfaceAdvicesButton
+                surfaceAdvices={surfaceAdvices}
+                setSurfaceAdvices={setSurfaceAdvices}
+              />
+              <ResetFocusButton toggleResetFocus={toggleResetFocus} />
+              <div className="">
+                <div
+                  className="tooltip tooltip-right bg-white p-2 "
+                  data-tip="Port Positioning Info"
+                  onClick={() => setShowAdvices(!showAdvices)}
+                >
+                  <GrStatusInfo size={18} color="blue" />
+                </div>
+                {showAdvices && <PositioningPortsInfo />}
               </div>
-              {showAdvices && <PositioningPortsInfo />}
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
+        <div className="gap-2 flex flex-row">
+          {selectedProject?.model.components && (
+            <>
+              <ExportPhisicsToCSV />
+              <PortImportFromCSV />
+              <LumpedImportFromCSV />
+              <FrequenciesImportFromCSV />
+            </>
+          )}
+        </div>
       </div>
       {/* <PhysicsLeftPanel
         selectedTabLeftPanel={selectedTabLeftPanel}

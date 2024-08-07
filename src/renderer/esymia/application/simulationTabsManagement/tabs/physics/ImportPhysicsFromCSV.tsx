@@ -230,7 +230,7 @@ export const LumpedImportFromCSV: FC = () => {
             ) : (
               <div className='flex flex-row gap-2 items-center'>
                 <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
-                <span >Import Lumped</span>
+                <span className='text-sm'>Import Lumped</span>
               </div>
 
             )}
@@ -368,7 +368,7 @@ export const PortImportFromCSV:FC = () => {
             ) : (
               <div className='flex flex-row gap-2 items-center'>
               <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
-              <span >Import Ports</span>
+              <span className='text-sm'>Import Ports</span>
             </div>
             )}
           </div>
@@ -474,7 +474,7 @@ export const FrequenciesImportFromCSV:FC = () => {
             ) : (
               <div className='flex flex-row gap-2 items-center'>
               <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
-              <span >Import Frequencies</span>
+              <span className='text-sm'>Import Frequencies</span>
             </div>
             )}
           </div>

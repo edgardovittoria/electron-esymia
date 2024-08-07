@@ -24,6 +24,7 @@ import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunct
 import JSZip from 'jszip';
 import saveAs from 'file-saver';
 import { jsonToCSV } from 'react-papaparse';
+import { BsFiletypeCsv } from 'react-icons/bs';
 
 export const ImportExportPhysicsSetup: FC<{}> = () => {
   const selectedProject = useSelector(selectedProjectSelector) as Project;
@@ -135,7 +136,7 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
       className={
         className
           ? className
-          : 'btn btn-sm text-sm bg-white text-black capitalize border-[#0fb25b] hover:bg-[#0fb25b] hover:text-white'
+          : 'rounded bg-white text-black capitalize px-3 flex flex-row gap-2 items-center max-h-8'
       }
       onClick={() => {
         const zip = new JSZip();
@@ -197,7 +198,8 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
         });
       }}
     >
-      Export physics to CSV
+      <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
+      <span className='text-sm'>Export physics</span>
     </button>
   );
 };
