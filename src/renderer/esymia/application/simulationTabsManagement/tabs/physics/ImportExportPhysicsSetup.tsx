@@ -118,20 +118,18 @@ export const ImportExportPhysicsSetup: FC<{}> = () => {
 };
 
 interface ExportPhysicsToCSVProps {
-  dataToExport: {
-    ports: Port[];
-    lumped: TempLumped[];
-    probe: Probe[];
-    frequencies: number[];
-    scatteringValue: number;
-  };
   className?: string;
 }
 
 export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
-  dataToExport,
   className
 }) => {
+  const selectedProject = useSelector(selectedProjectSelector)
+  let ports = selectedProject?.ports.filter(p => p.category === 'port') as Port[]
+  let lumped = selectedProject?.ports.filter(p => p.category === 'lumped') as TempLumped[]
+  let probe = selectedProject?.ports.filter(p => p.category === 'probe') as Probe[]
+  let frequencies = (selectedProject?.frequencies !== undefined) ? selectedProject.frequencies : []
+  let scatteringValue = (selectedProject?.scatteringValue !== undefined) ? selectedProject.scatteringValue : 0
   return (
     <button
       className={
@@ -141,10 +139,10 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
       }
       onClick={() => {
         const zip = new JSZip();
-        if (dataToExport.ports.length > 0) {
+        if (ports.length > 0) {
           let results = [
             ['name', 'x1', 'y1', 'z1', 'x2', 'y2', 'z2', 'scattering'],
-            ...dataToExport.ports.map((port) => [
+            ...ports.map((port) => [
               port.name,
               port.inputElement[0],
               port.inputElement[1],
@@ -152,7 +150,7 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
               port.outputElement[0],
               port.outputElement[1],
               port.outputElement[2],
-              dataToExport.scatteringValue,
+              scatteringValue,
             ]),
           ]
             .map((e) => e.join(','))
@@ -160,10 +158,10 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
           const blob = new Blob([results]);
           zip.file('ports.csv', blob);
         }
-        if (dataToExport.lumped.length > 0) {
+        if (lumped.length > 0) {
           let results = [
             ['name', 'x1', 'y1', 'z1', 'x2', 'y2', 'z2', 'type', 'R', 'L', 'C'],
-            ...dataToExport.lumped.map((lump) => [
+            ...lumped.map((lump) => [
               lump.name,
               lump.inputElement[0],
               lump.inputElement[1],
@@ -182,10 +180,10 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
           const blob = new Blob([results]);
           zip.file('lumped.csv', blob);
         }
-        if (dataToExport.frequencies.length > 0) {
+        if (frequencies.length > 0) {
           let results = [
             ['Frequencies'],
-            ...dataToExport.frequencies.map((freq) => [
+            ...frequencies.map((freq) => [
              freq
             ])
           ]

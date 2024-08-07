@@ -116,13 +116,7 @@ export const Physics: React.FC<PhysicsProps> = ({
               selectedProject={selectedProject}
               cameraPosition={cameraPosition}
             />
-            <ExportPhisicsToCSV dataToExport={{
-              ports: selectedProject.ports.filter(p => p.category === 'port') as Port[],
-              lumped: selectedProject.ports.filter(p => p.category === 'lumped') as TempLumped[],
-              probe: selectedProject.ports.filter(p => p.category === 'probe') as Probe[],
-              frequencies : (selectedProject.frequencies !== undefined) ? selectedProject.frequencies : [],
-              scatteringValue: (selectedProject.scatteringValue !== undefined) ? selectedProject.scatteringValue : 0
-              }}/>
+            <ExportPhisicsToCSV />
             <SurfaceAdvicesButton
               surfaceAdvices={surfaceAdvices}
               setSurfaceAdvices={setSurfaceAdvices}
