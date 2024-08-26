@@ -138,7 +138,6 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     }
   };
 
-
   return (
     <>
       {chartsDataToVisualize.map((chartData, index) => {
@@ -159,12 +158,21 @@ export const ChartsList: React.FC<ChartsListProps> = ({
               }
               {/* <ExportToCsvZippedButton buttonLabel="to CSV" graphDataToExport={[chartData]} zipFilename="graphs_data"/> */}
             </div>
-            {showGraphsSettings[index] && <ScaleChartOptions index={index} scaleMode={scaleMode} setScaleMode={setScaleMode}/>}
+            {showGraphsSettings[index] && ChartVisualizationMode === "full" && <ScaleChartOptions index={index} scaleMode={scaleMode} setScaleMode={setScaleMode}/>}
             {selectedProject?.simulation && selectedProject.simulation.status === "Completed" ?
+            <>
+              {ChartVisualizationMode === "full" ?
               <Line
               options={optionsWithScaleMode(chartData.options, scaleMode[index], "line")}
               data={chartData.data}
             /> :
+            <Line
+              options={optionsWithScaleMode(chartData.options, {xaxis: 'logarithmic', yaxis: 'linear', xnotation: "exponential", ynotation: "decimal"}, "line")}
+              data={chartData.data}
+            />
+            }
+            </>
+               :
             <Scatter
               options={optionsWithScaleMode(chartData.options, scaleMode[index], "scatter")}
               data={{
