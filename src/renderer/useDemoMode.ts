@@ -11,7 +11,7 @@ import { useDispatch } from 'react-redux';
 
 export const useDemoMode = () => {
   const MILLISECONDS_IN_A_DAY = 8.64e7;
-  const DEMO_DAYS = 30;
+  const DEMO_DAYS = 300;
   const { user } = useAuth0();
   const [allowedUser, setallowedUser] = useState<boolean>(true);
   const [remainingDemoDays, setRemainingDemoDays] = useState<number>(DEMO_DAYS);

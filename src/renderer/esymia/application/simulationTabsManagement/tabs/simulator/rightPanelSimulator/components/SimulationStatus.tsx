@@ -9,6 +9,7 @@ import { Project, Simulation } from '../../../../../../model/esymiaModels';
 import {
   convergenceTresholdSelector,
   solverIterationsSelector,
+  solverTypeSelector,
 } from '../../../../../../store/solverSlice';
 import {
   deleteSimulation,
@@ -177,6 +178,7 @@ const SimulationStatusItem: React.FC<{
   const iterations = useSelector(iterationsSelector).filter(
     (item) => item.id === associatedProject.faunaDocumentId,
   )[0];
+  const solverType = useSelector(solverTypeSelector)
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
   const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
@@ -213,6 +215,7 @@ const SimulationStatusItem: React.FC<{
 
   const solverInputFrom = (
     project: Project,
+    solverType: 1|2,
     solverIterations: [number, number],
     convergenceThreshold: number,
   ) => {
@@ -237,6 +240,7 @@ const SimulationStatusItem: React.FC<{
         outerIteration: solverIterations[0],
         convergenceThreshold,
       },
+      solverType: solverType,
       id: project.faunaDocumentId as string,
     };
   };
@@ -244,6 +248,7 @@ const SimulationStatusItem: React.FC<{
   useEffect(() => {
     let objectToSendToSolver = solverInputFrom(
       associatedProject,
+      solverType,
       solverIterations,
       convergenceThreshold,
     );
@@ -264,7 +269,14 @@ const SimulationStatusItem: React.FC<{
 
   useEffect(() => {
     if (solverResults) {
-      if (solverResults.isStopped) {
+      if (solverResults.error) {
+        dispatch(
+          setMessageInfoModal(
+            'Memory error, the computation can not be run, try a larger quantum if possible!',
+          ),
+        );
+        dispatch(setIsAlertInfoModal(true));
+        dispatch(setShowInfoModal(true));
         dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
         dispatch(
           setMeshApproved({
@@ -273,32 +285,44 @@ const SimulationStatusItem: React.FC<{
           }),
         );
       } else {
-        // dispatch(setSolverOutput(res.data));
-        const simulationUpdated: Simulation = {
-          ...simulation,
-          results: {
-            ...solverResults.matrices,
-            freqIndex: solverResults.freqIndex,
-          },
-          ended: Date.now().toString(),
-          status: solverResults.partial ? 'Running' : 'Completed',
-        };
-        dispatch(
-          updateSimulation({
-            associatedProject: simulation.associatedProject,
-            value: simulationUpdated,
-          }),
-        );
-        if (!solverResults.partial) {
-          execQuery(
-            updateProjectInFauna,
-            convertInFaunaProjectThis({
-              ...associatedProject,
-              simulation: simulationUpdated,
-            } as Project),
-            dispatch,
-          ).then(() => {});
-          setRunningSimulation(undefined);
+        if (solverResults.isStopped) {
+          dispatch(
+            deleteSimulation(associatedProject.faunaDocumentId as string),
+          );
+          dispatch(
+            setMeshApproved({
+              approved: false,
+              projectToUpdate: associatedProject.faunaDocumentId as string,
+            }),
+          );
+        } else {
+          // dispatch(setSolverOutput(res.data));
+          const simulationUpdated: Simulation = {
+            ...simulation,
+            results: {
+              ...solverResults.matrices,
+              freqIndex: solverResults.freqIndex,
+            },
+            ended: Date.now().toString(),
+            status: solverResults.partial ? 'Running' : 'Completed',
+          };
+          dispatch(
+            updateSimulation({
+              associatedProject: simulation.associatedProject,
+              value: simulationUpdated,
+            }),
+          );
+          if (!solverResults.partial) {
+            execQuery(
+              updateProjectInFauna,
+              convertInFaunaProjectThis({
+                ...associatedProject,
+                simulation: simulationUpdated,
+              } as Project),
+              dispatch,
+            ).then(() => {});
+            setRunningSimulation(undefined);
+          }
         }
       }
     }

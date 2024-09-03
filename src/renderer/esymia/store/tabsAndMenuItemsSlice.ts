@@ -42,7 +42,7 @@ type TabsAndMenuItemsState = {
   iterations: {freqNumber: number, id: string}[],
   meshAdvice: {id: string, quantum: [number, number, number]}[],
   meshResults?: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}, error?: any},
-  solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number}[],
+  solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number, error?:any }[],
   externalGrids?: any
   brokerConnected: boolean
 }
@@ -169,7 +169,7 @@ export const TabsAndMenuItemsSlice = createSlice({
     setAWSExternalGridsData(state: TabsAndMenuItemsState, action: PayloadAction<any>){
       state.externalGrids = action.payload
     },
-    setSolverResults(state: TabsAndMenuItemsState, action: PayloadAction<{matrices: SolverOutput, id: string, isStopped: boolean, partial: boolean, freqIndex?: number}>){
+    setSolverResults(state: TabsAndMenuItemsState, action: PayloadAction<{id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number, error?:any }>){
       state.solverResults = state.solverResults.filter(item => item.id !== action.payload.id)
       state.solverResults.push(action.payload)
     },

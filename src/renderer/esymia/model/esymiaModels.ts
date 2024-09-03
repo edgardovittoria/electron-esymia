@@ -111,6 +111,7 @@ export type Simulation = {
   results: SolverOutput,
   associatedProject: string,
   solverAlgoParams: {
+    solverType: 1|2,
     innerIteration: number,
     outerIteration: number,
     convergenceThreshold: number

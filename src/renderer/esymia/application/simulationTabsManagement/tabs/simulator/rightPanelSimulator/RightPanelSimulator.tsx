@@ -30,7 +30,9 @@ import {
   convergenceTresholdSelector,
   setConvergenceTreshold,
   setSolverIterations,
+  setSolverType,
   solverIterationsSelector,
+  solverTypeSelector,
 } from '../../../../../store/solverSlice';
 import { DebounceInput } from 'react-debounce-input';
 import { LiaCubeSolid, LiaCubesSolid } from 'react-icons/lia';
@@ -47,10 +49,10 @@ interface RightPanelSimulatorProps {
   selectedProject: Project;
   allMaterials?: Material[];
   externalGrids?: ExternalGridsObject;
-  spinnerLoadData: boolean,
-  sidebarItemSelected: string | undefined,
-  setsidebarItemSelected: Function,
-  setSelectedTabLeftPanel: Function
+  spinnerLoadData: boolean;
+  sidebarItemSelected: string | undefined;
+  setsidebarItemSelected: Function;
+  setSelectedTabLeftPanel: Function;
 }
 
 export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
@@ -60,7 +62,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   spinnerLoadData,
   setsidebarItemSelected,
   sidebarItemSelected,
-  setSelectedTabLeftPanel
+  setSelectedTabLeftPanel,
 }) => {
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
@@ -68,10 +70,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
     [number, number, number]
   >([0, 0, 0]);
   const meshGenerated = useSelector(meshGeneratedSelector);
+  const solverType = useSelector(solverTypeSelector)
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
-  const activeMeshing = useSelector(activeMeshingSelector)
-  const activeSimulations = useSelector(activeSimulationsSelector)
+  const activeMeshing = useSelector(activeMeshingSelector);
+  const activeSimulations = useSelector(activeSimulationsSelector);
   const quantumDimensionsLabels = ['X', 'Y', 'Z'];
   const [suggestedQuantumError, setSuggestedQuantumError] = useState<{
     active: boolean;
@@ -208,7 +211,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             parseFloat(meshAdvice.quantum[2].toFixed(5)),
           ],
         } as Project),
-        dispatch
+        dispatch,
       ).then();
     }
   }, [meshAdvice]);
@@ -249,7 +252,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             } else {
               setsidebarItemSelected('Mesher');
             }
-            setSelectedTabLeftPanel(undefined)
+            setSelectedTabLeftPanel(undefined);
           }}
         >
           <GiMeshBall style={{ width: '25px', height: '25px' }} />
@@ -267,7 +270,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             } else {
               setsidebarItemSelected('Solver');
             }
-            setSelectedTabLeftPanel(undefined)
+            setSelectedTabLeftPanel(undefined);
           }}
         >
           <TbServerBolt style={{ width: '25px', height: '25px' }} />
@@ -276,7 +279,10 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
       {sidebarItemSelected && sidebarItemSelected === 'Mesher' && (
         <div
           className={`${
-            (meshGenerated === 'Generating' || meshGenerated === 'Queued' || spinnerLoadData) && 'opacity-40'
+            (meshGenerated === 'Generating' ||
+              meshGenerated === 'Queued' ||
+              spinnerLoadData) &&
+            'opacity-40'
           } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
         >
           <div className="flex">
@@ -346,7 +352,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
                 </div>
               )}
-              {meshGenerated === 'Generated' && !spinnerLoadData && !selectedProject.simulation &&
+              {meshGenerated === 'Generated' &&
+                !spinnerLoadData &&
+                !selectedProject.simulation &&
                 !suggestedQuantumError.active &&
                 !pathToExternalGridsNotFound && (
                   <div className="flex flex-row gap-4 justify-center items-center w-full mt-3">
@@ -401,7 +409,8 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                       );
                       dispatch(
                         setMeshGenerated({
-                          status: activeMeshing.length > 0 ? "Queued" : "Generating",
+                          status:
+                            activeMeshing.length > 0 ? 'Queued' : 'Generating',
                           projectToUpdate:
                             selectedProject.faunaDocumentId as string,
                         }),
@@ -427,7 +436,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         <>
           <div
             className={`${
-              (selectedProject.simulation?.status === 'Queued' || selectedProject.simulation?.status === "Running") && 'opacity-40'
+              (selectedProject.simulation?.status === 'Queued' ||
+                selectedProject.simulation?.status === 'Running') &&
+              'opacity-40'
             } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
           >
             <div className="flex">
@@ -435,6 +446,25 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               <h5 className="ml-2 text-[12px] xl:text-base">Solving Info</h5>
             </div>
             <hr className="mt-1" />
+            <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
+              <h6 className="text-[12px] xl:text-base">Solver Type</h6>
+              <div className="mt-2">
+                <div className="flex justify-between mt-2">
+                  <div className="w-full">
+                    <select className="select select-bordered select-sm w-full max-w-xs"
+                      onChange={(e) => {
+                        dispatch(setSolverType(parseInt(e.target.value) as 1|2))
+                      }}
+                    >
+                      <option value={1} selected>
+                        Quasi static coefficents computation
+                      </option>
+                      <option value={2}>Rcc delayed coefficents computation</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
               <h6 className="text-[12px] xl:text-base">Solver Iterations</h6>
               <div className="mt-2">
@@ -580,16 +610,23 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     started: Date.now().toString(),
                     ended: '',
                     results: {} as SolverOutput,
-                    status: activeSimulations.length === 0 ? 'Running' : 'Queued',
+                    status:
+                      activeSimulations.length === 0 ? 'Running' : 'Queued',
                     associatedProject:
                       selectedProject?.faunaDocumentId as string,
                     solverAlgoParams: {
+                      solverType: solverType,
                       innerIteration: solverIterations[0],
                       outerIteration: solverIterations[1],
                       convergenceThreshold,
                     },
                   };
-                  dispatch(updateSimulation({associatedProject: simulation.associatedProject ,value:simulation}));
+                  dispatch(
+                    updateSimulation({
+                      associatedProject: simulation.associatedProject,
+                      value: simulation,
+                    }),
+                  );
                   dispatch(
                     setMeshApproved({
                       approved: true,
@@ -606,14 +643,14 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         </>
       )}
       <ModalRefineCoarse
-            showModal={showModalRefine}
-            mode={refineMode}
-            setShowModal={setShowModalRefine}
-            selectedProject={selectedProject}
-            quantumDimsInput={quantumDimsInput}
-            setQuantumDimsInput={setQuantumDimsInput}
-            activeMeshing={activeMeshing}
-          />
+        showModal={showModalRefine}
+        mode={refineMode}
+        setShowModal={setShowModalRefine}
+        selectedProject={selectedProject}
+        quantumDimsInput={quantumDimsInput}
+        setQuantumDimsInput={setQuantumDimsInput}
+        activeMeshing={activeMeshing}
+      />
     </>
   );
 };
@@ -671,8 +708,8 @@ interface ModalRefineCoarseProps {
     selectedProject: Project;
     allMaterials: Material[];
     quantum: [number, number, number];
-    meshStatus: "Not Generated" | "Generated";
-  }[]
+    meshStatus: 'Not Generated' | 'Generated';
+  }[];
 }
 
 const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
@@ -682,7 +719,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
   selectedProject,
   quantumDimsInput,
   setQuantumDimsInput,
-  activeMeshing
+  activeMeshing,
 }) => {
   const [xPercentage, setXPercentage] = useState<'No' | '10%' | '50%'>('No');
   const [yPercentage, setYPercentage] = useState<'No' | '10%' | '50%'>('No');
@@ -915,7 +952,10 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                         );
                         dispatch(
                           setMeshGenerated({
-                            status: activeMeshing.length > 0 ? "Queued" : "Generating",
+                            status:
+                              activeMeshing.length > 0
+                                ? 'Queued'
+                                : 'Generating',
                             projectToUpdate:
                               selectedProject.faunaDocumentId as string,
                           }),

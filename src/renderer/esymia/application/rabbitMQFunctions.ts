@@ -120,13 +120,26 @@ export const callback_solver_feedback = (message: any, dispatch: Function) => {
 export const callback_solver_results = (message: any, dispatch: Function) => {
   message.ack();
   let res = JSON.parse(message.body);
-  dispatch(
-    setSolverResults({
-      id: res.id,
-      matrices: !res.isStopped ? res.matrices : ({} as SolverOutput),
-      isStopped: res.isStopped,
-      partial: res.partial,
-      freqIndex: res.freqIndex,
-    }),
-  );
+  if(!res.error){
+    dispatch(
+      setSolverResults({
+        id: res.id,
+        matrices: !res.isStopped ? res.matrices : ({} as SolverOutput),
+        isStopped: res.isStopped,
+        partial: res.partial,
+        freqIndex: res.freqIndex,
+      }),
+    );
+  }else{
+    dispatch(
+      setSolverResults({
+        id: res.id,
+        matrices: {} as SolverOutput,
+        isStopped: res.isStopped,
+        partial: res.partial,
+        error: res.error
+      }),
+    );
+  }
+
 };
