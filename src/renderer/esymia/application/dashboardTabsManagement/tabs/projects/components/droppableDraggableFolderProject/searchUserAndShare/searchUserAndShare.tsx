@@ -189,12 +189,12 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                           let newProject: Project = {
                             ...projectToShare as Project,
                             simulation: undefined,
-                            meshData: {
-                              meshGenerated: "Not Generated",
-                              meshApproved: false,
-                              quantum: [0,0,0],
-                              pathToExternalGridsNotFound: false
-                            },
+                            // meshData: {
+                            //   meshGenerated: "Not Generated",
+                            //   meshApproved: false,
+                            //   quantum: [0,0,0],
+                            //   pathToExternalGridsNotFound: false
+                            // },
                             sharedWith: [
                               ...(projectToShare?.sharedWith as sharingInfoUser[]),
                               {
