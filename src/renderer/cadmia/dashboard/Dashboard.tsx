@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import {
   FaunaCadModel,
-  getModelsByOwner,
   resetState,
 } from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +21,38 @@ import {
 import { getSharedModels } from '../faunaDB/functions';
 import MySharedProject from './components/mySharedProjects/MySharedProject';
 import { useFaunaQuery } from '../../esymia/faunadb/hook/useFaunaClient';
+import { Client, fql, QuerySuccess } from 'fauna';
+
+const getModelsByOwner = async (faunaClient: Client, faunaQuery: typeof fql, owner_id: string) => {
+  try {
+      const response = await faunaClient.query(
+        faunaQuery`CadModels.models_by_owner(${owner_id})`
+      )
+          .catch((err: { name: any; message: any; errors: () => { description: any; }[]; }) => console.error(
+              'Error: [%s] %s: %s',
+              err.name,
+              err.message,
+              err.errors()[0].description,
+          ));
+          let res: FaunaModelDetails[] = ((response as QuerySuccess<any>).data.data as any[]).map((item: any) => {return {id: item.id, details: {...item} as FaunaCadModel}})
+      return res.map(el => faunaModelDetailsToFaunaCadModel(el))
+  } catch (e) {
+      console.log(e)
+      return {} as [];
+  }
+}
+
+function faunaModelDetailsToFaunaCadModel(modelDetails: FaunaModelDetails) {
+    return {
+        id: modelDetails.id,
+        ...modelDetails.details
+    } as FaunaCadModel
+}
+
+type FaunaModelDetails = {
+  id: string
+  details: FaunaCadModel
+}
 
 export interface DashboardProps {
   showCad: boolean;

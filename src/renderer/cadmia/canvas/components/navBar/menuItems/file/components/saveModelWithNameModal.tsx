@@ -4,7 +4,6 @@ import { FC, Fragment, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { Transition, Dialog } from '@headlessui/react';
-import faunadb from 'faunadb';
 import { unitSelector } from '../../../../statusBar/statusBarSlice';
 import { uploadFileS3 } from '../../../../../../aws/crud';
 import { addModel, setLoadingSpinner } from '../../../../../../store/modelSlice';

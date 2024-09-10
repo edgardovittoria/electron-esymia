@@ -13,7 +13,6 @@ import { ChartVisualizationMode } from './ChartVisualizationMode';
 import { ChartsList } from './ChartsList';
 import { ResultsLeftPanelTab } from './ResultsLeftPanelTab';
 import { MyPanel } from '../../sharedElements/MyPanel';
-import { useFaunaQuery } from 'cad-library';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { Folder, Port, Project } from '../../../../model/esymiaModels';

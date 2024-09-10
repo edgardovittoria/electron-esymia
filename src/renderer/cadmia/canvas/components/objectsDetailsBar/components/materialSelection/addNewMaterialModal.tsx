@@ -2,9 +2,9 @@ import {Dialog, Transition} from "@headlessui/react"
 import {FC, Fragment, ReactNode, useEffect, useState} from "react"
 import toast from "react-hot-toast"
 import {ChromePicker} from "react-color"
-import faunadb from "faunadb"
 import ModalCustomAttributes, {CustomMaterialAttribute} from "./ModalCustomAttributes";
 import { useFaunaQuery } from "../../../../../../esymia/faunadb/hook/useFaunaClient"
+import { Client, fql } from "fauna"
 
 export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Function }> = ({
                                                                                                 showModal,
@@ -42,18 +42,11 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
         custom_conductivity?: CustomMaterialAttribute
     }
 
-    async function saveNewMaterial(faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, newMaterial: FaunaMaterial) {
+    async function saveNewMaterial(faunaClient: Client, faunaQuery: typeof fql, newMaterial: FaunaMaterial) {
         try {
-            await faunaClient.query((
-                faunaQuery.Create(
-                    faunaQuery.Collection('Materials'),
-                    {
-                        data: {
-                            ...newMaterial
-                        }
-                    }
-                )
-            ))
+            await faunaClient.query(
+                faunaQuery`Materials.create(${newMaterial})`
+            )
             toast.success("Material successfully saved!")
         } catch (e) {
             toast.error("Material not saved! See console log for error details.")
