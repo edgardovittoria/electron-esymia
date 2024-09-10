@@ -24,7 +24,7 @@ import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
 import {
   addProjectTab,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { Folder, Project } from '../../../../../../model/esymiaModels';
+import { Folder, MeshData, Port, Probe, Project, sharingInfoUser, TempLumped } from '../../../../../../model/esymiaModels';
 import { setModelInfoFromS3 } from '../../../shared/utilFunctions';
 import noResultsIconForProject from '../../../../../../../../../assets/noResultsIconForProject.png';
 import {
@@ -33,7 +33,7 @@ import {
 import { GrClone } from 'react-icons/gr';
 import { ImSpinner } from 'react-icons/im';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
-import { usersStateSelector } from '../../../../../../../cad_library';
+import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../cad_library';
 
 interface DraggableProjectCardProps {
   project: Project;
@@ -142,7 +142,19 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                           execQuery(
                             moveProjectInFauna,
                             {
-                              ...project,
+                              faunaDocumentId: project?.faunaDocumentId,
+                              description: project?.description as string,
+                              frequencies: project?.frequencies,
+                              meshData: project?.meshData as MeshData,
+                              model: project?.model as CanvasState,
+                              modelS3: project?.modelS3,
+                              name: project?.name as string,
+                              owner: project?.owner as UsersState,
+                              ports: project?.ports as (Port | Probe | TempLumped)[],
+                              screenshot: undefined,
+                              storage: project?.storage as "local" | "online",
+                              simulation: undefined,
+                              sharedWith: project?.sharedWith as sharingInfoUser[],
                               parentFolder: f.faunaDocumentId,
                             } as Project,
                             project.parentFolder,

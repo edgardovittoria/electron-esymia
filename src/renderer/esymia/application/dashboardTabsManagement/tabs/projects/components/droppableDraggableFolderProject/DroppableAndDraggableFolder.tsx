@@ -26,12 +26,12 @@ import {
 } from '../../../../../../faunadb/projectsFolderAPIs';
 import { RenameFolder } from './RenameFolder';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
-import { Folder, Project } from '../../../../../../model/esymiaModels';
+import { Folder, MeshData, Port, Probe, Project, sharingInfoUser, TempLumped } from '../../../../../../model/esymiaModels';
 import { takeAllProjectsInArrayOf } from '../../../../../../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
 import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
 import { useStorageData } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
-import { usersStateSelector } from '../../../../../../../cad_library';
+import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../cad_library';
 
 interface DroppableAndDraggableFolderProps {
   folder: Folder;
@@ -99,7 +99,19 @@ export const DroppableAndDraggableFolder: React.FC<
           execQuery(
             moveProjectInFauna,
             {
-              ...objectToMove,
+              faunaDocumentId: objectToMove?.faunaDocumentId,
+              description: objectToMove?.description as string,
+              frequencies: objectToMove?.frequencies,
+              meshData: objectToMove?.meshData as MeshData,
+              model: objectToMove?.model as CanvasState,
+              modelS3: objectToMove?.modelS3,
+              name: objectToMove?.name as string,
+              owner: objectToMove?.owner as UsersState,
+              ports: objectToMove?.ports as (Port | Probe | TempLumped)[],
+              screenshot: undefined,
+              storage: objectToMove?.storage as "local" | "online",
+              simulation: undefined,
+              sharedWith: objectToMove?.sharedWith as sharingInfoUser[],
               parentFolder: dropTargetFolder.faunaDocumentId,
             } as Project,
             objectToMove.parentFolder,
@@ -115,7 +127,12 @@ export const DroppableAndDraggableFolder: React.FC<
           execQuery(
             moveFolderInFauna,
             {
-              ...objectToMove,
+              faunaDocumentId: objectToMove.faunaDocumentId,
+              name: objectToMove.name,
+              owner: objectToMove.owner,
+              projectList: objectToMove.projectList,
+              sharedWith: objectToMove.sharedWith,
+              subFolders: objectToMove.subFolders,
               parent: dropTargetFolder.faunaDocumentId,
             } as Folder,
             (objectToMove as Folder).parent,

@@ -39,7 +39,8 @@ export const getFoldersByOwner = async (
     dispatch(setIsAlertInfoModal(false));
     dispatch(setShowInfoModal(true));
   });
-  return (response as QuerySuccess<any>).data.data as FaunaFolder[];
+  let res:FaunaFolder[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, folder: {...item} as FaunaFolderDetails}})
+  return res
 };
 
 export const getSimulationProjectsByOwner = async (
@@ -103,7 +104,7 @@ export const deleteFolderFromFauna = async (
         )
         .then((projects) => {
           faunaClient.query(
-            faunaQuery`Folders.byID(${folderToDelete})!.delete()`
+            faunaQuery`Folders.byId(${folderToDelete})!.delete()`
           );
           ((subFolders as QuerySuccess<any>).data.data as string[]).forEach((sb) =>
             faunaClient.query(
@@ -117,7 +118,7 @@ export const deleteFolderFromFauna = async (
           );
           oldParent !== 'root' &&
             faunaClient.query(
-              faunaQuery`remove_subfolder_from_folder(${folderToDelete}, ${oldParent})`
+              faunaQuery`remove_subfolders_from_folder(${folderToDelete}, ${oldParent})`
             );
         })
         .catch((err) => {
@@ -331,7 +332,7 @@ export const moveFolderInFauna = async (
     .then(() => {
       oldParent !== 'root' &&
         faunaClient.query(
-          faunaQuery`remove_subfolder_from_folder(${folderToMove.faunaDocumentId as string}, ${oldParent})`
+          faunaQuery`remove_subfolders_from_folder(${folderToMove.faunaDocumentId as string}, ${oldParent})`
         );
       folderToMove.parent !== 'root' &&
         faunaClient.query(
