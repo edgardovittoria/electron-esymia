@@ -5,7 +5,7 @@ import { homePathSelector, selectFolder, setProjectsFolderToUser } from '../stor
 import { useDispatch, useSelector } from 'react-redux';
 import { getDirContents, readLocalFile } from '../../fileSystemAPIs/fileSystemAPIs';
 import { Folder, Project } from '../model/esymiaModels';
-import { useFaunaQuery } from '../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../../cad_library';
 
 export const useStorage = () => {

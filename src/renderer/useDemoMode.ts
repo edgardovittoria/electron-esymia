@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import faunadb from 'faunadb';
 import { useAuth0 } from '@auth0/auth0-react';
 import {
   setMessageInfoModal,
@@ -7,7 +6,7 @@ import {
   setShowInfoModal,
 } from './esymia/store/tabsAndMenuItemsSlice';
 import { useDispatch } from 'react-redux';
-import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaQuery';
 import { Client, fql, QuerySuccess } from 'fauna';
 
 export const useDemoMode = () => {

@@ -32,7 +32,7 @@ import { addProjectTab, closeProjectTab } from '../../../../../../store/tabsAndM
 import { Brick } from '../components/createGridsExternals';
 import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();

@@ -7,7 +7,7 @@ import { unitSelector } from '../../../../statusBar/statusBarSlice';
 import { uploadFileS3 } from '../../../../../../aws/crud';
 import { addModel, setLoadingSpinner } from '../../../../../../store/modelSlice';
 import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../../../../../../esymia/store/tabsAndMenuItemsSlice';
-import { useFaunaQuery } from '../../../../../../../esymia/faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { Client, fql } from 'fauna';
 import { canvasStateSelector, FaunaCadModel } from '../../../../../../../cad_library';
 

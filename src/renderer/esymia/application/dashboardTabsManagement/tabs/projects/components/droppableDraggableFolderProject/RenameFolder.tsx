@@ -4,7 +4,7 @@ import {Dialog, Transition} from "@headlessui/react";
 import {updateFolderInFauna} from "../../../../../../faunadb/projectsFolderAPIs";
 import { renameFolder } from '../../../../../../store/projectSlice';
 import { Folder } from '../../../../../../model/esymiaModels';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 
 interface RenameFolderProps {
     folderToRename: Folder,

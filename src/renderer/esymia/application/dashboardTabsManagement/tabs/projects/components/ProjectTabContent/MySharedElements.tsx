@@ -22,7 +22,7 @@ import {
 } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { ImSpinner } from 'react-icons/im';
 import { setShowCreateNewProjectModal } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../../../../../../../cad_library';
 
 export interface MySharedElementsProps {

@@ -2,7 +2,7 @@ import React, {Fragment, useState} from 'react';
 import {saveSignal} from "../../../../../faunadb/signalsAPIs";
 import {Dialog, Transition} from "@headlessui/react";
 import { Signal, SignalValues } from '../../../../../model/esymiaModels';
-import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaQuery';
 
 interface ModalSignalsProps {
     showModalSignal: boolean,

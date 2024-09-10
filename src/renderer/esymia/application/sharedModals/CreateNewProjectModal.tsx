@@ -17,7 +17,7 @@ import {
 } from '../../store/tabsAndMenuItemsSlice';
 import { Project, sharingInfoUser } from '../../model/esymiaModels';
 import toast from 'react-hot-toast';
-import { useFaunaQuery } from '../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../faunadb/hook/useFaunaQuery';
 import { CanvasState, UsersState, usersStateSelector } from '../../../cad_library';
 
 interface CreateNewProjectModalProps {

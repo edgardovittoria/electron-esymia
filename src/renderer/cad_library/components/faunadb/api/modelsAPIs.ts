@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import faunadb from "faunadb"
+import { Client, fql, QuerySuccess } from "fauna";
 
 export type FaunaCadModel = {
     id?: string,
@@ -22,18 +22,11 @@ function faunaModelDetailsToFaunaCadModel(modelDetails: FaunaModelDetails) {
     } as FaunaCadModel
 }
 
-export async function saveNewModel(faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, newModel: FaunaCadModel) {
+export async function saveNewModel(faunaClient: Client, faunaQuery: typeof fql, newModel: FaunaCadModel) {
     try {
-        await faunaClient.query((
-            faunaQuery.Create(
-                faunaQuery.Collection('CadModels'),
-                {
-                    data: {
-                        ...newModel
-                    }
-                }
-            )
-        ))
+        await faunaClient.query(
+          faunaQuery`CadModels.create(${newModel})`
+        )
         toast.success("Model successfully saved!")
     } catch (e) {
         toast.error("Model not saved! See console log for error details.")
@@ -41,21 +34,10 @@ export async function saveNewModel(faunaClient: faunadb.Client, faunaQuery: type
     }
 }
 
-export const getModelsByOwner = async (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, owner_id: string) => {
+export const getModelsByOwner = async (faunaClient: Client, faunaQuery: typeof fql, owner_id: string) => {
     try {
         const response = await faunaClient.query(
-            faunaQuery.Select("data",
-                faunaQuery.Map(
-                    faunaQuery.Paginate(faunaQuery.Match(faunaQuery.Index("models_by_owner"), owner_id)),
-                    faunaQuery.Lambda("model",
-                        {
-                            id: faunaQuery.Select(
-                                ['ref', 'id'],
-                                faunaQuery.Get(faunaQuery.Var('model'))),
-                            details: faunaQuery.Select("data", faunaQuery.Get(faunaQuery.Var("model")))
-                        })
-                )
-            )
+          faunaQuery`CadModels.models_by_owner(${owner_id})`
         )
             .catch((err: { name: any; message: any; errors: () => { description: any; }[]; }) => console.error(
                 'Error: [%s] %s: %s',
@@ -63,7 +45,8 @@ export const getModelsByOwner = async (faunaClient: faunadb.Client, faunaQuery: 
                 err.message,
                 err.errors()[0].description,
             ));
-        return (response as FaunaModelDetails[]).map(el => faunaModelDetailsToFaunaCadModel(el))
+        let res: FaunaModelDetails[] = ((response as QuerySuccess<any>).data.data as any[]).map((item: any) => {return {id: item.id, details: {...item} as FaunaCadModel}})
+        return res.map(el => faunaModelDetailsToFaunaCadModel(el))
     } catch (e) {
         console.log(e)
         return {} as [];

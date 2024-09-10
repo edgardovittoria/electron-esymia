@@ -43,7 +43,7 @@ import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs'
 import { publishMessage } from '../../../../../../middleware/stompMiddleware';
 import { TbServerBolt } from 'react-icons/tb';
 import { GiCubeforce, GiMeshBall } from 'react-icons/gi';
-import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaQuery';
 import { ComponentEntity, Material } from '../../../../../../cad_library';
 
 interface RightPanelSimulatorProps {

@@ -5,7 +5,7 @@ import { addFolder, SelectedFolderSelector } from "../../../../../store/projectS
 import { Dialog, Transition } from "@headlessui/react";
 import { Folder } from '../../../../../model/esymiaModels';
 import toast from 'react-hot-toast';
-import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../../../../../../cad_library';
 
 interface CreateNewFolderModalProps {

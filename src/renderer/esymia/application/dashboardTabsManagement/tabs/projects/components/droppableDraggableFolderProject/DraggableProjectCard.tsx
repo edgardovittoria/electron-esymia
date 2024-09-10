@@ -32,7 +32,7 @@ import {
 } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
 import { GrClone } from 'react-icons/gr';
 import { ImSpinner } from 'react-icons/im';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../../../../../../../cad_library';
 
 interface DraggableProjectCardProps {

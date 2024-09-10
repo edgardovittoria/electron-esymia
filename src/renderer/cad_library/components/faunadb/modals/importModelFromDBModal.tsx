@@ -7,9 +7,9 @@ import {
   ImportActionParamsObject
 } from "../../importFunctions/importFunctions";
 import { FaunaCadModel, getModelsByOwner } from "../api/modelsAPIs";
-import { useFaunaQuery } from "../useFaunaQuery";
 import { ComponentEntity } from "../../model/componentEntity/componentEntity";
 import AWS from "aws-sdk"
+import { useFaunaQuery } from "../../../../esymia/faunadb/hook/useFaunaQuery";
 
 export const ImportModelFromDBModal: FC<{
   showModalLoad: Function;

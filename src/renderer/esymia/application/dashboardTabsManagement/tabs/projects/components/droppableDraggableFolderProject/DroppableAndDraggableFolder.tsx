@@ -30,7 +30,7 @@ import { Folder, Project } from '../../../../../../model/esymiaModels';
 import { takeAllProjectsInArrayOf } from '../../../../../../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
 import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
 import { useStorageData } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../../../../../../../cad_library';
 
 interface DroppableAndDraggableFolderProps {

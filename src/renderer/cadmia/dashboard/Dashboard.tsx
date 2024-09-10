@@ -16,7 +16,7 @@ import {
 } from '../store/modelSlice';
 import { getSharedModels } from '../faunaDB/functions';
 import MySharedProject from './components/mySharedProjects/MySharedProject';
-import { useFaunaQuery } from '../../esymia/faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../esymia/faunadb/hook/useFaunaQuery';
 import { Client, fql, QuerySuccess } from 'fauna';
 import { FaunaCadModel, resetState } from '../../cad_library';
 

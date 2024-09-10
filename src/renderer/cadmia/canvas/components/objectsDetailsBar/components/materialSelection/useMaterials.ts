@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from "../../../../../../esymia/store/tabsAndMenuItemsSlice";
 import { useDispatch } from "react-redux";
-import { useFaunaQuery } from "../../../../../../esymia/faunadb/hook/useFaunaClient";
+import { useFaunaQuery } from "../../../../../../esymia/faunadb/hook/useFaunaQuery";
 import { Client, fql, QuerySuccess } from "fauna";
 import { Material } from "../../../../../../cad_library";
 

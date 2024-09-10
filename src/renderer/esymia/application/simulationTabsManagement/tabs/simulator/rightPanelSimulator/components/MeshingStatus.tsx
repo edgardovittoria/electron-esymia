@@ -38,7 +38,7 @@ import { Disclosure } from '@headlessui/react';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { PiClockCountdownBold } from 'react-icons/pi';
 import { TbTrashXFilled } from 'react-icons/tb';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { ComponentEntity, Material } from '../../../../../../../cad_library';
 
 export interface MeshingStatusProps {

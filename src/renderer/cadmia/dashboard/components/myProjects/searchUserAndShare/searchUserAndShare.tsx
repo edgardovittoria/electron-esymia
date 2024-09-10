@@ -8,7 +8,7 @@ import { SearchUser } from './components/SearchUser';
 import { updateModelInFauna } from '../../../../faunaDB/functions';
 import { updateModel } from '../../../../store/modelSlice';
 import { FaUserCheck } from 'react-icons/fa';
-import { useFaunaQuery } from '../../../../../esymia/faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { FaunaCadModel, usersStateSelector } from '../../../../../cad_library';
 
 interface SearchUserAndShareProps {

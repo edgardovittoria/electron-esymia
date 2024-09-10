@@ -24,7 +24,7 @@ import JSZip from 'jszip';
 import saveAs from 'file-saver';
 import { jsonToCSV } from 'react-papaparse';
 import { BsFiletypeCsv } from 'react-icons/bs';
-import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 
 export const ImportExportPhysicsSetup: FC<{}> = () => {
   const selectedProject = useSelector(selectedProjectSelector) as Project;

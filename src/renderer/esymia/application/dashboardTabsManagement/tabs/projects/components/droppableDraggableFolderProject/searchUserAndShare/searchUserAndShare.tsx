@@ -23,7 +23,7 @@ import {
 import { convertInFaunaProjectThis } from '../../../../../../../faunadb/apiAuxiliaryFunctions';
 import toast from 'react-hot-toast';
 import { addProjectTab, setShowCreateNewProjectModal } from '../../../../../../../store/tabsAndMenuItemsSlice';
-import { useFaunaQuery } from '../../../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../../faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../../../../../../../../cad_library';
 
 interface SearchUserAndShareProps {

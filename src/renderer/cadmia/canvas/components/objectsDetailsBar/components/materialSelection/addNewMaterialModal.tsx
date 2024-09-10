@@ -3,7 +3,7 @@ import {FC, Fragment, ReactNode, useEffect, useState} from "react"
 import toast from "react-hot-toast"
 import {ChromePicker} from "react-color"
 import ModalCustomAttributes, {CustomMaterialAttribute} from "./ModalCustomAttributes";
-import { useFaunaQuery } from "../../../../../../esymia/faunadb/hook/useFaunaClient"
+import { useFaunaQuery } from "../../../../../../esymia/faunadb/hook/useFaunaQuery"
 import { Client, fql } from "fauna"
 
 export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Function }> = ({

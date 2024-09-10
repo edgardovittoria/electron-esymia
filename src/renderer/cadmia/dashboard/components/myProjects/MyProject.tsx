@@ -14,7 +14,7 @@ import {
 import { selectModel, updateModel } from '../../../store/modelSlice';
 import RenameModal from './modal/RenameModal';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
-import { useFaunaQuery } from '../../../../esymia/faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../esymia/faunadb/hook/useFaunaQuery';
 import { FaunaCadModel, resetState } from '../../../../cad_library';
 
 export interface ContextMenuProps {

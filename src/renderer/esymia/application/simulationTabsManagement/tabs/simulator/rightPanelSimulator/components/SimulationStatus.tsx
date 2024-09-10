@@ -37,7 +37,7 @@ import { publishMessage } from '../../../../../../../middleware/stompMiddleware'
 import { PiClockCountdownBold } from 'react-icons/pi';
 import { ImSpinner } from 'react-icons/im';
 import { TbTrashXFilled } from 'react-icons/tb';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { ComponentEntity } from '../../../../../../../cad_library';
 
 export interface SimulationStatusProps {

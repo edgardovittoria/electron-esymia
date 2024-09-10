@@ -10,7 +10,7 @@ import {
   UserSessionInfo,
 } from './esymia/model/FaunaModels';
 import { useDispatch } from 'react-redux';
-import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaQuery';
 
 export const useAllowSingleSessionUser = () => {
   const { user } = useAuth0();

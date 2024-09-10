@@ -32,7 +32,7 @@ import {
   navbarShortcutStyle
 } from '../../../../../config/styles';
 import { setModality } from '../../../cadmiaModality/cadmiaModalitySlice';
-import { useFaunaQuery } from '../../../../../../esymia/faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { addComponent, BufferGeometryAttributes, canvasStateSelector, ComponentEntity, componentseSelector, exportToSTL, FaunaCadModel, getNewKeys, ImportActionParamsObject, ImportCadProjectButton, ImportModelFromDBModal, importStateCanvas, numberOfGeneratedKeySelector, TRANSF_PARAMS_DEFAULTS, CanvasState } from '../../../../../../cad_library';
 
 interface FileItemProps {}

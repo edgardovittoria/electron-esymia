@@ -31,7 +31,7 @@ import { DashboardTabsContentFactory } from './application/dashboardTabsManageme
 import { SimulationTabsContentFactory } from './application/simulationTabsManagement/SimulationTabsContentFactory';
 import { BsPlugin } from 'react-icons/bs';
 import Plugins from './plugin/Plugins';
-import { useFaunaQuery } from './faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from './faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../cad_library';
 export interface EsymiaProps {
   selectedTab: string;

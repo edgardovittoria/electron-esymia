@@ -4,7 +4,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import toast from 'react-hot-toast';
 import { updateModelInFauna } from '../../../../faunaDB/functions';
 import { updateModel } from '../../../../store/modelSlice';
-import { useFaunaQuery } from '../../../../../esymia/faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { FaunaCadModel } from '../../../../../cad_library';
 
 const RenameModal: FC<{

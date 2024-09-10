@@ -6,7 +6,7 @@ import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAP
 import { Project } from '../../../../../../model/esymiaModels';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 
 
 interface RenameProjectProps {

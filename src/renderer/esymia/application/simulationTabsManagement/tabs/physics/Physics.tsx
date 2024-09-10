@@ -52,7 +52,7 @@ import {
   LumpedImportFromCSV,
   PortImportFromCSV,
 } from './ImportPhysicsFromCSV';
-import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaClient';
+import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string | undefined;
