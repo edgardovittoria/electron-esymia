@@ -1,5 +1,4 @@
 import { User, useAuth0 } from '@auth0/auth0-react';
-import { useFaunaQuery } from 'cad-library';
 import { useEffect, useState } from 'react';
 import {
   createUserSessionInfo,
@@ -11,6 +10,7 @@ import {
   UserSessionInfo,
 } from './esymia/model/FaunaModels';
 import { useDispatch } from 'react-redux';
+import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaClient';
 
 export const useAllowSingleSessionUser = () => {
   const { user } = useAuth0();

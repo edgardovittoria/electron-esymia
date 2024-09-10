@@ -11,7 +11,7 @@ import {
 import { BiRename, BiShareAlt, BiTrash } from 'react-icons/bi';
 import { BsFillFolderSymlinkFill } from 'react-icons/bs';
 import { useDispatch, useSelector } from 'react-redux';
-import { useFaunaQuery, usersStateSelector } from 'cad-library';
+import { usersStateSelector } from 'cad-library';
 import {
   allProjectFoldersSelector,
   moveFolder,
@@ -31,6 +31,7 @@ import { Folder, Project } from '../../../../../../model/esymiaModels';
 import { takeAllProjectsInArrayOf } from '../../../../../../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
 import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
 import { useStorageData } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
 
 interface DroppableAndDraggableFolderProps {
   folder: Folder;

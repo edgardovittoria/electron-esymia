@@ -29,7 +29,7 @@ import {
 } from '../../../../../../store/projectSlice';
 import { Project } from '../../../../../../model/esymiaModels';
 import { generateSTLListFromComponents } from './rightPanelFunctions';
-import { ComponentEntity, Material, useFaunaQuery } from 'cad-library';
+import { ComponentEntity, Material } from 'cad-library';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
@@ -39,6 +39,7 @@ import { Disclosure } from '@headlessui/react';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { PiClockCountdownBold } from 'react-icons/pi';
 import { TbTrashXFilled } from 'react-icons/tb';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;

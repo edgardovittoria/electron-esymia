@@ -13,6 +13,7 @@ const configuration: webpack.Configuration = {
   stats: 'errors-only',
 
   module: {
+    unknownContextCritical: false,
     rules: [
       {
         test: /\.[jt]sx?$/,

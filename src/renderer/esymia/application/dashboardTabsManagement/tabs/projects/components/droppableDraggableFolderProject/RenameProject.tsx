@@ -1,12 +1,12 @@
 import React, {Fragment, useState} from 'react';
 import {Dialog, Transition} from "@headlessui/react";
 import {useDispatch} from "react-redux";
-import {useFaunaQuery} from "cad-library";
 import { renameProject } from '../../../../../../store/projectSlice';
 import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { Project } from '../../../../../../model/esymiaModels';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
 
 
 interface RenameProjectProps {

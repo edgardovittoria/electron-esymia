@@ -3,9 +3,7 @@ import { Folder, Project } from '../model/esymiaModels';
 import {
   FaunaFolder,
   FaunaFolderDetails,
-  FaunaProject,
   FaunaProjectDetails,
-  FaunaUserSessionInfo,
   UserSessionInfo,
 } from '../model/FaunaModels';
 import {
@@ -22,128 +20,37 @@ import {
   setShowInfoModal,
 } from '../store/tabsAndMenuItemsSlice';
 import { Dispatch } from '@reduxjs/toolkit';
+import { Client, fql, QuerySuccess } from 'fauna';
+import { FaunaProject, FaunaUserSessionInfo } from '../model/FaunaModels';
 
-/* export const execQueryCustom = async (queryFunction: (faunaClient: faunadb.Client, faunaQuery: typeof faunadb.query, ...params: any) => Promise<any>, token: string, ...queryParams: any) => {
-  try {
-    const faunaClient = new faunadb.Client({ secret: token })
-    const faunaQuery = faunadb.query
-    return queryFunction(faunaClient, faunaQuery, ...queryParams)
-  } catch (e) {
-    console.log(e)
-    return null
-  }
-} */
+
 export const getFoldersByOwner = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   owner: string,
   dispatch: Dispatch,
 ) => {
-  const response = await faunaClient
-    .query(
-      faunaQuery.Select(
-        'data',
-        faunaQuery.Map(
-          faunaQuery.Paginate(
-            faunaQuery.Match(faunaQuery.Index('folders_by_owner'), owner),
-          ),
-          faunaQuery.Lambda('folder', {
-            id: faunaQuery.Select(
-              ['ref', 'id'],
-              faunaQuery.Get(faunaQuery.Var('folder')),
-            ),
-            folder: faunaQuery.Select(
-              ['data'],
-              faunaQuery.Get(faunaQuery.Var('folder')),
-            ),
-          }),
-        ),
+  const query = faunaQuery`Folders.folders_by_owner(${owner})`;
+  const response = await faunaClient.query(query).catch((err) => {
+    dispatch(
+      setMessageInfoModal(
+        'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
       ),
-    )
-    .catch((err) => {
-      dispatch(
-        setMessageInfoModal(
-          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
-        ),
-      );
-      dispatch(setIsAlertInfoModal(false));
-      dispatch(setShowInfoModal(true));
-    });
-  return response as FaunaFolder[];
-};
-
-export const getFoldersByOwnerUsername = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
-  owner: string,
-  dispatch: Dispatch,
-) => {
-  const response = await faunaClient
-    .query(
-      faunaQuery.Select(
-        'data',
-        faunaQuery.Map(
-          faunaQuery.Paginate(
-            faunaQuery.Match(
-              faunaQuery.Index('folders_by_owner_username'),
-              owner,
-            ),
-          ),
-          faunaQuery.Lambda('folder', {
-            id: faunaQuery.Select(
-              ['ref', 'id'],
-              faunaQuery.Get(faunaQuery.Var('folder')),
-            ),
-            folder: faunaQuery.Select(
-              ['data'],
-              faunaQuery.Get(faunaQuery.Var('folder')),
-            ),
-          }),
-        ),
-      ),
-    )
-    .catch((err) => {
-      dispatch(
-        setMessageInfoModal(
-          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
-        ),
-      );
-      dispatch(setIsAlertInfoModal(false));
-      dispatch(setShowInfoModal(true));
-    });
-  return response as FaunaFolder[];
+    );
+    dispatch(setIsAlertInfoModal(false));
+    dispatch(setShowInfoModal(true));
+  });
+  return (response as QuerySuccess<any>).data.data as FaunaFolder[];
 };
 
 export const getSimulationProjectsByOwner = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   owner: string,
   dispatch: Dispatch,
 ) => {
-  const response = await faunaClient
-    .query(
-      faunaQuery.Select(
-        'data',
-        faunaQuery.Map(
-          faunaQuery.Paginate(
-            faunaQuery.Match(
-              faunaQuery.Index('simulationProjects_by_owner'),
-              owner,
-            ),
-          ),
-          faunaQuery.Lambda('project', {
-            id: faunaQuery.Select(
-              ['ref', 'id'],
-              faunaQuery.Get(faunaQuery.Var('project')),
-            ),
-            project: faunaQuery.Select(
-              ['data'],
-              faunaQuery.Get(faunaQuery.Var('project')),
-            ),
-          }),
-        ),
-      ),
-    )
+  const query = faunaQuery`SimulationProjects.simulationProjects_by_owner(${owner})`
+  const response = await faunaClient.query(query)
     .catch((err) => {
       dispatch(
         setMessageInfoModal(
@@ -153,25 +60,21 @@ export const getSimulationProjectsByOwner = async (
       dispatch(setIsAlertInfoModal(false));
       dispatch(setShowInfoModal(true));
     });
-  return response as FaunaProject[];
+  return (response as QuerySuccess<any>).data.data as FaunaProject[];
 };
 
 export const createFolderInFauna = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   folderToSave: Folder,
   dispatch: Dispatch,
 ) => {
-  const response = await faunaClient
-    .query(
-      faunaQuery.Create(faunaQuery.Collection('Folders'), {
-        data: {
-          ...folderToSave,
-          projectList: [],
-          subFolders: [],
-        } as FaunaFolderDetails,
-      }),
-    )
+  const query = faunaQuery`Folders.create(${{
+    ...folderToSave,
+    projectList: [],
+    subFolders: [],
+  } as FaunaFolderDetails})`
+  const response = await faunaClient.query(query)
     .catch((err) => {
       dispatch(
         setMessageInfoModal(
@@ -185,49 +88,36 @@ export const createFolderInFauna = async (
 };
 
 export const deleteFolderFromFauna = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   folderToDelete: string,
   oldParent: string,
-  dispatch: Dispatch
+  dispatch: Dispatch,
 ) => {
   faunaClient
-    .query(faunaQuery.Call('get_all_subfolders_of_folder', folderToDelete))
+    .query(faunaQuery`get_all_subfolders_of_folder(${folderToDelete})`)
     .then((subFolders) => {
       faunaClient
         .query(
-          faunaQuery.Call(
-            'get_all_projects_recursively_of_folder',
-            folderToDelete,
-          ),
+          faunaQuery`get_all_projects_recursively_of_folder(${folderToDelete})`
         )
         .then((projects) => {
           faunaClient.query(
-            faunaQuery.Delete(
-              faunaQuery.Ref(faunaQuery.Collection('Folders'), folderToDelete),
+            faunaQuery`Folders.delete(${folderToDelete})`
+          );
+          ((subFolders as QuerySuccess<any>).data.data as string[]).forEach((sb) =>
+            faunaClient.query(
+              faunaQuery`Folders.delete(${sb})`
             ),
           );
-          (subFolders as string[]).forEach((sb) =>
+          ((projects as QuerySuccess<any>).data.data as string[]).forEach((p) =>
             faunaClient.query(
-              faunaQuery.Delete(
-                faunaQuery.Ref(faunaQuery.Collection('Folders'), sb),
-              ),
-            ),
-          );
-          (projects as string[]).forEach((p) =>
-            faunaClient.query(
-              faunaQuery.Delete(
-                faunaQuery.Ref(faunaQuery.Collection('SimulationProjects'), p),
-              ),
+              faunaQuery`SimulationProjects.delete(${p})`
             ),
           );
           oldParent !== 'root' &&
             faunaClient.query(
-              faunaQuery.Call(
-                'remove_subfolder_from_folder',
-                folderToDelete,
-                oldParent,
-              ),
+              faunaQuery`remove_subfolder_from_folder(${folderToDelete}, ${oldParent})`
             );
         })
         .catch((err) => {
@@ -243,8 +133,8 @@ export const deleteFolderFromFauna = async (
 };
 
 export const addIDInSubFoldersList = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   folderFaunaID: string,
   selectedFolder: Folder,
   dispatch: Dispatch,
@@ -252,18 +142,7 @@ export const addIDInSubFoldersList = async (
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
     .query(
-      faunaQuery.Update(
-        faunaQuery.Ref(
-          faunaQuery.Collection('Folders'),
-          selectedFolder.faunaDocumentId,
-        ),
-        {
-          data: {
-            ...folder,
-            subFolders: [...folder.subFolders, folderFaunaID],
-          },
-        },
-      ),
+      faunaQuery`Folders.byId(${selectedFolder.faunaDocumentId as string}).update(${{subFolders: [...folder.subFolders, folderFaunaID]}})`
     )
     .catch((err) => {
       dispatch(
@@ -278,8 +157,8 @@ export const addIDInSubFoldersList = async (
 };
 
 export const removeIDInSubFoldersList = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   folderFaunaID: string,
   selectedFolder: Folder,
   dispatch: Dispatch,
@@ -287,20 +166,9 @@ export const removeIDInSubFoldersList = async (
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
     .query(
-      faunaQuery.Update(
-        faunaQuery.Ref(
-          faunaQuery.Collection('Folders'),
-          selectedFolder.faunaDocumentId,
-        ),
-        {
-          data: {
-            ...folder,
-            subFolders: [
-              ...folder.subFolders.filter((id) => id !== folderFaunaID),
-            ],
-          },
-        },
-      ),
+      faunaQuery`Folders.byId(${selectedFolder.faunaDocumentId as string}).update(${{subFolders: [
+        ...folder.subFolders.filter((id) => id !== folderFaunaID),
+      ]}})`
     )
     .catch((err) => {
       dispatch(
@@ -315,36 +183,27 @@ export const removeIDInSubFoldersList = async (
 };
 
 export const deleteSimulationProjectFromFauna = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   projectToDelete: string,
   parentFolder: string,
   dispatch: Dispatch,
 ) => {
   faunaClient
     .query(
-      faunaQuery.Delete(
-        faunaQuery.Ref(
-          faunaQuery.Collection('SimulationProjects'),
-          projectToDelete,
-        ),
-      ),
+      faunaQuery`SimulationProjects.delete(${projectToDelete})`
     )
     .then(() => {
       parentFolder !== 'root' &&
         faunaClient.query(
-          faunaQuery.Call(
-            'remove_project_from_folder',
-            projectToDelete,
-            parentFolder,
-          ),
+          faunaQuery`remove_project_from_folder(${projectToDelete}, ${parentFolder})`
         );
     });
 };
 
 export const removeIDInFolderProjectsList = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   projectFaunaID: string,
   selectedFolder: Folder,
   dispatch: Dispatch,
@@ -352,20 +211,9 @@ export const removeIDInFolderProjectsList = async (
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
     .query(
-      faunaQuery.Update(
-        faunaQuery.Ref(
-          faunaQuery.Collection('Folders'),
-          selectedFolder.faunaDocumentId,
-        ),
-        {
-          data: {
-            ...folder,
-            projectList: [
-              ...folder.projectList.filter((id) => id !== projectFaunaID),
-            ],
-          },
-        },
-      ),
+      faunaQuery`Folders.byId(${selectedFolder.faunaDocumentId as string}).update(${{projectList: [
+        ...folder.projectList.filter((id) => id !== projectFaunaID)
+      ]}})`
     )
     .catch((err) => {
       dispatch(
@@ -380,16 +228,14 @@ export const removeIDInFolderProjectsList = async (
 };
 
 export const createSimulationProjectInFauna = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   projectToSave: Project,
   dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery.Create(faunaQuery.Collection('SimulationProjects'), {
-        data: { ...projectToSave } as FaunaProjectDetails,
-      }),
+      faunaQuery`SimulationProjects.create(${{...projectToSave as FaunaProjectDetails}})`
     )
     .catch((err) => {
       dispatch(
@@ -404,8 +250,8 @@ export const createSimulationProjectInFauna = async (
 };
 
 export const addIDInFolderProjectsList = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   projectFaunaID: string,
   selectedFolder: Folder,
   dispatch: Dispatch,
@@ -413,18 +259,7 @@ export const addIDInFolderProjectsList = async (
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
     .query(
-      faunaQuery.Update(
-        faunaQuery.Ref(
-          faunaQuery.Collection('Folders'),
-          selectedFolder.faunaDocumentId,
-        ),
-        {
-          data: {
-            ...folder,
-            projectList: [...folder.projectList, projectFaunaID],
-          },
-        },
-      ),
+      faunaQuery`Folders.byId(${selectedFolder.faunaDocumentId as string}).update(${{projectList: [...folder.projectList, projectFaunaID]}})`
     )
     .catch((err) => {
       dispatch(
@@ -439,22 +274,14 @@ export const addIDInFolderProjectsList = async (
 };
 
 export const updateProjectInFauna = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   projectToUpdate: FaunaProject,
   dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery.Update(
-        faunaQuery.Ref(
-          faunaQuery.Collection('SimulationProjects'),
-          projectToUpdate.id,
-        ),
-        {
-          data: projectToUpdate.project,
-        },
-      ),
+      faunaQuery`SimulationProjects.byId(${projectToUpdate.id}).update(${projectToUpdate.project})`
     )
     .catch((err) => {
       dispatch(
@@ -469,22 +296,14 @@ export const updateProjectInFauna = async (
 };
 
 export const updateFolderInFauna = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   folderToUpdate: Folder,
   dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery.Update(
-        faunaQuery.Ref(
-          faunaQuery.Collection('Folders'),
-          folderToUpdate.faunaDocumentId,
-        ),
-        {
-          data: convertInFaunaFolderDetailsThis(folderToUpdate),
-        },
-      ),
+      faunaQuery`Folders.byId(${folderToUpdate.faunaDocumentId as string}).update(${convertInFaunaFolderDetailsThis(folderToUpdate)})`
     )
     .catch((err) => {
       dispatch(
@@ -499,40 +318,24 @@ export const updateFolderInFauna = async (
 };
 
 export const moveFolderInFauna = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   folderToMove: Folder,
   oldParent: string,
-  dispatch: Dispatch
+  dispatch: Dispatch,
 ) => {
   faunaClient
     .query(
-      faunaQuery.Update(
-        faunaQuery.Ref(
-          faunaQuery.Collection('Folders'),
-          folderToMove.faunaDocumentId,
-        ),
-        {
-          data: convertInFaunaFolderDetailsThis(folderToMove),
-        },
-      ),
+      faunaQuery`Folders.byId(${folderToMove.faunaDocumentId as string}).update(${convertInFaunaFolderDetailsThis(folderToMove)})`
     )
     .then(() => {
       oldParent !== 'root' &&
         faunaClient.query(
-          faunaQuery.Call(
-            'remove_subfolder_from_folder',
-            folderToMove.faunaDocumentId as string,
-            oldParent,
-          ),
+          faunaQuery`remove_subfolder_from_folder(${folderToMove.faunaDocumentId as string}, ${oldParent})`
         );
       folderToMove.parent !== 'root' &&
         faunaClient.query(
-          faunaQuery.Call(
-            'add_subfolder_to_folder',
-            folderToMove.faunaDocumentId as string,
-            folderToMove.parent,
-          ),
+          faunaQuery`add_subfolder_to_folder(${folderToMove.faunaDocumentId as string}, ${folderToMove.parent})`
         );
     })
     .catch((err) => {
@@ -547,42 +350,26 @@ export const moveFolderInFauna = async (
 };
 
 export const moveProjectInFauna = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   projectToUpdate: Project,
   oldParent: string,
-  dispatch: Dispatch
+  dispatch: Dispatch,
 ) => {
   faunaClient
     .query(
-      faunaQuery.Update(
-        faunaQuery.Ref(
-          faunaQuery.Collection('SimulationProjects'),
-          projectToUpdate.faunaDocumentId,
-        ),
-        {
-          data: {
-            ...projectToUpdate,
-          } as FaunaProjectDetails,
-        },
-      ),
+      faunaQuery`SimulationProjects.byId(${projectToUpdate.faunaDocumentId as string}).update(${{
+        ...projectToUpdate,
+      } as FaunaProjectDetails})`
     )
     .then(() => {
       oldParent !== 'root' &&
         faunaClient.query(
-          faunaQuery.Call(
-            'remove_project_from_folder',
-            projectToUpdate.faunaDocumentId as string,
-            oldParent,
-          ),
+          faunaQuery`remove_project_from_folder(${projectToUpdate.faunaDocumentId as string}, ${oldParent})`
         );
       projectToUpdate.parentFolder !== 'root' &&
         faunaClient.query(
-          faunaQuery.Call(
-            'add_project_to_folder',
-            projectToUpdate.faunaDocumentId as string,
-            projectToUpdate.parentFolder,
-          ),
+          faunaQuery`add_project_to_folder(${projectToUpdate.faunaDocumentId as string}, ${projectToUpdate.parentFolder})`
         );
     })
     .catch((err) => {
@@ -597,34 +384,14 @@ export const moveProjectInFauna = async (
 };
 
 export const getSharedSimulationProjects = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   user: string,
   dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery.Select(
-        'data',
-        faunaQuery.Map(
-          faunaQuery.Paginate(
-            faunaQuery.Match(
-              faunaQuery.Index('get_shared_projects_by_user_email'),
-              user,
-            ),
-          ),
-          faunaQuery.Lambda('project', {
-            id: faunaQuery.Select(
-              ['ref', 'id'],
-              faunaQuery.Get(faunaQuery.Var('project')),
-            ),
-            project: faunaQuery.Select(
-              ['data'],
-              faunaQuery.Get(faunaQuery.Var('project')),
-            ),
-          }),
-        ),
-      ),
+      faunaQuery`SimulationProjects.get_shared_projects_by_user_email(${user})`
     )
     .catch((err) => {
       dispatch(
@@ -635,38 +402,19 @@ export const getSharedSimulationProjects = async (
       dispatch(setIsAlertInfoModal(false));
       dispatch(setShowInfoModal(true));
     });
-  return response as FaunaProject[];
+    let res:FaunaProject[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, project: {...item} as FaunaProjectDetails}})
+  return res
 };
 
 export const getSharedFolders = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   user: string,
   dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery.Select(
-        'data',
-        faunaQuery.Map(
-          faunaQuery.Paginate(
-            faunaQuery.Match(
-              faunaQuery.Index('get_shared_folders_by_user_email'),
-              user,
-            ),
-          ),
-          faunaQuery.Lambda('folder', {
-            id: faunaQuery.Select(
-              ['ref', 'id'],
-              faunaQuery.Get(faunaQuery.Var('folder')),
-            ),
-            folder: faunaQuery.Select(
-              ['data'],
-              faunaQuery.Get(faunaQuery.Var('folder')),
-            ),
-          }),
-        ),
-      ),
+      faunaQuery`Folders.get_shared_folders_by_user_email(${user})`
     )
     .catch((err) => {
       dispatch(
@@ -677,12 +425,13 @@ export const getSharedFolders = async (
       dispatch(setIsAlertInfoModal(false));
       dispatch(setShowInfoModal(true));
     });
-  return response as FaunaFolder[];
+    let res:FaunaFolder[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, folder: {...item} as FaunaFolderDetails}})
+  return res;
 };
 
 export const recursiveUpdateSharingInfoFolderInFauna = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   folderToUpdate: Folder,
   dispatch: Dispatch,
 ) => {
@@ -702,34 +451,14 @@ export const recursiveUpdateSharingInfoFolderInFauna = async (
 };
 
 export const getUserSessionInfo = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   user: string,
   dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery.Select(
-        'data',
-        faunaQuery.Map(
-          faunaQuery.Paginate(
-            faunaQuery.Match(
-              faunaQuery.Index('get_user_session_info_by_email'),
-              user,
-            ),
-          ),
-          faunaQuery.Lambda('userSessionInfo', {
-            id: faunaQuery.Select(
-              ['ref', 'id'],
-              faunaQuery.Get(faunaQuery.Var('userSessionInfo')),
-            ),
-            userSessionInfo: faunaQuery.Select(
-              ['data'],
-              faunaQuery.Get(faunaQuery.Var('userSessionInfo')),
-            ),
-          }),
-        ),
-      ),
+      faunaQuery`UserSessionManagement.get_user_session_info_by_email(${user})`
     )
     .catch((err) => {
       dispatch(
@@ -740,26 +469,19 @@ export const getUserSessionInfo = async (
       dispatch(setIsAlertInfoModal(false));
       dispatch(setShowInfoModal(true));
     });
-  return response as FaunaProject[];
+    let res:FaunaUserSessionInfo[] = ((response as QuerySuccess<any>).data.data as any[]).map((item: any) => {return {id: item.id, userSessionInfo: {...item} as UserSessionInfo}})
+  return res;
 };
 
 export const updateUserSessionInfo = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   userSessionInfo: FaunaUserSessionInfo,
   dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery.Update(
-        faunaQuery.Ref(
-          faunaQuery.Collection('UserSessionManagement'),
-          userSessionInfo.id,
-        ),
-        {
-          data: userSessionInfo.userSessionInfo,
-        },
-      ),
+      faunaQuery`UserSessionManagement.byId(${userSessionInfo.id}).update(${userSessionInfo.userSessionInfo})`
     )
     .catch((err) => {
       dispatch(
@@ -774,16 +496,14 @@ export const updateUserSessionInfo = async (
 };
 
 export const createUserSessionInfo = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   userSessionInfo: UserSessionInfo,
   dispatch: Dispatch,
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery.Create(faunaQuery.Collection('UserSessionManagement'), {
-        data: userSessionInfo,
-      }),
+      faunaQuery`UserSessionManagement.create(${userSessionInfo})`
     )
     .catch((err) => {
       dispatch(

@@ -1,6 +1,6 @@
 import React, { FC, Fragment, useState } from 'react';
 import { Item, Menu, Separator, useContextMenu } from 'react-contexify';
-import { FaunaCadModel, resetState, useFaunaQuery } from 'cad-library';
+import { FaunaCadModel, resetState } from 'cad-library';
 import { ActionCreators } from 'redux-undo';
 import { GiCubeforce } from 'react-icons/gi';
 import { useDispatch } from 'react-redux';
@@ -15,6 +15,7 @@ import {
 import { selectModel, updateModel } from '../../../store/modelSlice';
 import RenameModal from './modal/RenameModal';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
+import { useFaunaQuery } from '../../../../esymia/faunadb/hook/useFaunaClient';
 
 export interface ContextMenuProps {
   model: FaunaCadModel;

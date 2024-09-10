@@ -1,10 +1,10 @@
 import React, {Fragment, useState} from 'react';
 import {useDispatch} from "react-redux";
-import {useFaunaQuery} from "cad-library";
 import {Dialog, Transition} from "@headlessui/react";
 import {updateFolderInFauna} from "../../../../../../faunadb/projectsFolderAPIs";
 import { renameFolder } from '../../../../../../store/projectSlice';
 import { Folder } from '../../../../../../model/esymiaModels';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
 
 interface RenameFolderProps {
     folderToRename: Folder,

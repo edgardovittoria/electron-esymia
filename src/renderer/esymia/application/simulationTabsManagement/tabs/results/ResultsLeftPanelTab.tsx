@@ -9,9 +9,9 @@ import {
 import noResultsIcon from '../../../../../../../assets/noResultsIcon.png';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
-import { useFaunaQuery } from 'cad-library';
 import { Project } from '../../../../model/esymiaModels';
 import { ImSpinner } from 'react-icons/im';
+import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaClient';
 
 interface ResultsLeftPanelTabProps {
   selectedPort: string;

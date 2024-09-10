@@ -16,14 +16,14 @@ import { MyPanel } from '../../sharedElements/MyPanel';
 import { useFaunaQuery } from 'cad-library';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
-import { Folder, Project } from '../../../../model/esymiaModels';
+import { Folder, Port, Project } from '../../../../model/esymiaModels';
 import {
   alertMessageStyle,
   emptyResultsMessage,
   runningSimulationMessageOnResults,
 } from '../../../config/textMessages';
 import { resultsLeftPanelTitle } from '../../../config/panelTitles';
-import { Dataset } from './sharedElements';
+import { Dataset, pairs } from './sharedElements';
 import { AiOutlineBarChart } from 'react-icons/ai';
 import { useStorageData } from '../simulator/rightPanelSimulator/hook/useStorageData';
 import { GrClone } from 'react-icons/gr';
@@ -49,9 +49,13 @@ export const Results: React.FC<ResultsProps> = ({
   const selectedFolder = useSelector(SelectedFolderSelector);
   let selectedPort = findSelectedPort(selectedProject);
   const dispatch = useDispatch();
+  const ports = selectedProject?.ports.filter(
+    (p) => p.category === 'port',
+  ) as Port[];
+  const labels = pairs(ports.map((p) => p.name));
   const [selectedLabel, setSelectedLabel] = useState<
     { label: string; id: number }[]
-  >([{ label: 'All Ports', id: 0 }]);
+  >([{ label: `${labels[0][0]} - ${labels[0][1]}`, id: 0 }]);
   const [chartsScaleMode, setChartsScaleMode] = useState<
     'logarithmic' | 'linear'
   >('logarithmic');
@@ -69,9 +73,9 @@ export const Results: React.FC<ResultsProps> = ({
     }[]
   >([]);
 
-  useEffect(() => {
-    setSelectedLabel([{ label: 'All Ports', id: 0 }]);
-  }, [selectedProject]);
+  // useEffect(() => {
+  //   setSelectedLabel([{ label: 'All Ports', id: 0 }]);
+  // }, [selectedProject]);
 
   useEffect(() => {
     setSelectedTabLeftPanel(undefined)

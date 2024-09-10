@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import {
   CanvasState,
-  useFaunaQuery, UsersState,
+  UsersState,
   usersStateSelector
 } from 'cad-library';
 import {
@@ -22,6 +22,7 @@ import {
 } from '../../store/tabsAndMenuItemsSlice';
 import { Project, sharingInfoUser } from '../../model/esymiaModels';
 import toast from 'react-hot-toast';
+import { useFaunaQuery } from '../../faunadb/hook/useFaunaClient';
 
 interface CreateNewProjectModalProps {
 }

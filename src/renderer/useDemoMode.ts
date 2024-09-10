@@ -1,4 +1,3 @@
-import { useFaunaQuery } from 'cad-library';
 import { useEffect, useState } from 'react';
 import faunadb from 'faunadb';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -8,6 +7,8 @@ import {
   setShowInfoModal,
 } from './esymia/store/tabsAndMenuItemsSlice';
 import { useDispatch } from 'react-redux';
+import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaClient';
+import { Client, fql, QuerySuccess } from 'fauna';
 
 export const useDemoMode = () => {
   const MILLISECONDS_IN_A_DAY = 8.64e7;
@@ -17,36 +18,15 @@ export const useDemoMode = () => {
   const [remainingDemoDays, setRemainingDemoDays] = useState<number>(DEMO_DAYS);
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
+  console.log(user)
 
   const getItemByMacAddress = async (
-    faunaClient: faunadb.Client,
-    faunaQuery: typeof faunadb.query,
+    faunaClient: Client,
+    faunaQuery: typeof fql,
     macaddress: string,
   ) => {
-    const response = await faunaClient
-      .query(
-        faunaQuery.Select(
-          'data',
-          faunaQuery.Map(
-            faunaQuery.Paginate(
-              faunaQuery.Match(
-                faunaQuery.Index('get_item_by_macaddress'),
-                macaddress,
-              ),
-            ),
-            faunaQuery.Lambda('item', {
-              id: faunaQuery.Select(
-                ['ref', 'id'],
-                faunaQuery.Get(faunaQuery.Var('item')),
-              ),
-              item: faunaQuery.Select(
-                ['data'],
-                faunaQuery.Get(faunaQuery.Var('item')),
-              ),
-            }),
-          ),
-        ),
-      )
+    const query = fql`getItemByMacAddress(${macaddress})`
+    const response = await faunaClient.query(query)
       .catch((err) => {
         dispatch(
           setMessageInfoModal(
@@ -56,20 +36,16 @@ export const useDemoMode = () => {
         dispatch(setIsAlertInfoModal(false));
         dispatch(setShowInfoModal(true));
       });
-    return response;
+    return (response as QuerySuccess<any>).data.data;
   };
 
   const createItemInMacAddresses = async (
-    faunaClient: faunadb.Client,
-    faunaQuery: typeof faunadb.query,
+    faunaClient: Client,
+    faunaQuery: typeof fql,
     itemToSave: { macAddress: string; startTime: number },
   ) => {
-    const response = await faunaClient
-      .query(
-        faunaQuery.Create(faunaQuery.Collection('MacAddresses'), {
-          data: itemToSave,
-        }),
-      )
+    const query = faunaQuery`MacAddresses.create(${itemToSave})`
+    const response = faunaClient.query(query)
       .catch((err) => {
         dispatch(
           setMessageInfoModal(
@@ -91,8 +67,9 @@ export const useDemoMode = () => {
   const checkDemoPeriod = () => {
     window.electron.ipcRenderer.invoke('getMac').then((res) => {
       execQuery(getItemByMacAddress, res).then((item) => {
+        console.log("mac -> ", item)
         if (item.length !== 0) {
-          let elapsedDays = demoElapsedDays(item[0].item.startTime);
+          let elapsedDays = demoElapsedDays(item[0].startTime);
           setRemainingDemoDays(DEMO_DAYS - elapsedDays);
           if (elapsedDays >= DEMO_DAYS) {
             setallowedUser(false);

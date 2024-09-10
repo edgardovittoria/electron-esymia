@@ -1,5 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { canvasStateSelector, FaunaCadModel, useFaunaQuery } from 'cad-library';
+import { canvasStateSelector, FaunaCadModel } from 'cad-library';
 import { FC, Fragment, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +9,8 @@ import { unitSelector } from '../../../../statusBar/statusBarSlice';
 import { uploadFileS3 } from '../../../../../../aws/crud';
 import { addModel, setLoadingSpinner } from '../../../../../../store/modelSlice';
 import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../../../../../../esymia/store/tabsAndMenuItemsSlice';
+import { useFaunaQuery } from '../../../../../../../esymia/faunadb/hook/useFaunaClient';
+import { Client, fql } from 'fauna';
 
 export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
   showModalSave,
@@ -21,17 +23,13 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
   const dispatch = useDispatch();
 
   const saveModelInFauna = async (
-    faunaClient: faunadb.Client,
-    faunaQuery: typeof faunadb.query,
+    faunaClient: Client,
+    faunaQuery: typeof fql,
     modelToSave: FaunaCadModel,
   ) => {
     const response = await faunaClient
       .query(
-        faunaQuery.Create(faunaQuery.Collection('CadModels'), {
-          data: {
-            ...modelToSave,
-          },
-        }),
+        faunaQuery`CadModels.create(${modelToSave})`
       )
       .catch(
         (err: {

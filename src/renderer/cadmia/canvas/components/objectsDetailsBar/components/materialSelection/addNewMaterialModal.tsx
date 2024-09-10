@@ -1,10 +1,10 @@
 import {Dialog, Transition} from "@headlessui/react"
-import {useFaunaQuery} from "cad-library"
 import {FC, Fragment, ReactNode, useEffect, useState} from "react"
 import toast from "react-hot-toast"
 import {ChromePicker} from "react-color"
 import faunadb from "faunadb"
 import ModalCustomAttributes, {CustomMaterialAttribute} from "./ModalCustomAttributes";
+import { useFaunaQuery } from "../../../../../../esymia/faunadb/hook/useFaunaClient"
 
 export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Function }> = ({
                                                                                                 showModal,

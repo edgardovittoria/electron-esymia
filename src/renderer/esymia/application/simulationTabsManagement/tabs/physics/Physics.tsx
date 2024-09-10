@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useState } from 'react';
-import { meshFrom, useFaunaQuery } from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
 import * as THREE from 'three';
 import { BiHide, BiShow } from 'react-icons/bi';
@@ -53,6 +52,7 @@ import {
   LumpedImportFromCSV,
   PortImportFromCSV,
 } from './ImportPhysicsFromCSV';
+import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaClient';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string | undefined;

@@ -23,7 +23,6 @@ import {
 } from '../../../../../../faunadb/projectsFolderAPIs';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import { useFaunaQuery } from 'cad-library';
 import {
   deleteFile,
   readLocalFile,
@@ -33,6 +32,7 @@ import { addProjectTab, closeProjectTab } from '../../../../../../store/tabsAndM
 import { Brick } from '../components/createGridsExternals';
 import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();

@@ -1,4 +1,4 @@
-import { ComponentEntity, Material, useFaunaQuery } from 'cad-library';
+import { ComponentEntity, Material } from 'cad-library';
 import React, { FC, Fragment, useEffect, useState } from 'react';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
@@ -44,6 +44,7 @@ import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs'
 import { publishMessage } from '../../../../../../middleware/stompMiddleware';
 import { TbServerBolt } from 'react-icons/tb';
 import { GiCubeforce, GiMeshBall } from 'react-icons/gi';
+import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaClient';
 
 interface RightPanelSimulatorProps {
   selectedProject: Project;

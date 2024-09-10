@@ -84,7 +84,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
           </label>
           <ul
             tabIndex={0}
-            className="dropdown-content p-2 shadow bg-base-100 rounded-box w-52"
+            className="dropdown-content p-2 shadow bg-base-100 rounded-box w-full h-[500px] max-h-[500px] overflow-y-scroll"
           >
             <li
               className="flex flex-row items-center justify-between p-2"

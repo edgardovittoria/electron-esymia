@@ -51,7 +51,7 @@ export default function App() {
     window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
       dispatch(setHomePat(res));
     });
-    window.electron.ipcRenderer.sendMessage('runBroker', []);
+    //window.electron.ipcRenderer.sendMessage('runBroker', []);
     dispatch(connectStomp());
     return () => {
       dispatch(disconnectStomp());

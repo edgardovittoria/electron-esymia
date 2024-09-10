@@ -11,7 +11,7 @@ import {
 import { BiRename, BiShareAlt, BiTrash } from 'react-icons/bi';
 import { BsFillFolderSymlinkFill } from 'react-icons/bs';
 import { useDispatch, useSelector } from 'react-redux';
-import { useFaunaQuery, usersStateSelector } from 'cad-library';
+import { usersStateSelector } from 'cad-library';
 import {
   allProjectFoldersSelector,
   moveProject,
@@ -33,6 +33,7 @@ import {
 } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
 import { GrClone } from 'react-icons/gr';
 import { ImSpinner } from 'react-icons/im';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
 
 interface DraggableProjectCardProps {
   project: Project;

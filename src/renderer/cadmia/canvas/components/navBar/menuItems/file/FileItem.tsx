@@ -24,7 +24,6 @@ import {
   numberOfGeneratedKeySelector,
   saveNewModel,
   TRANSF_PARAMS_DEFAULTS,
-  useFaunaQuery,
 } from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -51,6 +50,7 @@ import {
   navbarShortcutStyle
 } from '../../../../../config/styles';
 import { setModality } from '../../../cadmiaModality/cadmiaModalitySlice';
+import { useFaunaQuery } from '../../../../../../esymia/faunadb/hook/useFaunaClient';
 
 interface FileItemProps {}
 

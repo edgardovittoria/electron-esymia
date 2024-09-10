@@ -16,9 +16,9 @@ import {
 } from '../../../../store/projectSlice';
 import { Folder, Project } from '../../../../model/esymiaModels';
 import { ImSpinner } from 'react-icons/im';
-import { useFaunaQuery } from 'cad-library';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
+import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaClient';
 
 interface ModelerProps {
   selectedTabLeftPanel: string | undefined;

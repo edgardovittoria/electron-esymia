@@ -1,9 +1,10 @@
-import { Material, useFaunaQuery } from "cad-library";
+import { Material } from "cad-library";
 import {useEffect, useState} from "react";
 import faunadb from 'faunadb'
 import { useAuth0 } from "@auth0/auth0-react";
 import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from "../../../../../../esymia/store/tabsAndMenuItemsSlice";
 import { useDispatch } from "react-redux";
+import { useFaunaQuery } from "../../../../../../esymia/faunadb/hook/useFaunaClient";
 
 export const useMaterials = () => {
     const {user} = useAuth0()

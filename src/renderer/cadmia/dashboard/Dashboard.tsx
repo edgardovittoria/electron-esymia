@@ -4,7 +4,6 @@ import {
   FaunaCadModel,
   getModelsByOwner,
   resetState,
-  useFaunaQuery
 } from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
 import { ActionCreators } from 'redux-undo';
@@ -22,6 +21,7 @@ import {
 } from '../store/modelSlice';
 import { getSharedModels } from '../faunaDB/functions';
 import MySharedProject from './components/mySharedProjects/MySharedProject';
+import { useFaunaQuery } from '../../esymia/faunadb/hook/useFaunaClient';
 
 export interface DashboardProps {
   showCad: boolean;

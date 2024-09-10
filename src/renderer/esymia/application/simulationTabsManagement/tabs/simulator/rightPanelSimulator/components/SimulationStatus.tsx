@@ -4,7 +4,7 @@ import { Disclosure } from '@headlessui/react';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { ComponentEntity, useFaunaQuery } from 'cad-library';
+import { ComponentEntity } from 'cad-library';
 import { Project, Simulation } from '../../../../../../model/esymiaModels';
 import {
   convergenceTresholdSelector,
@@ -38,6 +38,7 @@ import { publishMessage } from '../../../../../../../middleware/stompMiddleware'
 import { PiClockCountdownBold } from 'react-icons/pi';
 import { ImSpinner } from 'react-icons/im';
 import { TbTrashXFilled } from 'react-icons/tb';
+import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean;

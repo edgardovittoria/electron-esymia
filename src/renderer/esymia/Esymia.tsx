@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useFaunaQuery, usersStateSelector } from 'cad-library';
+import { usersStateSelector } from 'cad-library';
 import {
   showCreateNewProjectModalSelector,
   showInfoModalSelector,
@@ -32,6 +32,7 @@ import { DashboardTabsContentFactory } from './application/dashboardTabsManageme
 import { SimulationTabsContentFactory } from './application/simulationTabsManagement/SimulationTabsContentFactory';
 import { BsPlugin } from 'react-icons/bs';
 import Plugins from './plugin/Plugins';
+import { useFaunaQuery } from './faunadb/hook/useFaunaClient';
 export interface EsymiaProps {
   selectedTab: string;
 }

@@ -1,10 +1,11 @@
 import { FC, Fragment, useState } from 'react';
-import { FaunaCadModel, useFaunaQuery } from 'cad-library';
+import { FaunaCadModel } from 'cad-library';
 import { useDispatch } from 'react-redux';
 import { Dialog, Transition } from '@headlessui/react';
 import toast from 'react-hot-toast';
 import { updateModelInFauna } from '../../../../faunaDB/functions';
 import { updateModel } from '../../../../store/modelSlice';
+import { useFaunaQuery } from '../../../../../esymia/faunadb/hook/useFaunaClient';
 
 const RenameModal: FC<{
   setRenameModalShow: Function;

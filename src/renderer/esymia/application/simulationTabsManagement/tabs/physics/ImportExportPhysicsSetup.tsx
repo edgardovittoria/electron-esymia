@@ -18,13 +18,13 @@ import {
   generateTerminationName,
   isTerminationNameValid,
 } from './portManagement/selectPorts/portLumpedProbeGenerator';
-import { useFaunaQuery } from 'cad-library';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import JSZip from 'jszip';
 import saveAs from 'file-saver';
 import { jsonToCSV } from 'react-papaparse';
 import { BsFiletypeCsv } from 'react-icons/bs';
+import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaClient';
 
 export const ImportExportPhysicsSetup: FC<{}> = () => {
   const selectedProject = useSelector(selectedProjectSelector) as Project;

@@ -2,6 +2,7 @@ import faunadb from 'faunadb';
 import { FaunaCadModel } from 'cad-library';
 import { Dispatch } from '@reduxjs/toolkit';
 import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../esymia/store/tabsAndMenuItemsSlice';
+import { Client, fql, QuerySuccess } from 'fauna';
 
 type FaunaModelDetails = {
   id: string;
@@ -15,16 +16,14 @@ function faunaModelDetailsToFaunaCadModel(modelDetails: FaunaModelDetails) {
   } as FaunaCadModel;
 }
 export async function deleteFaunadbModel(
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   modelToDelete: string,
   dispatch: Dispatch
 ) {
   try {
     await faunaClient.query(
-      faunaQuery.Delete(
-        faunaQuery.Ref(faunaQuery.Collection('CadModels'), modelToDelete),
-      ),
+      faunaQuery`CadModels.delete(${modelToDelete})`
     ).catch((err) =>
       {
         dispatch(
@@ -42,19 +41,14 @@ export async function deleteFaunadbModel(
 }
 
 export const updateModelInFauna = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   modelToUpdate: FaunaCadModel,
   dispatch: Dispatch
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery.Update(
-        faunaQuery.Ref(faunaQuery.Collection('CadModels'), modelToUpdate.id),
-        {
-          data: modelToUpdate,
-        },
-      ),
+      faunaQuery`CadModels.byId(${modelToUpdate.id as string}).update(${modelToUpdate})`
     )
     .catch((err) =>
       {
@@ -71,31 +65,14 @@ export const updateModelInFauna = async (
 };
 
 export const getSharedModels = async (
-  faunaClient: faunadb.Client,
-  faunaQuery: typeof faunadb.query,
+  faunaClient: Client,
+  faunaQuery: typeof fql,
   user: string,
   dispatch: Dispatch
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery.Select(
-        'data',
-        faunaQuery.Map(
-          faunaQuery.Paginate(
-            faunaQuery.Match(faunaQuery.Index('models_shared_with'), user),
-          ),
-          faunaQuery.Lambda('model', {
-            id: faunaQuery.Select(
-              ['ref', 'id'],
-              faunaQuery.Get(faunaQuery.Var('model')),
-            ),
-            details: faunaQuery.Select(
-              'data',
-              faunaQuery.Get(faunaQuery.Var('model')),
-            ),
-          }),
-        ),
-      ),
+      faunaQuery`CadModels.models_shared_with(${user})`
     )
     .catch((err) =>
       {
@@ -108,7 +85,8 @@ export const getSharedModels = async (
         dispatch(setShowInfoModal(true));
       }
     );
-  return (response as FaunaModelDetails[]).map((el) =>
+    let res:FaunaModelDetails[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, details: {...item} as FaunaCadModel}})
+  return res.map((el) =>
     faunaModelDetailsToFaunaCadModel(el),
   );
 };
