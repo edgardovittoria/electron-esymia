@@ -13,7 +13,7 @@ export const useMaterials = () => {
     const dispatch = useDispatch()
     async function getMaterials(faunaClient: Client, faunaQuery: typeof fql) {
         const response = await faunaClient.query(
-          faunaQuery`Materials.materials_all()`
+          faunaQuery`Materials.all()`
         )
             .catch((err) => {
               dispatch(
