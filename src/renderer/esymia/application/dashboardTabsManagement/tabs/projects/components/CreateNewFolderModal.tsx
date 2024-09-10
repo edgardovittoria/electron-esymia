@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from 'react';
-import { usersStateSelector } from "cad-library";
 import { createFolderInFauna, addIDInSubFoldersList } from "../../../../../faunadb/projectsFolderAPIs";
 import { useDispatch, useSelector } from "react-redux";
 import { addFolder, SelectedFolderSelector } from "../../../../../store/projectSlice";
@@ -7,6 +6,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Folder } from '../../../../../model/esymiaModels';
 import toast from 'react-hot-toast';
 import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaClient';
+import { usersStateSelector } from '../../../../../../cad_library';
 
 interface CreateNewFolderModalProps {
     setShowNewFolderModal: Function,

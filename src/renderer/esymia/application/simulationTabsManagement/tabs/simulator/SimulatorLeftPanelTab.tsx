@@ -3,9 +3,9 @@ import {useSelector} from "react-redux";
 import {selectedProjectSelector} from "../../../../store/projectSlice";
 import {FaCircle} from "react-icons/fa";
 import {Disclosure, Switch, Transition} from '@headlessui/react'
-import {Material} from 'cad-library';
 import {MdOutlineKeyboardArrowDown} from "react-icons/md";
 import noMaterialsIcon from '../../../../../../../assets/noMaterialsIcon.png'
+import { Material } from '../../../../../cad_library';
 
 
 interface SimulatorLeftPanelTabProps {

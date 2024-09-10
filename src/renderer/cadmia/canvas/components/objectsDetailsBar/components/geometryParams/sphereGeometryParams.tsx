@@ -1,6 +1,6 @@
-import { SphereGeometryAttributes } from "cad-library";
 import { FC } from "react";
 import { GeometryParamsGeneralProps } from "./geometryParams";
+import { SphereGeometryAttributes } from "../../../../../../cad_library";
 
 
 export const SphereGeometryParams: FC<GeometryParamsGeneralProps> = ({ entity, updateParams }) => {

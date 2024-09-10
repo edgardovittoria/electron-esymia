@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ComponentEntity, Material } from 'cad-library';
 import {
   pathToExternalGridsNotFoundSelector,
   SelectedFolderSelector,
@@ -39,6 +38,7 @@ import { BiInfoCircle } from 'react-icons/bi';
 import { Brick } from './rightPanelSimulator/components/createGridsExternals';
 import { GiAtomicSlashes, GiCubeforce } from 'react-icons/gi';
 import { GrClone } from 'react-icons/gr';
+import { ComponentEntity, Material } from '../../../../../cad_library';
 
 interface SimulatorProps {
   selectedTabLeftPanel: string | undefined;

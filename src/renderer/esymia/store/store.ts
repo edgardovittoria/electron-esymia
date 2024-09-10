@@ -1,9 +1,9 @@
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
-import { UsersSlice } from 'cad-library';
 import {ProjectSlice} from "./projectSlice";
 import {SolverSlice} from "./solverSlice";
 import { TabsAndMenuItemsSlice } from './tabsAndMenuItemsSlice';
 import { PluginsSlice } from './pluginsSlice';
+import { UsersSlice } from '../../cad_library';
 
 
 const rootReducer = combineReducers({

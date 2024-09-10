@@ -2,11 +2,11 @@ import { getFoldersByOwner, getSimulationProjectsByOwner } from '../faunadb/proj
 import { FaunaFolder, FaunaProject } from '../model/FaunaModels';
 import { constructFolderStructure } from '../faunadb/apiAuxiliaryFunctions';
 import { homePathSelector, selectFolder, setProjectsFolderToUser } from '../store/projectSlice';
-import { UsersState, usersStateSelector } from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDirContents, readLocalFile } from '../../fileSystemAPIs/fileSystemAPIs';
 import { Folder, Project } from '../model/esymiaModels';
 import { useFaunaQuery } from '../faunadb/hook/useFaunaClient';
+import { usersStateSelector } from '../../cad_library';
 
 export const useStorage = () => {
   const { execQuery } = useFaunaQuery();

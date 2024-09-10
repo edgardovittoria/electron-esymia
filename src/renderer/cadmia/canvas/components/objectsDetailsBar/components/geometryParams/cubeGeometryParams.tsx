@@ -1,7 +1,7 @@
-import {CubeGeometryAttributes, updateTransformationParams} from "cad-library";
 import {FC} from "react";
 import {GeometryParamsGeneralProps} from "./geometryParams";
 import { useDispatch } from "react-redux";
+import { CubeGeometryAttributes, updateTransformationParams } from "../../../../../../cad_library";
 
 export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({entity, updateParams}) => {
   const dispatch = useDispatch()

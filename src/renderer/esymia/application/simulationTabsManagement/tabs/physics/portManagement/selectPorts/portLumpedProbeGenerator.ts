@@ -1,7 +1,7 @@
-import {CircleGeometryAttributes, ComponentEntity, TransformationParams} from "cad-library";
 import {Port, Probe, Project, RLCParams, TempLumped} from "../../../../../../model/esymiaModels";
 import { Vector3 } from 'three';
 import uniqid from "uniqid";
+import { CircleGeometryAttributes, ComponentEntity, TransformationParams } from "../../../../../../../cad_library";
 
 export function isTerminationNameValid(terminationName: string, allTermination: (Port|TempLumped|Probe)[]){
   return allTermination.filter(t => t.name === terminationName).length === 0

@@ -1,8 +1,8 @@
-import { ComponentEntity } from 'cad-library';
 import { Dispatch } from '@reduxjs/toolkit';
 import { Project } from '../../../../model/esymiaModels';
 import { s3 } from '../../../../aws/s3Config';
 import { setModel, setModelUnit } from '../../../../store/projectSlice';
+import { ComponentEntity } from '../../../../../cad_library';
 
 export const setModelInfoFromS3 = (project: Project, dispatch: Dispatch) => {
   const params = {

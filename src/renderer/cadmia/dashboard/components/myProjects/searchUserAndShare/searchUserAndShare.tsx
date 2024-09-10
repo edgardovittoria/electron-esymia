@@ -2,7 +2,6 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ImSpinner } from 'react-icons/im';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaunaCadModel, usersStateSelector } from 'cad-library';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { SearchUser } from './components/SearchUser';
@@ -10,6 +9,7 @@ import { updateModelInFauna } from '../../../../faunaDB/functions';
 import { updateModel } from '../../../../store/modelSlice';
 import { FaUserCheck } from 'react-icons/fa';
 import { useFaunaQuery } from '../../../../../esymia/faunadb/hook/useFaunaClient';
+import { FaunaCadModel, usersStateSelector } from '../../../../../cad_library';
 
 interface SearchUserAndShareProps {
   setShowSearchUser: (v: boolean) => void;

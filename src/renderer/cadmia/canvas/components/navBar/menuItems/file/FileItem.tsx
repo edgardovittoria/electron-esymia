@@ -7,24 +7,6 @@ import {
   CloudArrowDownIcon,
   CloudArrowUpIcon,
 } from '@heroicons/react/20/solid';
-import {
-  addComponent,
-  BufferGeometryAttributes,
-  CanvasState,
-  canvasStateSelector,
-  ComponentEntity,
-  componentseSelector,
-  exportToSTL,
-  FaunaCadModel,
-  getNewKeys,
-  ImportActionParamsObject,
-  ImportCadProjectButton,
-  ImportModelFromDBModal,
-  importStateCanvas,
-  numberOfGeneratedKeySelector,
-  saveNewModel,
-  TRANSF_PARAMS_DEFAULTS,
-} from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth0 } from '@auth0/auth0-react';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
@@ -51,6 +33,7 @@ import {
 } from '../../../../../config/styles';
 import { setModality } from '../../../cadmiaModality/cadmiaModalitySlice';
 import { useFaunaQuery } from '../../../../../../esymia/faunadb/hook/useFaunaClient';
+import { addComponent, BufferGeometryAttributes, canvasStateSelector, ComponentEntity, componentseSelector, exportToSTL, FaunaCadModel, getNewKeys, ImportActionParamsObject, ImportCadProjectButton, ImportModelFromDBModal, importStateCanvas, numberOfGeneratedKeySelector, TRANSF_PARAMS_DEFAULTS, CanvasState } from '../../../../../../cad_library';
 
 interface FileItemProps {}
 

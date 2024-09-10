@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  addComponent,
-  ComponentEntity,
-  getNewKeys,
-  numberOfGeneratedKeySelector,
-  selectedComponentSelector,
-  setComponentsOpacity,
-} from 'cad-library';
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import single_select from './style/single_select.svg';
 import multiple_select from './style/multiple_select.png';
@@ -21,6 +13,7 @@ import { useCadmiaModalityManager } from '../cadmiaModality/useCadmiaModalityMan
 import { toolbarIconsHeight, toolbarIconsWidth, toolbarsHintStyle } from '../../../config/styles';
 import { resetFocusToScene } from '../navBar/menuItems/view/viewItemSlice';
 import { TbZoomReset } from 'react-icons/tb';
+import { addComponent, ComponentEntity, getNewKeys, numberOfGeneratedKeySelector, selectedComponentSelector } from '../../../../cad_library';
 
 interface MiscToolbarProps {}
 

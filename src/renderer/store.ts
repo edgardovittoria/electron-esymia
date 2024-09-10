@@ -1,5 +1,4 @@
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
-import { CanvasSlice, UsersSlice } from 'cad-library';
 import { ProjectSlice } from './esymia/store/projectSlice';
 import { SolverSlice } from './esymia/store/solverSlice';
 import { TabsAndMenuItemsSlice } from './esymia/store/tabsAndMenuItemsSlice';
@@ -19,6 +18,7 @@ import { ViewItemSlice } from './cadmia/canvas/components/navBar/menuItems/view/
 import { ModelSlice } from './cadmia/store/modelSlice';
 import { ObjectsDetailsSlice } from './cadmia/canvas/components/objectsDetailsBar/objectsDetailsSlice';
 import { stompMiddleware } from './middleware/stompMiddleware';
+import { CanvasSlice, UsersSlice } from './cad_library';
 
 
 

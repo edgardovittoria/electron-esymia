@@ -3,7 +3,6 @@ import undoable, { excludeAction } from 'redux-undo';
 import { persistReducer } from 'redux-persist';
 import persistStore from 'redux-persist/es/persistStore';
 import localforage from 'localforage';
-import { CanvasSlice, UsersSlice } from 'cad-library';
 import { TransformationsToolbarSlice } from '../canvas/components/transformationsToolbar/toolbarTransformationSlice';
 import { BinaryOperationsToolbarSlice } from '../canvas/components/binaryOperationsToolbar/binaryOperationsToolbarSlice';
 import { CadmiaModalitySlice } from '../canvas/components/cadmiaModality/cadmiaModalitySlice';
@@ -13,6 +12,7 @@ import { MiscToolbarSlice } from '../canvas/components/miscToolbar/miscToolbarSl
 import { ShapesToolbarSlice } from '../canvas/components/navBar/menuItems/shapes/shapesToolbarSlice';
 import { ViewItemSlice } from '../canvas/components/navBar/menuItems/view/viewItemSlice';
 import { ModelSlice } from './modelSlice';
+import { CanvasSlice, UsersSlice } from '../../cad_library';
 
 const persistConfig = {
   key: 'root',

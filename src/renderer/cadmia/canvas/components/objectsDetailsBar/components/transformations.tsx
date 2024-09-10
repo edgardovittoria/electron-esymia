@@ -1,6 +1,6 @@
-import {TransformationParamDetails, TransformationParams, updateTransformationParams} from "cad-library";
 import {FC} from "react";
 import {useDispatch} from "react-redux";
+import { TransformationParamDetails, TransformationParams, updateTransformationParams } from "../../../../../cad_library";
 
 export const Transformations: FC<{ transformationParams: TransformationParams }> = ({transformationParams}) => {
     const dispatch = useDispatch()

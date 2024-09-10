@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
-import { usersStateSelector } from 'cad-library';
 import {
 	mainFolderSelector,
 	SelectedFolderSelector,
@@ -24,6 +23,7 @@ import {
 import { ImSpinner } from 'react-icons/im';
 import { setShowCreateNewProjectModal } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaClient';
+import { usersStateSelector } from '../../../../../../../cad_library';
 
 export interface MySharedElementsProps {
 	showCreateNewFolderModal: boolean;

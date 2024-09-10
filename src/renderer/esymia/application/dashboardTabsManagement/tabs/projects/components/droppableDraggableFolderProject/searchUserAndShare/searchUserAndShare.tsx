@@ -2,7 +2,6 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ImSpinner } from 'react-icons/im';
 import { useDispatch, useSelector } from 'react-redux';
-import { usersStateSelector } from 'cad-library';
 import axios from 'axios';
 import { SearchUser } from './components/SearchUser';
 import {
@@ -25,6 +24,7 @@ import { convertInFaunaProjectThis } from '../../../../../../../faunadb/apiAuxil
 import toast from 'react-hot-toast';
 import { addProjectTab, setShowCreateNewProjectModal } from '../../../../../../../store/tabsAndMenuItemsSlice';
 import { useFaunaQuery } from '../../../../../../../faunadb/hook/useFaunaClient';
+import { usersStateSelector } from '../../../../../../../../cad_library';
 
 interface SearchUserAndShareProps {
   setShowSearchUser: (v: boolean) => void;

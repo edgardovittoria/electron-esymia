@@ -1,6 +1,6 @@
-import { ConeGeometryAttributes } from "cad-library";
 import { FC } from "react";
 import { GeometryParamsGeneralProps } from "./geometryParams";
+import { ConeGeometryAttributes } from "../../../../../../cad_library";
 
 
 export const ConeGeometryParams: FC<GeometryParamsGeneralProps> = ({ entity, updateParams }) => {

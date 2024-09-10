@@ -1,4 +1,3 @@
-import { ComponentEntity, GeometryAttributes, updateEntityGeometryParams } from "cad-library";
 import { FC } from "react";
 import { useDispatch } from "react-redux";
 import { ConeGeometryParams } from "./coneGeometryParams";
@@ -6,6 +5,7 @@ import { CubeGeometryParams } from "./cubeGeometryParams";
 import { CylinderGeometryParams } from "./cylinderGeometryProps";
 import { SphereGeometryParams } from "./sphereGeometryParams";
 import { TorusGeometryParams } from "./torusGeometryParams";
+import { ComponentEntity, GeometryAttributes, updateEntityGeometryParams } from "../../../../../../cad_library";
 
 interface GeometryParamsProps {
     entity: ComponentEntity

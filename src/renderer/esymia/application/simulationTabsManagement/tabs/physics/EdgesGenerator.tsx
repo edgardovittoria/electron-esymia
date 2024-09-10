@@ -1,6 +1,5 @@
 import React, {useEffect, useRef} from 'react';
 import * as THREE from "three";
-import { BufferGeometryAttributes, meshFrom } from 'cad-library';
 import {BufferGeometry, InstancedMesh, Material, Mesh, Object3D} from "three";
 import {useDispatch, useSelector} from "react-redux";
 import {

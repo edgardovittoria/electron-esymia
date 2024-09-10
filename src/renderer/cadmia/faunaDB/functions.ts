@@ -1,8 +1,7 @@
-import faunadb from 'faunadb';
-import { FaunaCadModel } from 'cad-library';
 import { Dispatch } from '@reduxjs/toolkit';
 import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../esymia/store/tabsAndMenuItemsSlice';
 import { Client, fql, QuerySuccess } from 'fauna';
+import { FaunaCadModel } from '../../cad_library';
 
 type FaunaModelDetails = {
   id: string;

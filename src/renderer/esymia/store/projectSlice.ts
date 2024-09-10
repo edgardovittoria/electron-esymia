@@ -1,4 +1,3 @@
-import { ComponentEntity, ImportActionParamsObject, Material, UsersState } from 'cad-library';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   recursiveFindFolders, removeFolderFromStore, removeProjectFromStore,
@@ -18,6 +17,7 @@ import {
   TempLumped
 } from '../model/esymiaModels';
 import { getMaterialListFrom } from '../application/simulationTabsManagement/tabs/simulator/Simulator';
+import { ComponentEntity, ImportActionParamsObject, Material, UsersState } from '../../cad_library';
 
 
 export type ProjectState = {

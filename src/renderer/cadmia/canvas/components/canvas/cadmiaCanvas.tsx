@@ -2,17 +2,12 @@ import React, { FC, ReactNode, useEffect, useState } from 'react';
 import { Provider, ReactReduxContext, useSelector } from 'react-redux';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
-import {
-  ComponentEntity,
-  componentseSelector,
-  FactoryShapes,
-  keySelectedComponenteSelector,
-} from 'cad-library';
 import { Bounds, Edges, GizmoHelper, GizmoViewport, OrbitControls, useBounds } from '@react-three/drei';
 import { CanvasObject } from './components/canvasObject';
 import { Controls } from './components/controls';
 import { invisibleMeshesSelector, meshesWithBordersVisibleSelector } from '../objectsDetailsBar/objectsDetailsSlice';
 import { focusToSceneSelector } from '../navBar/menuItems/view/viewItemSlice';
+import { ComponentEntity, componentseSelector, FactoryShapes, keySelectedComponenteSelector } from '../../../../cad_library';
 
 interface CadmiaCanvasProps {}
 

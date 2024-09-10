@@ -1,11 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import {
-  CanvasState,
-  UsersState,
-  usersStateSelector
-} from 'cad-library';
-import {
   addIDInFolderProjectsList,
   createSimulationProjectInFauna
 } from '../../faunadb/projectsFolderAPIs';
@@ -23,6 +18,7 @@ import {
 import { Project, sharingInfoUser } from '../../model/esymiaModels';
 import toast from 'react-hot-toast';
 import { useFaunaQuery } from '../../faunadb/hook/useFaunaClient';
+import { CanvasState, UsersState, usersStateSelector } from '../../../cad_library';
 
 interface CreateNewProjectModalProps {
 }

@@ -1,6 +1,6 @@
-import { CylinderGeometryAttributes } from "cad-library";
 import { FC } from "react";
 import { GeometryParamsGeneralProps } from "./geometryParams";
+import { CylinderGeometryAttributes } from "../../../../../../cad_library";
 
 
 export const CylinderGeometryParams: FC<GeometryParamsGeneralProps> = ({ entity, updateParams }) => {

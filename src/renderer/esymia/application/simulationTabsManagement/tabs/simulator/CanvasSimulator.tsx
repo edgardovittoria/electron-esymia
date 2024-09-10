@@ -8,9 +8,9 @@ import { Provider, ReactReduxContext, useSelector } from 'react-redux';
 import { pathToExternalGridsNotFoundSelector, selectedProjectSelector } from '../../../../store/projectSlice';
 import { FocusView } from '../../sharedElements/FocusView';
 import uniqid from 'uniqid';
-import { FactoryShapes } from 'cad-library';
 import { alertMessageStyle, comeBackToModelerMessage } from '../../../config/textMessages';
 import { Perf } from 'r3f-perf'
+import { ComponentEntity, FactoryShapes } from "../../../../../cad_library";
 
 interface CanvasSimulatorProps  {
   externalGrids: ExternalGridsObject | undefined,
@@ -42,7 +42,7 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
                   />
                   {/* paint models */}
                   <FocusView resetFocus={resetFocus}>
-                  {!mesherOutput || pathToExternalGridsNotFound ? selectedProject.model.components.map((component) => {
+                  {!mesherOutput || pathToExternalGridsNotFound ? selectedProject.model.components.map((component: ComponentEntity) => {
                     return (
                         <mesh
                           userData={{

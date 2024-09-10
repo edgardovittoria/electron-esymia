@@ -2,7 +2,7 @@ import React from 'react';
 import {Switch} from "@headlessui/react";
 import { useDispatch, useSelector } from 'react-redux';
 import { disableBordersForComponent, enableBordersForComponent, meshesWithBordersVisibleSelector } from '../objectsDetailsSlice';
-import { selectedComponentSelector } from 'cad-library';
+import { selectedComponentSelector } from '../../../../../cad_library';
 
 interface BordersMeshOptionProps {
 }

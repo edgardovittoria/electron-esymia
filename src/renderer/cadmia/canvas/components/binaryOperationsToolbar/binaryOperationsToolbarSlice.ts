@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { BinaryOperationType } from "cad-library";
 import { setModality } from "../cadmiaModality/cadmiaModalitySlice";
+import { BinaryOperationType } from "../../../../cad_library";
 
 
 export type BinaryOperationsToolbarState = {

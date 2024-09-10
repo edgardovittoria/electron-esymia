@@ -1,15 +1,7 @@
-import {
-  ComponentEntity,
-  addComponent,
-  getDefaultCone,
-  getDefaultCube,
-  getDefaultCylinder,
-  getDefaultSphere,
-  getDefaultTorus,
-  numberOfGeneratedKeySelector,
-} from 'cad-library';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { setFocusNotToScene } from '../view/viewItemSlice';
+import { addComponent, ComponentEntity, getDefaultCone, getDefaultCube, getDefaultCylinder, getDefaultSphere, getDefaultTorus, numberOfGeneratedKeySelector } from '../../../../../../cad_library';
 
 export const useAddToTheSceneANewShape = () => {
   const dispatch = useDispatch();

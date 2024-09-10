@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { SetUserInfo } from 'cad-library';
 import { Navbar } from './components/navBar/NavBar';
 import { KeyboardEventMapper } from './components/keyboardEventMapper';
 import { CadmiaCanvas } from './components/canvas/cadmiaCanvas';
@@ -13,6 +12,7 @@ import TabbedMenu from './components/canvas/TabbedMenu';
 import { useSelector } from 'react-redux';
 import { LoadingSpinnerSelector } from '../store/modelSlice';
 import { ImSpinner } from 'react-icons/im';
+import { SetUserInfo } from '../../cad_library';
 
 export interface CanvasProps {
   setShowCad: (v: boolean) => void;

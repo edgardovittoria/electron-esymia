@@ -1,6 +1,6 @@
-import { meshFrom } from 'cad-library';
 import * as THREE from 'three';
 import { Project } from '../../../model/esymiaModels';
+import { meshFrom } from '../../../../cad_library';
 
 export const exportToJsonFileThis = (data: any, fileName: string) => {
     const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
@@ -17,7 +17,7 @@ export const exportToJsonFileThis = (data: any, fileName: string) => {
   export const calculateModelBoundingBox = (selectedProject: Project) : THREE.Box3 => {
     const group = new THREE.Group();
       if (selectedProject.model.components) {
-        selectedProject.model.components.forEach((c) => {
+        selectedProject.model.components.forEach((c: any) => {
           group.add(meshFrom(c));
         });
       }

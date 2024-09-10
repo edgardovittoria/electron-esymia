@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Material } from 'cad-library';
 import { MyInstancedMesh } from './components/MyInstancedMesh';
 import { ExternalGridsObject, Project } from '../../../../../model/esymiaModels';
 import { useSelector } from 'react-redux';
 import { meshGeneratedSelector, selectedProjectSelector } from '../../../../../store/projectSlice';
 import { Brick } from '../rightPanelSimulator/components/createGridsExternals';
+import { ComponentEntity, Material } from '../../../../../../cad_library';
 
 interface MeshedElementProps {
   externalGrids: ExternalGridsObject;
@@ -18,7 +18,7 @@ export const MeshedElement: React.FC<MeshedElementProps> = ({
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   let meshGenerated = useSelector(meshGeneratedSelector);
-  let allMaterialsList = selectedProject?.model?.components.map(c => c.material as Material) as Material[];
+  let allMaterialsList = selectedProject?.model?.components.map((c: ComponentEntity) => c.material as Material) as Material[];
   let materialsList: Material[] = [];
   selectedMaterials.forEach(sm => {
     materialsList.push(...allMaterialsList.filter(m => m.name === sm));

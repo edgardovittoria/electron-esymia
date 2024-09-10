@@ -1,16 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { cadmiaModalitySelector, setModality } from './cadmiaModalitySlice';
 import {
-  Material,
-  componentseSelector,
-  removeComponent,
-  removeComponentMaterial,
-  selectComponent,
-  selectedComponentSelector,
-  setComponentMaterial,
-  setComponentsOpacity,
-} from 'cad-library';
-import {
   binaryOpEntitiesKeysSelector,
   toggleEntitySelectionForBinaryOp,
 } from '../binaryOperationsToolbar/binaryOperationsToolbarSlice';
@@ -24,6 +14,7 @@ import {
   setMeshInvisible,
   setMeshVisible,
 } from '../objectsDetailsBar/objectsDetailsSlice';
+import { componentseSelector, Material, removeComponent, removeComponentMaterial, selectComponent, selectedComponentSelector, setComponentMaterial, setComponentsOpacity } from '../../../../cad_library';
 
 export const useCadmiaModalityManager = () => {
   const modality = useSelector(cadmiaModalitySelector);

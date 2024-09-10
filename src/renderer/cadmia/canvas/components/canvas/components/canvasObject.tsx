@@ -3,14 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setNextTransformationActive,
 } from "../../transformationsToolbar/toolbarTransformationSlice";
-import {
-  keySelectedComponenteSelector,
-  TransformationParams,
-} from "cad-library";
 import { Edges, useBounds } from "@react-three/drei";
 import * as THREE from "three";
 import { useCadmiaModalityManager } from "../../cadmiaModality/useCadmiaModalityManager";
 import { setFocusNotToScene } from "../../navBar/menuItems/view/viewItemSlice";
+import { keySelectedComponenteSelector, TransformationParams } from "../../../../../cad_library";
 
 export interface ComponentProps {
   children: ReactNode;

@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {redoFunction, undoFunction} from "./navBar/menuItems/edit/undoRedo";
-import { canvasStateSelector, componentseSelector, exportToSTL, keySelectedComponenteSelector, lastActionTypeSelector, lengthFutureStateSelector, lengthPastStateSelector, removeComponent, resetState } from 'cad-library';
 import {exportJSONProject} from "./navBar/menuItems/file/FileItem";
 import { toggleObjectsDetails } from './objectsDetailsBar/objectsDetailsSlice';
+import { canvasStateSelector, componentseSelector, exportToSTL, keySelectedComponenteSelector, lastActionTypeSelector, lengthFutureStateSelector, lengthPastStateSelector, resetState } from '../../../cad_library';
 
 interface KeyboardEventMapperProps {
 }

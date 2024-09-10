@@ -1,5 +1,4 @@
 import React from 'react';
-import { componentseSelector, selectedComponentSelector } from 'cad-library';
 import { useSelector } from 'react-redux';
 import { Transformations } from './components/transformations';
 import { GeometryParams } from './components/geometryParams/geometryParams';
@@ -7,6 +6,7 @@ import { MaterialSelection } from './components/materialSelection/materialSelect
 import { Outliner } from './components/outliner';
 import { BordersMeshOption } from './components/bordersMeshOption';
 import { useCadmiaModalityManager } from '../cadmiaModality/useCadmiaModalityManager';
+import { componentseSelector, selectedComponentSelector } from '../../../../cad_library';
 
 interface ObjectsDetailsProps {}
 

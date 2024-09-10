@@ -1,7 +1,6 @@
 /*
 import React, { FormEvent, useEffect, useState } from "react";
 import { ModalInputSignal } from "./ModalInputSignal";
-import { useFaunaQuery } from "cad-library";
 import { useDispatch } from "react-redux";
 import { setAssociatedSignal } from "../../../../../store/projectSlice";
 import { saveSignal, getSignals } from "../../../../../faunadb/signalsAPIs";

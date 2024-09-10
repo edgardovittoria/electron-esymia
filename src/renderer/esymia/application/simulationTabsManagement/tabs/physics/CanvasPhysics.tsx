@@ -15,7 +15,6 @@ import { Canvas, ThreeEvent, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { FocusView } from '../../sharedElements/FocusView';
 import uniqid from 'uniqid';
-import { CircleGeometryAttributes, ComponentEntity, FactoryShapes, TransformationParams } from 'cad-library';
 import {
   Edges,
   GizmoHelper,
@@ -32,6 +31,7 @@ import {
   alertMessageStyle,
   comeBackToModelerMessage,
 } from '../../../config/textMessages';
+import { CircleGeometryAttributes, ComponentEntity, FactoryShapes, TransformationParams } from '../../../../../cad_library';
 
 interface CanvasPhysicsProps {
   setCameraPosition: Function;
@@ -111,7 +111,7 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                   <CanvasInfo setCameraPosition={setCameraPosition} />
                   <FocusView resetFocus={resetFocus}>
                     {selectedProject.model.components.map(
-                      (component, index) => {
+                      (component: ComponentEntity, index: number) => {
                         return (
                           <mesh
                             ref={(el) => {

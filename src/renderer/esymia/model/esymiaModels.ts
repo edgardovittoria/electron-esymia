@@ -1,7 +1,4 @@
-import { CanvasState, ComponentEntity, UsersState } from "cad-library"
-import {
-  Brick
-} from '../application/simulationTabsManagement/tabs/simulator/rightPanelSimulator/components/createGridsExternals';
+import { CanvasState, ComponentEntity, UsersState } from "../../cad_library"
 
 export type Folder = {
   name: string,

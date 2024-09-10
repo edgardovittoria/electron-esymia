@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import {
-  FaunaCadModel,
-  resetState,
-} from 'cad-library';
 import { useDispatch, useSelector } from 'react-redux';
 import { ActionCreators } from 'redux-undo';
 import { AiOutlineAppstoreAdd } from 'react-icons/ai';
@@ -22,6 +18,7 @@ import { getSharedModels } from '../faunaDB/functions';
 import MySharedProject from './components/mySharedProjects/MySharedProject';
 import { useFaunaQuery } from '../../esymia/faunadb/hook/useFaunaClient';
 import { Client, fql, QuerySuccess } from 'fauna';
+import { FaunaCadModel, resetState } from '../../cad_library';
 
 const getModelsByOwner = async (faunaClient: Client, faunaQuery: typeof fql, owner_id: string) => {
   try {

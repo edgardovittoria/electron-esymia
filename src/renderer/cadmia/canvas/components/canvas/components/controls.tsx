@@ -1,10 +1,10 @@
 import { TransformControls } from "@react-three/drei";
 import { Object3DNode, useThree } from "@react-three/fiber";
-import { TransformationParams, updateTransformationParams } from "cad-library";
 import { FC, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as THREE from "three"
 import { activeTransformationSelector } from "../../transformationsToolbar/toolbarTransformationSlice";
+import { TransformationParams, updateTransformationParams } from "../../../../../cad_library";
 
 export const Controls: FC<{
     keySelectedComponent: number;

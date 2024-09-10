@@ -1,5 +1,4 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { canvasStateSelector, FaunaCadModel } from 'cad-library';
 import { FC, Fragment, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +9,7 @@ import { addModel, setLoadingSpinner } from '../../../../../../store/modelSlice'
 import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../../../../../../esymia/store/tabsAndMenuItemsSlice';
 import { useFaunaQuery } from '../../../../../../../esymia/faunadb/hook/useFaunaClient';
 import { Client, fql } from 'fauna';
+import { canvasStateSelector, FaunaCadModel } from '../../../../../../../cad_library';
 
 export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
   showModalSave,

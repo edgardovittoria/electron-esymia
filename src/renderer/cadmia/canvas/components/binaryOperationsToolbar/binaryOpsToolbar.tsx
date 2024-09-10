@@ -10,24 +10,12 @@ import { CadmiaModality } from "../cadmiaModality/cadmiaModalityType";
 import unionIcon from "./style/unionIcon.png";
 import intersectionIcon from "./style/intersectionIcon.png";
 import subtractionIcon from "./style/subtractionIcon.png";
-import {
-    binaryOperation,
-    BinaryOperationType,
-    CanvasState,
-    canvasStateSelector,
-    ComponentEntity,
-    ComponentTypes,
-    CompositeEntity,
-    findComponentByKey,
-    GeometryAttributes,
-    getNewKeys,
-    setComponentsOpacity,
-} from "cad-library";
 import { Dispatch } from "@reduxjs/toolkit";
 import { CheckIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { setModality } from "../cadmiaModality/cadmiaModalitySlice";
 import { toolbarIconsHeight, toolbarIconsWidth, toolbarsHintStyle } from '../../../config/styles';
 import { setLoadingSpinner } from "../../../store/modelSlice";
+import { binaryOperation, BinaryOperationType, canvasStateSelector, ComponentEntity, ComponentTypes, CompositeEntity, findComponentByKey, GeometryAttributes, getNewKeys, CanvasState } from "../../../../cad_library";
 
 interface BinaryOpsToolbarProps {
 }

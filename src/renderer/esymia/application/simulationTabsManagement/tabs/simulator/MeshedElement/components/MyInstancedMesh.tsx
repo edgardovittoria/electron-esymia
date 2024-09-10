@@ -1,6 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { BackSide, FrontSide, InstancedMesh, Object3D } from 'three';
-import { FactoryShapes, Material } from 'cad-library';
 import { CellSize, OriginPoint, Project } from '../../../../../../model/esymiaModels';
 import { useSelector } from 'react-redux';
 import { Brick } from '../../rightPanelSimulator/components/createGridsExternals';
@@ -11,6 +10,7 @@ import uniqid from 'uniqid';
 import { selectedProjectSelector } from '../../../../../../store/projectSlice';
 import * as THREE from 'three'
 import { calculateModelBoundingBox } from '../../../../sharedElements/utilityFunctions';
+import { ComponentEntity, FactoryShapes, Material } from '../../../../../../../cad_library';
 
 
 interface InstancedMeshProps {
@@ -83,7 +83,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
         <meshPhongMaterial color={material && material.color} side={FrontSide}/>
       </instancedMesh> :
         <>
-          {selectedProject && selectedProject.model.components.map((component) => {
+          {selectedProject && selectedProject.model.components.map((component: ComponentEntity) => {
             return (
               <mesh
                 userData={{

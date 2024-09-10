@@ -1,10 +1,10 @@
-import { Material } from "cad-library";
 import {useEffect, useState} from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from "../../../../../../esymia/store/tabsAndMenuItemsSlice";
 import { useDispatch } from "react-redux";
 import { useFaunaQuery } from "../../../../../../esymia/faunadb/hook/useFaunaClient";
 import { Client, fql, QuerySuccess } from "fauna";
+import { Material } from "../../../../../../cad_library";
 
 export const useMaterials = () => {
     const {user} = useAuth0()

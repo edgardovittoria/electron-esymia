@@ -1,4 +1,3 @@
-import { ComponentEntity, updateName } from 'cad-library';
 import { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { invisibleMeshesSelector } from '../objectsDetailsSlice';
@@ -7,6 +6,7 @@ import { CubeIcon } from '@heroicons/react/24/outline';
 import { IoMdEye, IoMdEyeOff, IoMdSave } from 'react-icons/io';
 import { BiRename } from 'react-icons/bi';
 import { MdDelete, MdOutlineCancel } from 'react-icons/md';
+import { ComponentEntity, updateName } from '../../../../../cad_library';
 
 interface OutlinerProps {
   components: ComponentEntity[],

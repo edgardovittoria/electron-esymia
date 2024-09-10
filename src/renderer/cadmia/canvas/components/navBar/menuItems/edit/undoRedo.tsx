@@ -4,12 +4,8 @@ import { ActionCreators } from 'redux-undo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRedo, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { Dispatch } from '@reduxjs/toolkit';
-import {
-  lastActionTypeSelector,
-  lengthFutureStateSelector,
-  lengthPastStateSelector
-} from 'cad-library';
 import { navbarDropdownItemStyle, navbarShortcutStyle } from '../../../../../config/styles';
+import { lastActionTypeSelector, lengthFutureStateSelector, lengthPastStateSelector } from '../../../../../../cad_library';
 
 interface UndoRedoProps {
 }

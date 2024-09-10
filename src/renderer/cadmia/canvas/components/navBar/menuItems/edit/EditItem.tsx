@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import { Popover, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { resetState } from 'cad-library';
 import { ActionCreators } from 'redux-undo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -14,6 +13,7 @@ import {
   navbarDropdownStyle, navbarItemStyle,
   navbarShortcutStyle
 } from '../../../../../config/styles';
+import { resetState } from '../../../../../../cad_library';
 
 interface EditItemProps {}
 

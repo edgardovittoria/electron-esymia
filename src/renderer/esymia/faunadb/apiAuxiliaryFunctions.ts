@@ -1,4 +1,4 @@
-import { CanvasState } from 'cad-library';
+import { CanvasState } from '../../cad_library';
 import { Folder, Project, sharingInfoUser } from '../model/esymiaModels';
 import {
   FaunaFolder,

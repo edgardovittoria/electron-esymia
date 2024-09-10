@@ -1,13 +1,8 @@
 import { Dispatch } from '@reduxjs/toolkit';
-import {
-  CanvasState,
-  ComponentEntity,
-  ImportActionParamsObject,
-  importStateCanvas,
-} from 'cad-library';
 import ReactS3Client from 'react-aws-s3-typescript';
 import { setUnit } from '../canvas/components/statusBar/statusBarSlice';
 import { s3, s3Config } from './s3Config';
+import { ComponentEntity, ImportActionParamsObject, importStateCanvas, CanvasState } from '../../cad_library';
 
 export const openModel = (
   bucket: string,

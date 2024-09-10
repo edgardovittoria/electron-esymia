@@ -1,4 +1,4 @@
-import { CanvasState, UsersState } from "cad-library"
+import { UsersState } from "../../cad_library"
 import { MeshData, Port, Probe, sharingInfoUser, Signal, Simulation } from "./esymiaModels"
 
 export type FaunaProject = {

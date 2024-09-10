@@ -4,15 +4,6 @@ import * as THREE from "three";
 import {OrbitControls, GizmoHelper, GizmoViewport, Edges} from "@react-three/drei";
 import {GiCubeforce} from "react-icons/gi";
 import uniqid from "uniqid"
-import {
-  CanvasState,
-  FactoryShapes,
-  ImportActionParamsObject,
-  ImportCadProjectButton,
-  ImportModelFromDBModal
-  ,
-} from "cad-library";
-
 import { Vector3 } from 'three';
 import { Provider, ReactReduxContext, useDispatch, useSelector } from 'react-redux';
 import { importModel, selectedProjectSelector, setModelS3, setModelUnit } from '../../../../store/projectSlice';
@@ -20,6 +11,7 @@ import { setModelInfoFromS3 } from '../../../dashboardTabsManagement/tabs/shared
 import { FocusView } from '../../sharedElements/FocusView';
 import { uploadFileS3 } from '../../../../aws/mesherAPIs';
 import { s3 } from '../../../../aws/s3Config';
+import { FactoryShapes, ImportActionParamsObject, ImportCadProjectButton, ImportModelFromDBModal, CanvasState, ComponentTypes, GeometryAttributes, Material, TransformationParams, ComponentEntity } from "../../../../../cad_library";
 
 
 export const CanvasModeler: React.FC = () => {
@@ -51,7 +43,7 @@ export const CanvasModeler: React.FC = () => {
                     intensity={3}
                   />
                   {/* paint models */}
-                  {selectedProject.model.components.map((component, index) => {
+                  {selectedProject.model.components.map((component: ComponentEntity, index: number) => {
                     return (
                       <FocusView key={uniqid()}>
                         <mesh

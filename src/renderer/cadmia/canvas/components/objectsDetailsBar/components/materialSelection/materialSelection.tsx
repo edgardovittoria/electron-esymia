@@ -1,5 +1,4 @@
 import { Listbox, Transition } from '@headlessui/react';
-import { Material } from 'cad-library';
 import { FC, Fragment, useEffect, useState } from 'react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { useMaterials } from './useMaterials';
@@ -7,6 +6,7 @@ import { AddNewMaterialModal } from './addNewMaterialModal';
 import { useAuth0 } from '@auth0/auth0-react';
 import { CgDetailsMore } from 'react-icons/cg';
 import { useCadmiaModalityManager } from '../../../cadmiaModality/useCadmiaModalityManager';
+import { Material } from '../../../../../../cad_library';
 
 interface MaterialSelectionProps {
   defaultMaterial?: Material;

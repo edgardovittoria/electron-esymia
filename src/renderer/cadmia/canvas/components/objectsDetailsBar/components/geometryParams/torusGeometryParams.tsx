@@ -1,6 +1,6 @@
-import { TorusGeometryAttributes } from "cad-library";
 import { FC } from "react";
 import { GeometryParamsGeneralProps } from "./geometryParams";
+import { TorusGeometryAttributes } from "../../../../../../cad_library";
 
 
 export const TorusGeometryParams: FC<GeometryParamsGeneralProps> = ({ entity, updateParams }) => {

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
-import { usersStateSelector } from 'cad-library';
 import {
   mainFolderSelector,
   SelectedFolderSelector,

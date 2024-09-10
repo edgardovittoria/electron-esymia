@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { FaPlus, FaTimes, FaUser } from 'react-icons/fa';
 import { MdOutlineDashboard } from 'react-icons/md';
 import { useAuth0 } from '@auth0/auth0-react';
-import { SetUserInfo, UsersState } from 'cad-library';
 import { HiOutlineLogout } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
 import { SelectedFolderSelector, selectProject } from '../store/projectSlice';
@@ -15,6 +14,7 @@ import {
 import { BsPlugin } from 'react-icons/bs';
 import { VscServerProcess } from 'react-icons/vsc';
 import { ActivePluginsSelector, addActivePlugin } from '../store/pluginsSlice';
+import { SetUserInfo, UsersState } from '../../cad_library';
 
 interface TabsContainerProps {
   user: UsersState;

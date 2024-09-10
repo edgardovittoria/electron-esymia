@@ -1,6 +1,4 @@
-import { ComponentEntity, exportToSTL, Material } from 'cad-library';
-import { Project } from '../../../../../../model/esymiaModels';
-import { AppDispatch } from '../../../../../../store/store';
+import { ComponentEntity, exportToSTL, Material } from '../../../../../../../cad_library';
 
 export function generateSTLListFromComponents(
   materialList: Material[],

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FaunaCadModel } from 'cad-library';
+import { FaunaCadModel } from '../../cad_library';
 
 export interface ModelState {
   models: FaunaCadModel[];
