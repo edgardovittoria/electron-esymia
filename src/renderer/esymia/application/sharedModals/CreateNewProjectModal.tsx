@@ -59,7 +59,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
       execQuery(createSimulationProjectInFauna, newProject, dispatch).then((res: any) => {
         newProject = {
           ...newProject,
-          faunaDocumentId: res.ref.value.id
+          faunaDocumentId: res.id
         } as Project;
         (selectedFolder?.faunaDocumentId !== 'root') && execQuery(
           addIDInFolderProjectsList,

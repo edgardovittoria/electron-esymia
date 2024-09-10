@@ -8,7 +8,7 @@ import { uploadFileS3 } from '../../../../../../aws/crud';
 import { addModel, setLoadingSpinner } from '../../../../../../store/modelSlice';
 import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../../../../../../esymia/store/tabsAndMenuItemsSlice';
 import { useFaunaQuery } from '../../../../../../../esymia/faunadb/hook/useFaunaQuery';
-import { Client, fql } from 'fauna';
+import { Client, fql, QuerySuccess } from 'fauna';
 import { canvasStateSelector, FaunaCadModel } from '../../../../../../../cad_library';
 
 export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
@@ -45,7 +45,7 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
           dispatch(setShowInfoModal(true));
         },
       );
-    return response;
+    return (response as QuerySuccess<any>).data;
   };
 
   const saveModel = async () => {
@@ -64,7 +64,7 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
           owner: user?.name,
         } as FaunaCadModel;
         execQuery(saveModelInFauna, newModel).then((res) => {
-          newModel.id = res.ref.id;
+          newModel.id = res.id;
           dispatch(addModel(newModel));
           toast.success('Model has been saved!');
           dispatch(setLoadingSpinner(false))

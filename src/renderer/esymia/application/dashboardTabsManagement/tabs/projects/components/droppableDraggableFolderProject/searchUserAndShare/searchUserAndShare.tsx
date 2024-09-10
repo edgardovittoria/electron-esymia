@@ -17,14 +17,18 @@ import {
 } from '../../../../../../../faunadb/projectsFolderAPIs';
 import {
   Folder,
+  MeshData,
+  Port,
+  Probe,
   Project,
   sharingInfoUser,
+  TempLumped,
 } from '../../../../../../../model/esymiaModels';
 import { convertInFaunaProjectThis } from '../../../../../../../faunadb/apiAuxiliaryFunctions';
 import toast from 'react-hot-toast';
 import { addProjectTab, setShowCreateNewProjectModal } from '../../../../../../../store/tabsAndMenuItemsSlice';
 import { useFaunaQuery } from '../../../../../../../faunadb/hook/useFaunaQuery';
-import { usersStateSelector } from '../../../../../../../../cad_library';
+import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../../cad_library';
 
 interface SearchUserAndShareProps {
   setShowSearchUser: (v: boolean) => void;
@@ -188,14 +192,19 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                         onClick={() => {
                           setShareDone(true);
                           let newProject: Project = {
-                            ...projectToShare as Project,
+                            faunaDocumentId: projectToShare?.faunaDocumentId,
+                            description: projectToShare?.description as string,
+                            frequencies: projectToShare?.frequencies,
+                            meshData: projectToShare?.meshData as MeshData,
+                            model: projectToShare?.model as CanvasState,
+                            modelS3: projectToShare?.modelS3,
+                            name: projectToShare?.name as string,
+                            owner: projectToShare?.owner as UsersState,
+                            parentFolder: projectToShare?.parentFolder as string,
+                            ports: projectToShare?.ports as (Port | Probe | TempLumped)[],
+                            screenshot: undefined,
+                            storage: projectToShare?.storage as "local" | "online",
                             simulation: undefined,
-                            // meshData: {
-                            //   meshGenerated: "Not Generated",
-                            //   meshApproved: false,
-                            //   quantum: [0,0,0],
-                            //   pathToExternalGridsNotFound: false
-                            // },
                             sharedWith: [
                               ...(projectToShare?.sharedWith as sharingInfoUser[]),
                               {
@@ -208,7 +217,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                           execQuery(createSimulationProjectInFauna, newProject, dispatch).then((res: any) => {
                             newProject = {
                               ...newProject,
-                              faunaDocumentId: res.ref.value.id
+                              faunaDocumentId: res.id
                             } as Project;
                           }).then(() => {
                             setShowSearchUser(false);
