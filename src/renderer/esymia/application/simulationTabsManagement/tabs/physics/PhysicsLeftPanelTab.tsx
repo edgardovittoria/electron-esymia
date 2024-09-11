@@ -10,6 +10,7 @@ import {
   selectedProjectSelector,
   selectPort,
   setPortName,
+  setPortsS3,
   unsetScatteringValue,
 } from '../../../../store/projectSlice';
 import noPhysicsIcon from '../../../../../../../assets/noPhysicsIcon.png';
@@ -18,6 +19,11 @@ import { isTerminationNameValid } from './portManagement/selectPorts/portLumpedP
 import { DebounceInput } from 'react-debounce-input';
 import toast from 'react-hot-toast';
 import { MdDeleteSweep } from 'react-icons/md';
+import { deleteFileS3, uploadFileS3 } from '../../../../aws/mesherAPIs';
+import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
+import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
+import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
+import { savePortsOnS3 } from './savePortsOnS3';
 
 interface PhysicsLeftPanelTabProps {}
 
@@ -25,6 +31,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   const dispatch = useDispatch();
   const selectedProject = useSelector(selectedProjectSelector);
   const [portRename, setPortRename] = useState('');
+  const { execQuery } = useFaunaQuery()
 
   useEffectNotOnMount(() => {
     selectedProject?.ports.filter((p) => p.category === 'port').length === 0 &&
@@ -43,6 +50,8 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
               data-tip="Delete all ports"
               onClick={() => {
                 dispatch(deleteAllPorts());
+                let ports = selectedProject.ports.filter(p => p.category !== 'port')
+                savePortsOnS3(ports, selectedProject, dispatch, execQuery)
               }}
             >
               <MdDeleteSweep
@@ -56,6 +65,8 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
               data-tip="Delete all lumped"
               onClick={() => {
                 dispatch(deleteAllLumped());
+                let ports = selectedProject.ports.filter(p => p.category !== 'lumped')
+                savePortsOnS3(ports, selectedProject, dispatch, execQuery)
               }}
             >
               <MdDeleteSweep
@@ -147,16 +158,23 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                                   <label
                                     htmlFor="modalRename"
                                     className="btn h-[2rem] min-h-[2rem]"
-                                    onClick={() =>
-                                      isTerminationNameValid(
-                                        portRename,
-                                        selectedProject.ports,
-                                      )
-                                        ? dispatch(setPortName(portRename))
-                                        : toast.error(
-                                            'Name already set! Please choose another one',
-                                          )
-                                    }
+                                    onClick={() => {
+                                      if(isTerminationNameValid(portRename,selectedProject.ports)){
+                                        dispatch(setPortName(portRename))
+                                        let ports = selectedProject.ports.map(p => {
+                                          if(p.isSelected){
+                                            return {...p, name: portRename}
+                                          }else{
+                                            return p
+                                          }
+                                        })
+                                        savePortsOnS3(ports, selectedProject, dispatch, execQuery)
+                                      }else{
+                                        toast.error(
+                                          'Name already set! Please choose another one',
+                                        )
+                                      }
+                                    }}
                                   >
                                     Rename
                                   </label>
@@ -168,6 +186,8 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                               data-tip="Delete"
                               onClick={() => {
                                 dispatch(deletePort(port.name));
+                                let ports = selectedProject.ports.filter(p => p.name !== port.name)
+                                savePortsOnS3(ports, selectedProject, dispatch, execQuery)
                               }}
                             >
                               <IoTrashOutline

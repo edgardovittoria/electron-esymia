@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as THREE from 'three';
 import { BiHide, BiShow } from 'react-icons/bi';
 import {
+  addPorts,
   boundingBoxDimensionSelector,
   findSelectedPort,
   SelectedFolderSelector,
   selectedProjectSelector,
   setBoundingBoxDimension,
+  setPortsS3,
 } from '../../../../store/projectSlice';
 import { PhysicsLeftPanelTab } from './PhysicsLeftPanelTab';
 import { CreatePorts } from './portManagement/selectPorts/CreatePorts';
@@ -53,6 +55,10 @@ import {
   PortImportFromCSV,
 } from './ImportPhysicsFromCSV';
 import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
+import { s3 } from '../../../../aws/s3Config';
+import { deleteFileS3, uploadFileS3 } from '../../../../aws/mesherAPIs';
+import { Dispatch } from '@reduxjs/toolkit';
+import { savePortsOnS3 } from './savePortsOnS3';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string | undefined;
@@ -63,6 +69,26 @@ export const Physics: React.FC<PhysicsProps> = ({
   selectedTabLeftPanel,
   setSelectedTabLeftPanel,
 }) => {
+  const setPortsFromS3 = (project: Project, dispatch: Dispatch) => {
+    const params = {
+      Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+      Key: project.portsS3 as string,
+    };
+    s3.getObject(params, (err, data) => {
+      if (err) {
+        console.log(err);
+      }
+      const ports:(Port | Probe)[] = JSON.parse(data.Body?.toString() as string)
+      ports.forEach(p => {
+        dispatch(addPorts(p))
+      })
+    });
+  };
+  useEffect(() => {
+    if(selectedProject?.portsS3){
+      setPortsFromS3(selectedProject, dispatch)
+    }
+  }, [])
   const { cloneProject } = useStorageData();
   const [cloning, setcloning] = useState<boolean>(false);
   const selectedProject = useSelector(selectedProjectSelector);
@@ -86,11 +112,15 @@ export const Physics: React.FC<PhysicsProps> = ({
 
   useEffectNotOnMount(() => {
     if (selectedProject && savedPhysicsParameters) {
-      execQuery(
-        updateProjectInFauna,
-        convertInFaunaProjectThis(selectedProject),
-        dispatch,
-      ).then(() => {});
+      if(selectedProject.ports.length > 0){
+        savePortsOnS3(selectedProject.ports, selectedProject, dispatch, execQuery)
+      }else{
+        execQuery(
+          updateProjectInFauna,
+          convertInFaunaProjectThis(selectedProject),
+          dispatch,
+        ).then(() => {});
+      }
     }
   }, [savedPhysicsParameters]);
 

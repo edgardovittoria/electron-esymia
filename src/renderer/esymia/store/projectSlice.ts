@@ -162,6 +162,12 @@ export const ProjectSlice = createSlice({
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       selectedProject?.ports.push(action.payload);
     },
+    setPortsS3(state: ProjectState, action: PayloadAction<string>) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if (selectedProject) {
+        selectedProject.portsS3 = action.payload;
+      }
+    },
     selectPort(state: ProjectState, action: PayloadAction<string>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       selectedProject?.ports.forEach(port => {
@@ -330,6 +336,7 @@ export const {
   selectProject,
   updateSimulation,
   addPorts,
+  setPortsS3,
   selectPort,
   deletePort,
   setPortType,

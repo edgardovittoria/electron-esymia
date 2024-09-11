@@ -320,9 +320,17 @@ export const useStorageData = () => {
       );
   };
 
+  const deletePortsOnline = (project: Project) => {
+    project?.portsS3 &&
+      deleteFileS3(project?.portsS3).catch((err) =>
+        console.log(err),
+      );
+  }
+
   const deleteProjectOnline = (project: Project) => {
     deleteMeshDataOnline(project);
     deleteResultsOnline(project)
+    deletePortsOnline(project)
     dispatch(removeProject(project.faunaDocumentId as string));
     dispatch(closeProjectTab(project.faunaDocumentId as string));
     execQuery(
@@ -395,16 +403,18 @@ export const useStorageData = () => {
             mesh: `${res.id}_mesh.json.gz`,
             externalGrids: `${res.id}_grids.json.gz`
           },
+          ports: [],
+          portsS3: `${res.id}_ports.json`,
           faunaDocumentId: res.id
         } as Project;
         execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
           selectedFolder?.faunaDocumentId !== 'root' &&
-          execQuery(
-            addIDInFolderProjectsList,
-            clonedProject.faunaDocumentId,
-            selectedFolder,
-            dispatch
-          );
+            execQuery(
+              addIDInFolderProjectsList,
+              clonedProject.faunaDocumentId,
+              selectedFolder,
+              dispatch
+            );
         dispatch(addProject(clonedProject));
         dispatch(addProjectTab(clonedProject));
         setCloning(false)
@@ -414,13 +424,14 @@ export const useStorageData = () => {
     })
   }
 
+
   const cloneProject = (project: Project, selectedFolder: Folder, setCloning: (v:boolean) => void) => {
     let clonedProject = {
       description: project.description,
       model: {} as CanvasState,
       owner: project.owner,
       parentFolder: project.parentFolder,
-      ports: project.ports,
+      ports: [],
       screenshot: project.screenshot,
       sharedWith: project.sharedWith,
       storage: project.storage,
@@ -441,24 +452,58 @@ export const useStorageData = () => {
     } as Project;
     execQuery(createSimulationProjectInFauna, clonedProject, dispatch).then(
       (res: any) => {
-        if(project.meshData.meshGenerated === "Generated"){
-          cloneMeshAndGridsS3(res, project, clonedProject, selectedFolder, setCloning)
+        if(project.portsS3){
+          s3.copyObject({
+            Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+            CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.portsS3}`,
+            Key: `${res.id}_ports.json`
+          }).promise().then(() => {
+            if(project.meshData.meshGenerated === "Generated"){
+              cloneMeshAndGridsS3(res, project, clonedProject, selectedFolder, setCloning)
+            }else{
+              clonedProject = {
+                ...clonedProject,
+                ports: [],
+                portsS3: `${res.id}_ports.json`,
+                faunaDocumentId: res.id,
+              } as Project;
+              execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
+                selectedFolder?.faunaDocumentId !== 'root' &&
+                  execQuery(
+                    addIDInFolderProjectsList,
+                    clonedProject.faunaDocumentId,
+                    selectedFolder,
+                    dispatch
+                  );
+              dispatch(addProject(clonedProject));
+              dispatch(addProjectTab(clonedProject));
+              setCloning(false)
+              toast.success('Project Cloned!');
+              })
+            }
+          })
         }else{
-          clonedProject = {
-            ...clonedProject,
-            faunaDocumentId: res.id,
-          } as Project;
-          selectedFolder?.faunaDocumentId !== 'root' &&
-            execQuery(
-              addIDInFolderProjectsList,
-              clonedProject.faunaDocumentId,
-              selectedFolder,
-              dispatch
-            );
-          dispatch(addProject(clonedProject));
-          dispatch(addProjectTab(clonedProject));
-          setCloning(false)
-          toast.success('Project Cloned!');
+          if(project.meshData.meshGenerated === "Generated"){
+            cloneMeshAndGridsS3(res, project, clonedProject, selectedFolder, setCloning)
+          }else{
+            clonedProject = {
+              ...clonedProject,
+              faunaDocumentId: res.id,
+            } as Project;
+            selectedFolder?.faunaDocumentId !== 'root' &&
+            execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
+              execQuery(
+                addIDInFolderProjectsList,
+                clonedProject.faunaDocumentId,
+                selectedFolder,
+                dispatch
+              );
+            })
+            dispatch(addProject(clonedProject));
+            dispatch(addProjectTab(clonedProject));
+            setCloning(false)
+            toast.success('Project Cloned!');
+        }
         }
       },
     );

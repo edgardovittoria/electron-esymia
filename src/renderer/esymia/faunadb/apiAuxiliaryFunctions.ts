@@ -76,6 +76,7 @@ export const faunaProjectHaveParentInFolderList = (
 export const convertInProjectThis = (faunaProject: FaunaProject) => {
   const project: Project = {
     ...faunaProject.project,
+    ports: [],
     faunaDocumentId: faunaProject.id,
     storage: faunaProject.project.storage,
     simulation:
@@ -97,9 +98,8 @@ export const convertInFaunaProjectThis = (project: Project) => {
       description: project.description,
       storage: project.storage,
       modelS3: project.modelS3,
-      ports: project.ports,
+      portsS3: project.portsS3,
       frequencies: project.frequencies,
-      //signal: project.signal,
       simulation: project.simulation === undefined ? null : {
         ...project.simulation,
         results: {} as SolverOutput

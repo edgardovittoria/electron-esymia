@@ -11,6 +11,7 @@ import {
   boundingBoxDimensionSelector,
   selectedProjectSelector,
   setFrequencies,
+  setPortsS3,
   setScatteringValue,
 } from '../../../../store/projectSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,6 +22,12 @@ import {
   getDefaultPort,
 } from './portManagement/selectPorts/portLumpedProbeGenerator';
 import { BsFiletypeCsv } from 'react-icons/bs';
+import { Port, Probe } from '../../../../model/esymiaModels';
+import { deleteFileS3, uploadFileS3 } from '../../../../aws/mesherAPIs';
+import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
+import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
+import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
+import { savePortsOnS3 } from './savePortsOnS3';
 
 const GREY = '#CCC';
 const GREY_LIGHT = 'rgba(255, 255, 255, 0.4)';
@@ -106,6 +113,7 @@ export const LumpedImportFromCSV: FC = () => {
   );
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
+  const { execQuery } = useFaunaQuery()
 
   type CSVDataRow = {
     name?: string;
@@ -144,6 +152,7 @@ export const LumpedImportFromCSV: FC = () => {
       config={{ header: true }}
       onUploadAccepted={(data: any) => {
         if (selectedProject) {
+          let ports: (Port | Probe)[] = [...selectedProject.ports]
           data.data.forEach((pdata: CSVDataRow) => {
             if(isValidThis(pdata)){
               let port = getDefaultLumped(
@@ -167,8 +176,10 @@ export const LumpedImportFromCSV: FC = () => {
               port.rlcParams.inductance = parseFloat(pdata.L);
               port.rlcParams.capacitance = parseFloat(pdata.C);
               dispatch(addPorts(port));
+              ports.push(port)
             }
           });
+          savePortsOnS3(ports, selectedProject, dispatch, execQuery)
         }
         setZoneHover(false);
       }}
@@ -250,6 +261,7 @@ export const PortImportFromCSV:FC = () => {
   );
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
+  const { execQuery } = useFaunaQuery()
 
   type CSVDataRow = {
     name?: string;
@@ -281,6 +293,7 @@ export const PortImportFromCSV:FC = () => {
       config={{ header: true }}
       onUploadAccepted={(results: any) => {
         if (selectedProject) {
+          let ports: (Port | Probe)[] = [...selectedProject.ports]
           let scatteringNotYetSet = true
           results.data.forEach((pdata: CSVDataRow) => {
             if (isValidThis(pdata)) {
@@ -305,8 +318,10 @@ export const PortImportFromCSV:FC = () => {
                 dispatch(setScatteringValue(parseFloat(pdata.scattering)))
                 scatteringNotYetSet = false
               }
+              ports.push(port)
             }
           });
+          savePortsOnS3(ports, selectedProject, dispatch, execQuery)
         }
         setZoneHover(false);
       }}
@@ -387,6 +402,7 @@ export const FrequenciesImportFromCSV:FC = () => {
   );
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
+  const { execQuery } = useFaunaQuery()
 
   type CSVDataRow = {
     Frequencies: string
@@ -412,7 +428,17 @@ export const FrequenciesImportFromCSV:FC = () => {
               frequencies.push(parseFloat(pdata.Frequencies))
             }
           });
-          (frequencies.length > 0 && dispatch(setFrequencies(frequencies)))
+          if(frequencies.length > 0){
+            dispatch(setFrequencies(frequencies))
+            execQuery(
+              updateProjectInFauna,
+              convertInFaunaProjectThis({
+                ...selectedProject,
+                frequencies: frequencies
+              }),
+              dispatch,
+            ).then(() => {});
+          }
         }
         setZoneHover(false);
       }}

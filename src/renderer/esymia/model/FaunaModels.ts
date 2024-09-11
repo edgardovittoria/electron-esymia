@@ -11,9 +11,8 @@ export type FaunaProjectDetails = {
     description: string,
     storage: 'local' | 'online'
     modelS3?: string,
-    ports: (Port | Probe)[],
+    portsS3?: string,
     frequencies?: number[]
-    //signal: Signal,
     simulation?: Simulation|null,
     meshData: MeshData,
     screenshot: string | undefined,
