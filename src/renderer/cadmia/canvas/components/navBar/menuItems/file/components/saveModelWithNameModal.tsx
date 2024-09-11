@@ -51,7 +51,7 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
   const saveModel = async () => {
     const model = JSON.stringify({ components: canvas.components, unit });
     const blobFile = new Blob([model]);
-    const modelFile = new File([blobFile], `${name}.json`, {
+    const modelFile = new File([blobFile], `${name}_model_cadmia.json`, {
       type: 'application/json',
     });
     dispatch(setLoadingSpinner(true))

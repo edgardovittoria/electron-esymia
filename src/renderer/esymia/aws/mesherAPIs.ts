@@ -7,7 +7,7 @@ import { Project } from '../model/esymiaModels';
 export const uploadFileS3 = async (file: File, selectedProject?: Project) => {
     const s3 = new ReactS3Client(s3Config as IConfig);
     try {
-        return await s3.uploadFile(file)
+        return await s3.uploadFile(file, file.name)
     } catch (exception) {
         console.log(exception);
     }

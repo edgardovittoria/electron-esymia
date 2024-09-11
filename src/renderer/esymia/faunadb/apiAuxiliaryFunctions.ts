@@ -1,5 +1,5 @@
 import { CanvasState } from '../../cad_library';
-import { Folder, Project, sharingInfoUser } from '../model/esymiaModels';
+import { Folder, Project, sharingInfoUser, SolverOutput } from '../model/esymiaModels';
 import {
   FaunaFolder,
   FaunaFolderDetails,
@@ -100,7 +100,10 @@ export const convertInFaunaProjectThis = (project: Project) => {
       ports: project.ports,
       frequencies: project.frequencies,
       //signal: project.signal,
-      simulation: project.simulation === undefined ? null : project.simulation,
+      simulation: project.simulation === undefined ? null : {
+        ...project.simulation,
+        results: {} as SolverOutput
+      },
       meshData: project.meshData,
       screenshot: project.screenshot,
       owner: project.owner,

@@ -202,18 +202,18 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           ),
         ]),
       );
-      execQuery(
-        updateProjectInFauna,
-        convertInFaunaProjectThis({
-          ...selectedProject,
-          suggestedQuantum: [
-            parseFloat(meshAdvice.quantum[0].toFixed(5)),
-            parseFloat(meshAdvice.quantum[1].toFixed(5)),
-            parseFloat(meshAdvice.quantum[2].toFixed(5)),
-          ],
-        } as Project),
-        dispatch,
-      ).then();
+      // execQuery(
+      //   updateProjectInFauna,
+      //   convertInFaunaProjectThis({
+      //     ...selectedProject,
+      //     suggestedQuantum: [
+      //       parseFloat(meshAdvice.quantum[0].toFixed(5)),
+      //       parseFloat(meshAdvice.quantum[1].toFixed(5)),
+      //       parseFloat(meshAdvice.quantum[2].toFixed(5)),
+      //     ],
+      //   } as Project),
+      //   dispatch,
+      // ).then();
     }
   }, [meshAdvice]);
 

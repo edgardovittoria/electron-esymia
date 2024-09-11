@@ -33,6 +33,7 @@ import { Brick } from '../components/createGridsExternals';
 import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
+import { CanvasState } from '../../../../../../../cad_library';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();
@@ -312,8 +313,16 @@ export const useStorageData = () => {
       deleteFile(project.meshData.externalGrids);
   };
 
+  const deleteResultsOnline = (project: Project) => {
+    project?.simulation?.resultS3 &&
+      deleteFileS3(project?.simulation?.resultS3).catch((err) =>
+        console.log(err),
+      );
+  };
+
   const deleteProjectOnline = (project: Project) => {
     deleteMeshDataOnline(project);
+    deleteResultsOnline(project)
     dispatch(removeProject(project.faunaDocumentId as string));
     dispatch(closeProjectTab(project.faunaDocumentId as string));
     execQuery(
@@ -368,9 +377,60 @@ export const useStorageData = () => {
     }
   };
 
+  const cloneMeshAndGridsS3 = (res:any, project: Project, clonedProject: Project, selectedFolder: Folder, setCloning: Function) => {
+    s3.copyObject({
+      Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+      CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
+      Key: `${res.id}_mesh.json.gz`
+    }).promise().then(mesh => {
+      s3.copyObject({
+        Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+        CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`,
+        Key: `${res.id}_grids.json.gz`
+      }).promise().then(grids => {
+        clonedProject = {
+          ...clonedProject,
+          meshData: {
+            ...project.meshData,
+            mesh: `${res.id}_mesh.json.gz`,
+            externalGrids: `${res.id}_grids.json.gz`
+          },
+          faunaDocumentId: res.id
+        } as Project;
+        execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
+          selectedFolder?.faunaDocumentId !== 'root' &&
+          execQuery(
+            addIDInFolderProjectsList,
+            clonedProject.faunaDocumentId,
+            selectedFolder,
+            dispatch
+          );
+        dispatch(addProject(clonedProject));
+        dispatch(addProjectTab(clonedProject));
+        setCloning(false)
+        toast.success('Project Cloned!');
+        })
+      })
+    })
+  }
+
   const cloneProject = (project: Project, selectedFolder: Folder, setCloning: (v:boolean) => void) => {
     let clonedProject = {
-      ...project,
+      description: project.description,
+      model: {} as CanvasState,
+      owner: project.owner,
+      parentFolder: project.parentFolder,
+      ports: project.ports,
+      screenshot: project.screenshot,
+      sharedWith: project.sharedWith,
+      storage: project.storage,
+      boundingBoxDimension: project.boundingBoxDimension,
+      frequencies: project.frequencies,
+      modelS3: project.modelS3,
+      modelUnit: project.modelUnit,
+      scatteringValue: project.scatteringValue,
+      suggestedQuantum: project.suggestedQuantum,
+      simulation: undefined,
       meshData: {
         meshApproved: false,
         meshGenerated: 'Not Generated',
@@ -382,50 +442,11 @@ export const useStorageData = () => {
     execQuery(createSimulationProjectInFauna, clonedProject, dispatch).then(
       (res: any) => {
         if(project.meshData.meshGenerated === "Generated"){
-          s3.copyObject({
-            Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-            CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-            Key: `${res.ref.value.id}_mesh.json.gz`
-          }).promise().then(mesh => {
-            console.log(mesh)
-            s3.copyObject({
-              Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-              CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`,
-              Key: `${res.ref.value.id}_grids.json.gz`
-            }).promise().then(grids => {
-              clonedProject = {
-                ...clonedProject,
-                meshData: {
-                  ...project.meshData,
-                  mesh: `${res.ref.value.id}_mesh.json.gz`,
-                  externalGrids: `${res.ref.value.id}_grids.json.gz`
-                },
-                faunaDocumentId: res.ref.value.id,
-                simulation: project.simulation ? {
-                  ...project.simulation,
-                  name: `${project?.name}_copy - sim`,
-                  associatedProject: res.ref.value.id,
-                } : undefined
-              } as Project;
-              execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
-                selectedFolder?.faunaDocumentId !== 'root' &&
-                execQuery(
-                  addIDInFolderProjectsList,
-                  clonedProject.faunaDocumentId,
-                  selectedFolder,
-                  dispatch
-                );
-              dispatch(addProject(clonedProject));
-              dispatch(addProjectTab(clonedProject));
-              setCloning(false)
-              toast.success('Project Cloned!');
-              })
-            })
-          })
+          cloneMeshAndGridsS3(res, project, clonedProject, selectedFolder, setCloning)
         }else{
           clonedProject = {
             ...clonedProject,
-            faunaDocumentId: res.ref.value.id,
+            faunaDocumentId: res.id,
           } as Project;
           selectedFolder?.faunaDocumentId !== 'root' &&
             execQuery(

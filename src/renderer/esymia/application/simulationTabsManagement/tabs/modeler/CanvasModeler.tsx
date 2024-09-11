@@ -12,12 +12,17 @@ import { FocusView } from '../../sharedElements/FocusView';
 import { uploadFileS3 } from '../../../../aws/mesherAPIs';
 import { s3 } from '../../../../aws/s3Config';
 import { FactoryShapes, ImportActionParamsObject, ImportCadProjectButton, ImportModelFromDBModal, CanvasState, ComponentTypes, GeometryAttributes, Material, TransformationParams, ComponentEntity } from "../../../../../cad_library";
+import { useFaunaQuery } from "../../../../faunadb/hook/useFaunaQuery";
+import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
+import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
+import { Project } from "../../../../model/esymiaModels";
 
 
 export const CanvasModeler: React.FC = () => {
   const selectedProject = useSelector(selectedProjectSelector);
   const [showModalLoadFromDB, setShowModalLoadFromDB] = useState(false);
   const dispatch = useDispatch()
+  const { execQuery } = useFaunaQuery()
 
 
 
@@ -87,7 +92,7 @@ export const CanvasModeler: React.FC = () => {
                 unit: importActionParamsObject.unit
               })
               let blobFile = new Blob([model])
-              let modelFile = new File([blobFile], `${selectedProject?.faunaDocumentId}.json`, {type: 'application/json'})
+              let modelFile = new File([blobFile], `${selectedProject?.faunaDocumentId}_model_esymia.json`, {type: 'application/json'})
               uploadFileS3(modelFile).then(res => {
                 if (res) {
                   dispatch(setModelS3(res.key))
@@ -122,6 +127,15 @@ export const CanvasModeler: React.FC = () => {
             dispatch(importModel(importActionParamsObject))
             dispatch(setModelUnit(importActionParamsObject.unit))
             dispatch(setModelS3(importActionParamsObject.modelS3 as string))
+            execQuery(
+                    updateProjectInFauna,
+                    convertInFaunaProjectThis({
+                      ...selectedProject,
+                      modelS3: importActionParamsObject.modelS3,
+                      modelUnit: importActionParamsObject.unit,
+                    } as Project),
+                    dispatch,
+                  ).then(() => {});
           }}
           importActionParams={
             {

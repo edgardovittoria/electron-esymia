@@ -15,12 +15,7 @@ import { Port, Project, Simulation } from "../../../../model/esymiaModels";
 import { useSelector } from "react-redux";
 import { selectedProjectSelector } from "../../../../store/projectSlice";
 import { VscSettings } from "react-icons/vsc";
-import JSZip from "jszip";
-import saveAs from "file-saver";
 import { Dataset, pairs } from "./sharedElements";
-import { ExportToCsvZippedButton } from "./ExportToCsvZippedButton";
-import { BsGrid3X3Gap } from 'react-icons/bs';
-import { ChartVisualizationMode } from './ChartVisualizationMode';
 
 ChartJS.register(
   CategoryScale,

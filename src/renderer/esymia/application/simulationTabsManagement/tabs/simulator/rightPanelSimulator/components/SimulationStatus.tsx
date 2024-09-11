@@ -4,7 +4,7 @@ import { Disclosure } from '@headlessui/react';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { Project, Simulation } from '../../../../../../model/esymiaModels';
+import { Project, Simulation, SolverOutput } from '../../../../../../model/esymiaModels';
 import {
   convergenceTresholdSelector,
   solverIterationsSelector,
@@ -39,6 +39,7 @@ import { ImSpinner } from 'react-icons/im';
 import { TbTrashXFilled } from 'react-icons/tb';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { ComponentEntity } from '../../../../../../../cad_library';
+import { uploadFileS3 } from '../../../../../../aws/mesherAPIs';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean;
@@ -314,15 +315,42 @@ const SimulationStatusItem: React.FC<{
             }),
           );
           if (!solverResults.partial) {
-            execQuery(
-              updateProjectInFauna,
-              convertInFaunaProjectThis({
-                ...associatedProject,
-                simulation: simulationUpdated,
-              } as Project),
-              dispatch,
-            ).then(() => {});
-            setRunningSimulation(undefined);
+            let results = {
+              ...solverResults.matrices,
+              freqIndex: solverResults.freqIndex,
+            }
+            let blobFile = new Blob([JSON.stringify(results)])
+            let modelFile = new File([blobFile], `${associatedProject.faunaDocumentId}_results.json`, {type: 'application/json'})
+            uploadFileS3(modelFile).then(res => {
+              if (res) {
+                const simulationUpdatedCompleted: Simulation = {
+                  ...simulation,
+                  results: {} as SolverOutput,
+                  resultS3: res.key,
+                  ended: Date.now().toString(),
+                  status: solverResults.partial ? 'Running' : 'Completed',
+                };
+                dispatch(
+                  updateSimulation({
+                    associatedProject: simulation.associatedProject,
+                    value: {
+                      ...simulationUpdated,
+                      resultS3: res.key
+                    },
+                  }),
+                );
+                execQuery(
+                  updateProjectInFauna,
+                  convertInFaunaProjectThis({
+                    ...associatedProject,
+                    simulation: simulationUpdatedCompleted,
+                  } as Project),
+                  dispatch,
+                ).then(() => {});
+                setRunningSimulation(undefined);
+              }
+            })
+
           }
         }
       }

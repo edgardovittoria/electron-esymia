@@ -154,7 +154,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
                             const blobFile = new Blob([model]);
                             const modelFile = new File(
                               [blobFile],
-                              `${selectedModel?.name}.json`,
+                              `${selectedModel?.name}_model.json`,
                               {
                                 type: 'application/json',
                               },

@@ -12,6 +12,7 @@ import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { Project } from '../../../../model/esymiaModels';
 import { ImSpinner } from 'react-icons/im';
 import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
+import { deleteFileS3 } from '../../../../aws/mesherAPIs';
 
 interface ResultsLeftPanelTabProps {
   selectedPort: string;
@@ -115,18 +116,20 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                             selectedProject?.faunaDocumentId as string,
                         }),
                       );
-                      execQuery(
-                        updateProjectInFauna,
-                        convertInFaunaProjectThis({
-                          ...selectedProject,
-                          simulation: undefined,
-                          meshData: {
-                            ...selectedProject?.meshData,
-                            meshApproved: false,
-                          },
-                        } as Project),
-                        dispatch,
-                      );
+                      deleteFileS3(selectedProject.simulation?.resultS3 as string).then(() => {
+                        execQuery(
+                          updateProjectInFauna,
+                          convertInFaunaProjectThis({
+                            ...selectedProject,
+                            simulation: undefined,
+                            meshData: {
+                              ...selectedProject?.meshData,
+                              meshApproved: false,
+                            },
+                          } as Project),
+                          dispatch,
+                        );
+                      })
                     }}
                   >
                     REMOVE RESULTS

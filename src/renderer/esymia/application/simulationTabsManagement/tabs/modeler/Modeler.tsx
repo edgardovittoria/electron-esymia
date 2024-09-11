@@ -40,15 +40,15 @@ export const Modeler: React.FC<ModelerProps> = ({
     setSelectedTabLeftPanel(undefined);
   }, []);
 
-  useEffect(() => {
-    if (selectedProject?.model.components) {
-      execQuery(
-        updateProjectInFauna,
-        convertInFaunaProjectThis(selectedProject),
-        dispatch,
-      ).then(() => {});
-    }
-  }, [selectedProject?.model.components]);
+  // useEffect(() => {
+  //   if (selectedProject?.model.components) {
+  //     execQuery(
+  //       updateProjectInFauna,
+  //       convertInFaunaProjectThis(selectedProject),
+  //       dispatch,
+  //     ).then(() => {});
+  //   }
+  // }, [selectedProject?.model.components]);
 
   return (
     <div>

@@ -8,6 +8,7 @@ import {
   selectPort,
   selectProject,
   setMeshApproved,
+  updateSimulation,
 } from '../../../../store/projectSlice';
 import { ChartVisualizationMode } from './ChartVisualizationMode';
 import { ChartsList } from './ChartsList';
@@ -15,7 +16,7 @@ import { ResultsLeftPanelTab } from './ResultsLeftPanelTab';
 import { MyPanel } from '../../sharedElements/MyPanel';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
-import { Folder, Port, Project } from '../../../../model/esymiaModels';
+import { Folder, Port, Project, Simulation, SolverOutput } from '../../../../model/esymiaModels';
 import {
   alertMessageStyle,
   emptyResultsMessage,
@@ -32,6 +33,8 @@ import JSZip from 'jszip';
 import saveAs from 'file-saver';
 import { TbFileExport } from 'react-icons/tb';
 import toast, { ToastOptions } from 'react-hot-toast';
+import { Dispatch } from '@reduxjs/toolkit';
+import { s3 } from '../../../../aws/s3Config';
 
 interface ResultsProps {
   selectedTabLeftPanel: string | undefined;
@@ -42,9 +45,35 @@ export const Results: React.FC<ResultsProps> = ({
   selectedTabLeftPanel,
   setSelectedTabLeftPanel,
 }) => {
+  const setResultsFromS3 = (project: Project, dispatch: Dispatch) => {
+    const params = {
+      Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+      Key: project.simulation?.resultS3 as string,
+    };
+    s3.getObject(params, (err, data) => {
+      if (err) {
+        console.log(err);
+      }
+      const results = JSON.parse(data.Body?.toString() as string) as SolverOutput
+      dispatch(
+        updateSimulation({
+          associatedProject: project.simulation?.associatedProject as string,
+          value: {
+            ...project.simulation,
+            results: results
+          } as Simulation,
+        }),
+      );
+    });
+  };
   const { cloneProject } = useStorageData();
   const [cloning, setcloning] = useState<boolean>(false);
   const selectedProject = useSelector(selectedProjectSelector);
+  useEffect(() => {
+    if(selectedProject && selectedProject.simulation && selectedProject.simulation.resultS3 && selectedProject.simulation.status === "Completed" && !selectedProject.simulation.results.matrix_S){
+      setResultsFromS3(selectedProject, dispatch)
+    }
+  }, [])
   const selectedFolder = useSelector(SelectedFolderSelector);
   let selectedPort = findSelectedPort(selectedProject);
   const dispatch = useDispatch();
@@ -54,7 +83,7 @@ export const Results: React.FC<ResultsProps> = ({
   const labels = pairs(ports.map((p) => p.name));
   const [selectedLabel, setSelectedLabel] = useState<
     { label: string; id: number }[]
-  >([{ label: `${labels[0][0]} - ${labels[0][1]}`, id: 0 }]);
+  >([{ label: (selectedProject && selectedProject?.ports.length > 0) ? `${labels[0][0]} - ${labels[0][1]}` : "", id: 0 }]);
   const [chartsScaleMode, setChartsScaleMode] = useState<
     'logarithmic' | 'linear'
   >('logarithmic');
