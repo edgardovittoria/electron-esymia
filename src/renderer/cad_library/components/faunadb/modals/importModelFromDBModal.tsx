@@ -1,15 +1,14 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import { Dialog, Transition } from "@headlessui/react";
-import { FC, useEffect, useState, Fragment } from "react";
-import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import {
-  ImportActionParamsObject
-} from "../../importFunctions/importFunctions";
-import { FaunaCadModel, getModelsByOwner } from "../api/modelsAPIs";
-import { ComponentEntity } from "../../model/componentEntity/componentEntity";
-import AWS from "aws-sdk"
-import { useFaunaQuery } from "../../../../esymia/faunadb/hook/useFaunaQuery";
+import { useAuth0 } from '@auth0/auth0-react';
+import { Dialog, Transition } from '@headlessui/react';
+import { FC, useEffect, useState, Fragment } from 'react';
+import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { ImportActionParamsObject } from '../../importFunctions/importFunctions';
+import { FaunaCadModel, getModelsByOwner } from '../api/modelsAPIs';
+import { ComponentEntity } from '../../model/componentEntity/componentEntity';
+import AWS from 'aws-sdk';
+import { useFaunaQuery } from '../../../../esymia/faunadb/hook/useFaunaQuery';
+import { CheckIcon } from '@heroicons/react/20/solid';
 
 export const ImportModelFromDBModal: FC<{
   showModalLoad: Function;
@@ -26,9 +25,9 @@ export const ImportModelFromDBModal: FC<{
 }) => {
   const [models, setModels] = useState<FaunaCadModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<FaunaCadModel | undefined>(
-    undefined
+    undefined,
   );
-  const [loadingMessage, setLoadingMessage] = useState("Loading...");
+  const [loadingMessage, setLoadingMessage] = useState('Loading...');
   const { user } = useAuth0();
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
@@ -39,7 +38,7 @@ export const ImportModelFromDBModal: FC<{
       execQuery(getModelsByOwner, user.sub).then((mods) => {
         setModels(mods);
         models.length === 0 &&
-          setLoadingMessage("No models to load form database.");
+          setLoadingMessage('No models to load form database.');
       });
   }, []);
 
@@ -48,7 +47,7 @@ export const ImportModelFromDBModal: FC<{
     bucket: string,
     fileKey: string,
     importActionParams: ImportActionParamsObject,
-    importAction: (params: ImportActionParamsObject) => any
+    importAction: (params: ImportActionParamsObject) => any,
   ) => {
     try {
       const params = {
@@ -59,13 +58,14 @@ export const ImportModelFromDBModal: FC<{
         if (err) {
           console.log(err);
         }
-        let model = JSON.parse(
-          data.Body?.toString() as string
-        ) as { components:ComponentEntity[], unit: string };
+        let model = JSON.parse(data.Body?.toString() as string) as {
+          components: ComponentEntity[];
+          unit: string;
+        };
         importActionParams.canvas.components = model.components;
         importActionParams.unit = model.unit;
-        importActionParams.modelS3 = selectedModel?.components
-        importAction(importActionParams)
+        importActionParams.modelS3 = selectedModel?.components;
+        importAction(importActionParams);
       });
     } catch (exception) {
       console.log(exception);
@@ -103,45 +103,40 @@ export const ImportModelFromDBModal: FC<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900"
                 >
                   Select model to load
                 </Dialog.Title>
-                <div className="mt-4">
+                <div className="py-2 mt-3 px-2 border border-gray-300 z-20 rounded-xl flex flex-col gap-2 max-h-[400px] overflow-y-scroll relative">
+                  <div className="grid grid-cols-12 gap-4 items-center">
+                    <CheckIcon className="col-span-1 text-secondaryColor"/>
+                    <span className="font-semibold col-span-4">name</span>
+                    <span className="font-semibold col-span-7">owner</span>
+                  </div>
+
+                  <hr />
                   {models.length === 0 ? (
                     <div>{loadingMessage}</div>
                   ) : (
-                    <table className="table-auto">
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Model name</th>
-                          <th>Owner</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {models.map((model, index) => {
-                          return (
-                            <tr key={index}>
-                              <td>
-                                <input
-                                  key={model.name}
-                                  type="radio"
-                                  value={model.name}
-                                  name="modelSelection"
-                                  onChange={() => setSelectedModel(model)}
-                                />
-                              </td>
-                              <td>{model.name}</td>
-                              <td>{model.owner}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                    models.map((model) => {
+                      return (
+                        <div className="grid grid-cols-12 gap-4 items-center">
+                          <input
+                            key={model.name}
+                            type="radio"
+                            value={model.name}
+                            name="modelSelection"
+                            onChange={() => setSelectedModel(model)}
+                            className='col-span-1'
+                          />
+                          <span className="font-semibold text-sm col-span-4">{model.name}</span>
+                          <span className="text-sm col-span-7">{model.owner}</span>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
 
@@ -159,7 +154,7 @@ export const ImportModelFromDBModal: FC<{
                     onClick={
                       selectedModel === undefined
                         ? () => {
-                            toast.error("You must select a model to load.");
+                            toast.error('You must select a model to load.');
                           }
                         : () => {
                             getFileS3(
@@ -167,10 +162,10 @@ export const ImportModelFromDBModal: FC<{
                               bucket,
                               selectedModel.components,
                               importActionParams,
-                              importAction
+                              importAction,
                             ).then(() => {
                               showModalLoad(false);
-                              toast.success("Model successfully loaded");
+                              toast.success('Model successfully loaded');
                             });
                           }
                     }
