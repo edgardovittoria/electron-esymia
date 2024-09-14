@@ -41,36 +41,37 @@ interface ResultsProps {
   setSelectedTabLeftPanel: Function;
 }
 
+export const setResultsFromS3 = (project: Project, dispatch: Dispatch) => {
+  const params = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+    Key: project.simulation?.resultS3 as string,
+  };
+  s3.getObject(params, (err, data) => {
+    if (err) {
+      console.log(err);
+    }
+    const results = JSON.parse(data.Body?.toString() as string) as SolverOutput
+    dispatch(
+      updateSimulation({
+        associatedProject: project.simulation?.associatedProject as string,
+        value: {
+          ...project.simulation,
+          results: results
+        } as Simulation,
+      }),
+    );
+  });
+};
+
 export const Results: React.FC<ResultsProps> = ({
   selectedTabLeftPanel,
   setSelectedTabLeftPanel,
 }) => {
-  const setResultsFromS3 = (project: Project, dispatch: Dispatch) => {
-    const params = {
-      Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-      Key: project.simulation?.resultS3 as string,
-    };
-    s3.getObject(params, (err, data) => {
-      if (err) {
-        console.log(err);
-      }
-      const results = JSON.parse(data.Body?.toString() as string) as SolverOutput
-      dispatch(
-        updateSimulation({
-          associatedProject: project.simulation?.associatedProject as string,
-          value: {
-            ...project.simulation,
-            results: results
-          } as Simulation,
-        }),
-      );
-    });
-  };
   const { cloneProject } = useStorageData();
   const [cloning, setcloning] = useState<boolean>(false);
   const selectedProject = useSelector(selectedProjectSelector);
   useEffect(() => {
-    if(selectedProject && selectedProject.simulation && selectedProject.simulation.resultS3 && selectedProject.simulation.status === "Completed" && !selectedProject.simulation.results.matrix_S){
+    if(selectedProject && selectedProject.simulation && selectedProject.simulation.resultS3 && selectedProject.simulation.status === "Completed"  && !selectedProject.simulation.results.matrix_S){
       setResultsFromS3(selectedProject, dispatch)
     }
   }, [])

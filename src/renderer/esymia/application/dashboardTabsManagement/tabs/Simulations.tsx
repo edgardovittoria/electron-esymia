@@ -19,6 +19,7 @@ import {
 import { Folder, Simulation } from '../../../model/esymiaModels';
 import noresultfound from '../../../../../../assets/noresultfound.png';
 import { ImSpinner } from 'react-icons/im';
+import { setPortsFromS3 } from '../../simulationTabsManagement/tabs/physics/Physics';
 
 interface SimulationsProps {
   maxH: string
@@ -85,6 +86,9 @@ export const Simulations: React.FC<SimulationsProps> = ({maxH}) => {
                   Ended
                 </th>
                 <th className="py-4" scope="col">
+                  Simulation Time
+                </th>
+                <th className="py-4" scope="col">
                   Status
                 </th>
                 <th className="py-4" scope="col" />
@@ -108,6 +112,11 @@ export const Simulations: React.FC<SimulationsProps> = ({maxH}) => {
                     <td className="fw-bold py-4">{simulation.name}</td>
                     <td className="py-4">{`${started.toLocaleString()}`}</td>
                     <td className="py-4">{`${ended.toLocaleString()}`}</td>
+                    <td className="py-4">
+                      {ended.getHours() - started.getHours()}{' '}h{' '}
+                      {ended.getMinutes() - started.getMinutes()}{' '}min{' '}
+                      {ended.getSeconds() - started.getSeconds()}{' '}sec
+                    </td>
                     <td className="py-4">{simulation.status}</td>
                     <td
                       id={index.toString()}
@@ -121,6 +130,9 @@ export const Simulations: React.FC<SimulationsProps> = ({maxH}) => {
                             projects,
                             simulation.associatedProject,
                           );
+                          if(proj?.portsS3 && proj.ports.length === 0){
+                            setPortsFromS3(proj, dispatch)
+                          }
                           if (proj) {
                             if (
                               projectsTabs.filter(

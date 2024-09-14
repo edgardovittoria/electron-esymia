@@ -40,6 +40,7 @@ type TabsAndMenuItemsState = {
   computingP: {done: boolean, id: string}[],
   computingLp: {done: boolean, id: string}[],
   iterations: {freqNumber: number, id: string}[],
+  estimatedTime?: {estimatedTime: number, portIndex: number, id: string},
   meshAdvice: {id: string, quantum: [number, number, number]}[],
   meshResults?: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}, error?: any},
   solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number, error?:any }[],
@@ -159,6 +160,9 @@ export const TabsAndMenuItemsSlice = createSlice({
     unsetIterations(state: TabsAndMenuItemsState, action: PayloadAction<string>){
       state.iterations = state.iterations.filter(item => item.id !== action.payload)
     },
+    setEstimatedTime(state: TabsAndMenuItemsState, action: PayloadAction<{estimatedTime: number, portIndex: number, id: string} | undefined>){
+      state.estimatedTime = action.payload
+    },
     setMeshAdvice(state: TabsAndMenuItemsState, action: PayloadAction<{quantum: [number, number, number], id: string}>){
       state.meshAdvice = state.meshAdvice.filter(item => item.id !== action.payload.id)
       state.meshAdvice.push(action.payload)
@@ -220,6 +224,7 @@ export const {
   setcomputingP,
   setcomputingLp,
   setIterations,
+  setEstimatedTime,
   unsetComputingP,
   unsetComputingLp,
   unsetIterations,
@@ -314,6 +319,10 @@ export const computingLpSelector = (state: {
 export const iterationsSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState
 }) => state.tabsAndMenuItems.iterations;
+
+export const estimatedTimeSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.estimatedTime;
 
 export const meshAdviceSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState

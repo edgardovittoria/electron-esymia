@@ -3,6 +3,7 @@ import { setMesherStatus, setSolverStatus } from '../store/pluginsSlice';
 import {
   setAWSExternalGridsData,
   setCompress,
+  setEstimatedTime,
   setGridsCreationLength,
   setGridsCreationValue,
   setIterations,
@@ -110,9 +111,9 @@ export const callback_solver_feedback = (message: any, dispatch: Function) => {
     } else if (body['computingLp']) {
       dispatch(setcomputingLp({ done: body['computingLp'], id: body['id'] }));
     } else if (body['freqNumber']) {
-      dispatch(
-        setIterations({ freqNumber: body['freqNumber'], id: body['id'] }),
-      );
+      dispatch(setIterations({ freqNumber: body['freqNumber'], id: body['id'] }));
+    } else if (body['estimatedTime']){
+      dispatch(setEstimatedTime({estimatedTime: body['estimatedTime'], portIndex: body['portIndex'], id: body['id']}))
     }
   }
 };
@@ -130,6 +131,7 @@ export const callback_solver_results = (message: any, dispatch: Function) => {
         freqIndex: res.freqIndex,
       }),
     );
+    dispatch(setEstimatedTime(undefined))
   }else{
     dispatch(
       setSolverResults({
@@ -140,6 +142,7 @@ export const callback_solver_results = (message: any, dispatch: Function) => {
         error: res.error
       }),
     );
+    dispatch(setEstimatedTime(undefined))
   }
 
 };

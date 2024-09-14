@@ -4,7 +4,11 @@ import { Disclosure } from '@headlessui/react';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { Project, Simulation, SolverOutput } from '../../../../../../model/esymiaModels';
+import {
+  Project,
+  Simulation,
+  SolverOutput,
+} from '../../../../../../model/esymiaModels';
 import {
   convergenceTresholdSelector,
   solverIterationsSelector,
@@ -19,6 +23,7 @@ import { getMaterialListFrom } from '../../Simulator';
 import {
   computingLpSelector,
   computingPSelector,
+  estimatedTimeSelector,
   isAlertInfoModalSelector,
   isConfirmedInfoModalSelector,
   iterationsSelector,
@@ -120,7 +125,7 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
 
   return (
     <div
-      className={`absolute right-10 w-1/4 bottom-16 flex flex-col justify-center items-center bg-white p-3 rounded ${
+      className={`absolute right-10 w-1/3 bottom-16 flex flex-col justify-center items-center bg-white p-3 rounded ${
         !feedbackSimulationVisible && 'hidden'
       }`}
     >
@@ -180,7 +185,8 @@ const SimulationStatusItem: React.FC<{
   const iterations = useSelector(iterationsSelector).filter(
     (item) => item.id === associatedProject.faunaDocumentId,
   )[0];
-  const solverType = useSelector(solverTypeSelector)
+  const estimatedTime = useSelector(estimatedTimeSelector);
+  const solverType = useSelector(solverTypeSelector);
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
   const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
@@ -217,7 +223,7 @@ const SimulationStatusItem: React.FC<{
 
   const solverInputFrom = (
     project: Project,
-    solverType: 1|2,
+    solverType: 1 | 2,
     solverIterations: [number, number],
     convergenceThreshold: number,
   ) => {
@@ -318,10 +324,14 @@ const SimulationStatusItem: React.FC<{
             let results = {
               ...solverResults.matrices,
               freqIndex: solverResults.freqIndex,
-            }
-            let blobFile = new Blob([JSON.stringify(results)])
-            let modelFile = new File([blobFile], `${associatedProject.faunaDocumentId}_results.json`, {type: 'application/json'})
-            uploadFileS3(modelFile).then(res => {
+            };
+            let blobFile = new Blob([JSON.stringify(results)]);
+            let modelFile = new File(
+              [blobFile],
+              `${associatedProject.faunaDocumentId}_results.json`,
+              { type: 'application/json' },
+            );
+            uploadFileS3(modelFile).then((res) => {
               if (res) {
                 const simulationUpdatedCompleted: Simulation = {
                   ...simulation,
@@ -335,7 +345,7 @@ const SimulationStatusItem: React.FC<{
                     associatedProject: simulation.associatedProject,
                     value: {
                       ...simulationUpdated,
-                      resultS3: res.key
+                      resultS3: res.key,
                     },
                   }),
                 );
@@ -349,17 +359,25 @@ const SimulationStatusItem: React.FC<{
                 ).then(() => {});
                 setRunningSimulation(undefined);
               }
-            })
-
+            });
           }
         }
       }
     }
   }, [solverResults]);
 
+  const [elapsedTime, setelapsedTime] = useState(0);
+  useEffect(() => {
+    setelapsedTime(0)
+    const interval = setInterval(() => {
+      setelapsedTime(prev => prev+1);
+    }, 1000);
+    return () => clearInterval(interval)
+  }, [estimatedTime?.portIndex]);
+
   return (
     <div className="w-full px-4 pt-2">
-      <div className="mx-auto w-full max-w-md rounded-2xl bg-white p-2">
+      <div className="mx-auto w-full max-w-xl rounded-2xl bg-white p-2">
         <Disclosure defaultOpen>
           {({ open }) => (
             <>
@@ -420,12 +438,68 @@ const SimulationStatusItem: React.FC<{
                   </div>
 
                   <div className="flex flex-col gap-2 mt-2">
-                    <span>Doing Iterations</span>
+                    <span>
+                      Doing Iterations:{' '}
+                      <span className="font-semibold">
+                        freq {iterations ? iterations.freqNumber : 0}/
+                        {frequenciesNumber}
+                      </span>
+                    </span>
+                    {/* {estimatedTime && estimatedTime.estimatedTime && (
+                      <span className="text-xs">
+                        worst case estimated time for current frequency{' '}
+                        <span className="text-xs font-semibold">
+                          {(
+                            estimatedTime?.estimatedTime * solverIterations[1]
+                          ).toFixed(2)}
+                        </span>{' '}
+                        sec
+                      </span>
+                    )} */}
                     <progress
                       className="progress w-full"
                       value={iterations ? iterations.freqNumber : 0}
                       max={frequenciesNumber}
                     />
+                    <div className="max-h-[200px] overflow-y-scroll flex flex-col gap-2">
+                      {associatedProject.ports
+                        .filter((p) => p.category === 'port')
+                        .map((port, index) => {
+                          return (
+                            <div className="flex flex-row items-center gap-4">
+                              <span className="text-xs font-semibold">
+                                {port.name}
+                              </span>
+                              {estimatedTime &&
+                                estimatedTime.estimatedTime &&
+                                index === estimatedTime.portIndex - 1 && (
+                                  <ImSpinner className="animate-spin w-3 h-3" />
+                                )}
+                              {estimatedTime &&
+                                estimatedTime.estimatedTime &&
+                                index === estimatedTime.portIndex - 1 && (
+                                  <span className="text-xs font-semibold">
+                                    {elapsedTime} s
+                                  </span>
+                                )}
+                              {estimatedTime &&
+                                estimatedTime.estimatedTime &&
+                                index === estimatedTime.portIndex - 1 && (
+                                  <span className="text-xs">
+                                    worst case estimated time{' '}
+                                    <span className="text-xs font-semibold">
+                                      {(
+                                        estimatedTime?.estimatedTime *
+                                        solverIterations[1]
+                                      ).toFixed(2)}
+                                    </span>{' '}
+                                    sec
+                                  </span>
+                                )}
+                            </div>
+                          );
+                        })}
+                    </div>
                   </div>
                 </div>
                 <div

@@ -65,27 +65,28 @@ interface PhysicsProps {
   setSelectedTabLeftPanel: Function;
 }
 
+export const setPortsFromS3 = (project: Project, dispatch: Dispatch) => {
+  const params = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+    Key: project.portsS3 as string,
+  };
+  s3.getObject(params, (err, data) => {
+    if (err) {
+      console.log(err);
+    }
+    const ports:(Port | Probe)[] = JSON.parse(data.Body?.toString() as string)
+    ports.forEach(p => {
+      dispatch(addPorts(p))
+    })
+  });
+};
+
 export const Physics: React.FC<PhysicsProps> = ({
   selectedTabLeftPanel,
   setSelectedTabLeftPanel,
 }) => {
-  const setPortsFromS3 = (project: Project, dispatch: Dispatch) => {
-    const params = {
-      Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-      Key: project.portsS3 as string,
-    };
-    s3.getObject(params, (err, data) => {
-      if (err) {
-        console.log(err);
-      }
-      const ports:(Port | Probe)[] = JSON.parse(data.Body?.toString() as string)
-      ports.forEach(p => {
-        dispatch(addPorts(p))
-      })
-    });
-  };
   useEffect(() => {
-    if(selectedProject?.portsS3){
+    if(selectedProject?.portsS3 && selectedProject.ports.length === 0){
       setPortsFromS3(selectedProject, dispatch)
     }
   }, [])

@@ -63,6 +63,25 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                         ).toLocaleString()}
                       </span>
                     </span>
+                    <span>
+                      Simulation Time:{' '}
+                      <span className="font-semibold">
+                      {((new Date(
+                          parseInt(selectedProject.simulation.ended),
+                        ).getHours() - new Date(
+                          parseInt(selectedProject.simulation.started),
+                        ).getHours()))}{' '}h{' '}
+                        {((new Date(
+                          parseInt(selectedProject.simulation.ended),
+                        ).getMinutes() - new Date(
+                          parseInt(selectedProject.simulation.started),
+                        ).getMinutes()))}{' '}min{' '}{((new Date(
+                          parseInt(selectedProject.simulation.ended),
+                        ).getSeconds() - new Date(
+                          parseInt(selectedProject.simulation.started),
+                        ).getSeconds()))}{' '}sec
+                      </span>
+                    </span>
                   </div>
                   <div className="relative w-full mt-3 mb-3 px-3 pt-5 pb-2 flex flex-col gap-2 items-start border rounded border-gray-800">
                     <span className="absolute top-[-13px] font-bold bg-white px-1">

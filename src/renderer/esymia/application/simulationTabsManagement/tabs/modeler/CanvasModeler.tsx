@@ -16,6 +16,8 @@ import { useFaunaQuery } from "../../../../faunadb/hook/useFaunaQuery";
 import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
 import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
 import { Project } from "../../../../model/esymiaModels";
+import { setPortsFromS3 } from '../physics/Physics';
+import { setResultsFromS3 } from "../results/Results";
 
 
 export const CanvasModeler: React.FC = () => {
@@ -29,6 +31,12 @@ export const CanvasModeler: React.FC = () => {
   useEffect(() => {
     if (!selectedProject?.model.components && selectedProject?.modelS3) {
       setModelInfoFromS3(selectedProject, dispatch)
+    }
+    if(selectedProject?.portsS3 && selectedProject.ports.length === 0){
+      setPortsFromS3(selectedProject, dispatch)
+    }
+    if(selectedProject && selectedProject.simulation && selectedProject.simulation.resultS3 && selectedProject.simulation.status === "Completed" && !selectedProject.simulation.results.matrix_S){
+      setResultsFromS3(selectedProject, dispatch)
     }
   }, [])
 
