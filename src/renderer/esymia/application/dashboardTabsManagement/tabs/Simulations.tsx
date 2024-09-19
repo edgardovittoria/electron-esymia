@@ -25,6 +25,22 @@ interface SimulationsProps {
   maxH: string
 }
 
+export function msToTime(duration:number) {
+  let milliseconds = Math.floor((duration % 1000) / 100)
+  let seconds: number | string = Math.floor((duration / 1000) % 60)
+  let minutes: number | string = Math.floor((duration / (1000 * 60)) % 60)
+  let hours: number | string = Math.floor((duration / (1000 * 60 * 60)));
+
+  hours = (hours < 10) ? "0" + hours : hours;
+  minutes = (minutes < 10) ? "0" + minutes : minutes;
+  seconds = (seconds < 10) ? "0" + seconds : seconds;
+  if(milliseconds > 0.5){
+    seconds = (seconds as number) + 1
+  }
+
+  return hours + " h " + minutes + " min " + seconds + " sec";
+}
+
 export const Simulations: React.FC<SimulationsProps> = ({maxH}) => {
   const dispatch = useDispatch();
   const mainFolder = useSelector(mainFolderSelector);
@@ -113,9 +129,7 @@ export const Simulations: React.FC<SimulationsProps> = ({maxH}) => {
                     <td className="py-4">{`${started.toLocaleString()}`}</td>
                     <td className="py-4">{`${ended.toLocaleString()}`}</td>
                     <td className="py-4">
-                      {ended.getHours() - started.getHours()}{' '}h{' '}
-                      {ended.getMinutes() - started.getMinutes()}{' '}min{' '}
-                      {ended.getSeconds() - started.getSeconds()}{' '}sec
+                      {msToTime(ended.getTime() - started.getTime())}
                     </td>
                     <td className="py-4">{simulation.status}</td>
                     <td

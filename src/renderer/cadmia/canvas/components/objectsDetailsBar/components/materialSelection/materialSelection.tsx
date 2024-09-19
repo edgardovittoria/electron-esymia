@@ -25,10 +25,9 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
   const [showDetails, setShowDetails] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log(availableMaterials)
-    setMaterialSelected(defaultMaterial)
-  }, [defaultMaterial])
-
+    console.log(availableMaterials);
+    setMaterialSelected(defaultMaterial);
+  }, [defaultMaterial]);
 
   return (
     <div className="flex flex-col">
@@ -61,7 +60,9 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
               leaveTo="opacity-0"
             >
               <Listbox.Options
-                className={`absolute ${availableMaterials ? 'mt-[-190px]' : 'mt-[-80px]'} border-2 border-amber-400 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm`}
+                className={`absolute ${
+                  availableMaterials ? 'mt-[-190px]' : 'mt-[-80px]'
+                } border-2 border-amber-400 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm`}
               >
                 {user ? (
                   availableMaterials.map((material, materialIdx) => (
@@ -79,7 +80,9 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
                       {({ selected }) => (
                         <>
                           <span
-                            className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                            className={`block truncate ${
+                              selected ? 'font-medium' : 'font-normal'
+                            }`}
                           >
                             {material.name}
                           </span>
@@ -106,7 +109,7 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
             </Transition>
           </div>
         </Listbox>
-        <div className='tooltip tooltip-left' data-tip="Material Details">
+        <div className="tooltip tooltip-left" data-tip="Material Details">
           <CgDetailsMore
             color="black"
             className="hover:cursor-pointer w-5 h-5 "
@@ -115,15 +118,18 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
             }}
           />
         </div>
-
       </div>
       {showDetails && materialSelected && (
         <div className="overflow-scroll max-h-[200px] justify-between mt-2 px-2">
           {Object.entries(materialSelected).map(([p, value]) => (
-            <div className="flex flex-row justify-between text-sm leading-tight">
-              <div className="text-black text-[12px]">{p}:</div>
-              <div className="text-black text-[12px]">{value}</div>
-            </div>
+            <>
+              {p !== 'coll' && p !== 'ts' && p !== 'ttl' && p !== "id" && (
+                <div className="flex flex-row justify-between text-sm leading-tight">
+                  <div className="text-black text-[12px]">{p}:</div>
+                  <div className="text-black text-[12px]">{value}</div>
+                </div>
+              )}
+            </>
           ))}
         </div>
       )}

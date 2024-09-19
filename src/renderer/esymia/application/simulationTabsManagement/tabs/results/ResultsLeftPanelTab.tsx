@@ -13,6 +13,7 @@ import { Project } from '../../../../model/esymiaModels';
 import { ImSpinner } from 'react-icons/im';
 import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 import { deleteFileS3 } from '../../../../aws/mesherAPIs';
+import { msToTime } from '../../../dashboardTabsManagement/tabs/Simulations';
 
 interface ResultsLeftPanelTabProps {
   selectedPort: string;
@@ -66,20 +67,11 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                     <span>
                       Simulation Time:{' '}
                       <span className="font-semibold">
-                      {((new Date(
+                      {msToTime((new Date(
                           parseInt(selectedProject.simulation.ended),
-                        ).getHours() - new Date(
+                        ).getTime() - new Date(
                           parseInt(selectedProject.simulation.started),
-                        ).getHours()))}{' '}h{' '}
-                        {((new Date(
-                          parseInt(selectedProject.simulation.ended),
-                        ).getMinutes() - new Date(
-                          parseInt(selectedProject.simulation.started),
-                        ).getMinutes()))}{' '}min{' '}{((new Date(
-                          parseInt(selectedProject.simulation.ended),
-                        ).getSeconds() - new Date(
-                          parseInt(selectedProject.simulation.started),
-                        ).getSeconds()))}{' '}sec
+                        ).getTime()))}
                       </span>
                     </span>
                   </div>
