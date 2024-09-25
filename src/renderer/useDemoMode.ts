@@ -17,7 +17,7 @@ export const useDemoMode = () => {
   const [remainingDemoDays, setRemainingDemoDays] = useState<number>(DEMO_DAYS);
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
-  console.log(user)
+  //console.log(user)
 
   const getItemByMacAddress = async (
     faunaClient: Client,
@@ -66,7 +66,7 @@ export const useDemoMode = () => {
   const checkDemoPeriod = () => {
     window.electron.ipcRenderer.invoke('getMac').then((res) => {
       execQuery(getItemByMacAddress, res).then((item) => {
-        console.log("mac -> ", item)
+        //console.log("mac -> ", item)
         if (item.length !== 0) {
           let elapsedDays = demoElapsedDays(item[0].startTime);
           setRemainingDemoDays(DEMO_DAYS - elapsedDays);

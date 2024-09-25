@@ -180,11 +180,6 @@ const PhysicsPortsDrawer: FC = () => {
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    console.log(size)
-    console.log(selectedProject?.ports)
-  }, [selectedProject?.ports])
-
 
   const componentEntityFrom = (
     port: Port | TempLumped,

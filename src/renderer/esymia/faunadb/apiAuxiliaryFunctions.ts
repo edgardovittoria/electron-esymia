@@ -97,6 +97,7 @@ export const convertInFaunaProjectThis = (project: Project) => {
       name: project.name,
       description: project.description,
       storage: project.storage,
+      model: {} as CanvasState,
       modelS3: project.modelS3,
       portsS3: project.portsS3,
       frequencies: project.frequencies,

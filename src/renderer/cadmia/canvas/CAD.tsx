@@ -22,9 +22,6 @@ const CAD: React.FC<CanvasProps> = ({ setShowCad }) => {
   const { useBaseOpactityBasedOnModality } = useCadmiaModalityManager();
   useBaseOpactityBasedOnModality();
   const loadingSpinner = useSelector(LoadingSpinnerSelector)
-  useEffect(() => {
-    console.log(loadingSpinner)
-  }, [loadingSpinner])
   return (
     <div className="m-0 h-[97vh] relative">
       {loadingSpinner &&

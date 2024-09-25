@@ -147,7 +147,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
       selectedProject.frequencies &&
       selectedProject.frequencies.length === 0
     ) {
-      console.log('qui');
+      //console.log('qui');
       setSuggestedQuantumError({ active: true, type: 'Frequencies not set' });
     }
   }, [mesherStatus]);

@@ -16,7 +16,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 	setSavedPortParameters
 }) => {
 	const dispatch = useDispatch();
-  console.log(selectedPort)
+  //console.log(selectedPort)
 
 	return (
 		<>

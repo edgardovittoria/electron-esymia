@@ -77,6 +77,7 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
   }, []);
 
   useEffect(() => {
+    console.log(activeSimulations)
     activeSimulations.forEach((sim) => {
       if (sim.simulation.status === 'Running') {
         setRunningSimulation(sim);
@@ -92,6 +93,8 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
         }
       }
     });
+    console.log(runningSimulation)
+    console.log(queuedSimulations)
     if (!runningSimulation && queuedSimulations.length > 0) {
       let item = queuedSimulations.pop();
       if (item) {
@@ -305,21 +308,23 @@ const SimulationStatusItem: React.FC<{
           );
         } else {
           // dispatch(setSolverOutput(res.data));
-          const simulationUpdated: Simulation = {
-            ...simulation,
-            results: {
-              ...solverResults.matrices,
-              freqIndex: solverResults.freqIndex,
-            },
-            ended: Date.now().toString(),
-            status: solverResults.partial ? 'Running' : 'Completed',
-          };
-          dispatch(
-            updateSimulation({
-              associatedProject: simulation.associatedProject,
-              value: simulationUpdated,
-            }),
-          );
+          if(solverResults.partial){
+            const simulationUpdated: Simulation = {
+              ...simulation,
+              results: {
+                ...solverResults.matrices,
+                freqIndex: solverResults.freqIndex,
+              },
+              ended: Date.now().toString(),
+              status: solverResults.partial ? 'Running' : 'Completed',
+            };
+            dispatch(
+              updateSimulation({
+                associatedProject: simulation.associatedProject,
+                value: simulationUpdated,
+              }),
+            );
+          }
           if (!solverResults.partial) {
             let results = {
               ...solverResults.matrices,
@@ -340,15 +345,6 @@ const SimulationStatusItem: React.FC<{
                   ended: Date.now().toString(),
                   status: solverResults.partial ? 'Running' : 'Completed',
                 };
-                dispatch(
-                  updateSimulation({
-                    associatedProject: simulation.associatedProject,
-                    value: {
-                      ...simulationUpdated,
-                      resultS3: res.key,
-                    },
-                  }),
-                );
                 execQuery(
                   updateProjectInFauna,
                   convertInFaunaProjectThis({
@@ -356,8 +352,21 @@ const SimulationStatusItem: React.FC<{
                     simulation: simulationUpdatedCompleted,
                   } as Project),
                   dispatch,
-                ).then(() => {});
-                setRunningSimulation(undefined);
+                ).then(() => {
+                  setRunningSimulation(undefined);
+                  dispatch(
+                    updateSimulation({
+                      associatedProject: simulation.associatedProject,
+                      value: {
+                        ...simulationUpdatedCompleted,
+                        results: {
+                          ...solverResults.matrices,
+                          freqIndex: solverResults.freqIndex,
+                        },
+                      },
+                    }),
+                  );
+                });
               }
             });
           }

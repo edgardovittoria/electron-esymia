@@ -29,7 +29,7 @@ export const getFoldersByOwner = async (
   owner: string,
   dispatch: Dispatch,
 ) => {
-  const query = faunaQuery`Folders.folders_by_owner(${owner})`;
+  const query = faunaQuery`Folders.folders_by_owner(${owner}).pageSize(1000)`;
   const response = await faunaClient.query(query).catch((err) => {
     dispatch(
       setMessageInfoModal(
@@ -49,7 +49,7 @@ export const getSimulationProjectsByOwner = async (
   owner: string,
   dispatch: Dispatch,
 ) => {
-  const query = faunaQuery`SimulationProjects.simulationProjects_by_owner(${owner})`
+  const query = faunaQuery`SimulationProjects.simulationProjects_by_owner(${owner}).pageSize(1000)`
   const response = await faunaClient.query(query)
     .catch((err) => {
       dispatch(
@@ -392,7 +392,7 @@ export const getSharedSimulationProjects = async (
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery`SimulationProjects.get_shared_projects_by_user_email(${user})`
+      faunaQuery`get_shared_simulation_projects_by_email(${user})`
     )
     .catch((err) => {
       dispatch(

@@ -191,6 +191,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                         className="button buttonPrimary py-1 px-2 text-sm"
                         onClick={() => {
                           setShareDone(true);
+                          //TODO:clonare mesh, porte e risulati
                           let newProject: Project = {
                             faunaDocumentId: projectToShare?.faunaDocumentId,
                             description: projectToShare?.description as string,

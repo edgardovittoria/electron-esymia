@@ -24,7 +24,7 @@ export const callback_mesh_advices = function (
   // called when the client receives a STOMP message from the server
   message.ack();
   let res = JSON.parse(message.body);
-  console.log(res);
+  //console.log(res);
   dispatch(setMeshAdvice({ quantum: JSON.parse(res.quantum), id: res.id }));
 };
 
@@ -97,7 +97,7 @@ export const callback_mesher_results = (message: any, dispatch: Function) => {
 export const callback_mesher_grids = (message: any, dispatch: Function) => {
   message.ack();
   let res = JSON.parse(message.body);
-  console.log(res);
+  //console.log(res);
   res.grids_exist && dispatch(setAWSExternalGridsData(res.grids));
   // dispatch(setMesherResults({id: res.id, gridsPath: res.grids, meshPath: res.mesh, isStopped: (res.isStopped) ? res.isStopped : false, isValid: res.isValid, error: res.error}))
 };
