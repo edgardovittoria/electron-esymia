@@ -32,8 +32,8 @@ export const DashboardTabsContentFactory: React.FC<
       );
     case 'Simulations':
       return (
-        <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] overflow-y-scroll lg:h-[60vh] h-[80vh]">
-          <Simulations maxH="max-h-[600px]"/>
+        <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] lg:h-[60vh] h-[80vh]">
+          <Simulations maxH="max-h-[750px]"/>
           {/* <RightPanel /> */}
         </div>
       );
