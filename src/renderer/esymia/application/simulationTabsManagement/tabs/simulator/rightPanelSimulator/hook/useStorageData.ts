@@ -378,11 +378,12 @@ export const useStorageData = () => {
   };
 
   const deleteProjectStoredMeshData = (project: Project) => {
-    if (project.storage === 'local') {
-      deleteMeshDataLocal(project);
-    } else {
-      deleteMeshDataOnline(project);
-    }
+    // if (project.storage === 'local') {
+    //   deleteMeshDataLocal(project);
+    // } else {
+    //   deleteMeshDataOnline(project);
+    // }
+    deleteMeshDataOnline(project);
   };
 
   const cloneMeshAndGridsS3 = (res:any, project: Project, clonedProject: Project, selectedFolder: Folder, setCloning: Function) => {

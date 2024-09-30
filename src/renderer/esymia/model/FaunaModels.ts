@@ -10,7 +10,7 @@ export type FaunaProjectDetails = {
     name: string,
     description: string,
     storage: 'local' | 'online',
-    model: CanvasState,
+    model: string,
     modelS3?: string,
     portsS3?: string,
     frequencies?: number[]

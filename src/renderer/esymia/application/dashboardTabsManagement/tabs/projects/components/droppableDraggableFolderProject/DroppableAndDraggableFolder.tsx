@@ -47,7 +47,7 @@ export const DroppableAndDraggableFolder: React.FC<
   const selectedFolder = useSelector(SelectedFolderSelector) as Folder;
   const allProjectFolders = useSelector(allProjectFoldersSelector);
   const user = useSelector(usersStateSelector);
-  const {deleteProjectStoredMeshData} = useStorageData()
+  const {deleteProject} = useStorageData()
   const [showRename, setShowRename] = useState(false);
   const [showSearchUser, setShowSearchUser] = useState(false);
 
@@ -252,7 +252,7 @@ export const DroppableAndDraggableFolder: React.FC<
                   folder.parent,
                   dispatch
                 );
-                takeAllProjectsInArrayOf([folder]).forEach(p => {deleteProjectStoredMeshData(p)})
+                takeAllProjectsInArrayOf([folder]).forEach(p => {deleteProject(p)})
                 dispatch(removeFolder(folder));
                 hideAll();
               }}

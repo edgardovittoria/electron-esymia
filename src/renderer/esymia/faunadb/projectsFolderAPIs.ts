@@ -106,15 +106,16 @@ export const deleteFolderFromFauna = async (
           faunaClient.query(
             faunaQuery`Folders.byId(${folderToDelete})!.delete()`
           );
-          ((subFolders as QuerySuccess<any>).data.data as string[]).forEach((sb) =>
+          ((subFolders as QuerySuccess<any>).data as string[]).forEach((sb) => {
             faunaClient.query(
               faunaQuery`Folders.byId(${sb})!.delete()`
-            ),
+            )},
           );
-          ((projects as QuerySuccess<any>).data.data as string[]).forEach((p) =>
+          ((projects as QuerySuccess<any>).data as any[]).forEach((p) => {
+            console.log(p)
             faunaClient.query(
-              faunaQuery`SimulationProjects.byId(${p})!.delete()`
-            ),
+              faunaQuery`SimulationProjects.byId(${p.id as string})!.delete()`
+            )},
           );
           oldParent !== 'root' &&
             faunaClient.query(
@@ -236,7 +237,7 @@ export const createSimulationProjectInFauna = async (
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery`SimulationProjects.create(${{...projectToSave as FaunaProjectDetails}})`
+      faunaQuery`SimulationProjects.create(${{...convertInFaunaProjectThis(projectToSave).project as FaunaProjectDetails}})`
     )
     .catch((err) => {
       dispatch(
@@ -360,7 +361,7 @@ export const moveProjectInFauna = async (
   faunaClient
     .query(
       faunaQuery`SimulationProjects.byId(${projectToUpdate.faunaDocumentId as string})!.update(${{
-        ...projectToUpdate,
+        ...convertInFaunaProjectThis(projectToUpdate).project,
       } as FaunaProjectDetails})`
     )
     .then(() => {
