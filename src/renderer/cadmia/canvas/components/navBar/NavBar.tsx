@@ -7,6 +7,8 @@ import { EditItem } from './menuItems/edit/EditItem';
 import { Shapes } from './menuItems/shapes/shapes';
 import { LoginLogout } from './menuItems/loginLogout';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useDispatch } from 'react-redux';
+import { selectModel } from '../../../store/modelSlice';
 
 interface NavbarProps {
   setShowCad: (v: boolean) => void;
@@ -19,6 +21,7 @@ export function classNames(...classes: string[]) {
 export const Navbar: React.FC<NavbarProps> = ({ setShowCad }) => {
 
   const { user } = useAuth0();
+  const dispatch = useDispatch()
 
   return (
     <Popover className='relative bg-white h-[3vh]'>
@@ -34,7 +37,10 @@ export const Navbar: React.FC<NavbarProps> = ({ setShowCad }) => {
 
         <div
           className='flex flex-row items-center gap-2 px-2 py-1 rounded hover:bg-secondaryColor hover:text-white hover:cursor-pointer'
-          onClick={() => setShowCad(false)}
+          onClick={() => {
+            dispatch(selectModel(undefined))
+            setShowCad(false)
+          }}
         >
           <MdDashboard size={20} />
           <span className='text-sm'>Dashboard</span>

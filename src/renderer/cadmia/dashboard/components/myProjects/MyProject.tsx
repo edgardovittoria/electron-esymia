@@ -1,4 +1,4 @@
-import React, { FC, Fragment, useState } from 'react';
+import React, { FC, Fragment, useEffect, useState } from 'react';
 import { Item, Menu, Separator, useContextMenu } from 'react-contexify';
 import { ActionCreators } from 'redux-undo';
 import { GiCubeforce } from 'react-icons/gi';
@@ -16,6 +16,9 @@ import RenameModal from './modal/RenameModal';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
 import { useFaunaQuery } from '../../../../esymia/faunadb/hook/useFaunaQuery';
 import { FaunaCadModel, resetState } from '../../../../cad_library';
+import { getSimulationProjectsByOwner } from '../../../../esymia/faunadb/projectsFolderAPIs';
+import { useAuth0 } from '@auth0/auth0-react';
+import { FaunaProject } from '../../../../esymia/model/FaunaModels';
 
 export interface ContextMenuProps {
   model: FaunaCadModel;
@@ -30,8 +33,10 @@ const MyProject: React.FC<ContextMenuProps> = ({
 }) => {
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
+  const { user } = useAuth0();
   const [modalRenameShow, setModalRenameShow] = useState<boolean>(false);
   const [serchUserAndShare, setSerchUserAndShare] = useState<boolean>(false);
+  const [modelErasable, setModelErasable] = useState(true);
   const { show, hideAll } = useContextMenu({
     id: model.components,
   });
@@ -45,17 +50,29 @@ const MyProject: React.FC<ContextMenuProps> = ({
     });
   }
 
+  useEffect(() => {
+    execQuery(getSimulationProjectsByOwner, user?.email, dispatch).then(
+      (projects: FaunaProject[]) => {
+        projects.forEach((p) => {
+          if (p.project.modelS3 === model.components) {
+            setModelErasable(false);
+          }
+        });
+      },
+    );
+  }, []);
+
   return (
     <div key={model.id}>
       {modalRenameShow && (
         <RenameModal setRenameModalShow={setModalRenameShow} model={model} />
       )}
-      {serchUserAndShare && (
+      {/* {serchUserAndShare && (
         <SearchUserAndShare
           setShowSearchUser={setSerchUserAndShare}
           modelToShare={model}
         />
-      )}
+      )} */}
       <div
         className="px-10 py-12 relative rounded-xl border border-black flex flex-col items-center hover:bg-secondaryColor hover:text-white hover:cursor-pointer hover:shadow-2xl"
         onClick={() => {
@@ -86,7 +103,7 @@ const MyProject: React.FC<ContextMenuProps> = ({
             <BiSolidRename size={20} />
           </div>
         </Item>
-        <Item
+        {/* <Item
           onClick={(e) => {
             e.event.preventDefault();
             setSerchUserAndShare(true);
@@ -96,9 +113,10 @@ const MyProject: React.FC<ContextMenuProps> = ({
             <span>Share With</span>
             <BiSolidShare size={20} />
           </div>
-        </Item>
+        </Item> */}
         <Separator />
         <Item
+          disabled={!modelErasable}
           onClick={(e) => {
             e.event.preventDefault();
             // eslint-disable-next-line no-restricted-globals
@@ -118,10 +136,20 @@ const MyProject: React.FC<ContextMenuProps> = ({
             }
           }}
         >
-          <div className="flex w-full flex-row justify-between items-center">
-            <span>Delete</span>
-            <BiSolidTrash size={20} />
-          </div>
+          {modelErasable ? (
+            <div className="flex w-full flex-row justify-between items-center">
+              <span>Delete</span>
+              <BiSolidTrash size={20} />
+            </div>
+          ) : (
+            <div className='flex flex-col items-center gap-5'>
+              <div className="flex w-full flex-row justify-between items-center">
+              <span>Delete</span>
+              <BiSolidTrash size={20} />
+            </div>
+            <span className='text-xs'> It is not possible to delete the model  <br />since it is present in at least one <br /> esymia project. <br /> Make sure the project is not <br /> present in any esymia project <br /> and try again.</span>
+            </div>
+          )}
         </Item>
       </Menu>
     </div>

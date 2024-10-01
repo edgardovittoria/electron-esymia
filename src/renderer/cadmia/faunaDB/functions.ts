@@ -22,7 +22,7 @@ export async function deleteFaunadbModel(
 ) {
   try {
     await faunaClient.query(
-      faunaQuery`CadModels.delete(${modelToDelete})`
+      faunaQuery`CadModels.byId(${modelToDelete})!.delete()`
     ).catch((err) =>
       {
         dispatch(

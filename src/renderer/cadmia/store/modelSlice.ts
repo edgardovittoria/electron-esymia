@@ -28,7 +28,7 @@ export const ModelSlice = createSlice({
         m.id === action.payload.id ? action.payload : m,
       );
     },
-    selectModel(state: ModelState, action: PayloadAction<FaunaCadModel>) {
+    selectModel(state: ModelState, action: PayloadAction<FaunaCadModel | undefined>) {
       state.selectedModel = action.payload;
     },
     setSharedModel(state: ModelState, action: PayloadAction<FaunaCadModel[]>) {

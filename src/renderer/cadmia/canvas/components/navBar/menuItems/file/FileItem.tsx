@@ -139,7 +139,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
               <Popover.Panel className={navbarDropdownStyle}>
                 <div className={navbarDropdownBoxStyle}>
                   <div className={navbarDropdownPadding}>
-                    {isAuthenticated ? (
+                    {/* {isAuthenticated ? (
                       <span
                         className={navbarDropdownItemStyle}
                         onClick={() => {
@@ -183,15 +183,16 @@ export const FileItem: React.FC<FileItemProps> = () => {
                           });
                         }}
                       >
-                        <div className="flex justify-between w-full hover:cursor-pointer">
+                        <button className="flex justify-between w-full hover:cursor-pointer disabled:opa"
+                                disabled={!selectedModel}
+                        >
                           <div className="flex">
                             <CloudArrowDownIcon className="w-[20px] mr-4" />
                             <p className="text-base font-medium">
                               Save
                             </p>
                           </div>
-                          {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
-                        </div>
+                        </button>
                       </span>
                     ) : (
                       <span className={navbarDropdownItemStyle}>
@@ -202,10 +203,9 @@ export const FileItem: React.FC<FileItemProps> = () => {
                               Save As New Model
                             </p>
                           </div>
-                          {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
                         </div>
                       </span>
-                    )}
+                    )} */}
                     {isAuthenticated ? (
                       <span
                         className={navbarDropdownItemStyle}
