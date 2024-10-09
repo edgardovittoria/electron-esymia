@@ -26,7 +26,7 @@ export type Project = {
   modelUnit?: string,
   modelS3?: string,
   ports: (Port | Probe | TempLumped)[],
-  portsS3?: string,
+  portsS3?: string | null,
   scatteringValue?: number,
   frequencies?: number[],
   simulation?: Simulation,

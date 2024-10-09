@@ -27,6 +27,7 @@ import {
   isAlertInfoModalSelector,
   isConfirmedInfoModalSelector,
   iterationsSelector,
+  setEstimatedTime,
   setIsAlertInfoModal,
   setMessageInfoModal,
   setShowInfoModal,
@@ -77,7 +78,6 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
   }, []);
 
   useEffect(() => {
-    console.log(activeSimulations)
     activeSimulations.forEach((sim) => {
       if (sim.simulation.status === 'Running') {
         setRunningSimulation(sim);
@@ -93,8 +93,6 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
         }
       }
     });
-    console.log(runningSimulation)
-    console.log(queuedSimulations)
     if (!runningSimulation && queuedSimulations.length > 0) {
       let item = queuedSimulations.pop();
       if (item) {
@@ -203,6 +201,13 @@ const SimulationStatusItem: React.FC<{
   useEffect(() => {
     if (isAlertConfirmed) {
       if (!isAlert) {
+        dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
+        dispatch(
+          setMeshApproved({
+            approved: false,
+            projectToUpdate: associatedProject.faunaDocumentId as string,
+          }),
+        );
         dispatch(
           publishMessage({
             queue: 'management_solver',
@@ -210,14 +215,6 @@ const SimulationStatusItem: React.FC<{
               message: 'stop_computation',
               id: associatedProject.faunaDocumentId as string,
             },
-          }),
-        );
-      } else {
-        dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
-        dispatch(
-          setMeshApproved({
-            approved: false,
-            projectToUpdate: associatedProject.faunaDocumentId as string,
           }),
         );
       }
@@ -257,6 +254,11 @@ const SimulationStatusItem: React.FC<{
   };
 
   useEffect(() => {
+    dispatch(unsetComputingLp(associatedProject.faunaDocumentId as string));
+    dispatch(unsetComputingP(associatedProject.faunaDocumentId as string));
+    dispatch(unsetIterations(associatedProject.faunaDocumentId as string));
+    dispatch(unsetSolverResults(associatedProject.faunaDocumentId as string));
+    dispatch(setEstimatedTime(undefined))
     let objectToSendToSolver = solverInputFrom(
       associatedProject,
       solverType,
@@ -270,12 +272,6 @@ const SimulationStatusItem: React.FC<{
       }),
     );
     // client.publish({destination: "management_solver", body: JSON.stringify({ message: "solving", body: objectToSendToSolver })})
-    return () => {
-      dispatch(unsetComputingLp(associatedProject.faunaDocumentId as string));
-      dispatch(unsetComputingP(associatedProject.faunaDocumentId as string));
-      dispatch(unsetIterations(associatedProject.faunaDocumentId as string));
-      dispatch(unsetSolverResults(associatedProject.faunaDocumentId as string));
-    };
   }, []);
 
   useEffect(() => {

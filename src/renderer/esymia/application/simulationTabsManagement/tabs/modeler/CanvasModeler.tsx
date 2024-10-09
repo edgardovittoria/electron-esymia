@@ -19,10 +19,12 @@ import { Project } from "../../../../model/esymiaModels";
 import { setPortsFromS3 } from '../physics/Physics';
 import { setResultsFromS3 } from "../results/Results";
 
+interface CanvasModelerProps  {
+  setShowModalLoadFromDB: (v: boolean) => void
+}
 
-export const CanvasModeler: React.FC = () => {
+export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFromDB}) => {
   const selectedProject = useSelector(selectedProjectSelector);
-  const [showModalLoadFromDB, setShowModalLoadFromDB] = useState(false);
   const dispatch = useDispatch()
   const { execQuery } = useFaunaQuery()
 
@@ -126,7 +128,7 @@ export const CanvasModeler: React.FC = () => {
           </button>
         </div>
       )}
-      {showModalLoadFromDB && (
+      {/* {showModalLoadFromDB && (
         <ImportModelFromDBModal
           s3Config={s3}
           bucket={process.env.REACT_APP_AWS_BUCKET_NAME as string}
@@ -158,7 +160,7 @@ export const CanvasModeler: React.FC = () => {
             } as ImportActionParamsObject
           }
         />
-      )}
+      )} */}
     </div>
   );
 }

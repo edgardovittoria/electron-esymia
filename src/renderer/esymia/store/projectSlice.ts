@@ -162,7 +162,7 @@ export const ProjectSlice = createSlice({
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       selectedProject?.ports.push(action.payload);
     },
-    setPortsS3(state: ProjectState, action: PayloadAction<string>) {
+    setPortsS3(state: ProjectState, action: PayloadAction<string | undefined>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       if (selectedProject) {
         selectedProject.portsS3 = action.payload;

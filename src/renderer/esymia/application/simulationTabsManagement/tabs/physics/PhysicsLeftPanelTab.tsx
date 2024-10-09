@@ -31,7 +31,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   const dispatch = useDispatch();
   const selectedProject = useSelector(selectedProjectSelector);
   const [portRename, setPortRename] = useState('');
-  const { execQuery } = useFaunaQuery()
+  const { execQuery } = useFaunaQuery();
 
   useEffectNotOnMount(() => {
     selectedProject?.ports.filter((p) => p.category === 'port').length === 0 &&
@@ -43,39 +43,69 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
       {selectedProject && selectedProject.ports.length !== 0 ? (
         <div className="lg:max-h-[150px] xl:max-h-[200px] xl:h-[200px] overflow-y-scroll">
           <div className="flex flex-row items-center justify-between pt-3">
-          <span className="font-bold">Terminations</span>
-          <div className='flex flex-row items-center gap-8'>
-            <div
-              className="w-[15%] tooltip tooltip-left hover:cursor-pointer"
-              data-tip="Delete all ports"
-              onClick={() => {
-                dispatch(deleteAllPorts());
-                let ports = selectedProject.ports.filter(p => p.category !== 'port')
-                savePortsOnS3(ports, selectedProject, dispatch, execQuery)
-              }}
-            >
-              <MdDeleteSweep
-                color="#d80233"
-                style={{ width: '20px', height: '20px' }}
-                className='hover:opacity-50'
-              />
+            <span className="font-bold">Terminations</span>
+            <div className="flex flex-row items-center gap-8">
+              <div
+                className="w-[15%] tooltip tooltip-left hover:cursor-pointer"
+                data-tip="Delete all ports"
+                onClick={() => {
+                  dispatch(deleteAllPorts());
+                  let ports = selectedProject.ports.filter(
+                    (p) => p.category !== 'port',
+                  );
+                  if (ports.length > 0) {
+                    savePortsOnS3(ports, selectedProject, dispatch, execQuery);
+                  } else {
+                    deleteFileS3(selectedProject.portsS3 as string);
+                    dispatch(setPortsS3(undefined));
+                    execQuery(
+                      updateProjectInFauna,
+                      convertInFaunaProjectThis({
+                        ...selectedProject,
+                        portsS3: null,
+                      }),
+                      dispatch,
+                    ).then(() => {});
+                  }
+                }}
+              >
+                <MdDeleteSweep
+                  color="#d80233"
+                  style={{ width: '20px', height: '20px' }}
+                  className="hover:opacity-50"
+                />
+              </div>
+              <div
+                className="w-[15%] tooltip tooltip-left hover:cursor-pointer"
+                data-tip="Delete all lumped"
+                onClick={() => {
+                  dispatch(deleteAllLumped());
+                  let ports = selectedProject.ports.filter(
+                    (p) => p.category !== 'lumped',
+                  );
+                  if (ports.length > 0) {
+                    savePortsOnS3(ports, selectedProject, dispatch, execQuery);
+                  } else {
+                    deleteFileS3(selectedProject.portsS3 as string);
+                    dispatch(setPortsS3(undefined));
+                    execQuery(
+                      updateProjectInFauna,
+                      convertInFaunaProjectThis({
+                        ...selectedProject,
+                        portsS3: null,
+                      }),
+                      dispatch,
+                    ).then(() => {});
+                  }
+                }}
+              >
+                <MdDeleteSweep
+                  color="violet"
+                  style={{ width: '20px', height: '20px' }}
+                  className="hover:opacity-50"
+                />
+              </div>
             </div>
-            <div
-              className="w-[15%] tooltip tooltip-left hover:cursor-pointer"
-              data-tip="Delete all lumped"
-              onClick={() => {
-                dispatch(deleteAllLumped());
-                let ports = selectedProject.ports.filter(p => p.category !== 'lumped')
-                savePortsOnS3(ports, selectedProject, dispatch, execQuery)
-              }}
-            >
-              <MdDeleteSweep
-                color="violet"
-                style={{ width: '20px', height: '20px' }}
-                className='hover:opacity-50'
-              />
-            </div>
-          </div>
           </div>
           <hr className="border-[1px] border-gray-300 w-full mb-2 mt-1" />
           <ul className="list-none pl-3 mb-0">
@@ -159,20 +189,32 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                                     htmlFor="modalRename"
                                     className="btn h-[2rem] min-h-[2rem]"
                                     onClick={() => {
-                                      if(isTerminationNameValid(portRename,selectedProject.ports)){
-                                        dispatch(setPortName(portRename))
-                                        let ports = selectedProject.ports.map(p => {
-                                          if(p.isSelected){
-                                            return {...p, name: portRename}
-                                          }else{
-                                            return p
-                                          }
-                                        })
-                                        savePortsOnS3(ports, selectedProject, dispatch, execQuery)
-                                      }else{
+                                      if (
+                                        isTerminationNameValid(
+                                          portRename,
+                                          selectedProject.ports,
+                                        )
+                                      ) {
+                                        dispatch(setPortName(portRename));
+                                        let ports = selectedProject.ports.map(
+                                          (p) => {
+                                            if (p.isSelected) {
+                                              return { ...p, name: portRename };
+                                            } else {
+                                              return p;
+                                            }
+                                          },
+                                        );
+                                        savePortsOnS3(
+                                          ports,
+                                          selectedProject,
+                                          dispatch,
+                                          execQuery,
+                                        );
+                                      } else {
                                         toast.error(
                                           'Name already set! Please choose another one',
-                                        )
+                                        );
                                       }
                                     }}
                                   >
@@ -186,8 +228,30 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                               data-tip="Delete"
                               onClick={() => {
                                 dispatch(deletePort(port.name));
-                                let ports = selectedProject.ports.filter(p => p.name !== port.name)
-                                savePortsOnS3(ports, selectedProject, dispatch, execQuery)
+                                let ports = selectedProject.ports.filter(
+                                  (p) => p.name !== port.name,
+                                );
+                                if (ports.length > 0) {
+                                  savePortsOnS3(
+                                    ports,
+                                    selectedProject,
+                                    dispatch,
+                                    execQuery,
+                                  );
+                                } else {
+                                  deleteFileS3(
+                                    selectedProject.portsS3 as string,
+                                  );
+                                  dispatch(setPortsS3(undefined));
+                                  execQuery(
+                                    updateProjectInFauna,
+                                    convertInFaunaProjectThis({
+                                      ...selectedProject,
+                                      portsS3: null,
+                                    }),
+                                    dispatch,
+                                  ).then(() => {});
+                                }
                               }}
                             >
                               <IoTrashOutline
@@ -212,8 +276,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
           />
           <h5 className="lg:text-sm xl:text-xl">No Physics applied</h5>
           <p className="mt-[20px] text-sm">
-            Add ports or lumpeds and apply them to geometry in
-            the 3D View.
+            Add ports or lumpeds and apply them to geometry in the 3D View.
           </p>
         </div>
       )}
