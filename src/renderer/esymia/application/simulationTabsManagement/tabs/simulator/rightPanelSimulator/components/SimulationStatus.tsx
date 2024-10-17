@@ -71,10 +71,12 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
   >([]);
 
   useEffect(() => {
-    window.electron.ipcRenderer.sendMessage('solvingComputation', [true]);
-    return () => {
-      window.electron.ipcRenderer.sendMessage('solvingComputation', [false]);
-    };
+    if(process.env.APP_MODE !== 'test'){
+      window.electron.ipcRenderer.sendMessage('solvingComputation', [true]);
+      return () => {
+        window.electron.ipcRenderer.sendMessage('solvingComputation', [false]);
+      };
+    }
   }, []);
 
   useEffect(() => {

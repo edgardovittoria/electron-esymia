@@ -247,6 +247,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               : 'text-primaryColor bg-white'
           }`}
           data-tip="Mesher"
+          data-testid="quantumSettings"
           onClick={() => {
             if (sidebarItemSelected === 'Mesher') {
               setsidebarItemSelected(undefined);
@@ -265,6 +266,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               : 'text-primaryColor bg-white'
           }`}
           data-tip="Solver"
+          data-testid="solverSettings"
           onClick={() => {
             if (sidebarItemSelected === 'Solver') {
               setsidebarItemSelected(undefined);
@@ -367,7 +369,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                       }}
                     >
                       <LiaCubeSolid size={25} />
-                      <span>Coarsen</span>
+                      <span data-testid="coarsenButton">Coarsen</span>
                     </div>
                     <div
                       className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200"
@@ -390,13 +392,14 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   <button
                     data-testid="generateMeshButton"
                     className={
-                      checkQuantumDimensionsValidity()
+                      process.env.APP_MODE !== "test" ?
+                        checkQuantumDimensionsValidity()
                         ? 'button buttonPrimary w-[100%]'
                         : 'button bg-gray-300 text-gray-600 opacity-70 w-[100%]'
+                        : 'button buttonPrimary w-[100%]'
                     }
                     disabled={
-                      !checkQuantumDimensionsValidity() ||
-                      pathToExternalGridsNotFound
+                      process.env.APP_MODE !== "test" ? !checkQuantumDimensionsValidity() : false
                     }
                     onClick={() => {
                       dispatch(
@@ -587,6 +590,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             {selectedProject.simulation?.status === 'Completed' ? (
               <button
                 className="button buttonPrimary w-[100%] mt-3 text-[12px] xl:text-base"
+                data-testid="resultsButton"
                 onClick={() => {
                   dispatch(selectMenuItem('Results'));
                 }}

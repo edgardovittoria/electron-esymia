@@ -137,6 +137,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
                 className="button buttonPrimary lg:text-base text-sm mt-5"
                 data-toggle="modal"
                 data-target="#createNewProjectModal"
+                data-testid="createProjectButton"
                 onClick={() => {
                   dispatch(setShowCreateNewProjectModal(true))
                 }}

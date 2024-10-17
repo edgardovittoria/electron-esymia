@@ -78,9 +78,11 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
   >([]);
 
   useEffect(() => {
-    window.electron.ipcRenderer.sendMessage('meshingComputation', [true])
-    return () => {
-      window.electron.ipcRenderer.sendMessage('meshingComputation', [false])
+    if(process.env.APP_MODE !== "test"){
+      window.electron.ipcRenderer.sendMessage('meshingComputation', [true])
+      return () => {
+        window.electron.ipcRenderer.sendMessage('meshingComputation', [false])
+      }
     }
   }, [])
 

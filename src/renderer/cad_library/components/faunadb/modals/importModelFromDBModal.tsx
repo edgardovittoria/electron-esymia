@@ -127,6 +127,7 @@ export const ImportModelFromDBModal: FC<{
                           <input
                             key={model.name}
                             type="radio"
+                            data-testid="modelChoose"
                             value={model.name}
                             name="modelSelection"
                             onChange={() => setSelectedModel(model)}

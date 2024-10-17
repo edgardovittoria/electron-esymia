@@ -10,8 +10,8 @@ export const PluginsSlice = createSlice({
     name: 'plugins',
     initialState: {
       activePlugins: [],
-      mesherStatus: 'idle',
-      solverStatus: 'idle'
+      mesherStatus: process.env.APP_MODE === "test" ? 'ready' : 'idle',
+      solverStatus: process.env.APP_MODE === "test" ? 'ready' : 'idle'
     } as PluginsState,
     reducers: {
       addActivePlugin(state: PluginsState, action: PayloadAction<string>){

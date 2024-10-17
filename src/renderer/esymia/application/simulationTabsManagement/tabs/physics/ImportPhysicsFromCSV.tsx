@@ -102,7 +102,7 @@ const styles = {
     right: 6,
     top: 6,
     width: 23,
-  } as CSSProperties,
+  } as CSSProperties
 };
 
 export const LumpedImportFromCSV: FC = () => {
@@ -131,16 +131,16 @@ export const LumpedImportFromCSV: FC = () => {
 
   const isValidThis = (dataElement: CSVDataRow) => {
     if (
-      dataElement.x1 === '' ||
-      dataElement.x2 === '' ||
-      dataElement.y1 === '' ||
-      dataElement.y2 === '' ||
-      dataElement.z1 === '' ||
-      dataElement.z2 === '' ||
-      dataElement.R === '' ||
-      dataElement.L === '' ||
-      dataElement.C === '' ||
-      dataElement.type === ''
+      (dataElement.x1 === '' || dataElement.x1 === undefined) ||
+      (dataElement.x2 === '' || dataElement.x2 === undefined) ||
+      (dataElement.y1 === '' || dataElement.y1 === undefined) ||
+      (dataElement.y2 === '' || dataElement.y2 === undefined) ||
+      (dataElement.z1 === '' || dataElement.z1 === undefined) ||
+      (dataElement.z2 === '' || dataElement.z2 === undefined) ||
+      (dataElement.R === '' || dataElement.R === undefined) ||
+      (dataElement.L === '' || dataElement.L === undefined) ||
+      (dataElement.C === '' || dataElement.C === undefined) ||
+      (dataElement.type === '' || dataElement.type === undefined)
     ) {
       return false;
     }
@@ -150,10 +150,12 @@ export const LumpedImportFromCSV: FC = () => {
   return (
     <CSVReader
       config={{ header: true }}
+      disabled={selectedProject?.simulation?.resultS3}
       onUploadAccepted={(data: any) => {
         if (selectedProject) {
           let ports: (Port | Probe)[] = [...selectedProject.ports]
           data.data.forEach((pdata: CSVDataRow) => {
+            console.log(pdata)
             if(isValidThis(pdata)){
               let port = getDefaultLumped(
                 pdata.name !== undefined
@@ -203,7 +205,7 @@ export const LumpedImportFromCSV: FC = () => {
         <>
           <div
             {...getRootProps()}
-            className='hover:cursor-pointer'
+            className={`hover:cursor-pointer ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
             style={Object.assign(
               {},
               styles.zone,
@@ -276,12 +278,12 @@ export const PortImportFromCSV:FC = () => {
 
   const isValidThis = (dataElement: CSVDataRow) => {
     if (
-      dataElement.x1 === '' ||
-      dataElement.x2 === '' ||
-      dataElement.y1 === '' ||
-      dataElement.y2 === '' ||
-      dataElement.z1 === '' ||
-      dataElement.z2 === ''
+      (dataElement.x1 === '' || dataElement.x1 === undefined) ||
+      (dataElement.x2 === '' || dataElement.x2 === undefined) ||
+      (dataElement.y1 === '' || dataElement.y1 === undefined) ||
+      (dataElement.y2 === '' || dataElement.y2 === undefined) ||
+      (dataElement.z1 === '' || dataElement.z1 === undefined) ||
+      (dataElement.z2 === '' || dataElement.z2 === undefined)
     ) {
       return false;
     }
@@ -291,10 +293,12 @@ export const PortImportFromCSV:FC = () => {
   return (
     <CSVReader
       config={{ header: true }}
+      disabled={selectedProject?.simulation?.resultS3}
       onUploadAccepted={(results: any) => {
         if (selectedProject) {
           let ports: (Port | Probe)[] = [...selectedProject.ports]
           let scatteringNotYetSet = true
+          console.log(results.data)
           results.data.forEach((pdata: CSVDataRow) => {
             if (isValidThis(pdata)) {
               let port = getDefaultPort(
@@ -345,7 +349,7 @@ export const PortImportFromCSV:FC = () => {
         <>
           <div
             {...getRootProps()}
-            className='hover:cursor-pointer'
+            className={`hover:cursor-pointer ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
             style={Object.assign(
               {},
               styles.zone,
@@ -410,7 +414,7 @@ export const FrequenciesImportFromCSV:FC = () => {
 
   const isValidThis = (dataElement: CSVDataRow) => {
     if (
-      dataElement.Frequencies === ""
+      (dataElement.Frequencies === "" || dataElement.Frequencies === undefined)
     ) {
       return false;
     }
@@ -420,6 +424,7 @@ export const FrequenciesImportFromCSV:FC = () => {
   return (
     <CSVReader
       config={{ header: true }}
+      disabled={selectedProject?.simulation?.resultS3}
       onUploadAccepted={(results: any) => {
         if (selectedProject) {
           let frequencies: number[] = []
@@ -462,7 +467,7 @@ export const FrequenciesImportFromCSV:FC = () => {
         <>
           <div
             {...getRootProps()}
-            className='hover:cursor-pointer'
+            className={`hover:cursor-pointer ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
             style={Object.assign(
               {},
               styles.zone,

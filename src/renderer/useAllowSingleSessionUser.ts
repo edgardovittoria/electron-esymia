@@ -39,9 +39,11 @@ export const useAllowSingleSessionUser = () => {
               userSessionInfo: newSessionInfo,
             } as FaunaUserSessionInfo);
           } else {
-            window.electron.ipcRenderer.sendMessage('logout', [
-              process.env.REACT_APP_AUTH0_DOMAIN,
-            ]);
+            if(process.env.APP_MODE !== 'test'){
+              window.electron.ipcRenderer.sendMessage('logout', [
+                process.env.REACT_APP_AUTH0_DOMAIN,
+              ]);
+            }
             alert(
               'You are already logged in to another device. Close that connection in order to start a new one.',
             );

@@ -237,7 +237,7 @@ export const Physics: React.FC<PhysicsProps> = ({
 
 const PositioningPortsInfo: FC = () => {
   return (
-    <div className="flex flex-col bg-white shadow-2xl text-sm text-start p-[10px] max-w-[300px] max-h-[300px] overflow-y-scroll">
+    <div className="fixed bottom-20 right-5 flex flex-col bg-white shadow-2xl text-sm text-start p-[10px] max-w-[300px] max-h-[300px] overflow-y-scroll">
       <span className="font-semibold">
         Once you have added a new termination, you can place it in the following
         ways:
@@ -450,6 +450,7 @@ const PhysicsRightSidebar: FC<{
               ? 'text-white bg-primaryColor'
               : 'text-primaryColor bg-white'
           }`}
+          data-testid="terminationSettings"
           data-tip="Terminations Settings"
           onClick={() => {
             if (selectedTabRightPanel === physicsRightPanelTitle.first) {
@@ -468,6 +469,7 @@ const PhysicsRightSidebar: FC<{
               ? 'text-white bg-primaryColor'
               : 'text-primaryColor bg-white'
           }`}
+          data-testid="frequenciesSettings"
           data-tip="Frequencies"
           onClick={() => {
             if (selectedTabRightPanel === physicsRightPanelTitle.second) {

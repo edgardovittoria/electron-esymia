@@ -83,6 +83,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
               item === 'Projects' ||
               item === 'Simulations' ? (
                 <span
+                  data-testid={item}
                   className={
                     menuItemSelected === item
                       ? 'text-black no-underline px-4 py-3 text-sm'

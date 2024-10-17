@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaReact } from 'react-icons/fa6';
 import { IoTrashOutline } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,6 +24,7 @@ import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { savePortsOnS3 } from './savePortsOnS3';
+import { isConfirmedInfoModalSelector, setIsAlertInfoModal, setMessageInfoModal, setShowInfoModal } from '../../../../store/tabsAndMenuItemsSlice';
 
 interface PhysicsLeftPanelTabProps {}
 
@@ -32,11 +33,56 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   const selectedProject = useSelector(selectedProjectSelector);
   const [portRename, setPortRename] = useState('');
   const { execQuery } = useFaunaQuery();
+  const isConfirmedInfoModal = useSelector(isConfirmedInfoModalSelector)
+  const [deleteAllType, setDeleteAllType] = useState("port")
 
   useEffectNotOnMount(() => {
     selectedProject?.ports.filter((p) => p.category === 'port').length === 0 &&
       dispatch(unsetScatteringValue());
   }, [selectedProject?.ports.length]);
+
+  useEffect(() => {
+    if(isConfirmedInfoModal && selectedProject && deleteAllType === "port"){
+      dispatch(deleteAllPorts());
+      let ports = selectedProject.ports.filter(
+        (p) => p.category !== 'port',
+      );
+      if (ports.length > 0) {
+        savePortsOnS3(ports, selectedProject, dispatch, execQuery);
+      } else {
+        deleteFileS3(selectedProject.portsS3 as string);
+        dispatch(setPortsS3(undefined));
+        execQuery(
+          updateProjectInFauna,
+          convertInFaunaProjectThis({
+            ...selectedProject,
+            portsS3: null,
+          }),
+          dispatch,
+        ).then(() => {});
+      }
+    } else if(isConfirmedInfoModal && selectedProject && deleteAllType === "lumped"){
+      dispatch(deleteAllLumped());
+      let ports = selectedProject.ports.filter(
+        (p) => p.category !== 'lumped',
+      );
+      if (ports.length > 0) {
+        savePortsOnS3(ports, selectedProject, dispatch, execQuery);
+      } else {
+        deleteFileS3(selectedProject.portsS3 as string);
+        dispatch(setPortsS3(undefined));
+        execQuery(
+          updateProjectInFauna,
+          convertInFaunaProjectThis({
+            ...selectedProject,
+            portsS3: null,
+          }),
+          dispatch,
+        ).then(() => {});
+      }
+    }
+  }, [isConfirmedInfoModal, deleteAllType])
+
 
   return (
     <>
@@ -49,24 +95,14 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                 className="w-[15%] tooltip tooltip-left hover:cursor-pointer"
                 data-tip="Delete all ports"
                 onClick={() => {
-                  dispatch(deleteAllPorts());
-                  let ports = selectedProject.ports.filter(
-                    (p) => p.category !== 'port',
+                  setDeleteAllType("port")
+                  dispatch(
+                    setMessageInfoModal(
+                      'Are you sure to delete all ports?',
+                    ),
                   );
-                  if (ports.length > 0) {
-                    savePortsOnS3(ports, selectedProject, dispatch, execQuery);
-                  } else {
-                    deleteFileS3(selectedProject.portsS3 as string);
-                    dispatch(setPortsS3(undefined));
-                    execQuery(
-                      updateProjectInFauna,
-                      convertInFaunaProjectThis({
-                        ...selectedProject,
-                        portsS3: null,
-                      }),
-                      dispatch,
-                    ).then(() => {});
-                  }
+                  dispatch(setIsAlertInfoModal(false));
+                  dispatch(setShowInfoModal(true));
                 }}
               >
                 <MdDeleteSweep
@@ -79,24 +115,14 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                 className="w-[15%] tooltip tooltip-left hover:cursor-pointer"
                 data-tip="Delete all lumped"
                 onClick={() => {
-                  dispatch(deleteAllLumped());
-                  let ports = selectedProject.ports.filter(
-                    (p) => p.category !== 'lumped',
+                  setDeleteAllType("lumped")
+                  dispatch(
+                    setMessageInfoModal(
+                      'Are you sure to delete all lumped?',
+                    ),
                   );
-                  if (ports.length > 0) {
-                    savePortsOnS3(ports, selectedProject, dispatch, execQuery);
-                  } else {
-                    deleteFileS3(selectedProject.portsS3 as string);
-                    dispatch(setPortsS3(undefined));
-                    execQuery(
-                      updateProjectInFauna,
-                      convertInFaunaProjectThis({
-                        ...selectedProject,
-                        portsS3: null,
-                      }),
-                      dispatch,
-                    ).then(() => {});
-                  }
+                  dispatch(setIsAlertInfoModal(false));
+                  dispatch(setShowInfoModal(true));
                 }}
               >
                 <MdDeleteSweep

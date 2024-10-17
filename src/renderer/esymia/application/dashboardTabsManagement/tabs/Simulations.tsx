@@ -35,11 +35,10 @@ export function msToTime(duration: number) {
 
   hours = hours < 10 ? '0' + hours : hours;
   minutes = minutes < 10 ? '0' + minutes : minutes;
-  seconds = seconds < 10 ? '0' + seconds : seconds;
   if (milliseconds > 0.5) {
     seconds = (seconds as number) + 1;
   }
-
+  seconds = seconds < 10 ? '0' + seconds : seconds;
   return hours + ' h ' + minutes + ' min ' + seconds + ' sec';
 }
 
@@ -191,7 +190,7 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
         </div>
       </div>
       {simulations.length > 0 ? (
-        <div className={`overflow-scroll h-full ${maxH} w-full mt-5`}>
+        <div className={`overflow-scroll h-full ${maxH} w-full`}>
           <table className="table mt-4 w-full">
             <thead className="sticky top-0 bg-[#f4f4f4]">
               <tr>

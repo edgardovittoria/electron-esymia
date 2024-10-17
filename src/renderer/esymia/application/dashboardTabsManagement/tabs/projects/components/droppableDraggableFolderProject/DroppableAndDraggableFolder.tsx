@@ -162,6 +162,7 @@ export const DroppableAndDraggableFolder: React.FC<
         }}
         onContextMenu={handleContextMenu}
         key={folder.name}
+        data-testid={folder.name}
         role="Dustbin"
         style={{
           backgroundColor: isOver ? '#e6e6e6' : 'white',
@@ -178,6 +179,7 @@ export const DroppableAndDraggableFolder: React.FC<
           <Menu id={folder.name}>
             <Submenu
               className='hover:text-white  text-primaryColor'
+              data-testid="moveMenu"
               label={
                 <>
                   <BsFillFolderSymlinkFill className="mr-4 w-[20px] h-[20px]" />
@@ -195,6 +197,7 @@ export const DroppableAndDraggableFolder: React.FC<
                   return (
                     <div key={f.faunaDocumentId}>
                       <Item
+                        data-testid={f.faunaDocumentId}
                         onClick={(p) => {
                           p.event.stopPropagation();
                           dispatch(
@@ -257,6 +260,7 @@ export const DroppableAndDraggableFolder: React.FC<
                 hideAll();
               }}
               className='hover:text-white  text-primaryColor'
+              data-testid="deleteButtonFolder"
             >
               <BiTrash className="mr-4 w-[20px] h-[20px]" />
               Delete

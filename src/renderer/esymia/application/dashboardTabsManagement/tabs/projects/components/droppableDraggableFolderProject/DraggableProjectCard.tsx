@@ -83,6 +83,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
       <div
         className="flex py-2 flex-col border-2 border-green-200 rounded-lg hover:cursor-pointer hover:border-secondaryColor shadow-xl"
         key={project.name}
+        data-testid={project.name}
         ref={drag}
         onClick={() => {
           if (!project.model.components && project.modelS3) {
@@ -116,6 +117,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
           <Menu id={project.name}>
             <Submenu
               className='hover:text-white  text-primaryColor'
+              data-testid="moveMenu"
               label={
                 <>
                   <BsFillFolderSymlinkFill className="mr-4 w-[20px] h-[20px]" />
@@ -131,6 +133,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                   return (
                     <div key={f.faunaDocumentId}>
                       <Item
+                        data-testid={f.faunaDocumentId}
                         onClick={(p) => {
                           p.event.stopPropagation();
                           dispatch(

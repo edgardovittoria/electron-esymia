@@ -9,7 +9,7 @@ export interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({setSelectedTab}) => {
-  const { loginWithPopup, user } = useAuth0();
+  const { loginWithPopup, user, loginWithRedirect } = useAuth0();
   return (
     <div className="flex flex-row">
       <div className='w-full h-[97vh]'>
@@ -26,6 +26,7 @@ const Home: React.FC<HomeProps> = ({setSelectedTab}) => {
                 <div className='flex flex-col w-full items-center gap-4'>
                   <h5>ESymIA</h5>
                   <div className='rounded-xl shadow-xl esymia w-full h-[400px] border border-black hover:scale-105 transition'
+                       data-testid="esymia"
                        onClick={() => setSelectedTab('esymia')}
                   />
                 </div>
@@ -48,7 +49,7 @@ const Home: React.FC<HomeProps> = ({setSelectedTab}) => {
               <span className="font-semibold text-xl">Log in/Sign in to use applications</span>
               <div
                 className='flex flex-col gap-5 w-1/5 items-center px-10 py-2 border border-black rounded-xl hover:bg-white hover:text-black hover:cursor-pointer'
-                onClick={() => loginWithPopup()}
+                onClick={() => process.env.APP_MODE === "test" ? loginWithRedirect() : loginWithPopup()}
               >
                 <div className='flex flex-row justify-between items-center gap-2'>
                   <IoMdLogIn size={25} />

@@ -42,55 +42,59 @@ export default function App() {
   // const [progressBarValue, setProgressBarValue] = useState<number>(0)
 
   // Uso del temporizzatore per la versione demo di 30 giorni. Commentare se si vuole disabilitare la modalità demo.
-  let {allowedUser, remainingDemoDays} = useDemoMode()
+  //let {allowedUser, remainingDemoDays} = useDemoMode()
 
   // Permette ad ogni utente di avere un'unica sessione attiva per volta. Commentare per disabilitare questo vincolo.
   //let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
 
   useEffect(() => {
-    window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
-      dispatch(setHomePat(res));
-    });
+    // window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
+    //   dispatch(setHomePat(res));
+    // });
     //window.electron.ipcRenderer.sendMessage('runBroker', []);
+
     dispatch(connectStomp());
     return () => {
       dispatch(disconnectStomp());
     };
   }, []);
 
-  window.electron.ipcRenderer.on('runBroker', (arg) => {
-    (arg as string).split("\n").filter(s => {
-      if (s === 'docker not installed') {
-        setDockerInstallationBox(true);
-      }
-      console.log(s.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
-    })
-  });
+  // window.electron.ipcRenderer.on('runBroker', (arg) => {
+  //   (arg as string).split("\n").filter(s => {
+  //     if (s === 'docker not installed') {
+  //       setDockerInstallationBox(true);
+  //     }
+  //     console.log(s.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
+  //   })
+  // });
 
-  window.electron.ipcRenderer.on('checkLogout', (arg) => {
-    if((arg as string) == 'allowed'){
-      if(mesherStatus != 'idle'){
-        dispatch(
-          publishMessage({
-            queue: 'management',
-            body: { message: 'stop' },
-          }),
-        );
+  if(process.env.APP_MODE !== "test"){
+    window.electron.ipcRenderer.on('checkLogout', (arg) => {
+      if((arg as string) == 'allowed'){
+        if(mesherStatus != 'idle'){
+          dispatch(
+            publishMessage({
+              queue: 'management',
+              body: { message: 'stop' },
+            }),
+          );
+        }
+        if(solverStatus != 'idle'){
+          dispatch(
+            publishMessage({
+              queue: 'management_solver',
+              body: { message: 'stop' },
+            }),
+          );
+        }
+        setLogout(true)
       }
-      if(solverStatus != 'idle'){
-        dispatch(
-          publishMessage({
-            queue: 'management_solver',
-            body: { message: 'stop' },
-          }),
-        );
-      }
-      setLogout(true)
-    }
-  });
+    });
+  }
+
 
   useEffect(() => {
-    if(logout){
+    if(logout && process.env.APP_MODE !== "test"){
       window.electron.ipcRenderer.sendMessage('logout', [
         process.env.REACT_APP_AUTH0_DOMAIN,
       ]);
@@ -134,7 +138,8 @@ export default function App() {
 
   return (
     <>
-      {dockerInstallationBox && allowedUser && (
+      {/* {dockerInstallationBox && allowedUser && ( */}
+      {dockerInstallationBox && (
         <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
           <div className="flex flex-col items-center gap-2 p-3 bg-white rounded border border-black">
             <span className='text-2xl'>Docker Needed</span>
@@ -147,7 +152,8 @@ export default function App() {
           </div>
         </div>
       )}
-      {!dockerInstallationBox && allowedUser && (
+      {/* {!dockerInstallationBox && allowedUser && ( */}
+      {!dockerInstallationBox && (
         <>
           {!brokerActive ? (
             <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
@@ -196,7 +202,7 @@ export default function App() {
                 </div>
                 {user && (
                   <div>
-                    <span className='absolute top-0 left-0 text-center p-1 border-b-2 border-r-2 border-secondaryColor rounded-br-xl bg-white font-bold text-sm'>DEMO: {remainingDemoDays} days remaining</span>
+                    {/* <span className='absolute top-0 left-0 text-center p-1 border-b-2 border-r-2 border-secondaryColor rounded-br-xl bg-white font-bold text-sm'>DEMO: {remainingDemoDays} days remaining</span> */}
                     <FaUser
                       id="profileIcon"
                       className="w-[20px] h-[20px] mr-4 text-black hover:opacity-40 hover:cursor-pointer"
@@ -221,8 +227,10 @@ export default function App() {
                       <div
                         className="flex items-center p-[5px] hover:bg-black hover:text-white hover:cursor-pointer"
                         onClick={() => {
-                          window.electron.ipcRenderer.sendMessage('checkLogout');
-                          //closeUserSessionOnFauna()
+                          if(process.env.APP_MODE !== 'test'){
+                            window.electron.ipcRenderer.sendMessage('checkLogout');
+                            //closeUserSessionOnFauna()
+                          }
                         }}
                       >
                         <HiOutlineLogout className="w-[20px] h-[20px] mr-[10px]" />

@@ -66,7 +66,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
                     <div className="fixed inset-0 bg-black bg-opacity-25" />
                 </Transition.Child>
 
-                <div className="fixed inset-0 overflow-y-auto">
+                <div className="fixed inset-0 overflow-y-auto" data-testid="createNewFolderModal">
                     <div className="flex min-h-full items-center justify-center p-4 text-center">
                         <Transition.Child
                             as={Fragment}
@@ -91,6 +91,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
                                             <h6>Insert Folder's Name</h6>
                                             <input
                                                 type="text"
+                                                data-testid="folderName"
                                                 className="formControl bg-gray-100 rounded p-2 w-full mt-3"
                                                 placeholder="Folder's Name"
                                                 value={folderName}
