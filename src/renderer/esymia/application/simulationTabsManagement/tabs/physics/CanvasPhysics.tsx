@@ -126,7 +126,7 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                             scale={component.transformationParams.scale}
                             rotation={component.transformationParams.rotation}
                             onDoubleClick={(e) => {
-                              if (selectedPort) {
+                              if (selectedPort && !selectedProject.simulation?.resultS3) {
                                 setPointerEvent(e);
                                 setSurfaceAdvices(false);
                               }
@@ -189,7 +189,7 @@ const PhysicsPortsDrawer: FC = () => {
       type: 'CIRCLE',
       keyComponent: 0,
       geometryAttributes: {
-        radius: (size as number) / 50,
+        radius: (size as number) / 100,
         segments: 20,
       } as CircleGeometryAttributes,
       name: (inputOrOutput === 'in') ? 'inputPort' + port.name : 'outputPort' + port.name,

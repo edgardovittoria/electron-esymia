@@ -272,6 +272,7 @@ const SurfaceAdvicesButton: FC<{
   surfaceAdvices: boolean;
   setSurfaceAdvices: Function;
 }> = ({ surfaceAdvices, setSurfaceAdvices }) => {
+  const selectedProject = useSelector(selectedProjectSelector)
   return (
     <div
       className="tooltip"
@@ -280,8 +281,9 @@ const SurfaceAdvicesButton: FC<{
       }
     >
       <button
-        className="bg-white rounded p-2"
+        className="bg-white rounded p-2 disabled:opacity-40"
         onClick={() => setSurfaceAdvices(!surfaceAdvices)}
+        disabled={selectedProject && selectedProject?.simulation?.resultS3 ? true : false }
       >
         {surfaceAdvices ? (
           <BiShow className="h-5 w-5 text-green-300 hover:text-secondaryColor" />

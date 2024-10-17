@@ -2,6 +2,7 @@ import { Dispatch } from '@reduxjs/toolkit';
 import { FC } from 'react';
 import { CircleGeometryAttributes, ComponentEntity, SphereGeometryAttributes, TRANSF_PARAMS_DEFAULTS } from '../../../model/componentEntity/componentEntity';
 import { getNewKeys } from '../cube/cube';
+import * as THREE from 'three';
 
 interface CircleProps {
     radius: number,
@@ -9,7 +10,7 @@ interface CircleProps {
     color: string,
     thetaStart?: number,
     thetaLength?: number,
-    opacity: number, 
+    opacity: number,
     transparency: boolean
 }
 
@@ -37,7 +38,7 @@ export const Circle: FC<CircleProps> = ({ radius, segments, color, thetaLength, 
     return (
         <>
             <circleGeometry args={[radius, segments, thetaStart, thetaLength]} />
-            <meshPhongMaterial color={color} opacity={opacity} transparent={transparency}/>
+            <meshPhongMaterial side={THREE.DoubleSide} color={color} opacity={opacity} transparent={transparency}/>
         </>
     )
 }
