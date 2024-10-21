@@ -732,6 +732,10 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
 
   const dispatch = useDispatch();
 
+  const [x, setx] = useState(quantumDimsInput[0])
+  const [y, sety] = useState(quantumDimsInput[1])
+  const [z, setz] = useState(quantumDimsInput[2])
+
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={() => {}}>
@@ -758,7 +762,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900"
@@ -771,7 +775,42 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                     Choose how to {mode === 'refine' ? 'reduce' : 'increase'}{' '}
                     the quantum on the desired axes
                   </span>
-                  <div className="flex flex-row gap-4">
+                  <div className="flex flex-row justify-between">
+                    <input type="number" name="x" id="x" defaultValue={x} onChange={(e) => setx(parseFloat(e.target.value))}/>
+                    <input type="number" name="y" id="y" defaultValue={y} onChange={(e) => sety(parseFloat(e.target.value))}/>
+                    <input type="number" name="x" id="z" defaultValue={z} onChange={(e) => setz(parseFloat(e.target.value))}/>
+                  </div>
+                  <button onClick={() => {
+                    setQuantumDimsInput([x,y,z]);
+                    dispatch(
+                      setPreviousMeshStatus({
+                        status: selectedProject.meshData.meshGenerated as
+                          | 'Not Generated'
+                          | 'Generated',
+                        projectToUpdate:
+                          selectedProject.faunaDocumentId as string,
+                      }),
+                    );
+                    dispatch(
+                      setMeshGenerated({
+                        status:
+                          activeMeshing.length > 0
+                            ? 'Queued'
+                            : 'Generating',
+                        projectToUpdate:
+                          selectedProject.faunaDocumentId as string,
+                      }),
+                    );
+                    dispatch(
+                      setQuantum({
+                        quantum: [x,y,z],
+                        projectToUpdate:
+                          selectedProject.faunaDocumentId as string,
+                      }),
+                    );
+                    setShowModal(false);
+                  }}>Generate Mesh</button>
+                  {/* <div className="flex flex-row gap-4">
                     <span className="font-semibold">X: </span>
                     <div className="flex flex-row gap-2 items-center">
                       <input
@@ -980,7 +1019,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                     >
                       {mode.toUpperCase()}
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </Dialog.Panel>
             </Transition.Child>
