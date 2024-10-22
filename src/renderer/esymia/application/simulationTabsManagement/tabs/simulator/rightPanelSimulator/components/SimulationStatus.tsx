@@ -256,10 +256,6 @@ const SimulationStatusItem: React.FC<{
   };
 
   useEffect(() => {
-    dispatch(unsetComputingLp(associatedProject.faunaDocumentId as string));
-    dispatch(unsetComputingP(associatedProject.faunaDocumentId as string));
-    dispatch(unsetIterations(associatedProject.faunaDocumentId as string));
-    dispatch(unsetSolverResults(associatedProject.faunaDocumentId as string));
     dispatch(setEstimatedTime(undefined))
     let objectToSendToSolver = solverInputFrom(
       associatedProject,
@@ -273,7 +269,6 @@ const SimulationStatusItem: React.FC<{
         body: { message: 'solving', body: objectToSendToSolver },
       }),
     );
-    // client.publish({destination: "management_solver", body: JSON.stringify({ message: "solving", body: objectToSendToSolver })})
   }, []);
 
   useEffect(() => {

@@ -775,7 +775,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                     Choose how to {mode === 'refine' ? 'reduce' : 'increase'}{' '}
                     the quantum on the desired axes
                   </span>
-                  <div className="flex flex-row justify-between">
+                  {/* <div className="flex flex-row justify-between">
                     <input type="number" name="x" id="x" defaultValue={x} onChange={(e) => setx(parseFloat(e.target.value))}/>
                     <input type="number" name="y" id="y" defaultValue={y} onChange={(e) => sety(parseFloat(e.target.value))}/>
                     <input type="number" name="x" id="z" defaultValue={z} onChange={(e) => setz(parseFloat(e.target.value))}/>
@@ -809,8 +809,8 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                       }),
                     );
                     setShowModal(false);
-                  }}>Generate Mesh</button>
-                  {/* <div className="flex flex-row gap-4">
+                  }}>Generate Mesh</button> */}
+                  <div className="flex flex-row gap-4">
                     <span className="font-semibold">X: </span>
                     <div className="flex flex-row gap-2 items-center">
                       <input
@@ -1019,7 +1019,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                     >
                       {mode.toUpperCase()}
                     </button>
-                  </div> */}
+                  </div>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

@@ -144,5 +144,4 @@ export const callback_solver_results = (message: any, dispatch: Function) => {
     );
     dispatch(setEstimatedTime(undefined))
   }
-
 };
