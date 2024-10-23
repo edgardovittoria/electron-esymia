@@ -210,6 +210,10 @@ const SimulationStatusItem: React.FC<{
             projectToUpdate: associatedProject.faunaDocumentId as string,
           }),
         );
+        dispatch(unsetComputingLp(associatedProject.faunaDocumentId as string));
+        dispatch(unsetComputingP(associatedProject.faunaDocumentId as string));
+        dispatch(unsetIterations(associatedProject.faunaDocumentId as string));
+        dispatch(unsetSolverResults(associatedProject.faunaDocumentId as string));
         dispatch(
           publishMessage({
             queue: 'management_solver',
@@ -288,6 +292,10 @@ const SimulationStatusItem: React.FC<{
             projectToUpdate: associatedProject.faunaDocumentId as string,
           }),
         );
+        dispatch(unsetComputingLp(simulation.associatedProject as string));
+        dispatch(unsetComputingP(simulation.associatedProject as string));
+        dispatch(unsetIterations(simulation.associatedProject as string));
+        dispatch(unsetSolverResults(simulation.associatedProject as string));
       } else {
         if (solverResults.isStopped) {
           dispatch(
@@ -299,6 +307,10 @@ const SimulationStatusItem: React.FC<{
               projectToUpdate: associatedProject.faunaDocumentId as string,
             }),
           );
+          dispatch(unsetComputingLp(simulation.associatedProject as string));
+          dispatch(unsetComputingP(simulation.associatedProject as string));
+          dispatch(unsetIterations(simulation.associatedProject as string));
+          dispatch(unsetSolverResults(simulation.associatedProject as string));
         } else {
           // dispatch(setSolverOutput(res.data));
           if(solverResults.partial){
@@ -359,6 +371,10 @@ const SimulationStatusItem: React.FC<{
                       },
                     }),
                   );
+                  dispatch(unsetComputingLp(simulation.associatedProject as string));
+                  dispatch(unsetComputingP(simulation.associatedProject as string));
+                  dispatch(unsetIterations(simulation.associatedProject as string));
+                  dispatch(unsetSolverResults(simulation.associatedProject as string));
                 });
               }
             });

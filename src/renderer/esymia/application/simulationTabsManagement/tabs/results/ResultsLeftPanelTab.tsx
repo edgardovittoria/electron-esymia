@@ -116,10 +116,6 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                     type="button"
                     className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60 text-sm"
                     onClick={() => {
-                      dispatch(unsetComputingLp(selectedProject.faunaDocumentId as string));
-                      dispatch(unsetComputingP(selectedProject.faunaDocumentId as string));
-                      dispatch(unsetIterations(selectedProject.faunaDocumentId as string));
-                      dispatch(unsetSolverResults(selectedProject.faunaDocumentId as string));
                       dispatch(
                         deleteSimulation(
                           selectedProject.faunaDocumentId as string,
