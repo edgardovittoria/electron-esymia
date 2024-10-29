@@ -40,7 +40,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="box w-full">
-        <div className="flex p-2 gap-4 items-center">
+        {/* <div className="flex p-2 gap-4 items-center">
           <div className="sm:w-3/5 w-1/5">
             <h5 className="text-base">Files</h5>
           </div>
@@ -56,10 +56,11 @@ const MyFiles: React.FC<MyFilesProps> = ({
           >
             + New Folder
           </div>
-        </div>
+        </div> */}
 
-        <div className="p-[12px] text-[18px]">
-          <hr />
+        <div className="flex flex-row justify-between">
+        <div className="px-[12px] text-[18px] w-5/6">
+
           {path.map((p, index) => {
             return (
               <div className="inline-block p-2" key={index}>
@@ -83,7 +84,21 @@ const MyFiles: React.FC<MyFilesProps> = ({
               </div>
             );
           })}
-          <hr />
+        </div>
+        <div className="flex p-2 gap-4 items-center w-1/6">
+          <div
+            className="text-end text-sm text-primaryColor hover:text-secondaryColor hover:cursor-pointer hover:underline"
+            onClick={() => dispatch(setShowCreateNewProjectModal(true))}
+          >
+            + New Project
+          </div>
+          <div
+            className="text-sm text-center text-primaryColor hover:text-secondaryColor hover:cursor-pointer hover:underline"
+            onClick={() => setShowCreateNewFolderModal(true)}
+          >
+            + New Folder
+          </div>
+        </div>
         </div>
 
         <div className="w-full text-left p-[20px] h-[80%]">
@@ -96,7 +111,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
                   Folders
                 </h5>
               )}
-              <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[200px]">
+              <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[100px]">
                 {folders.map((folder) => {
                   return (
                     <DroppableAndDraggableFolder
@@ -113,7 +128,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
                   Projects
                 </h5>
               )}
-              <div data-testid="projectsBox" className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[380px]">
+              <div data-testid="projectsBox" className="grid xl:grid-cols-8 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[200px]">
                 {projects
                   .map((project) => {
                     return (

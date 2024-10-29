@@ -84,6 +84,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
         className="flex py-2 flex-col border-2 border-green-200 rounded-lg hover:cursor-pointer hover:border-secondaryColor shadow-xl"
         key={project.name}
         data-testid={project.name}
+        data-tip={project.name}
         ref={drag}
         onClick={() => {
           if (!project.model.components && project.modelS3) {
@@ -94,11 +95,13 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
         style={{ opacity: isDragging ? 0.5 : 1 }}
         onContextMenu={handleContextMenu}
       >
-        <h5 className="text-center text-base" role="Handle" ref={dragPreview}>
-          {project.name.length > 15
-            ? `${project.name.substring(0, 15)}...`
-            : project.name}
-        </h5>
+        <div className="tooltip tooltip-bottom" data-tip={project.name}>
+          <h5 className="text-center text-base" role="Handle" ref={dragPreview}>
+            {project.name.length > 15
+              ? `${project.name.substring(0, 15)}...`
+              : project.name}
+          </h5>
+        </div>
         <div>
           <img
             className="w-[60%] md:w-[80%] mx-auto"

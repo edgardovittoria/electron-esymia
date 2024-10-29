@@ -17,7 +17,7 @@ export const DashboardTabsContentFactory: React.FC<
   switch (menuItemSelected) {
     case 'Overview':
       return (
-        <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] h-[80vh]">
+        <div className="w-full px-10 flex mx-auto pt-5 bg-[#ececec] h-[80vh]">
           <Overview />
           {/* <RightPanel /> */}
         </div>

@@ -7,6 +7,7 @@ import { addProjectTab, setShowCreateNewProjectModal } from '../../../store/tabs
 import { setModelInfoFromS3 } from './shared/utilFunctions';
 import noProjectsIcon2 from '../../../../../../assets/noProjectsIcon2.png';
 import noResultsIconForProject from '../../../../../../assets/noResultsIconForProject.png';
+import { Projects } from './projects/Projects';
 
 interface OverviewProps {
 }
@@ -17,8 +18,8 @@ export const Overview: React.FC<OverviewProps> = ({  }) => {
   // const [cardMenuHovered, setCardMenuHovered] = useState(false);
 
   return (
-    <div className="grid lg:grid-cols-2 grid-cols-1 w-full gap-7">
-      <div className="box">
+    <div className="w-full">
+      {/* <div className="box">
         <div className="flex flex-row justify-between items-start p-2">
           <h5 className="lg:text-base text-sm">My Recent Projects</h5>
           <button
@@ -124,7 +125,8 @@ export const Overview: React.FC<OverviewProps> = ({  }) => {
           style={{ fill: 'url(#blue-gradient)' }}
           className="absolute right-0 bottom-0 sm:bottom-[-40px] sm:w-[280px] sm:h-[280px] w-[180px] h-[180px]"
         />
-      </div>
+      </div> */}
+      <Projects/>
       <div className="lg:col-span-2 justify-between w-full">
         <Simulations maxH="max-h-[300px]"/>
       </div>

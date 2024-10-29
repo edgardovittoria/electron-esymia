@@ -5,7 +5,7 @@ import { selectProject } from './projectSlice';
 const getMenuItemsArrayBasedOnTabType = (tabType: string) => {
   switch (tabType) {
     case 'DASHBOARD':
-      return ['Overview', 'Projects', 'Simulations'];
+      return ['Overview'];
     default:
       return ['Modeler', 'Terminations', 'Simulator', 'Results'];
   }
