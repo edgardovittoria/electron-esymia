@@ -44,6 +44,7 @@ type TabsAndMenuItemsState = {
   meshAdvice: {id: string, quantum: [number, number, number]}[],
   meshResults?: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, isValid: {valid: boolean, axis?: string}, error?: any},
   solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number, error?:any }[],
+  SolverResultsS3?: string,
   externalGrids?: any
   brokerConnected: boolean
 }
@@ -177,6 +178,9 @@ export const TabsAndMenuItemsSlice = createSlice({
       state.solverResults = state.solverResults.filter(item => item.id !== action.payload.id)
       state.solverResults.push(action.payload)
     },
+    setSolverResultsS3(state: TabsAndMenuItemsState, action: PayloadAction<string | undefined>){
+      state.SolverResultsS3 = action.payload
+    },
     unsetAWSExternalGridsData(state: TabsAndMenuItemsState){
       state.externalGrids = undefined
     },
@@ -231,6 +235,7 @@ export const {
   setMeshAdvice,
   setMesherResults,
   setSolverResults,
+  setSolverResultsS3,
   unsetMeshAdvice,
   unsetSolverResults,
   setBrokerConnected,
@@ -335,6 +340,10 @@ export const mesherResultsSelector = (state: {
 export const solverResultsSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState
 }) => state.tabsAndMenuItems.solverResults;
+
+export const solverResultsS3Selector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.SolverResultsS3;
 
 export const brokerConnectedSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState

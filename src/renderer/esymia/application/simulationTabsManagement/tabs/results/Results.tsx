@@ -35,6 +35,8 @@ import { TbFileExport } from 'react-icons/tb';
 import toast, { ToastOptions } from 'react-hot-toast';
 import { Dispatch } from '@reduxjs/toolkit';
 import { s3 } from '../../../../aws/s3Config';
+import { RiAlarmWarningFill } from 'react-icons/ri';
+import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../../../store/tabsAndMenuItemsSlice';
 
 interface ResultsProps {
   selectedTabLeftPanel: string | undefined;
@@ -50,16 +52,27 @@ export const setResultsFromS3 = (project: Project, dispatch: Dispatch) => {
     if (err) {
       console.log(err);
     }
-    const results = JSON.parse(data.Body?.toString() as string) as SolverOutput
-    dispatch(
-      updateSimulation({
-        associatedProject: project.simulation?.associatedProject as string,
-        value: {
-          ...project.simulation,
-          results: results
-        } as Simulation,
-      }),
-    );
+    if(!data){
+      dispatch(
+        setMessageInfoModal(
+          'Results not found. launch a simulation or wait if there is one running',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(true));
+      dispatch(setShowInfoModal(true));
+    }else{
+      const results = JSON.parse(data.Body?.toString() as string).matrices as SolverOutput
+      dispatch(
+        updateSimulation({
+          associatedProject: project.simulation?.associatedProject as string,
+          value: {
+            ...project.simulation,
+            results: results
+          } as Simulation,
+        }),
+      );
+    }
+
   });
 };
 
@@ -69,6 +82,7 @@ export const Results: React.FC<ResultsProps> = ({
 }) => {
   const { cloneProject } = useStorageData();
   const [cloning, setcloning] = useState<boolean>(false);
+  const [emergencyCommand, setEmergencyCommand] = useState(false)
   const selectedProject = useSelector(selectedProjectSelector);
   useEffect(() => {
     if(selectedProject && selectedProject.simulation && selectedProject.simulation.resultS3 && selectedProject.simulation.status === "Completed"  && !selectedProject.simulation.results.matrix_S){
@@ -126,6 +140,7 @@ export const Results: React.FC<ResultsProps> = ({
                 setSelectedTabLeftPanel(undefined);
               } else {
                 setSelectedTabLeftPanel(resultsLeftPanelTitle.first);
+                setEmergencyCommand(false)
               }
             }}
           >
@@ -206,6 +221,18 @@ export const Results: React.FC<ResultsProps> = ({
             </div>
           </>
         )}
+        {emergencyCommand && (
+          <>
+            <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]">
+              <div className="flex flex-col items-center gap-4">
+                <span>Use this command only if you are facing some issues with simulation!</span>
+                <button className="button w-full buttonPrimary text-center mt-4 mb-4"
+                  onClick={() => setResultsFromS3(selectedProject as Project, dispatch)}
+                >Force Retrive results</button>
+              </div>
+            </div>
+          </>
+        )}
         <div className="absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
           <button
             disabled={selectedProject && selectedProject.simulation && selectedProject.simulation.status === "Running"}
@@ -227,6 +254,23 @@ export const Results: React.FC<ResultsProps> = ({
             {cloning && (
               <ImSpinner className="absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5" />
             )}
+          </button>
+        </div>
+        <div className={`absolute left-[2%] top-[370px] rounded max-h-[500px] flex flex-col items-center gap-0 ${emergencyCommand ? 'bg-primaryColor' : 'bg-white'}`}>
+          <button
+            disabled={selectedProject && selectedProject.simulation && selectedProject.simulation.status === "Running"}
+            className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
+            data-tip="Emergency Command"
+            onClick={() => {
+              setEmergencyCommand(!emergencyCommand)
+              setSelectedTabLeftPanel(undefined)
+            }}
+          >
+            <RiAlarmWarningFill
+              style={{ width: '25px', height: '25px' }}
+              color={emergencyCommand ? 'white' : 'red'}
+              className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
+            />
           </button>
         </div>
       </div>

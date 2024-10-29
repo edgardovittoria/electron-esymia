@@ -31,6 +31,8 @@ import {
   setIsAlertInfoModal,
   setMessageInfoModal,
   setShowInfoModal,
+  setSolverResultsS3,
+  solverResultsS3Selector,
   solverResultsSelector,
   unsetComputingLp,
   unsetComputingP,
@@ -197,6 +199,7 @@ const SimulationStatusItem: React.FC<{
   const solverResults = useSelector(solverResultsSelector).filter(
     (item) => item.id === associatedProject.faunaDocumentId,
   )[0];
+  const solverResultsS3 = useSelector(solverResultsS3Selector)
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
 
@@ -330,59 +333,99 @@ const SimulationStatusItem: React.FC<{
               }),
             );
           }
-          if (!solverResults.partial) {
-            let results = {
-              ...solverResults.matrices,
-              freqIndex: solverResults.freqIndex,
-            };
-            let blobFile = new Blob([JSON.stringify(results)]);
-            let modelFile = new File(
-              [blobFile],
-              `${associatedProject.faunaDocumentId}_results.json`,
-              { type: 'application/json' },
-            );
-            uploadFileS3(modelFile).then((res) => {
-              if (res) {
-                const simulationUpdatedCompleted: Simulation = {
-                  ...simulation,
-                  results: {} as SolverOutput,
-                  resultS3: res.key,
-                  ended: Date.now().toString(),
-                  status: solverResults.partial ? 'Running' : 'Completed',
-                };
-                execQuery(
-                  updateProjectInFauna,
-                  convertInFaunaProjectThis({
-                    ...associatedProject,
-                    simulation: simulationUpdatedCompleted,
-                  } as Project),
-                  dispatch,
-                ).then(() => {
-                  setRunningSimulation(undefined);
-                  dispatch(
-                    updateSimulation({
-                      associatedProject: simulation.associatedProject,
-                      value: {
-                        ...simulationUpdatedCompleted,
-                        results: {
-                          ...solverResults.matrices,
-                          freqIndex: solverResults.freqIndex,
-                        },
-                      },
-                    }),
-                  );
-                  dispatch(unsetComputingLp(simulation.associatedProject as string));
-                  dispatch(unsetComputingP(simulation.associatedProject as string));
-                  dispatch(unsetIterations(simulation.associatedProject as string));
-                  dispatch(unsetSolverResults(simulation.associatedProject as string));
-                });
-              }
-            });
-          }
+          // if (!solverResults.partial) {
+          //   let results = {
+          //     ...solverResults.matrices,
+          //     freqIndex: solverResults.freqIndex,
+          //   };
+          //   let blobFile = new Blob([JSON.stringify(results)]);
+          //   let modelFile = new File(
+          //     [blobFile],
+          //     `${associatedProject.faunaDocumentId}_results.json`,
+          //     { type: 'application/json' },
+          //   );
+          //   uploadFileS3(modelFile).then((res) => {
+          //     if (res) {
+          //       const simulationUpdatedCompleted: Simulation = {
+          //         ...simulation,
+          //         results: {} as SolverOutput,
+          //         resultS3: res.key,
+          //         ended: Date.now().toString(),
+          //         status: solverResults.partial ? 'Running' : 'Completed',
+          //       };
+          //       execQuery(
+          //         updateProjectInFauna,
+          //         convertInFaunaProjectThis({
+          //           ...associatedProject,
+          //           simulation: simulationUpdatedCompleted,
+          //         } as Project),
+          //         dispatch,
+          //       ).then(() => {
+          //         setRunningSimulation(undefined);
+          //         dispatch(
+          //           updateSimulation({
+          //             associatedProject: simulation.associatedProject,
+          //             value: {
+          //               ...simulationUpdatedCompleted,
+          //               results: {
+          //                 ...solverResults.matrices,
+          //                 freqIndex: solverResults.freqIndex,
+          //               },
+          //             },
+          //           }),
+          //         );
+          //         dispatch(unsetComputingLp(simulation.associatedProject as string));
+          //         dispatch(unsetComputingP(simulation.associatedProject as string));
+          //         dispatch(unsetIterations(simulation.associatedProject as string));
+          //         dispatch(unsetSolverResults(simulation.associatedProject as string));
+          //       });
+          //     }
+          //   });
+          // }
         }
       }
     }
   }, [solverResults]);
+
+  useEffect(() => {
+    if(solverResultsS3){
+      const simulationUpdatedCompleted: Simulation = {
+        ...simulation,
+        results: {} as SolverOutput,
+        resultS3: solverResultsS3,
+        ended: Date.now().toString(),
+        status: 'Completed',
+      };
+      execQuery(
+        updateProjectInFauna,
+        convertInFaunaProjectThis({
+          ...associatedProject,
+          simulation: simulationUpdatedCompleted,
+        } as Project),
+        dispatch,
+      ).then(() => {
+        setRunningSimulation(undefined);
+        dispatch(
+          updateSimulation({
+            associatedProject: simulation.associatedProject,
+            value: {
+              ...simulationUpdatedCompleted,
+              results: {
+                ...solverResults.matrices,
+                freqIndex: solverResults.freqIndex,
+              },
+            },
+          }),
+        );
+        dispatch(unsetComputingLp(simulation.associatedProject as string));
+        dispatch(unsetComputingP(simulation.associatedProject as string));
+        dispatch(unsetIterations(simulation.associatedProject as string));
+        dispatch(unsetSolverResults(simulation.associatedProject as string));
+        dispatch(setSolverResultsS3(undefined))
+      });
+    }
+  }, [solverResultsS3])
+
 
   const [elapsedTime, setelapsedTime] = useState(0);
   useEffect(() => {

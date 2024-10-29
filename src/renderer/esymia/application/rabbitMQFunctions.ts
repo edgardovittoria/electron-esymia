@@ -13,6 +13,7 @@ import {
   setMesherResults,
   setMeshingProgress,
   setSolverResults,
+  setSolverResultsS3,
   setcomputingLp,
   setcomputingP,
 } from '../store/tabsAndMenuItemsSlice';
@@ -114,6 +115,8 @@ export const callback_solver_feedback = (message: any, dispatch: Function) => {
       dispatch(setIterations({ freqNumber: body['freqNumber'], id: body['id'] }));
     } else if (body['estimatedTime']){
       dispatch(setEstimatedTime({estimatedTime: body['estimatedTime'], portIndex: body['portIndex'], id: body['id']}))
+    } else if(body['computation_completed']){
+      dispatch(setSolverResultsS3(body['path']))
     }
   }
 };
