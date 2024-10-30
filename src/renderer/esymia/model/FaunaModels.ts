@@ -19,6 +19,7 @@ export type FaunaProjectDetails = {
     screenshot: string | undefined,
     owner: UsersState
     sharedWith?: sharingInfoUser[],
+    shared?: boolean,
     parentFolder: string,
     boundingBoxDimension?: number,
     suggestedQuantum?: [number, number, number]

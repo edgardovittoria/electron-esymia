@@ -33,7 +33,8 @@ export type Project = {
   meshData: MeshData,
   screenshot: string | undefined,
   owner: UsersState
-  sharedWith: sharingInfoUser[]
+  sharedWith: sharingInfoUser[],
+  shared?: boolean,
   faunaDocumentId?: string,
   parentFolder: string,
   boundingBoxDimension?: number,

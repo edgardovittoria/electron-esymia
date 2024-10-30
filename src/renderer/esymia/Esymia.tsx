@@ -116,7 +116,7 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
                     .map((sb) => sb.id),
                   projectList: projects
                     .filter((p) => p.project.parentFolder === 'root')
-                    .filter((p) => p.project.sharedWith?.length === 0)
+                    //.filter((p) => p.project.sharedWith?.length === 0)
                     .map((pr) => pr.id),
                   parent: 'nobody',
                 },
@@ -147,7 +147,7 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   return (
     <>
       {selectedTab === 'esymia' &&
-        <div className="lg:h-[97vh] h-screen">
+        <div className="lg:h-[97vh] h-screen overflow-x-hidden">
           {loginSpinner && (
             <ImSpinner className="animate-spin w-12 h-12 absolute left-1/2 top-1/2" />
           )}

@@ -233,8 +233,8 @@ export const DroppableAndDraggableFolder: React.FC<
               <BiRename className="mr-4 w-[20px] h-[20px]" />
               Rename
             </Item>
-            <Separator />
-            <Item
+            {/* <Separator /> */}
+            {/* <Item
               onClick={(p) => {
                 p.event.stopPropagation();
                 setShowSearchUser(true);
@@ -244,7 +244,7 @@ export const DroppableAndDraggableFolder: React.FC<
             >
               <BiShareAlt className="mr-4 w-[20px] h-[20px]" />
               Share
-            </Item>
+            </Item> */}
             <Separator />
             <Item
               onClick={(p) => {

@@ -128,7 +128,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
                   Projects
                 </h5>
               )}
-              <div data-testid="projectsBox" className="grid xl:grid-cols-8 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[200px]">
+              <div data-testid="projectsBox" className="grid xl:grid-cols-8 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[200px] py-3">
                 {projects
                   .map((project) => {
                     return (

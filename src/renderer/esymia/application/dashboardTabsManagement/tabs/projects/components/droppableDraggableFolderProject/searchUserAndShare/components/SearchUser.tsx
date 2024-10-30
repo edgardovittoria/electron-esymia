@@ -2,11 +2,12 @@ import React, {Fragment} from 'react';
 import {Combobox, Transition} from "@headlessui/react";
 import {HiArrowsUpDown} from "react-icons/hi2";
 import {BiCheck} from "react-icons/bi";
+import { UsersState } from '../../../../../../../../../cad_library';
 
 interface SearchUserProps {
-    selected: string,
-    setSelected: (v: string) => void,
-    filteredPeople: string[],
+    selected: UsersState,
+    setSelected: (v: UsersState) => void,
+    filteredPeople: UsersState[],
     query: string
     setQuery: (v: string) => void,
 }
@@ -25,9 +26,9 @@ export const SearchUser: React.FC<SearchUserProps> = (
                         className="relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
                         <Combobox.Input
                             className="w-full border-2 border-teal-600 rounded-lg py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-                            displayValue={(person) => {
-                                if (person) {
-                                    return selected
+                            displayValue={(person: UsersState) => {
+                                if (person.email) {
+                                    return selected.email as string
                                 } else {
                                     return ""
                                 }
@@ -58,7 +59,7 @@ export const SearchUser: React.FC<SearchUserProps> = (
                             ) : (
                                 filteredPeople.map((person) => (
                                     <Combobox.Option
-                                        key={person}
+                                        key={person.email}
                                         className={({active}) =>
                                             `relative cursor-default select-none py-2 pl-10 pr-4 ${
                                                 active ? 'bg-teal-600 text-white' : 'text-gray-900'
@@ -73,7 +74,7 @@ export const SearchUser: React.FC<SearchUserProps> = (
                                 selected ? 'font-medium' : 'font-normal'
                             }`}
                         >
-                          {person}
+                          {person.email}
                         </span>
                                                 {selected ? (
                                                     <span

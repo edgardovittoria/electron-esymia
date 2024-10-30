@@ -81,7 +81,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
     <>
       {cloning && <ImSpinner className='animate-spin w-8 h-8 absolute top-1/2 right-1/2 z-100'/>}
       <div
-        className="flex py-2 flex-col border-2 border-green-200 rounded-lg hover:cursor-pointer hover:border-secondaryColor shadow-xl"
+        className="flex flex-col border-2 relative border-green-200 rounded-lg hover:cursor-pointer hover:border-secondaryColor shadow-xl"
         key={project.name}
         data-testid={project.name}
         data-tip={project.name}
@@ -95,6 +95,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
         style={{ opacity: isDragging ? 0.5 : 1 }}
         onContextMenu={handleContextMenu}
       >
+        {project.shared && <div className="badge badge-neutral absolute bottom-[-10px] right-1/2  translate-x-1/2">shared</div>}
         <div className="tooltip tooltip-bottom" data-tip={project.name}>
           <h5 className="text-center text-base" role="Handle" ref={dragPreview}>
             {project.name.length > 15

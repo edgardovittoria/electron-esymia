@@ -109,6 +109,7 @@ export const convertInFaunaProjectThis = (project: Project) => {
       screenshot: project.screenshot,
       owner: project.owner,
       sharedWith: project.sharedWith,
+      shared: project.shared,
       parentFolder: project.parentFolder,
       scatteringValue: project.scatteringValue,
       suggestedQuantum: project.suggestedQuantum,

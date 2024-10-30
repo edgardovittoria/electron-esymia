@@ -29,6 +29,7 @@ import toast from 'react-hot-toast';
 import { addProjectTab, setShowCreateNewProjectModal } from '../../../../../../../store/tabsAndMenuItemsSlice';
 import { useFaunaQuery } from '../../../../../../../faunadb/hook/useFaunaQuery';
 import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../../cad_library';
+import { useStorageData } from '../../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
 
 interface SearchUserAndShareProps {
   setShowSearchUser: (v: boolean) => void;
@@ -41,14 +42,15 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
   folderToShare,
   projectToShare,
 }) => {
-  const [users, setUsers] = useState<string[]>([]);
+  const [users, setUsers] = useState<UsersState[]>([]);
   const [shareDone, setShareDone] = useState<boolean>(false);
   const { execQuery } = useFaunaQuery();
-  const [selected, setSelected] = useState('');
+  const [selected, setSelected] = useState({} as UsersState);
   const [query, setQuery] = useState('');
   const [spinner, setSpinner] = useState(true);
+  const { shareProject } = useStorageData()
   useEffect(() => {
-    const usersList: string[] = [];
+    const usersList: UsersState[] = [];
     setSpinner(true);
     axios.post(
       'https://dev-i414-g1x.us.auth0.com/oauth/token',
@@ -74,7 +76,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
       .then((res) => {
         res.data
           .filter((r: { name: string }) => r.name === 'Premium')
-          .forEach((role: { id: string }) => {
+          .forEach((role: { id: string, name: string }) => {
             axios
               .get(
                 `https://dev-i414-g1x.us.auth0.com/api/v2/roles/${role.id}/users`,
@@ -87,8 +89,8 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
               )
               .then((res) => {
                 // console.log(res.data)
-                res.data.forEach((u: { name: string }) => {
-                  usersList.push(u.name);
+                res.data.forEach((u: {email: string, name: string}) => {
+                  usersList.push({email: u.email, userName: u.name, userRole: role.name} as UsersState);
                 });
                 setUsers(usersList);
                 setSpinner(false);
@@ -117,13 +119,13 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
     }
   }, [folderToShare?.sharedWith]);
 
-  const filteredPeople: string[] =
+  const filteredPeople: UsersState[] =
     query === ''
-      ? users.filter((p) => p !== user.email)
+      ? users.filter((p) => p.email !== user.email)
       : users
-          .filter((p) => p !== user.email)
+          .filter((p) => p.email !== user.email)
           .filter((person) =>
-            person
+            (person.email as string)
               .toLowerCase()
               .replace(/\s+/g, '')
               .includes(query.toLowerCase().replace(/\s+/g, '')),
@@ -191,93 +193,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                         className="button buttonPrimary py-1 px-2 text-sm"
                         onClick={() => {
                           setShareDone(true);
-                          //TODO:clonare mesh, porte e risulati
-                          let newProject: Project = {
-                            faunaDocumentId: projectToShare?.faunaDocumentId,
-                            description: projectToShare?.description as string,
-                            frequencies: projectToShare?.frequencies,
-                            meshData: projectToShare?.meshData as MeshData,
-                            model: projectToShare?.model as CanvasState,
-                            modelS3: projectToShare?.modelS3,
-                            name: projectToShare?.name as string,
-                            owner: projectToShare?.owner as UsersState,
-                            parentFolder: projectToShare?.parentFolder as string,
-                            ports: projectToShare?.ports as (Port | Probe | TempLumped)[],
-                            screenshot: undefined,
-                            storage: projectToShare?.storage as "local" | "online",
-                            simulation: undefined,
-                            sharedWith: [
-                              ...(projectToShare?.sharedWith as sharingInfoUser[]),
-                              {
-                                userEmail: selected,
-                                read: true,
-                                write: true,
-                              } as sharingInfoUser,
-                            ],
-                          }
-                          execQuery(createSimulationProjectInFauna, newProject, dispatch).then((res: any) => {
-                            newProject = {
-                              ...newProject,
-                              faunaDocumentId: res.id
-                            } as Project;
-                          }).then(() => {
-                            setShowSearchUser(false);
-                            toast.success('Sharing Successful!!');
-                          })
-                            .catch((err) => {
-                              setShowSearchUser(false);
-                              toast.error(
-                                'Sharing Failed!! Please try again!',
-                              );
-                            });
-                          /* if (projectToShare) {
-                            dispatch(
-                              shareProject({
-                                projectToShare,
-                                user: {
-                                  userEmail: selected,
-                                  read: true,
-                                  write: true,
-                                },
-                              }),
-                            );
-                            execQuery(
-                              updateProjectInFauna,
-                              convertInFaunaProjectThis({
-                                ...projectToShare,
-                                sharedWith: [
-                                  ...(projectToShare.sharedWith as sharingInfoUser[]),
-                                  {
-                                    userEmail: selected,
-                                    read: true,
-                                    write: true,
-                                  } as sharingInfoUser,
-                                ],
-                              }),
-                            )
-                              .then(() => {
-                                setShowSearchUser(false);
-                                toast.success('Sharing Successful!!');
-                              })
-                              .catch((err) => {
-                                setShowSearchUser(false);
-                                toast.error(
-                                  'Sharing Failed!! Please try again!',
-                                );
-                              });
-                          } else  */if (folderToShare) {
-                            dispatch(
-                              shareFolder({
-                                folderToShare:
-                                  folderToShare.faunaDocumentId as string,
-                                user: {
-                                  userEmail: selected,
-                                  read: true,
-                                  write: true,
-                                },
-                              }),
-                            );
-                          }
+                          shareProject(projectToShare as Project, selected, setShowSearchUser)
                         }}
                       >
                         SHARE

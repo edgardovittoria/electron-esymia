@@ -26,7 +26,7 @@ export const Projects: React.FC<ProjectsProps> = ({  }) => {
   return (
     <div className="w-full py-2">
       <Tab.Group>
-        <Tab.List className="flex space-x-1 rounded-md bg-blue-900/20 p-1 mb-2 md:w-1/3">
+        {/* <Tab.List className="flex space-x-1 rounded-md bg-blue-900/20 p-1 mb-2 md:w-1/3">
           <Tab
             key="My Files"
             onClick={() =>
@@ -63,7 +63,7 @@ export const Projects: React.FC<ProjectsProps> = ({  }) => {
           >
             Shared With Me
           </Tab>
-        </Tab.List>
+        </Tab.List> */}
         <Tab.Panels>
           <Tab.Panel>
             <MyFiles
