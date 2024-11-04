@@ -8,25 +8,33 @@ import {
 } from '../../../../store/projectSlice';
 import MyFiles from './components/ProjectTabContent/MyFiles';
 import MySharedElements from './components/ProjectTabContent/MySharedElements';
-import { myFilesFolderID, mySharedElementsFolderID } from '../../../config/generalLabels';
+import {
+  myFilesFolderID,
+  mySharedElementsFolderID,
+} from '../../../config/generalLabels';
 
-interface ProjectsProps {
-}
+interface ProjectsProps {}
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-export const Projects: React.FC<ProjectsProps> = ({  }) => {
-
+export const Projects: React.FC<ProjectsProps> = ({}) => {
   const dispatch = useDispatch();
   const [showSearchUser, setShowSearchUser] = useState(false);
-  const [showCreateNewFolderModal, setShowCreateNewFolderModal] = useState(false);
+  const [showCreateNewFolderModal, setShowCreateNewFolderModal] =
+    useState(false);
 
   return (
-    <div className="w-full py-2">
-      <Tab.Group>
-        {/* <Tab.List className="flex space-x-1 rounded-md bg-blue-900/20 p-1 mb-2 md:w-1/3">
+    <div className="w-full py-2 h-[500px]">
+      <MyFiles
+        showCreateNewFolderModal={showCreateNewFolderModal}
+        setShowCreateNewFolderModal={setShowCreateNewFolderModal}
+        showSearchUser={showSearchUser}
+        setShowSearchUser={setShowSearchUser}
+      />
+      {/* <Tab.Group>
+        <Tab.List className="flex space-x-1 rounded-md bg-blue-900/20 p-1 mb-2 md:w-1/3">
           <Tab
             key="My Files"
             onClick={() =>
@@ -63,10 +71,10 @@ export const Projects: React.FC<ProjectsProps> = ({  }) => {
           >
             Shared With Me
           </Tab>
-        </Tab.List> */}
+        </Tab.List>
         <Tab.Panels>
           <Tab.Panel>
-            <MyFiles
+          <MyFiles
               showCreateNewFolderModal={showCreateNewFolderModal}
               setShowCreateNewFolderModal={setShowCreateNewFolderModal}
               showSearchUser={showSearchUser}
@@ -80,7 +88,7 @@ export const Projects: React.FC<ProjectsProps> = ({  }) => {
             />
           </Tab.Panel>
         </Tab.Panels>
-      </Tab.Group>
+      </Tab.Group> */}
     </div>
   );
 };

@@ -31,6 +31,7 @@ import {
   AWSExternalGridsDataSelector,
   meshVisualizationSelector,
   setMeshVisualization,
+  ThemeSelector,
   unsetAWSExternalGridsData,
 } from '../../../../store/tabsAndMenuItemsSlice';
 import { LiaFeatherSolid, LiaWeightHangingSolid } from 'react-icons/lia';
@@ -58,6 +59,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const [cloning, setcloning] = useState<boolean>(false)
   const selectedProject = useSelector(selectedProjectSelector)
   const selectedFolder = useSelector(SelectedFolderSelector)
+  const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch();
   const [resetFocus, setResetFocus] = useState(false);
   const [spinner, setSpinner] = useState<boolean>(false);
@@ -210,12 +212,12 @@ export const Simulator: React.FC<SimulatorProps> = ({
         setResetFocus={toggleResetFocus}
       />
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
-      <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+      <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
         <div
           className={`p-2 tooltip rounded-t tooltip-right ${
             selectedTabLeftPanel === simulatorLeftPanelTitle.first
-              ? 'text-white bg-primaryColor'
-              : 'text-primaryColor bg-white'
+              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
+              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
           }`}
           data-tip="Modeler"
           onClick={() => {
@@ -232,8 +234,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
         <div
           className={`p-2 tooltip rounded-b tooltip-right ${
             selectedTabLeftPanel === simulatorLeftPanelTitle.second
-              ? 'text-white bg-primaryColor'
-              : 'text-primaryColor bg-white'
+              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
+              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
           }`}
           data-tip="Materials"
           onClick={() => {
@@ -275,7 +277,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
         sidebarItemSelected={sidebarItemSelected}
         setSelectedTabLeftPanel={setSelectedTabLeftPanel}
       />
-      <div className="absolute left-[2%] top-[370px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+      <div className={`absolute left-[2%] top-[370px] rounded max-h-[500px] flex flex-col items-center gap-0 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}>
         <button
           disabled={selectedProject && selectedProject.simulation && selectedProject.simulation.status === "Running"}
           className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}

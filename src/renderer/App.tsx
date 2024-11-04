@@ -21,7 +21,7 @@ import {
   publishMessage,
 } from './middleware/stompMiddleware';
 import { ImSpinner } from 'react-icons/im';
-import { brokerConnectedSelector } from './esymia/store/tabsAndMenuItemsSlice';
+import { brokerConnectedSelector, setTheme, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
 import { useDemoMode } from './useDemoMode';
 import { MesherStatusSelector, SolverStatusSelector } from './esymia/store/pluginsSlice';
 
@@ -38,6 +38,10 @@ export default function App() {
   const mesherStatus = useSelector(MesherStatusSelector)
   const solverStatus = useSelector(SolverStatusSelector)
   const [logout, setLogout] = useState(false)
+  const theme = useSelector(ThemeSelector)
+  useEffect(() => {
+    console.log(theme)
+  }, [theme])
   // const [brokerActive, setBrokerActive] = useState<boolean>(false);
   // const [progressBarValue, setProgressBarValue] = useState<number>(0)
 
@@ -68,10 +72,10 @@ export default function App() {
   //   })
   // });
 
-  if(process.env.APP_MODE !== "test"){
+  if (process.env.APP_MODE !== "test") {
     window.electron.ipcRenderer.on('checkLogout', (arg) => {
-      if((arg as string) == 'allowed'){
-        if(mesherStatus != 'idle'){
+      if ((arg as string) == 'allowed') {
+        if (mesherStatus != 'idle') {
           dispatch(
             publishMessage({
               queue: 'management',
@@ -79,7 +83,7 @@ export default function App() {
             }),
           );
         }
-        if(solverStatus != 'idle'){
+        if (solverStatus != 'idle') {
           dispatch(
             publishMessage({
               queue: 'management_solver',
@@ -94,7 +98,7 @@ export default function App() {
 
 
   useEffect(() => {
-    if(logout && process.env.APP_MODE !== "test"){
+    if (logout && process.env.APP_MODE !== "test") {
       window.electron.ipcRenderer.sendMessage('logout', [
         process.env.REACT_APP_AUTH0_DOMAIN,
       ]);
@@ -137,7 +141,7 @@ export default function App() {
 
 
   return (
-    <>
+    <div className={theme==='dark' ? 'bg-bgColorDark' :'bg-bgColor'}>
       {/* {dockerInstallationBox && allowedUser && ( */}
       {dockerInstallationBox && (
         <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
@@ -168,13 +172,13 @@ export default function App() {
               <div className="flex flex-row items-center justify-center">
                 <div
                   role="tablist"
-                  className="tabs tabs-bordered w-full justify-center h-[3vh]"
+                  className={`tabs tabs-bordered w-full justify-center h-[3vh]`}
                 >
                   <input
                     type="radio"
                     name="dashboard"
                     role="tab"
-                    className={`tab`}
+                    className={`tab ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} ${theme === 'dark' && tabsSelected === 'home' ? 'border-textColorDark' : 'border-gray-400 border-opacity-35'}`}
                     aria-label="Home"
                     checked={tabsSelected === 'home'}
                     onClick={() => setTabsSelected('home')}
@@ -183,7 +187,7 @@ export default function App() {
                     type="radio"
                     name="cadmia"
                     role="tab"
-                    className={`tab`}
+                    className={`tab ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} ${theme === 'dark' && tabsSelected === 'cadmia' ? 'border-textColorDark' : 'border-gray-400 border-opacity-35'}`}
                     aria-label="CADmIA"
                     checked={tabsSelected === 'cadmia'}
                     disabled={!user}
@@ -193,7 +197,7 @@ export default function App() {
                     type="radio"
                     name="esymia"
                     role="tab"
-                    className={`tab`}
+                    className={`tab ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} ${theme === 'dark' && tabsSelected === 'esymia' ? 'border-textColorDark' : 'border-gray-400 border-opacity-35'}`}
                     aria-label="ESymIA"
                     checked={tabsSelected === 'esymia'}
                     disabled={!user}
@@ -205,7 +209,7 @@ export default function App() {
                     {/* <span className='absolute top-0 left-0 text-center p-1 border-b-2 border-r-2 border-secondaryColor rounded-br-xl bg-white font-bold text-sm'>DEMO: {remainingDemoDays} days remaining</span> */}
                     <FaUser
                       id="profileIcon"
-                      className="w-[20px] h-[20px] mr-4 text-black hover:opacity-40 hover:cursor-pointer"
+                      className={`w-[20px] h-[20px] mr-4 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} hover:opacity-40 hover:cursor-pointer`}
                       onClick={() => {
                         setUserDropdownVisibility(!userDropdownVisibility);
                       }}
@@ -214,20 +218,51 @@ export default function App() {
                       style={{
                         display: !userDropdownVisibility ? 'none' : 'block',
                       }}
-                      className="px-4 py-2 bg-white rounded list-none absolute right-[10px] mt-[20px] w-max shadow z-[10000]"
+                      className={`px-4 py-2 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} rounded list-none absolute right-[10px] mt-[20px] w-max shadow z-[10000]`}
                     >
-                      <li className="font-bold text-lg text-black">
+                      <li className="font-bold text-lg">
                         {user.nickname}
                       </li>
                       <hr className="mb-3" />
-                      <div className="flex items-center p-[5px] hover:bg-black hover:text-white hover:cursor-pointer">
-                        <GiSettingsKnobs className="w-[20px] h-[20px] mr-[10px]" />
-                        <li>Settings</li>
-                      </div>
+                      <label className="flex cursor-pointer gap-2 mb-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="5" />
+                          <path
+                            d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
+                        </svg>
+                        <input type="checkbox" value={theme} className="toggle toggle-sm theme-controller" onChange={() => {
+                          if(theme === 'light'){
+                            dispatch(setTheme('dark'))
+                          }else{
+                            dispatch(setTheme('light'))
+                          }
+                        }}/>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round">
+                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                      </label>
                       <div
                         className="flex items-center p-[5px] hover:bg-black hover:text-white hover:cursor-pointer"
                         onClick={() => {
-                          if(process.env.APP_MODE !== 'test'){
+                          if (process.env.APP_MODE !== 'test') {
                             window.electron.ipcRenderer.sendMessage('checkLogout');
                             //closeUserSessionOnFauna()
                           }
@@ -283,6 +318,6 @@ export default function App() {
           )}
         </>
       )}
-    </>
+    </div>
   );
 }

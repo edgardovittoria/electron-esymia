@@ -32,6 +32,7 @@ import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
 import { useStorageData } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../cad_library';
+import { ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
 
 interface DroppableAndDraggableFolderProps {
   folder: Folder;
@@ -47,7 +48,8 @@ export const DroppableAndDraggableFolder: React.FC<
   const selectedFolder = useSelector(SelectedFolderSelector) as Folder;
   const allProjectFolders = useSelector(allProjectFoldersSelector);
   const user = useSelector(usersStateSelector);
-  const {deleteProject} = useStorageData()
+  const theme = useSelector(ThemeSelector)
+  const { deleteProject } = useStorageData()
   const [showRename, setShowRename] = useState(false);
   const [showSearchUser, setShowSearchUser] = useState(false);
 
@@ -156,7 +158,7 @@ export const DroppableAndDraggableFolder: React.FC<
   return (
     <>
       <div
-        className="flex items-center py-[5px] px-[10px] border-2 border-gray-300 mt-[10px] rounded-lg hover:cursor-pointer hover:border-gray-600 w-full"
+        className={`flex items-center py-[5px] px-[10px] border-2 ${theme === 'light' ? 'text-textColor bg-white border-gray-300 hover:border-gray-600' : 'text-textColorDark bg-bgColorDark hover:border-secondaryColorDark'}  rounded-lg hover:cursor-pointer w-full`}
         ref={(ref) => {
           drag(drop(ref));
         }}
@@ -173,8 +175,14 @@ export const DroppableAndDraggableFolder: React.FC<
           dispatch(selectFolder(folder.faunaDocumentId as string));
         }}
       >
-        <IoMdFolder className="mr-2 w-[35px] h-[35px] text-gray-500" />
-        <span className="font-bold text-base text-gray-500">{folder.name}</span>
+        <IoMdFolder className={`mr-2 w-[35px] h-[35px] ${theme === 'light' ? 'text-gray-500' : 'text-textColorDark'}`} />
+        <div className="tooltip tooltip-right" data-tip={folder.name}>
+          <span className={`font-bold text-base ${theme === 'light' ? 'text-gray-500' : 'text-textColorDark'}`}>
+            {folder.name.length > 25
+              ? `${folder.name.substring(0, 25)}...`
+              : folder.name}
+          </span>
+        </div>
         {folder.owner.email === user.email && (
           <Menu id={folder.name}>
             <Submenu
@@ -255,7 +263,7 @@ export const DroppableAndDraggableFolder: React.FC<
                   folder.parent,
                   dispatch
                 );
-                takeAllProjectsInArrayOf([folder]).forEach(p => {deleteProject(p)})
+                takeAllProjectsInArrayOf([folder]).forEach(p => { deleteProject(p) })
                 dispatch(removeFolder(folder));
                 hideAll();
               }}
@@ -267,19 +275,22 @@ export const DroppableAndDraggableFolder: React.FC<
             </Item>
           </Menu>
         )}
-      </div>
+      </div >
       {showRename && (
         <RenameFolder
           folderToRename={folder}
           handleClose={() => setShowRename(false)}
         />
-      )}
-      {showSearchUser && (
-        <SearchUserAndShare
-          setShowSearchUser={setShowSearchUser}
-          folderToShare={folder}
-        />
-      )}
+      )
+      }
+      {
+        showSearchUser && (
+          <SearchUserAndShare
+            setShowSearchUser={setShowSearchUser}
+            folderToShare={folder}
+          />
+        )
+      }
     </>
   );
 };

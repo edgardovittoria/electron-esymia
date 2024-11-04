@@ -18,6 +18,7 @@ import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunct
 import { Project } from "../../../../model/esymiaModels";
 import { setPortsFromS3 } from '../physics/Physics';
 import { setResultsFromS3 } from "../results/Results";
+import { ThemeSelector } from "../../../../store/tabsAndMenuItemsSlice";
 
 interface CanvasModelerProps  {
   setShowModalLoadFromDB: (v: boolean) => void
@@ -25,6 +26,7 @@ interface CanvasModelerProps  {
 
 export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFromDB}) => {
   const selectedProject = useSelector(selectedProjectSelector);
+  const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch()
   const { execQuery } = useFaunaQuery()
 
@@ -41,6 +43,7 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFro
       setResultsFromS3(selectedProject, dispatch)
     }
   }, [])
+
 
   return (
     <div className="flex justify-center">
@@ -93,7 +96,7 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFro
       ) : (
         <div className="absolute top-1/2 flex justify-center gap-4">
           <ImportCadProjectButton
-            className="button buttonPrimary flex items-center"
+            className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} flex items-center`}
             importAction={(importActionParamsObject) => {
               dispatch(importModel(importActionParamsObject))
               dispatch(setModelUnit(importActionParamsObject.unit))
@@ -119,7 +122,7 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFro
           </ImportCadProjectButton>
           <span className="border-start border-dark"/>
           <button
-            className="button buttonPrimary flex items-center"
+            className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} flex items-center`}
             onClick={() => setShowModalLoadFromDB(true)}>
             <GiCubeforce
               style={{width: "25px", height: "25px", marginRight: "5px"}}

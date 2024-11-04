@@ -103,6 +103,9 @@ export const ProjectSlice = createSlice({
       let selectedFolder = folderByID(state, project?.parentFolder);
       if (project && selectedFolder) {
         project.name = action.payload.name;
+        if(project.simulation && project.simulation.name){
+          project.simulation.name = `${action.payload.name} - sim`
+        }
         selectedFolder.projectList = selectedFolder.projectList.filter(p => p.faunaDocumentId !== project?.faunaDocumentId);
         selectedFolder.projectList.push(project);
       }

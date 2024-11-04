@@ -9,7 +9,8 @@ import {
   closeProjectTab,
   projectsTabsSelector,
   selectTab, setShowCreateNewProjectModal,
-  tabSelectedSelector
+  tabSelectedSelector,
+  ThemeSelector
 } from '../store/tabsAndMenuItemsSlice';
 import { BsPlugin } from 'react-icons/bs';
 import { VscServerProcess } from 'react-icons/vsc';
@@ -27,6 +28,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
   const projectsTabs = useSelector(projectsTabsSelector);
   const dispatch = useDispatch();
   const selectedFolder = useSelector(SelectedFolderSelector)
+  const theme = useSelector(ThemeSelector)
 
   const { loginWithPopup, isAuthenticated, loginWithRedirect } = useAuth0();
   const activePlugins = useSelector(ActivePluginsSelector)
@@ -35,7 +37,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
     <>
       <SetUserInfo />
       <div className="grid grid-cols-12 px-8 pt-6 items-center">
-        <span className="xl:col-span-1 sm:col-span-2 col-span-3 text-secondaryColor text-2xl font-semibold mr-4 ml-4 flex justify-center">
+        <span className={`xl:col-span-1 sm:col-span-2 col-span-3 ${theme === 'light' ? 'text-secondaryColor' : 'text-secondaryColorDark'} text-2xl font-semibold mr-4 ml-4 flex justify-center`}>
           ESimIA
         </span>
         <ul className="flex xl:col-span-9 sm:col-span-7 col-span-7 flex-row gap-1 pl-0 mb-0 overflow-auto w-full">
@@ -43,15 +45,15 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
             data-testid="dashboard"
             className={
               tabSelected === 'DASHBOARD'
-                ? `px-3 py-3 bg-white rounded-t text-black flex justify-between items-center gap-2`
-                : `bg-[#dadada] rounded-t flex items-center px-3 py-3 hover:cursor-pointer`
+                ? `px-3 py-3 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} rounded-t flex justify-between items-center gap-2`
+                : `${theme === 'light' ? 'bg-white text-textColor opacity-60' : 'bg-bgColorDark2 text-textColorDark opacity-60'} rounded-t flex items-center px-3 py-3 hover:cursor-pointer`
             }
             onClick={() => {
               dispatch(selectTab('DASHBOARD'));
               dispatch(selectProject(undefined));
             }}
           >
-            <MdOutlineDashboard size={20} className="text-secondaryColor" />
+            <MdOutlineDashboard size={20} />
             {tabSelected === 'DASHBOARD' && (
               <span className="font-bold text-sm">Dashboard</span>
             )}
@@ -60,19 +62,19 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
             return (
               <li
                 key={projectTab.faunaDocumentId}
-                className="bg-[#dadada] rounded-t"
+                className={`${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} rounded-t`}
               >
                 <div
                   className={
                     tabSelected === projectTab.faunaDocumentId
-                      ? 'px-3 py-3 bg-white flex items-center rounded-t'
-                      : 'px-3 py-3 flex items-center'
+                      ? `px-3 py-3 ${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} flex items-center rounded-t`
+                      : `px-3 py-3 ${theme === 'light' ? 'bg-white opacity-60' : 'bg-bgColorDark2 opacity-60'} flex items-center`
                   }
                 >
                   <div
                     className={
                       tabSelected === projectTab.faunaDocumentId
-                        ? 'text-black font-bold text-sm'
+                        ? `${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} font-bold text-sm`
                         : 'text-gray-400 hover:cursor-pointer text-sm'
                     }
                     aria-current="page"
@@ -108,7 +110,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
         <div className="flex flex-row items-center justify-end xl:col-span-2 sm:col-span-3 col-span-4 ">
           {isAuthenticated ? (
             <>
-              <div className="px-3 py-1 mb-[-2px] bg-white rounded-t list-none mr-10 hover:bg-secondaryColor hover:text-white hover:cursor-pointer z-[1000]"
+              <div className={`px-3 py-1 mb-[-2px] ${theme === 'light' ? 'bg-white hover:bg-secondaryColor text-textColor' : 'bg-bgColorDark2 text-textColorDark'} rounded-t list-none mr-10 hover:text-white hover:cursor-pointer z-[1000]`}
                 onClick={() => {
                   if(activePlugins.filter(p => p === "serverGUI").length === 0) {
                     dispatch(addActivePlugin("serverGUI"))

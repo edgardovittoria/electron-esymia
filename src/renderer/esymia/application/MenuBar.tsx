@@ -8,6 +8,7 @@ import {
   menuItemsSelector,
   selectedMenuItemSelector,
   selectMenuItem,
+  ThemeSelector,
 } from '../store/tabsAndMenuItemsSlice';
 import { GrClone } from 'react-icons/gr';
 import {
@@ -24,13 +25,14 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
   const dispatch = useDispatch();
   const menuItems = useSelector(menuItemsSelector);
   const menuItemSelected = useSelector(selectedMenuItemSelector);
+  const theme = useSelector(ThemeSelector)
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedFolder = useSelector(SelectedFolderSelector)
   const { cloneProject } = useStorageData()
   const [cloning, setcloning] = useState<boolean>(false)
   return (
     <div className="w-full px-10">
-      <div className="bg-white px-4 py-2 flex flex-row justify-between items-center rounded-xl">
+      <div className={`${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'}  px-4 py-2 flex flex-row justify-between items-center rounded-xl`}>
         <ul className="relative flex items-center">
           {(menuItems as string[]).map((item) => (
             <li
@@ -86,7 +88,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
                   data-testid={item}
                   className={
                     menuItemSelected === item
-                      ? 'text-black no-underline px-4 py-3 text-sm'
+                      ? `${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} no-underline px-4 py-2 text-sm`
                       : 'no-underline px-4 py-3 text-gray-400 text-sm'
                   }
                 >
@@ -96,7 +98,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
                 <span
                   className={
                     menuItemSelected === item
-                      ? 'text-black no-underline px-4 text-[11px]'
+                      ? `${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} no-underline px-4 text-[11px]`
                       : 'no-underline px-4 text-gray-400 text-[11px]'
                   }
                 >
@@ -104,7 +106,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
                 </span>
               )}
               {menuItemSelected === item && (
-                <hr className="w-2/3 border border-secondaryColor" />
+                <hr className={`w-2/3 border ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'} border-secondaryColor`} />
               )}
             </li>
           ))}

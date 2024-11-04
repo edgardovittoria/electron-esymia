@@ -32,6 +32,7 @@ import {
   comeBackToModelerMessage,
 } from '../../../config/textMessages';
 import { CircleGeometryAttributes, ComponentEntity, FactoryShapes, TransformationParams } from '../../../../../cad_library';
+import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 
 interface CanvasPhysicsProps {
   setCameraPosition: Function;
@@ -51,6 +52,7 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
   const selectedPort = findSelectedPort(selectedProject);
+  const theme = useSelector(ThemeSelector)
   const mesh = useRef<THREE.Mesh[]>([]);
   const [pointerEvent, setPointerEvent] = useState<
     ThreeEvent<MouseEvent> | undefined
@@ -168,7 +170,7 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
         </ReactReduxContext.Consumer>
       ) : (
         <div className="absolute top-1/2">
-          <span className={alertMessageStyle}>{comeBackToModelerMessage}</span>
+          <span className={`${alertMessageStyle} ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>{comeBackToModelerMessage}</span>
         </div>
       )}
     </div>

@@ -24,7 +24,7 @@ import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { savePortsOnS3 } from './savePortsOnS3';
-import { isConfirmedInfoModalSelector, setIsAlertInfoModal, setMessageInfoModal, setShowInfoModal } from '../../../../store/tabsAndMenuItemsSlice';
+import { isConfirmedInfoModalSelector, setIsAlertInfoModal, setMessageInfoModal, setShowInfoModal, ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 
 interface PhysicsLeftPanelTabProps {}
 
@@ -82,6 +82,8 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
       }
     }
   }, [isConfirmedInfoModal, deleteAllType])
+
+  const theme = useSelector(ThemeSelector)
 
 
   return (
@@ -148,8 +150,8 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                     key={port.name}
                     className={
                       port.isSelected
-                        ? 'mt-[5px] rounded bg-gray-200 hover:bg-gray-200 hover:cursor-pointer hover:rounded'
-                        : 'mt-[5px] hover:bg-gray-200 hover:cursor-pointer hover:rounded'
+                        ? `mt-[5px] rounded ${theme === 'light' ? 'bg-gray-200 hover:bg-gray-200' : 'bg-bgColorDark hover:bg-bgColorDark'} hover:cursor-pointer hover:rounded`
+                        : `mt-[5px] ${theme === 'light' ? 'hover:bg-gray-200' : 'hover:bg-bgColorDark'} hover:cursor-pointer hover:rounded`
                     }
                     onClick={() => {
                       dispatch(selectPort(port.name));
@@ -187,8 +189,8 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                               id="modalRename"
                               className="modal-toggle"
                             />
-                            <div className="modal">
-                              <div className="modal-box">
+                            <div className={`modal`}>
+                              <div className={`modal-box ${theme === 'light' ? '' : 'bg-bgColorDark2 text-textColorDark'}`}>
                                 <h3 className="font-bold text-lg">
                                   Rename Port
                                 </h3>
@@ -197,7 +199,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                                     debounceTimeout={500}
                                     type="text"
                                     placeholder="Type here"
-                                    className="input input-bordered w-full max-w-xs"
+                                    className={`input input-bordered w-full max-w-xs ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'}`}
                                     value={portRename}
                                     onChange={(e) =>
                                       setPortRename(e.target.value)

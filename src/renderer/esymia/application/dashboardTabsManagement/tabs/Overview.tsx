@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AiFillUnlock } from 'react-icons/ai';
 import { Simulations } from './Simulations';
 import { projectsSelector } from '../../../store/projectSlice';
-import { addProjectTab, setShowCreateNewProjectModal } from '../../../store/tabsAndMenuItemsSlice';
+import { addProjectTab, setShowCreateNewProjectModal, ThemeSelector } from '../../../store/tabsAndMenuItemsSlice';
 import { setModelInfoFromS3 } from './shared/utilFunctions';
 import noProjectsIcon2 from '../../../../../../assets/noProjectsIcon2.png';
 import noResultsIconForProject from '../../../../../../assets/noResultsIconForProject.png';

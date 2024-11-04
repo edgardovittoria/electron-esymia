@@ -23,10 +23,12 @@ import { RenameProject } from './RenameProject';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
 import {
   addProjectTab,
+  ThemeSelector,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { Folder, MeshData, Port, Probe, Project, sharingInfoUser, TempLumped } from '../../../../../../model/esymiaModels';
 import { setModelInfoFromS3 } from '../../../shared/utilFunctions';
 import noResultsIconForProject from '../../../../../../../../../assets/noResultsIconForProject.png';
+import noResultsIconForProjectDark from '../../../../../../../../../assets/noResultsIconForProjectDark.png';
 import {
   useStorageData
 } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
@@ -48,6 +50,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
   const selectedFolder = useSelector(SelectedFolderSelector) as Folder;
   const allProjectFolders = useSelector(allProjectFoldersSelector);
   const user = useSelector(usersStateSelector);
+  const theme = useSelector(ThemeSelector)
   const [showRename, setShowRename] = useState(false);
   const [showSearchUser, setShowSearchUser] = useState(false);
   const { cloneProject } = useStorageData()
@@ -81,7 +84,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
     <>
       {cloning && <ImSpinner className='animate-spin w-8 h-8 absolute top-1/2 right-1/2 z-100'/>}
       <div
-        className="flex flex-col border-2 relative border-green-200 rounded-lg hover:cursor-pointer hover:border-secondaryColor shadow-xl"
+        className={`flex flex-col border-2 relative ${theme === 'light' ? 'text-textColor border-green-200 hover:border-secondaryColor' : 'text-textColorDark bg-bgColorDark border-textColorDark hover:border-secondaryColorDark'}  rounded-lg hover:cursor-pointer`}
         key={project.name}
         data-testid={project.name}
         data-tip={project.name}
@@ -95,7 +98,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
         style={{ opacity: isDragging ? 0.5 : 1 }}
         onContextMenu={handleContextMenu}
       >
-        {project.shared && <div className="badge badge-neutral absolute bottom-[-10px] right-1/2  translate-x-1/2">shared</div>}
+        {project.shared && <div className={`badge ${theme === 'light' ? 'badge-neutral' : 'bg-secondaryColorDark'}  absolute bottom-[-10px] right-1/2  translate-x-1/2`}>shared</div>}
         <div className="tooltip tooltip-bottom" data-tip={project.name}>
           <h5 className="text-center text-base" role="Handle" ref={dragPreview}>
             {project.name.length > 15
@@ -104,13 +107,19 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
           </h5>
         </div>
         <div>
+          {theme === 'light' ?
           <img
+          className="w-[60%] md:w-[80%] mx-auto"
+          alt="project_screenshot"
+          src={noResultsIconForProject}
+        /> :
+        <img
             className="w-[60%] md:w-[80%] mx-auto"
             alt="project_screenshot"
-            src={
-              project.screenshot ? project.screenshot : noResultsIconForProject
-            }
+            src={noResultsIconForProjectDark}
           />
+        }
+
         </div>
 
         {/* <div>

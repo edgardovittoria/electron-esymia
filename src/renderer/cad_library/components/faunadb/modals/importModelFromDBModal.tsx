@@ -2,13 +2,14 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Dialog, Transition } from '@headlessui/react';
 import { FC, useEffect, useState, Fragment } from 'react';
 import toast from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ImportActionParamsObject } from '../../importFunctions/importFunctions';
 import { FaunaCadModel, getModelsByOwner } from '../api/modelsAPIs';
 import { ComponentEntity } from '../../model/componentEntity/componentEntity';
 import AWS from 'aws-sdk';
 import { useFaunaQuery } from '../../../../esymia/faunadb/hook/useFaunaQuery';
 import { CheckIcon } from '@heroicons/react/20/solid';
+import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
 
 export const ImportModelFromDBModal: FC<{
   showModalLoad: Function;
@@ -31,6 +32,7 @@ export const ImportModelFromDBModal: FC<{
   const { user } = useAuth0();
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
+  const theme = useSelector(ThemeSelector)
 
   useEffect(() => {
     user !== undefined &&
@@ -103,10 +105,10 @@ export const ImportModelFromDBModal: FC<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className={`w-full max-w-lg transform overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2 text-textColorDark'} p-6 text-left align-middle shadow-xl transition-all`}>
                 <Dialog.Title
                   as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
+                  className={`text-lg font-medium leading-6 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}
                 >
                   Select model to load
                 </Dialog.Title>
@@ -144,14 +146,14 @@ export const ImportModelFromDBModal: FC<{
                 <div className="mt-4 flex justify-between">
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className={`inline-flex justify-center rounded-md border border-transparent ${theme === 'light' ? 'bg-blue-100 text-blue-900' : 'bg-secondaryColorDark text-textColor'} px-4 py-2 text-sm font-medium  hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2`}
                     onClick={() => showModalLoad(false)}
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className={`inline-flex justify-center rounded-md border border-transparent ${theme === 'light' ? 'bg-blue-100 text-blue-900' : 'bg-secondaryColorDark text-textColor'} px-4 py-2 text-sm font-medium hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2`}
                     onClick={
                       selectedModel === undefined
                         ? () => {

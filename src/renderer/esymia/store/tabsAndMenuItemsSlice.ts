@@ -46,7 +46,8 @@ type TabsAndMenuItemsState = {
   solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number, error?:any }[],
   SolverResultsS3?: string,
   externalGrids?: any
-  brokerConnected: boolean
+  brokerConnected: boolean,
+  theme: 'light' | 'dark'
 }
 
 export const TabsAndMenuItemsSlice = createSlice({
@@ -71,7 +72,8 @@ export const TabsAndMenuItemsSlice = createSlice({
     iterations: [],
     meshAdvice: [],
     solverResults: [],
-    brokerConnected: false
+    brokerConnected: false,
+    theme: 'light'
   } as TabsAndMenuItemsState,
   reducers: {
     selectTab(state: TabsAndMenuItemsState, action: PayloadAction<string>) {
@@ -195,6 +197,9 @@ export const TabsAndMenuItemsSlice = createSlice({
     },
     unsetBrokerConnected(state: TabsAndMenuItemsState){
       state.brokerConnected = false
+    },
+    setTheme(state: TabsAndMenuItemsState, action: PayloadAction<'light' | 'dark'>){
+      state.theme = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -241,7 +246,8 @@ export const {
   setBrokerConnected,
   unsetBrokerConnected,
   setAWSExternalGridsData,
-  unsetAWSExternalGridsData
+  unsetAWSExternalGridsData,
+  setTheme
 } = TabsAndMenuItemsSlice.actions;
 
 
@@ -352,3 +358,7 @@ export const brokerConnectedSelector = (state: {
 export const AWSExternalGridsDataSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState
 }) => state.tabsAndMenuItems.externalGrids;
+
+export const ThemeSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.theme;

@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Dialog, Transition } from '@headlessui/react';
 import { setPortType } from '../../../../../store/projectSlice';
 import { Port, Probe } from '../../../../../model/esymiaModels';
@@ -8,6 +8,12 @@ import portType2 from '../../../../../../../../assets/portType2.png';
 import portType3 from '../../../../../../../../assets/portType3.png';
 import portType4 from '../../../../../../../../assets/portType4.png';
 import portType5 from '../../../../../../../../assets/portType5.png';
+import portType1Dark from '../../../../../../../../assets/portType1Dark.png';
+import portType2Dark from '../../../../../../../../assets/portType2Dark.png';
+import portType3Dark from '../../../../../../../../assets/portType3Dark.png';
+import portType4Dark from '../../../../../../../../assets/portType4Dark.png';
+import portType5Dark from '../../../../../../../../assets/portType5Dark.png';
+import { ThemeSelector } from '../../../../../store/tabsAndMenuItemsSlice';
 
 interface ModalSelectPortTypeProps {
   show: boolean;
@@ -23,6 +29,7 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
   setSavedPortParameters,
 }) => {
   const dispatch = useDispatch();
+  const theme = useSelector(ThemeSelector)
 
   return (
     <Transition appear show={show} as={Fragment}>
@@ -50,17 +57,17 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-[800px] h-[450px] mt-14 transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className={`w-full max-w-[800px] h-[450px] mt-14 transform overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-6 text-left align-middle shadow-xl transition-all`}>
                 <Dialog.Title
                   as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
+                  className={`text-lg font-medium leading-6`}
                 >
                   SELECT PORT TYPE
                 </Dialog.Title>
                 <hr className="mt-2 mb-3" />
                 <div className="flex">
                   <div
-                    className="w-1/3 text-center hover:bg-green-100"
+                    className={`w-1/3 text-center ${theme === 'light' ? 'hover:ng-green-100' : 'hover:bg-bgColorDark'}`}
                     onClick={() => {
                       dispatch(
                         setPortType({ name: selectedPort.name, type: 1 }),
@@ -69,11 +76,11 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
                       setShow(false);
                     }}
                   >
-                    <img src={portType1} className="mx-auto" alt="img" />
+                    <img src={theme === 'light' ? portType1 : portType1Dark} className="mx-auto" alt="img" />
                     <div>Type 1</div>
                   </div>
                   <div
-                    className="w-1/3 text-center hover:bg-green-100"
+                    className={`w-1/3 text-center ${theme === 'light' ? 'hover:ng-green-100' : 'hover:bg-bgColorDark'}`}
                     onClick={() => {
                       dispatch(
                         setPortType({ name: selectedPort.name, type: 2 }),
@@ -82,11 +89,11 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
                       setShow(false);
                     }}
                   >
-                    <img src={portType2} className="mx-auto" alt="img" />
+                    <img src={theme === 'light' ? portType2 : portType2Dark} className="mx-auto" alt="img" />
                     <div>Type 2</div>
                   </div>
                   <div
-                    className="w-1/3 text-center hover:bg-green-100"
+                    className={`w-1/3 text-center ${theme === 'light' ? 'hover:ng-green-100' : 'hover:bg-bgColorDark'}`}
                     onClick={() => {
                       dispatch(
                         setPortType({ name: selectedPort.name, type: 3 }),
@@ -95,13 +102,13 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
                       setShow(false);
                     }}
                   >
-                    <img src={portType3} className="mx-auto" alt="img" />
+                    <img src={theme === 'light' ? portType3 : portType3Dark} className="mx-auto" alt="img" />
                     <div>Type 3</div>
                   </div>
                 </div>
                 <div className="flex items-baseline">
                   <div
-                    className="w-1/2 text-center hover:bg-green-100"
+                    className={`w-1/2 text-center ${theme === 'light' ? 'hover:ng-green-100' : 'hover:bg-bgColorDark'}`}
                     onClick={() => {
                       dispatch(
                         setPortType({ name: selectedPort.name, type: 4 }),
@@ -110,11 +117,11 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
                       setShow(false);
                     }}
                   >
-                    <img src={portType4} className="mx-auto" alt="img" />
+                    <img src={theme === 'light' ? portType4 : portType4Dark} className="mx-auto" alt="img" />
                     <div>Type 4</div>
                   </div>
                   <div
-                    className="w-1/2 text-center hover:bg-green-100"
+                    className={`w-1/2 text-center ${theme === 'light' ? 'hover:ng-green-100' : 'hover:bg-bgColorDark'}`}
                     onClick={() => {
                       dispatch(
                         setPortType({ name: selectedPort.name, type: 5 }),
@@ -123,7 +130,7 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
                       setShow(false);
                     }}
                   >
-                    <img src={portType5} className="mx-auto" alt="img" />
+                    <img src={theme === 'light' ? portType5 : portType5Dark} className="mx-auto" alt="img" />
                     <div>Type 5</div>
                   </div>
                 </div>

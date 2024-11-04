@@ -25,6 +25,7 @@ import saveAs from 'file-saver';
 import { jsonToCSV } from 'react-papaparse';
 import { BsFiletypeCsv } from 'react-icons/bs';
 import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
+import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 
 export const ImportExportPhysicsSetup: FC<{}> = () => {
   const selectedProject = useSelector(selectedProjectSelector) as Project;
@@ -126,6 +127,7 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
   className
 }) => {
   const selectedProject = useSelector(selectedProjectSelector)
+  const theme = useSelector(ThemeSelector)
   let ports = selectedProject?.ports.filter(p => p.category === 'port') as Port[]
   let lumped = selectedProject?.ports.filter(p => p.category === 'lumped') as TempLumped[]
   let probe = selectedProject?.ports.filter(p => p.category === 'probe') as Probe[]
@@ -136,7 +138,7 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
       className={
         className
           ? className
-          : 'rounded bg-white text-black capitalize px-3 flex flex-row gap-2 items-center max-h-8'
+          : `rounded ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} capitalize px-3 flex flex-row gap-2 items-center max-h-8`
       }
       onClick={() => {
         const zip = new JSZip();

@@ -19,6 +19,7 @@ import MySharedProject from './components/mySharedProjects/MySharedProject';
 import { useFaunaQuery } from '../../esymia/faunadb/hook/useFaunaQuery';
 import { Client, fql, QuerySuccess } from 'fauna';
 import { FaunaCadModel, resetState } from '../../cad_library';
+import { ThemeSelector } from '../../esymia/store/tabsAndMenuItemsSlice';
 
 const getModelsByOwner = async (faunaClient: Client, faunaQuery: typeof fql, owner_id: string) => {
   try {
@@ -62,6 +63,7 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
   // const [models, setModels] = useState<FaunaCadModel[]>([]);
   const models = useSelector(ModelsSelector);
   const shardeModels = useSelector(SharedModelsSelector);
+  const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch();
   const deleteModel = (model: FaunaCadModel) => {
     // setModels(models.filter((m) => m.id !== model.id));
@@ -90,15 +92,15 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
   }, [user, showCad, selectedMenuItem]);
 
   return (
-    <div className='flex flex-row'>
+    <div className='flex flex-col'>
       <Navbar
         selectedMenuItem={selectedMenuItem}
         setSelectedMenuItem={setSelectedMenuItem}
       />
       {user && (
-        <div className='w-full h-[97vh] flex items-start pt-20 relative'>
+        <div className='w-full h-[97vh] flex items-start pt-10 relative'>
           {selectedMenuItem === 'MP' && (
-            <div className='w-full px-10 grid grid-cols-5 gap-4'>
+            <div className='w-full px-10 grid grid-cols-6 gap-4'>
               {models.map((m) => {
                 return (
                   <MyProject
@@ -109,7 +111,7 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
                 );
               })}
               <div
-                className='px-10 py-12 relative rounded-xl border border-dashed border-black flex flex-col items-center hover:bg-secondaryColor hover:text-white hover:cursor-pointer hover:shadow-2xl'
+                className={`px-10 py-12 relative rounded-xl border ${theme === 'light' ? 'border-textColor text-textColor hover:bg-secondaryColor hover:text-white' : 'border-textColorDark text-textColorDark hover:bg-secondaryColorDark hover:text-textColor'}  flex flex-col items-center hover:cursor-pointer hover:shadow-2xl`}
                 onClick={() => {
                   dispatch(resetState());
                   dispatch(ActionCreators.clearHistory());

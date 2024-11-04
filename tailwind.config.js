@@ -9,6 +9,13 @@ module.exports = {
         primaryColor: '#184043',
         secondaryColor: '#29686E',
         shadowColor: '#c8c8c8',
+        bgColor: '#ececec',
+        textColor: 'black',
+        primaryColorDark: '#184043',
+        secondaryColorDark: '#77FF94',
+        bgColorDark: '#252525',
+        textColorDark: '#EEE5E9',
+        bgColorDark2: '#52525b'
       },
     },
   },

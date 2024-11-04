@@ -79,7 +79,7 @@ export const RenameProject: React.FC<RenameProjectProps> = (
                                             onClick={() => {
                                                 dispatch(renameProject({
                                                     projectToRename: projectToRename.faunaDocumentId as string,
-                                                    name: name
+                                                    name: name,
                                                 }))
                                                 dispatch(updateProjectTab({
                                                   ...projectToRename,
@@ -87,7 +87,11 @@ export const RenameProject: React.FC<RenameProjectProps> = (
                                                 }))
                                                 execQuery(updateProjectInFauna, convertInFaunaProjectThis({
                                                     ...projectToRename,
-                                                    name: name
+                                                    name: name,
+                                                    simulation: {
+                                                      ...projectToRename.simulation,
+                                                      name: `${name} - sim`
+                                                    }
                                                 } as Project), dispatch)
                                                 handleClose()
                                             }}

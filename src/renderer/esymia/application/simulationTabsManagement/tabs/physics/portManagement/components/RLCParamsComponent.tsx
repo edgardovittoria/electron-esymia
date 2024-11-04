@@ -1,8 +1,9 @@
 import React, { FC } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RLCParams, TempLumped } from '../../../../../../model/esymiaModels';
 import { setRLCParams } from '../../../../../../store/projectSlice';
 import { DebounceInput } from 'react-debounce-input';
+import { ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
 
 interface RLCParamsProps {
   selectedPort: TempLumped;
@@ -16,9 +17,9 @@ export const RLCParamsComponent: React.FC<RLCParamsProps> = ({
   setSavedPortParameters,
 }) => {
   const dispatch = useDispatch();
-
+  const theme = useSelector(ThemeSelector)
   return (
-    <div className="mt-3 p-[10px] text-left border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
+    <div className={`mt-3 p-[10px] text-left border-[1px] ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-secondaryColorDark bg-bgColorDark'} rounded`}>
       <h6 className="lg:text-base text-[12px]">RLC Params</h6>
       <RLCParamsInput
         disabled={disabled}
@@ -107,7 +108,7 @@ const RLCParamsInput: FC<RLCParamsInputProps> = ({disabled, debounceTimeoutMilli
     <div className="mt-2">
         <span className="lg:text-base text-[12px]">{label}</span>
         <input
-          className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
+          className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-black text-[15px] font-bold rounded formControl"
           type="number"
           min={0}
           disabled={disabled}

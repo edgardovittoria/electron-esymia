@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectedProjectSelector, setFrequencies } from '../../../../../store/projectSlice';
 import { DebounceInput } from 'react-debounce-input';
 import { log10 } from 'chart.js/helpers';
+import { ThemeSelector } from '../../../../../store/tabsAndMenuItemsSlice';
 
 export interface FrequenciesDefProps{
   setSavedPhysicsParameters: Function,
@@ -18,17 +19,18 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
   let linSpace = require('@stdlib/array-linspace')
   const selectedProject = useSelector(selectedProjectSelector)
   const dispatch = useDispatch()
+  const theme = useSelector(ThemeSelector)
 
   return(
-    <div className='p-[10px] mt-2 border-[1px] border-secondaryColor bg-[#f6f6f6] text-left overflow-y-scroll max-h-[800px]'>
+    <div className={`p-[10px] mt-2 border-[1px] ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-secondaryColorDark bg-bgColorDark'} text-left overflow-y-scroll max-h-[800px]`}>
       <h6 className="w-[100%] mb-3">Range Definition</h6>
       <div className='flex flex-row justify-between px-5'>
         <div className='flex flex-row items-center gap-2'>
-          <input type="radio" name="radio-1" className="radio" defaultChecked onClick={() => setScaleType(0)}/>
+          <input type="radio" name="radio-1" className="radio border-white text-black" defaultChecked onClick={() => setScaleType(0)}/>
           <span>logarithmic</span>
         </div>
         <div className='flex flex-row items-center gap-2'>
-          <input type="radio" name="radio-1" className="radio" onClick={() => setScaleType(1)}/>
+          <input type="radio" name="radio-1" className="radio border-white text-black" onClick={() => setScaleType(1)}/>
           <span>linear</span>
         </div>
 
@@ -41,7 +43,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
             //debounceTimeout={700}
             min={0}
             disabled={disabled}
-            className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
+            className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-black text-[15px] font-bold rounded formControl"
             type="number"
             onKeyDown={(evt) => ["+", "-"].includes(evt.key) && evt.preventDefault()}
             onChange={(e) => {
@@ -60,7 +62,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
             disabled={disabled}
             //debounceTimeout={700}
             min={0}
-            className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
+            className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-black text-[15px] font-bold rounded formControl"
             type="number"
             onKeyDown={(evt) => ["+", "-"].includes(evt.key) && evt.preventDefault()}
             onChange={(e) => {
@@ -79,7 +81,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
             //debounceTimeout={700}
             min={0}
             disabled={disabled}
-            className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
+            className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-black text-[15px] font-bold rounded formControl"
             type="number"
             step={1}
             onKeyDown={(evt) => ["+", "-", "e", "E"].includes(evt.key) && evt.preventDefault()}
@@ -95,7 +97,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
       </div>
       <button
         data-testid="generateFrequencies"
-        className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60"
+        className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} w-full mt-2 hover:opacity-80 disabled:opacity-60`}
         disabled={(fNum === 0 || fMax <= fMin)}
         onClick={() => {
           scaleType === 0 ? dispatch(setFrequencies(logSpace(log10(fMin), log10(fMax), fNum))) : dispatch(setFrequencies([].slice.call(linSpace(fMin, fMax, fNum))))
@@ -115,7 +117,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
           <div className="p-3 bg-white border border-secondaryColor flex flex-col overflow-y-scroll max-h-[200px]">
             {selectedProject.frequencies.map((f,index) => {
               return(
-                <span key={index}>{f % 1 !== 0 ? f.toFixed(4): f}</span>
+                <span className='text-black' key={index}>{f % 1 !== 0 ? f.toFixed(4): f}</span>
               )
             })}
           </div>

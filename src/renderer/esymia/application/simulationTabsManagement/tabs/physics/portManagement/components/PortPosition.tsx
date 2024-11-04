@@ -1,8 +1,9 @@
 import React, { FC } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Port, Probe } from "../../../../../../model/esymiaModels";
 import { updatePortPosition } from "../../../../../../store/projectSlice";
 import { DebounceInput } from "react-debounce-input";
+import { ThemeSelector } from "../../../../../../store/tabsAndMenuItemsSlice";
 
 interface PortPositionProps {
 	selectedPort: Port | Probe;
@@ -16,14 +17,14 @@ export const PortPosition: FC<PortPositionProps> = ({
 	setSavedPortParameters
 }) => {
 	const dispatch = useDispatch();
-  //console.log(selectedPort)
+  const theme = useSelector(ThemeSelector)
 
 	return (
 		<>
 			{selectedPort.category === "port" ||
 			selectedPort.category === "lumped" ? (
 				<div
-					className={`mt-3 p-[10px] text-left border-[1px] border-secondaryColor bg-[#f6f6f6]`}>
+					className={`mt-3 mb-2 p-[10px] text-left border-[1px] ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-secondaryColorDark bg-bgColorDark'}`}>
 					<h6 className="xl:text-base text-[12px]">Port Position</h6>
 					<div className="mt-2">
 						<span className="xl:text-base text-[12px]">Input (X,Y,Z)</span>
@@ -234,7 +235,7 @@ const TerminationPositionInput: FC<TerminationPositionInputProps> = ({dataTestId
 								<input
                   id={dataTestId}
 									disabled={disabled}
-									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl`}
+									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-black text-[12px] font-bold rounded formControl`}
 									type="number"
                   //debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
 									step={inputStep ? inputStep : 0.000001}

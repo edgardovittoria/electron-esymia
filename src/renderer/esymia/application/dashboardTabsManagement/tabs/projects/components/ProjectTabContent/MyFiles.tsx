@@ -13,7 +13,7 @@ import { SearchUserAndShare } from '../droppableDraggableFolderProject/searchUse
 import { CreateNewFolderModal } from '../CreateNewFolderModal';
 import noProjectsIcon2 from '../../../../../../../../../assets/noProjectsIcon2.png';
 import { Folder } from '../../../../../../model/esymiaModels';
-import { setShowCreateNewProjectModal } from '../../../../../../store/tabsAndMenuItemsSlice';
+import { setShowCreateNewProjectModal, ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
 
 export interface MyFilesProps {
   showCreateNewFolderModal: boolean;
@@ -30,6 +30,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
 }) => {
   const mainFolder = useSelector(mainFolderSelector)
   const selectedFolder = useSelector(SelectedFolderSelector);
+  const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch();
 
   const projects = selectedFolder?.projectList;
@@ -39,7 +40,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="box w-full">
+      <div className={`box ${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} w-full h-[470px]`}>
         {/* <div className="flex p-2 gap-4 items-center">
           <div className="sm:w-3/5 w-1/5">
             <h5 className="text-base">Files</h5>
@@ -67,11 +68,15 @@ const MyFiles: React.FC<MyFilesProps> = ({
                 {index !== path.length - 1 ? (
                   <div>
                     <span
-                      className="hover:underline hover:cursor-pointer text-sm"
+                      className={`hover:underline hover:cursor-pointer text-sm ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}
                       onClick={() => {
                         const newPath = path.filter((p, i) => i <= index);
                         setPath(newPath);
-                        dispatch(selectFolder(p.faunaDocumentId as string));
+                        if(newPath.length > 1){
+                          dispatch(selectFolder(p.faunaDocumentId as string));
+                        }else{
+                          dispatch(selectFolder('root'))
+                        }
                       }}
                     >
                       {p.name}
@@ -79,7 +84,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
                     <span> &gt; </span>
                   </div>
                 ) : (
-                  <span className="font-bold text-sm">{p.name}</span>
+                  <span className={`font-bold text-sm ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>{p.name}</span>
                 )}
               </div>
             );
@@ -87,13 +92,13 @@ const MyFiles: React.FC<MyFilesProps> = ({
         </div>
         <div className="flex p-2 gap-4 items-center w-1/6">
           <div
-            className="text-end text-sm text-primaryColor hover:text-secondaryColor hover:cursor-pointer hover:underline"
+            className={`text-end text-sm ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} hover:cursor-pointer hover:underline`}
             onClick={() => dispatch(setShowCreateNewProjectModal(true))}
           >
             + New Project
           </div>
           <div
-            className="text-sm text-center text-primaryColor hover:text-secondaryColor hover:cursor-pointer hover:underline"
+            className={`text-end text-sm ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} hover:cursor-pointer hover:underline`}
             onClick={() => setShowCreateNewFolderModal(true)}
           >
             + New Folder
@@ -106,12 +111,12 @@ const MyFiles: React.FC<MyFilesProps> = ({
           folders &&
           (projects.length > 0 || folders.length > 0) ? (
             <>
-              {folders.length > 0 && (
-                <h5 className="w-[100%] text-sm font-semibold uppercase p-2">
-                  Folders
-                </h5>
-              )}
-              <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[100px]">
+
+              <h5 className={`w-[100%] text-sm font-semibold uppercase p-2 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>
+                Folders
+              </h5>
+
+              <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 overflow-scroll max-h-[140px]">
                 {folders.map((folder) => {
                   return (
                     <DroppableAndDraggableFolder
@@ -123,12 +128,12 @@ const MyFiles: React.FC<MyFilesProps> = ({
                   );
                 })}
               </div>
-              {projects.length > 0 && (
-                <h5 className="w-[100%] mt-4 mb-2 text-sm font-semibold uppercase p-2">
-                  Projects
-                </h5>
-              )}
-              <div data-testid="projectsBox" className="grid xl:grid-cols-8 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-7 overflow-scroll max-h-[200px] py-3">
+
+              <h5 className={`w-[100%] mt-4 mb-2 text-sm font-semibold uppercase p-2 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>
+                Projects
+              </h5>
+
+              <div data-testid="projectsBox" className="grid xl:grid-cols-8 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 overflow-scroll max-h-[250px] pb-3">
                 {projects
                   .map((project) => {
                     return (

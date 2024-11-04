@@ -18,6 +18,7 @@ import {
 import {
   meshAdviceSelector,
   selectMenuItem,
+  ThemeSelector,
 } from '../../../../../store/tabsAndMenuItemsSlice';
 import {
   ExternalGridsObject,
@@ -76,6 +77,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
   const activeMeshing = useSelector(activeMeshingSelector);
   const activeSimulations = useSelector(activeSimulationsSelector);
+  const theme = useSelector(ThemeSelector)
   const quantumDimensionsLabels = ['X', 'Y', 'Z'];
   const [suggestedQuantumError, setSuggestedQuantumError] = useState<{
     active: boolean;
@@ -239,12 +241,12 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
 
   return (
     <>
-      <div className="absolute left-[2%] top-[270px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+      <div className="absolute left-[2%] top-[270px] rounded max-h-[500px] flex flex-col items-center gap-0">
         <div
           className={`p-2 tooltip rounded-t tooltip-right ${
             sidebarItemSelected === 'Mesher'
-              ? 'text-white bg-primaryColor'
-              : 'text-primaryColor bg-white'
+              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
+              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
           }`}
           data-tip="Mesher"
           data-testid="quantumSettings"
@@ -260,10 +262,10 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           <GiMeshBall style={{ width: '25px', height: '25px' }} />
         </div>
         <div
-          className={`p-2 tooltip rounded-t tooltip-right ${
+          className={`p-2 tooltip rounded-b tooltip-right ${
             sidebarItemSelected === 'Solver'
-              ? 'text-white bg-primaryColor'
-              : 'text-primaryColor bg-white'
+              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
+              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
           }`}
           data-tip="Solver"
           data-testid="solverSettings"

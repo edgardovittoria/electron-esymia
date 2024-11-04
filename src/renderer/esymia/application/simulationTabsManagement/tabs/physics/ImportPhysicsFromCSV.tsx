@@ -28,6 +28,7 @@ import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { savePortsOnS3 } from './savePortsOnS3';
+import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 
 const GREY = '#CCC';
 const GREY_LIGHT = 'rgba(255, 255, 255, 0.4)';
@@ -147,6 +148,8 @@ export const LumpedImportFromCSV: FC = () => {
     return true;
   };
 
+  const theme = useSelector(ThemeSelector)
+
   return (
     <CSVReader
       config={{ header: true }}
@@ -205,7 +208,7 @@ export const LumpedImportFromCSV: FC = () => {
         <>
           <div
             {...getRootProps()}
-            className={`hover:cursor-pointer ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
+            className={`hover:cursor-pointer ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
             style={Object.assign(
               {},
               styles.zone,
@@ -290,6 +293,8 @@ export const PortImportFromCSV:FC = () => {
     return true;
   };
 
+  const theme = useSelector(ThemeSelector)
+
   return (
     <CSVReader
       config={{ header: true }}
@@ -349,7 +354,7 @@ export const PortImportFromCSV:FC = () => {
         <>
           <div
             {...getRootProps()}
-            className={`hover:cursor-pointer ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
+            className={`hover:cursor-pointer ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
             style={Object.assign(
               {},
               styles.zone,
@@ -421,6 +426,8 @@ export const FrequenciesImportFromCSV:FC = () => {
     return true;
   };
 
+  const theme = useSelector(ThemeSelector)
+
   return (
     <CSVReader
       config={{ header: true }}
@@ -467,7 +474,7 @@ export const FrequenciesImportFromCSV:FC = () => {
         <>
           <div
             {...getRootProps()}
-            className={`hover:cursor-pointer ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
+            className={`hover:cursor-pointer ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
             style={Object.assign(
               {},
               styles.zone,

@@ -25,6 +25,7 @@ import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 import { FiEdit } from 'react-icons/fi';
 import { s3 } from '../../../../aws/s3Config';
 import { ImportActionParamsObject, ImportModelFromDBModal, CanvasState } from "../../../../../cad_library";
+import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 interface ModelerProps {
   selectedTabLeftPanel: string | undefined;
   setSelectedTabLeftPanel: Function;
@@ -38,6 +39,7 @@ export const Modeler: React.FC<ModelerProps> = ({
   const [cloning, setcloning] = useState<boolean>(false);
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedFolder = useSelector(SelectedFolderSelector);
+  const theme = useSelector(ThemeSelector)
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
 
@@ -61,12 +63,12 @@ export const Modeler: React.FC<ModelerProps> = ({
     <div>
       <CanvasModeler setShowModalLoadFromDB={setShowModalLoadFromDB}/>
       <StatusBar />
-      <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+      <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
         <div
           className={`p-2 tooltip rounded-t tooltip-right ${
             selectedTabLeftPanel === modelerLeftPanelTitle.first
-              ? 'text-white bg-primaryColor'
-              : 'text-primaryColor bg-white'
+              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
+              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
           }`}
           data-tip="Modeler"
           onClick={() => {
@@ -82,8 +84,8 @@ export const Modeler: React.FC<ModelerProps> = ({
         <div
           className={`p-2 tooltip rounded-b tooltip-right ${
             selectedTabLeftPanel === modelerLeftPanelTitle.second
-              ? 'text-white bg-primaryColor'
-              : 'text-primaryColor bg-white'
+              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
+              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
           }`}
           data-tip="Materials"
           onClick={() => {
@@ -99,7 +101,7 @@ export const Modeler: React.FC<ModelerProps> = ({
       </div>
       {selectedTabLeftPanel && (
         <>
-          <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[15%]">
+          <div className={`${theme === 'light' ? 'text-textColor bg-white' : 'text-textColorDark bg-bgColorDark2'} p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[15%]`}>
             {selectedTabLeftPanel === modelerLeftPanelTitle.first && (
               <Models>
                 <ModelOutliner />
@@ -111,13 +113,13 @@ export const Modeler: React.FC<ModelerProps> = ({
           </div>
         </>
       )}
-      <div className="absolute left-[2%] top-[270px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+      <div className="absolute left-[2%] top-[270px] rounded max-h-[500px] flex flex-col items-center gap-0">
         <button
           disabled={
             selectedProject &&
             (typeof(selectedProject.portsS3) === "string" || typeof(selectedProject.meshData.mesh) === "string")
           }
-          className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
+          className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40 ${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`}
           data-tip="Change Model"
           onClick={() => {
             setShowModalLoadFromDB(true)
@@ -129,14 +131,14 @@ export const Modeler: React.FC<ModelerProps> = ({
           />
         </button>
       </div>
-      <div className="absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+      <div className="absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0">
         <button
           disabled={
             selectedProject &&
             selectedProject.simulation &&
             selectedProject.simulation.status === 'Running'
           }
-          className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
+          className={`p-2 tooltip rounded tooltip-right relative z-10 disabled:opacity-40 ${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`}
           data-tip="Clone Project"
           onClick={() => {
             setcloning(true);

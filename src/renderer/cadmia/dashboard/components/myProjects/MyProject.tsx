@@ -2,7 +2,7 @@ import React, { FC, Fragment, useEffect, useState } from 'react';
 import { Item, Menu, Separator, useContextMenu } from 'react-contexify';
 import { ActionCreators } from 'redux-undo';
 import { GiCubeforce } from 'react-icons/gi';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { BiSolidRename, BiSolidShare, BiSolidTrash } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import { Dialog, Transition } from '@headlessui/react/dist';
@@ -19,6 +19,7 @@ import { FaunaCadModel, resetState } from '../../../../cad_library';
 import { getSimulationProjectsByOwner } from '../../../../esymia/faunadb/projectsFolderAPIs';
 import { useAuth0 } from '@auth0/auth0-react';
 import { FaunaProject } from '../../../../esymia/model/FaunaModels';
+import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
 
 export interface ContextMenuProps {
   model: FaunaCadModel;
@@ -37,6 +38,7 @@ const MyProject: React.FC<ContextMenuProps> = ({
   const [modalRenameShow, setModalRenameShow] = useState<boolean>(false);
   const [serchUserAndShare, setSerchUserAndShare] = useState<boolean>(false);
   const [modelErasable, setModelErasable] = useState(true);
+  const theme = useSelector(ThemeSelector)
   const { show, hideAll } = useContextMenu({
     id: model.components,
   });
@@ -74,7 +76,7 @@ const MyProject: React.FC<ContextMenuProps> = ({
         />
       )} */}
       <div
-        className="px-10 py-12 relative rounded-xl border border-black flex flex-col items-center hover:bg-secondaryColor hover:text-white hover:cursor-pointer hover:shadow-2xl"
+        className={`px-10 py-12 relative rounded-xl border ${theme === 'light' ? 'border-textColor text-textColor hover:bg-secondaryColor hover:text-white' : 'border-textColorDark text-textColorDark hover:bg-secondaryColorDark hover:text-textColor'}  flex flex-col items-center hover:cursor-pointer hover:shadow-2xl`}
         onClick={() => {
           dispatch(resetState());
           dispatch(ActionCreators.clearHistory());
@@ -88,8 +90,8 @@ const MyProject: React.FC<ContextMenuProps> = ({
         }}
         onContextMenu={handleContextMenu}
       >
-        <GiCubeforce size={75} />
-        <span className="absolute bottom-2 font-semibold">{model.name}</span>
+        <GiCubeforce size={75}  />
+        <span className={`absolute bottom-2 font-semibold`}>{model.name}</span>
       </div>
       <Menu id={model.components}>
         <Item

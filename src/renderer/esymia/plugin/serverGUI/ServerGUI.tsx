@@ -5,6 +5,7 @@ import { MesherStatusSelector, setMesherStatus, setSolverStatus, SolverStatusSel
 import { FaPlay, FaStop } from 'react-icons/fa';
 import { CgDetailsMore } from 'react-icons/cg';
 import { publishMessage } from '../../../middleware/stompMiddleware';
+import { ThemeSelector } from '../../store/tabsAndMenuItemsSlice';
 
 export interface ServerGUIProps{
 
@@ -20,6 +21,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
   const [solverLogsVisibility, setSolverLogsVisibility] = useState<boolean>(false);
   const mesherStatus = useSelector(MesherStatusSelector)
   const solverStatus = useSelector(SolverStatusSelector)
+  const theme = useSelector(ThemeSelector)
 
   const dispatch = useDispatch()
 
@@ -51,9 +53,9 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
 
   return (
     <>
-      <div className='flex relative flex-col py-5 px-5 border-2 border-secondaryColor'>
-        <h5 className="absolute top-[-16px] bg-white left-10 font-bold px-2 text-secondaryColor">serverGUI</h5>
-        <div className="flex flex-col border border-secondaryColor py-3 px-5">
+      <div className={`flex relative flex-col py-5 px-5 border-2 ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'}`}>
+        <h5 className={`absolute top-[-16px] ${theme === 'light' ? 'text-secondaryColor bg-white' : 'text-secondaryColorDark bg-bgColorDark2'} left-10 font-bold px-2`}>serverGUI</h5>
+        <div className={`flex flex-col border ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'} py-3 px-5`}>
           <div className="flex flex-row gap-2 items-center justify-between">
             <div className="w-2/3 flex flex-row items-center gap-2">
               <h5>Mesher</h5>
@@ -103,13 +105,13 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
             </button> */}
           </div>
           {mesherLogsVisibility &&
-            <div className={`h-[150px] max-h-[150px] overflow-y-scroll border border-secondaryColor p-3 flex flex-col ${spinnerMesher ? 'items-center justify-center bg-gray-100 bg-opacity-30': 'bg-white'}`}>
+            <div className={`h-[150px] max-h-[150px] overflow-y-scroll border ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'} p-3 flex flex-col ${spinnerMesher ? 'items-center justify-center bg-gray-100 bg-opacity-30': ''}`}>
               {spinnerMesher && <ImSpinner className='animate-spin w-12 h-12 z-50' />}
               {mesherLogs.map((ml, index) => <div key={index} className="text-[12px]">{ml}</div>)}
             </div>
           }
         </div>
-        <div className="flex flex-col border border-secondaryColor py-3 px-5">
+        <div className={`flex flex-col border ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'} py-3 px-5`}>
           <div className="flex flex-row gap-2 items-center justify-between">
             <div className="w-2/3 flex flex-row items-center gap-2">
               <h5>Solver</h5>
@@ -166,7 +168,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
             </button> */}
           </div>
           {solverLogsVisibility &&
-            <div className={`h-[150px] max-h-[150px] overflow-y-scroll border border-secondaryColor p-3 flex flex-col ${spinnerMesher ? 'items-center justify-center bg-gray-100 bg-opacity-30': 'bg-white'}`}>
+            <div className={`h-[150px] max-h-[150px] overflow-y-scroll border ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'} p-3 flex flex-col ${spinnerSolver ? 'items-center justify-center bg-gray-100 bg-opacity-30': ''}`}>
               {spinnerSolver && <ImSpinner className='animate-spin w-12 h-12 z-50' />}
               {solverLogs.map((ml, index) => <div key={index} className="text-[12px]">{ml}</div>)}
             </div>

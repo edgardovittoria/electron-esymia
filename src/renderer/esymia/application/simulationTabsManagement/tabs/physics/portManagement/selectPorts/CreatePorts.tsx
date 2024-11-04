@@ -10,6 +10,7 @@ import {
     selectPort} from '../../../../../../store/projectSlice';
 import { Project } from '../../../../../../model/esymiaModels';
 import { Vector3 } from 'three';
+import { ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
 
 interface SelectPortsProps {
     selectedProject: Project,
@@ -19,6 +20,7 @@ interface SelectPortsProps {
 export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, cameraPosition}) => {
 
     const dispatch = useDispatch()
+    const theme = useSelector(ThemeSelector)
 
     return (
         <>
@@ -27,7 +29,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                     <Menu.Button
                         data-testid="addPort"
                         disabled = {selectedProject.simulation?.status === 'Completed'}
-                        className="inline-flex w-full justify-center rounded-md bg-white px-2 py-2 text-sm font-medium text-black hover:bg-opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                        className={`inline-flex w-full justify-center rounded-md ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} px-2 py-2 text-sm font-medium text-black hover:bg-opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}>
                         <AiOutlineThunderbolt
                             className="ml-0 mr-2 h-5 w-5 text-green-300"
                             aria-hidden="true"

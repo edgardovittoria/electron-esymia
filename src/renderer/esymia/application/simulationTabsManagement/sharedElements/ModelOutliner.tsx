@@ -3,6 +3,7 @@ import { FaCube, FaCubes } from 'react-icons/fa';
 
 import { useSelector } from 'react-redux';
 import { selectedProjectSelector } from '../../../store/projectSlice';
+import { ThemeSelector } from '../../../store/tabsAndMenuItemsSlice';
 
 interface ModelOutlinerProps {}
 
@@ -10,7 +11,7 @@ export const ModelOutliner: React.FC<ModelOutlinerProps> = () => {
   const selectedProject = useSelector(selectedProjectSelector);
 
   return (
-    <div className="mt-1">
+    <div className={`mt-1`}>
       <div className="flex pl-1 items-center">
         <div className="w-[10%]">
           <FaCubes className="w-[20px] h-[20px]" />

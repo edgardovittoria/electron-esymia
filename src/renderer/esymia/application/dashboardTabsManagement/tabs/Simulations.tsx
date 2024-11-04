@@ -15,6 +15,7 @@ import {
   projectsTabsSelector,
   selectMenuItem,
   selectTab,
+  ThemeSelector,
 } from '../../../store/tabsAndMenuItemsSlice';
 import { Folder, Simulation } from '../../../model/esymiaModels';
 import noresultfound from '../../../../../../assets/noresultfound.png';
@@ -47,6 +48,7 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
   const mainFolder = useSelector(mainFolderSelector);
   const projects = useSelector(projectsSelector);
   const projectsTabs = useSelector(projectsTabsSelector);
+  const theme = useSelector(ThemeSelector)
 
   function getAllSimulation(folder: Folder) {
     let sim: Simulation[] = [];
@@ -91,11 +93,11 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
   }
 
   return (
-    <div className="text-center p-[20px] box w-full flex flex-col h-fit">
+    <div className={`text-center p-[20px] box w-full flex flex-col h-fit ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}>
       <div className="flex flex-row justify-between w-full items-center">
         <h5 className="text-left text-base p-2">Simulations</h5>
         <div className="tooltip" data-tip="Order By">
-          <div className="dropdown">
+          <div className="dropdown dropdown-left">
             <div tabIndex={0} role="button">
               <FaSortAlphaDown
                 size={22}
@@ -104,7 +106,7 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
             </div>
             <ul
               tabIndex={0}
-              className="dropdown-content hover:bg-white menu bg-base-100 rounded-box z-[1] mt-2 w-52 p-2 shadow"
+              className={`dropdown-content menu ${theme === 'light' ? 'bg-white hover:bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'} rounded-box z-[1] mt-2 w-52 p-2 shadow`}
             >
               <li
                 className="flex flex-row items-center gap-4"
@@ -192,7 +194,7 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
       {simulations.length > 0 ? (
         <div className={`overflow-scroll h-full ${maxH} w-full`}>
           <table className="table mt-4 w-full">
-            <thead className="sticky top-0 bg-[#f4f4f4]">
+            <thead className={`sticky top-0 ${theme === 'light' ? 'bg-[#f4f4f4]' : 'bg-bgColorDark text-secondaryColorDark'}`}>
               <tr>
                 <th className="py-4" scope="col" />
                 <th className="py-4" scope="col">
@@ -223,7 +225,7 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
                 return (
                   <tr
                     key={`${simulation.name}_${index}`}
-                    className="hover:bg-[#f1f1f1]"
+                    className={`${theme === 'light' ? 'hover:bg-[#f1f1f1]' : 'hover:bg-bgColorDark'}`}
                   >
                     <td scope="row" className="pl-8">
                       {statusIcon}
