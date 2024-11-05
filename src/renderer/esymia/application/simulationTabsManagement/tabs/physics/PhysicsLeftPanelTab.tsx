@@ -14,6 +14,7 @@ import {
   unsetScatteringValue,
 } from '../../../../store/projectSlice';
 import noPhysicsIcon from '../../../../../../../assets/noPhysicsIcon.png';
+import noPhysicsIconDark from '../../../../../../../assets/noPhysicsIconDark.png';
 import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
 import { isTerminationNameValid } from './portManagement/selectPorts/portLumpedProbeGenerator';
 import { DebounceInput } from 'react-debounce-input';
@@ -298,7 +299,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
       ) : (
         <div className="text-center">
           <img
-            src={noPhysicsIcon}
+            src={theme === 'light' ? noPhysicsIcon : noPhysicsIconDark}
             className="mx-auto xl:mt-[20px] w-1/4"
             alt="No Physics"
           />

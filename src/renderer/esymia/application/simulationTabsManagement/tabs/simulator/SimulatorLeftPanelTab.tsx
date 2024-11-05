@@ -5,6 +5,7 @@ import {FaCircle} from "react-icons/fa";
 import {Disclosure, Switch, Transition} from '@headlessui/react'
 import {MdOutlineKeyboardArrowDown} from "react-icons/md";
 import noMaterialsIcon from '../../../../../../../assets/noMaterialsIcon.png'
+import noMaterialsIconDark from '../../../../../../../assets/noMaterialsIconDark.png'
 import { Material } from '../../../../../cad_library';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 
@@ -151,7 +152,7 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
 
                 </div> :
                 <div className="text-center">
-                    <img src={noMaterialsIcon} className="mx-auto mt-[50px]" alt='No Materials'/>
+                    <img src={theme === 'light' ? noMaterialsIcon : noMaterialsIconDark} className="mx-auto mt-[50px]" alt='No Materials'/>
                     <h5>No Materials</h5>
                     <p className="mt-[50px]">Apply the materials on the model directly in the CAD</p>
                 </div>

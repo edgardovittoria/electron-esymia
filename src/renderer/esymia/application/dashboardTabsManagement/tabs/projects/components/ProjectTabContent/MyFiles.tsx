@@ -12,6 +12,7 @@ import { DraggableProjectCard } from '../droppableDraggableFolderProject/Draggab
 import { SearchUserAndShare } from '../droppableDraggableFolderProject/searchUserAndShare/searchUserAndShare';
 import { CreateNewFolderModal } from '../CreateNewFolderModal';
 import noProjectsIcon2 from '../../../../../../../../../assets/noProjectsIcon2.png';
+import noProjectsIcon2Dark from '../../../../../../../../../assets/noProjectsIcon2Dark.png';
 import { Folder } from '../../../../../../model/esymiaModels';
 import { setShowCreateNewProjectModal, ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
 
@@ -40,7 +41,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className={`box ${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} w-full h-[470px]`}>
+      <div className={`box ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} w-full h-[470px]`}>
         {/* <div className="flex p-2 gap-4 items-center">
           <div className="sm:w-3/5 w-1/5">
             <h5 className="text-base">Files</h5>
@@ -148,13 +149,13 @@ const MyFiles: React.FC<MyFilesProps> = ({
           ) : (
             <div className="text-center p-[20px]">
               <img
-                src={noProjectsIcon2}
+                src={theme === 'light' ? noProjectsIcon2 : noProjectsIcon2Dark}
                 className="my-[50px] mx-auto"
                 alt="No Projects Icon"
               />
               <p>No projects for now.</p>
               <button
-                className="button buttonPrimary lg:text-base text-sm mt-5"
+                className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} lg:text-base text-sm mt-5`}
                 data-toggle="modal"
                 data-target="#createNewProjectModal"
                 data-testid="createProjectButton"

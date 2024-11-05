@@ -19,6 +19,7 @@ import {
 } from '../../../store/tabsAndMenuItemsSlice';
 import { Folder, Simulation } from '../../../model/esymiaModels';
 import noresultfound from '../../../../../../assets/noresultfound.png';
+import noresultfoundDark from '../../../../../../assets/noresultfoundDark.png';
 import { ImSpinner } from 'react-icons/im';
 import { setPortsFromS3 } from '../../simulationTabsManagement/tabs/physics/Physics';
 import { IoCheckmark, IoFilterSharp } from 'react-icons/io5';
@@ -282,7 +283,7 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
       ) : (
         <div>
           <img
-            src={noresultfound}
+            src={theme === 'light' ? noresultfound : noresultfoundDark}
             className="my-[46px] mx-auto"
             alt="No Results Icon"
           />

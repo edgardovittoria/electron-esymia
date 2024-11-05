@@ -3,11 +3,14 @@ import { FaCircle } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { selectedProjectSelector } from '../../../../store/projectSlice';
 import noMaterialsIcon from '../../../../../../../assets/noMaterialsIcon.png';
+import noMaterialsIconDark from '../../../../../../../assets/noMaterialsIconDark.png';
+import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 
 interface MaterialsProps {}
 
 export const Materials: React.FC<MaterialsProps> = () => {
   const selectedProject = useSelector(selectedProjectSelector);
+  const theme = useSelector(ThemeSelector)
 
   return (
     <>
@@ -45,7 +48,7 @@ export const Materials: React.FC<MaterialsProps> = () => {
       ) : (
         <div className="text-center">
           <img
-            src={noMaterialsIcon}
+            src={theme === 'light' ? noMaterialsIcon : noMaterialsIconDark}
             className="mx-auto mt-[50px]"
             alt="No Materials"
           />
