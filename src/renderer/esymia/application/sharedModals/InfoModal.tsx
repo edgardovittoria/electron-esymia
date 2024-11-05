@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   infoModalSelector,
   setIsConfirmedInfoModal, setMessageInfoModal,
-  setShowInfoModal
+  setShowInfoModal,
+  ThemeSelector
 } from '../../store/tabsAndMenuItemsSlice';
 
 export interface InfoModalProps{
@@ -13,6 +14,7 @@ export interface InfoModalProps{
 
 const InfoModal: React.FC<InfoModalProps> = ({}) => {
     const infoModal = useSelector(infoModalSelector)
+    const theme = useSelector(ThemeSelector)
     const dispatch = useDispatch()
 
   useEffect(() => {
@@ -49,10 +51,10 @@ const InfoModal: React.FC<InfoModalProps> = ({}) => {
                 leaveTo='opacity-0 scale-95'
               >
                 <Dialog.Panel
-                  className='w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all'>
+                  className={`w-full max-w-md transform overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark '} p-6 text-left align-middle shadow-xl transition-all`}>
                   <Dialog.Title
                     as='h3'
-                    className='text-lg font-medium leading-6 text-gray-900'
+                    className='text-lg font-medium leading-6'
                   >
                     INFO
                   </Dialog.Title>

@@ -11,6 +11,7 @@ import uniqid from 'uniqid';
 import { alertMessageStyle, comeBackToModelerMessage } from '../../../config/textMessages';
 import { Perf } from 'r3f-perf'
 import { ComponentEntity, FactoryShapes } from "../../../../../cad_library";
+import { ThemeSelector } from "../../../../store/tabsAndMenuItemsSlice";
 
 interface CanvasSimulatorProps  {
   externalGrids: ExternalGridsObject | undefined,
@@ -21,6 +22,7 @@ interface CanvasSimulatorProps  {
 
 export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, selectedMaterials, resetFocus, setResetFocus}) => {
   const selectedProject = useSelector(selectedProjectSelector);
+  const theme = useSelector(ThemeSelector)
   let mesherOutput = selectedProject?.meshData.mesh;
   const pathToExternalGridsNotFound = useSelector(pathToExternalGridsNotFoundSelector)
 
@@ -86,7 +88,7 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({externalGrids, 
         </ReactReduxContext.Consumer>
       ) : (
         <div className="absolute top-1/2">
-          <span className={alertMessageStyle}>{comeBackToModelerMessage}</span>
+          <span className={`${alertMessageStyle} ${theme === 'light' ? '' : 'text-textColorDark'}`}>{comeBackToModelerMessage}</span>
         </div>
       )}
     </div>

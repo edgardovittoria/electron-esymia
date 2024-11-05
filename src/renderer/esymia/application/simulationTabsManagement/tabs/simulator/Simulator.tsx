@@ -252,7 +252,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
       </div>
       {selectedTabLeftPanel && (
         <>
-          <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[15%]">
+          <div className={`${theme === 'light' ? 'text-textColor bg-white' : 'text-textColorDark bg-bgColorDark2'} p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[15%]`}>
             {selectedTabLeftPanel === simulatorLeftPanelTitle.first && (
               <Models>
                 <ModelOutliner />
@@ -337,6 +337,7 @@ export function getMaterialListFrom(components: ComponentEntity[]) {
 const NormalMeshVisualizationButton: FC<{}> = () => {
   const dispatch = useDispatch();
   const meshVisualization = useSelector(meshVisualizationSelector);
+  const theme = useSelector(ThemeSelector)
   return (
     <div
       className="tooltip"
@@ -347,8 +348,8 @@ const NormalMeshVisualizationButton: FC<{}> = () => {
       <button
         className={`rounded p-2 ${
           meshVisualization !== 'normal'
-            ? 'bg-white text-green-300 hover:text-secondaryColor'
-            : 'bg-green-300 text-secondaryColor'
+            ? `${theme === 'light' ? 'bg-white text-green-300 hover:text-secondaryColor' : 'bg-bgColorDark2 text-secondaryColorDark'}`
+            : `${theme === 'light' ? 'bg-green-300 text-secondaryColor' : 'bg-secondaryColorDark text-secondaryColor'}`
         }`}
         onClick={() => dispatch(setMeshVisualization('normal'))}
       >
@@ -361,6 +362,7 @@ const NormalMeshVisualizationButton: FC<{}> = () => {
 const LightMeshVisualizationButton: FC<{}> = () => {
   const dispatch = useDispatch();
   const meshVisualization = useSelector(meshVisualizationSelector);
+  const theme = useSelector(ThemeSelector)
   return (
     <div
       className="tooltip"
@@ -371,8 +373,8 @@ const LightMeshVisualizationButton: FC<{}> = () => {
       <button
         className={`rounded p-2 ${
           meshVisualization !== 'light'
-            ? 'bg-white text-green-300 hover:text-secondaryColor'
-            : 'bg-green-300 text-secondaryColor'
+            ? `${theme === 'light' ? 'bg-white text-green-300 hover:text-secondaryColor' : 'bg-bgColorDark2 text-secondaryColorDark'}`
+            : `${theme === 'light' ? 'bg-green-300 text-secondaryColor' : 'bg-secondaryColorDark text-secondaryColor'}`
         }`}
         onClick={() => dispatch(setMeshVisualization('light'))}
       >

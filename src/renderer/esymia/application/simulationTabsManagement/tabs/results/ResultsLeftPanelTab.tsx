@@ -6,7 +6,8 @@ import {
   selectedProjectSelector,
   setMeshApproved,
 } from '../../../../store/projectSlice';
-import noResultsIcon from '../../../../../../../assets/noResultsIcon.png';
+import noResultsIcon from '../../../../../../../assets/noResultsIconForProject.png';
+import noResultsIconDark from '../../../../../../../assets/noResultsIconForProjectDark.png';
 import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { Project } from '../../../../model/esymiaModels';
@@ -14,7 +15,7 @@ import { ImSpinner } from 'react-icons/im';
 import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 import { deleteFileS3 } from '../../../../aws/mesherAPIs';
 import { msToTime } from '../../../dashboardTabsManagement/tabs/Simulations';
-import { unsetComputingLp, unsetComputingP, unsetIterations, unsetSolverResults } from '../../../../store/tabsAndMenuItemsSlice';
+import { ThemeSelector, unsetComputingLp, unsetComputingP, unsetIterations, unsetSolverResults } from '../../../../store/tabsAndMenuItemsSlice';
 
 interface ResultsLeftPanelTabProps {
   selectedPort: string;
@@ -26,6 +27,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
   setSelectedPort,
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
+  const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
   return (
@@ -45,8 +47,8 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
               </div>
               {selectedProject.simulation && selectedProject.simulation.status === "Completed" && (
                 <div className="mt-5 flex flex-col items-start gap-2">
-                  <div className="relative w-full px-3 pt-5 pb-2 flex flex-col gap-2 items-start border rounded border-gray-800">
-                    <span className="absolute top-[-13px] font-bold bg-white px-1">
+                  <div className={`relative w-full px-3 pt-5 pb-2 flex flex-col gap-2 items-start border rounded ${theme === 'light' ? 'border-gray-800' : 'border-textColorDark'}`}>
+                    <span className={`absolute top-[-13px] font-bold ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} px-1`}>
                       Time Info
                     </span>
                     <span>
@@ -76,8 +78,8 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                       </span>
                     </span>
                   </div>
-                  <div className="relative w-full mt-3 mb-3 px-3 pt-5 pb-2 flex flex-col gap-2 items-start border rounded border-gray-800">
-                    <span className="absolute top-[-13px] font-bold bg-white px-1">
+                  <div className={`relative w-full mt-3 px-3 pt-5 pb-2 flex flex-col gap-2 items-start border rounded ${theme === 'light' ? 'border-gray-800' : 'border-textColorDark'}`}>
+                    <span className={`absolute top-[-13px] font-bold ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} px-1`}>
                       Server Params
                     </span>
                     <span>
@@ -114,7 +116,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                 selectedProject.simulation.status == 'Completed' && (
                   <button
                     type="button"
-                    className="button buttonPrimary w-full mt-2 hover:opacity-80 disabled:opacity-60 text-sm"
+                    className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} w-full mt-2 hover:opacity-80 disabled:opacity-60 text-sm`}
                     onClick={() => {
                       dispatch(
                         deleteSimulation(
@@ -153,12 +155,12 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
       {selectedProject && !selectedProject.simulation && (
         <div className="text-center lg:max-h-[250px] xl:max-h-fit overflow-y-scroll">
           <img
-            src={noResultsIcon}
+            src={theme === 'light' ? noResultsIcon : noResultsIconDark}
             className="mx-auto mt-[50px] w-1/2"
             alt="No Results"
           />
           <h5 className="lg:text-sm xl:text-xl">No results to view</h5>
-          <p className="xl:mt-[50px] lg:mt-[20px] text-sm">
+          <p className="xl:mt-[30px] lg:mt-[20px] text-sm">
             Complete a study setup with CAD, materials, and physics, then
             Estimate and Run to generate results.
           </p>

@@ -16,6 +16,10 @@ import { useSelector } from "react-redux";
 import { selectedProjectSelector } from "../../../../store/projectSlice";
 import { VscSettings } from "react-icons/vsc";
 import { Dataset, pairs } from "./sharedElements";
+import { ThemeSelector } from "../../../../store/tabsAndMenuItemsSlice";
+import { color } from "chart.js/helpers";
+import { plugins } from "../../../../../../../postcss.config";
+import { title } from "process";
 
 ChartJS.register(
   CategoryScale,
@@ -67,6 +71,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   ChartVisualizationMode
 }) => {
   const selectedProject = useSelector(selectedProjectSelector)
+  const theme = useSelector(ThemeSelector)
   const [showGraphsSettings, setShowGraphsSettings] = useState<boolean[]>(defaultShowGraphsSettings(11))
   const ports = selectedProject?.ports.filter(p => p.category === 'port') as Port[]
   const matrix_Z = JSON.parse((selectedProject?.simulation as Simulation).results.matrix_Z);
@@ -85,7 +90,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   "S_Phase",
   "S_dB",]
   const [chartsDataToVisualize, setChartsDataToVisualize] = useState(chartsOrderedIDs.map((id) =>
-  chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+  chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel, theme)
 ))
   useEffect(() => {
     let graphs: string[] = []
@@ -102,7 +107,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
       graphs = ["S_Module", "S_Phase", "S_dB"]
     }
     let charts = graphs.map((id) =>
-    chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel)
+    chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel, theme)
   )
     setChartsDataToVisualize(charts)
     setScaleMode(defaultScaleModes(graphs.length))
@@ -113,12 +118,27 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   const optionsWithScaleMode = (options: any, scaleMode: ScaleMode, type: "scatter"|"line") => {
     return {
       ...options,
+        plugins: {
+          // changin the lagend colour
+          legend: {
+              position: "top" as const,
+              labels: {
+                color: theme === 'light' ? "black" : "white",
+              },
+          },
+          title: {
+            display: true,
+            text: selectedProject?.simulation && `${selectedProject.simulation.name} - ${selectedProject.modelUnit}`,
+            color: theme === 'light' ? "black" : "white",
+          }
+        },
           type: type,
           scales: {
             x:
             { ...options.scale.x,
               type: scaleMode.xaxis === "logarithmic" ? "logarithmic": "linear",
               ticks: {
+                color: theme === 'light' ? 'black' : 'white',
                 callback: (val: number) => scaleMode.xnotation === "exponential" ? (val.toExponential()) : (val % 1 !== 0 ? val.toFixed(2) : val)
               }
             },
@@ -126,8 +146,9 @@ export const ChartsList: React.FC<ChartsListProps> = ({
             { ...options.scale.y,
               type: scaleMode.yaxis === "logarithmic" ? "logarithmic": "linear",
               ticks: {
+                color: theme === 'light' ? 'black' : 'white',
                 callback: (val: number) => scaleMode.ynotation === "exponential" ? (val.toExponential()) : (val % 1 !== 0 ? val.toFixed(2) : val)
-              }
+              },
             }
           },
     }
@@ -137,11 +158,11 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     <>
       {chartsDataToVisualize.map((chartData, index) => {
         return (
-          <div className="box w-full" key={index}>
+          <div className={`box w-full ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`} key={index}>
             <div className="flex flex-row justify-between items-center">
               {ChartVisualizationMode === "full" &&
                 <div
-                className={`box p-[5px] flex flex-col items-center border text-[#0fb25b] border-[#0fb25b] hover:cursor-pointer hover:bg-[#0fb25b] hover:text-white`}
+                className={`box p-[5px] flex flex-col items-center border ${theme === 'light' ? 'text-[#0fb25b] border-[#0fb25b] hover:bg-[#0fb25b] hover:text-white' : 'bg-bgColorDark2 text-textColorDark border-[#0fb25b] hover:bg-[#0fb25b] hover:text-white'} hover:cursor-pointer`}
                 onClick={() => {
                   let shows = [...showGraphsSettings]
                   shows[index] = !shows[index]
@@ -185,12 +206,13 @@ export const ChartsList: React.FC<ChartsListProps> = ({
 
 
 const ScaleChartOptions: FC<{index: number, scaleMode: ScaleMode[], setScaleMode: Function}> = ({scaleMode, index, setScaleMode}) => {
+  const theme = useSelector(ThemeSelector)
   return (
     <>
     <div className="flex justify-between mt-3">
               <div className="flex flex-row">
                 <div
-                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].yaxis === 'logarithmic' ? 'border-[#0fb25b]' : ''}`}
+                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer ${theme === 'light' ? 'hover:bg-[#0fb25b] hover:text-white' : 'bg-bgColorDark2 text-textColorDark hover:bg-[#0fb25b] hover:text-white'} ${scaleMode[index].yaxis === 'logarithmic' ? 'border-[#0fb25b]' : ''}`}
                     onClick={() => {
                       let newScaleMode = [...scaleMode]
                       newScaleMode[index] = {...newScaleMode[index], yaxis: 'logarithmic'}
@@ -200,7 +222,7 @@ const ScaleChartOptions: FC<{index: number, scaleMode: ScaleMode[], setScaleMode
                     <span className="text-[12px]">logarithmic-y</span>
                 </div>
                 <div
-                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].yaxis === 'linear' ? 'border-[#0fb25b]' : ''}`}
+                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer ${theme === 'light' ? 'hover:bg-[#0fb25b] hover:text-white' : 'bg-bgColorDark2 text-textColorDark hover:bg-[#0fb25b] hover:text-white'} ${scaleMode[index].yaxis === 'linear' ? 'border-[#0fb25b]' : ''}`}
                     onClick={() => {
                       let newScaleMode = [...scaleMode]
                       newScaleMode[index] = {...newScaleMode[index], yaxis: 'linear'}
@@ -212,7 +234,7 @@ const ScaleChartOptions: FC<{index: number, scaleMode: ScaleMode[], setScaleMode
               </div>
               <div className="flex flex-row">
                 <div
-                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].xaxis === 'logarithmic' ? 'border-[#0fb25b]' : ''}`}
+                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer ${theme === 'light' ? 'hover:bg-[#0fb25b] hover:text-white' : 'bg-bgColorDark2 text-textColorDark hover:bg-[#0fb25b] hover:text-white'} ${scaleMode[index].xaxis === 'logarithmic' ? 'border-[#0fb25b]' : ''}`}
                     onClick={() => {
                       let newScaleMode = [...scaleMode]
                       newScaleMode[index] = {...newScaleMode[index], xaxis: 'logarithmic'}
@@ -222,7 +244,7 @@ const ScaleChartOptions: FC<{index: number, scaleMode: ScaleMode[], setScaleMode
                     <span className="text-[12px]">logarithmic-x</span>
                 </div>
                 <div
-                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].xaxis === 'linear' ? 'border-[#0fb25b]' : ''}`}
+                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer ${theme === 'light' ? 'hover:bg-[#0fb25b] hover:text-white' : 'bg-bgColorDark2 text-textColorDark hover:bg-[#0fb25b] hover:text-white'} ${scaleMode[index].xaxis === 'linear' ? 'border-[#0fb25b]' : ''}`}
                     onClick={() => {
                       let newScaleMode = [...scaleMode]
                       newScaleMode[index] = {...newScaleMode[index], xaxis: 'linear'}
@@ -236,7 +258,7 @@ const ScaleChartOptions: FC<{index: number, scaleMode: ScaleMode[], setScaleMode
             <div className="flex justify-between">
               <div className="flex flex-row">
                 <div
-                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].ynotation === "exponential" ? 'border-[#0fb25b]' : ''}`}
+                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer ${theme === 'light' ? 'hover:bg-[#0fb25b] hover:text-white' : 'bg-bgColorDark2 text-textColorDark hover:bg-[#0fb25b] hover:text-white'} ${scaleMode[index].ynotation === "exponential" ? 'border-[#0fb25b]' : ''}`}
                     onClick={() => {
                       let newScaleMode = [...scaleMode]
                       newScaleMode[index] = {...newScaleMode[index], ynotation: 'exponential'}
@@ -246,7 +268,7 @@ const ScaleChartOptions: FC<{index: number, scaleMode: ScaleMode[], setScaleMode
                     <span className="text-[12px]">exp-notation-y</span>
                 </div>
                 <div
-                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].ynotation === 'decimal' ? 'border-[#0fb25b]' : ''}`}
+                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer ${theme === 'light' ? 'hover:bg-[#0fb25b] hover:text-white' : 'bg-bgColorDark2 text-textColorDark hover:bg-[#0fb25b] hover:text-white'} ${scaleMode[index].ynotation === 'decimal' ? 'border-[#0fb25b]' : ''}`}
                     onClick={() => {
                       let newScaleMode = [...scaleMode]
                       newScaleMode[index] = {...newScaleMode[index], ynotation: 'decimal'}
@@ -258,7 +280,7 @@ const ScaleChartOptions: FC<{index: number, scaleMode: ScaleMode[], setScaleMode
               </div>
               <div className="flex flex-row">
                 <div
-                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].xnotation === 'exponential' ? 'border-[#0fb25b]' : ''}`}
+                    className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer ${theme === 'light' ? 'hover:bg-[#0fb25b] hover:text-white' : 'bg-bgColorDark2 text-textColorDark hover:bg-[#0fb25b] hover:text-white'} ${scaleMode[index].xnotation === 'exponential' ? 'border-[#0fb25b]' : ''}`}
                     onClick={() => {
                       let newScaleMode = [...scaleMode]
                       newScaleMode[index] = {...newScaleMode[index], xnotation: 'exponential'}
@@ -268,7 +290,7 @@ const ScaleChartOptions: FC<{index: number, scaleMode: ScaleMode[], setScaleMode
                     <span className="text-[12px]">exp-notation-x</span>
                 </div>
                 <div
-                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${scaleMode[index].xnotation === 'decimal' ? 'border-[#0fb25b]' : ''}`}
+                    className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer ${theme === 'light' ? 'hover:bg-[#0fb25b] hover:text-white' : 'bg-bgColorDark2 text-textColorDark hover:bg-[#0fb25b] hover:text-white'} ${scaleMode[index].xnotation === 'decimal' ? 'border-[#0fb25b]' : ''}`}
                     onClick={() => {
                       let newScaleMode = [...scaleMode]
                       newScaleMode[index] = {...newScaleMode[index], xnotation: 'decimal'}
@@ -291,7 +313,8 @@ const chartsDataOptionsFactory = (
   matrix_Y: any[][][][],
   matrix_S: any[][][][],
   ports: Port[],
-  selectedLabel: { label: string, id: number }[]
+  selectedLabel: { label: string, id: number }[],
+  theme: 'light' | 'dark'
 ) => {
   const colorArray = [
     "red",
@@ -346,15 +369,6 @@ const chartsDataOptionsFactory = (
 
     let options = {
       responsive: true,
-      plugins: {
-        legend: {
-          position: "top" as const
-        },
-        title: {
-          display: true,
-          text: `${simulation.name} - ${unit}`,
-        },
-      },
       layout: {
         padding: {
           right: 20,

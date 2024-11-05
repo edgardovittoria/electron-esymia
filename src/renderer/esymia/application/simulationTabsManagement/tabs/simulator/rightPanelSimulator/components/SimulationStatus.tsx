@@ -34,6 +34,7 @@ import {
   setSolverResultsS3,
   solverResultsS3Selector,
   solverResultsSelector,
+  ThemeSelector,
   unsetComputingLp,
   unsetComputingP,
   unsetIterations,
@@ -65,6 +66,7 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
   activeSimulations,
 }) => {
   const dispatch = useDispatch();
+  const theme = useSelector(ThemeSelector)
   const [runningSimulation, setRunningSimulation] = useState<
     { simulation: Simulation; freqNumber: number; project: Project } | undefined
   >(undefined);
@@ -130,7 +132,7 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
 
   return (
     <div
-      className={`absolute right-10 w-1/3 bottom-16 flex flex-col justify-center items-center bg-white p-3 rounded ${
+      className={`absolute right-10 w-1/3 bottom-16 flex flex-col justify-center items-center ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-3 rounded ${
         !feedbackSimulationVisible && 'hidden'
       }`}
     >
@@ -200,6 +202,7 @@ const SimulationStatusItem: React.FC<{
     (item) => item.id === associatedProject.faunaDocumentId,
   )[0];
   const solverResultsS3 = useSelector(solverResultsS3Selector)
+  const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch();
   const { execQuery } = useFaunaQuery();
 
@@ -438,11 +441,11 @@ const SimulationStatusItem: React.FC<{
 
   return (
     <div className="w-full px-4 pt-2">
-      <div className="mx-auto w-full max-w-xl rounded-2xl bg-white p-2">
+      <div className="mx-auto w-full max-w-xl rounded-2xl p-2">
         <Disclosure defaultOpen>
           {({ open }) => (
             <>
-              <Disclosure.Button className="flex w-full justify-between rounded-lg border border-secondaryColor px-4 py-2 text-left text-sm font-medium text-secondaryColor hover:bg-green-100 focus:outline-none focus-visible:ring focus-visible:ring-green-500/75">
+              <Disclosure.Button className={`flex w-full justify-between rounded-lg border px-4 py-2 text-left text-sm font-medium ${theme === 'light' ? 'border-secondaryColor text-secondaryColor hover:bg-green-100' : 'border-textColorDark text-textColorDark hover:bg-bgColorDark'} focus:outline-none focus-visible:ring focus-visible:ring-green-500/75`}>
                 <span>{name}</span>
                 <div className="badge bg-green-500 text-white flex flex-row gap-2 items-center py-3">
                   <ImSpinner className="w-4 h-4 animate-spin" />
@@ -451,11 +454,11 @@ const SimulationStatusItem: React.FC<{
                 <MdKeyboardArrowUp
                   className={`${
                     open ? 'rotate-180 transform' : ''
-                  } h-5 w-5 text-secondaryColor`}
+                  } h-5 w-5 ${theme === 'light' ? 'text-secondaryColor' : 'text-textColorDark'}`}
                 />
               </Disclosure.Button>
-              <Disclosure.Panel className="px-4 pb-2 pt-4 text-sm text-gray-500">
-                <div className="p-5 w-full border border-secondaryColor rounded">
+              <Disclosure.Panel className="px-4 pb-2 pt-4 text-sm">
+                <div className={`p-5 w-full border ${theme === 'light' ? 'border-secondaryColor' : 'border-textColorDark'}  rounded`}>
                   <div className="flex flex-col gap-2">
                     <span>Computing P</span>
                     <div className="flex flex-row justify-between items-center w-full">
@@ -564,7 +567,7 @@ const SimulationStatusItem: React.FC<{
                   </div>
                 </div>
                 <div
-                  className="button w-full buttonPrimary text-center mt-4 mb-4"
+                  className={`button w-full buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} text-center mt-4 mb-4`}
                   onClick={() => {
                     dispatch(
                       setMessageInfoModal(

@@ -7,6 +7,7 @@ import { Folder } from '../../../../../model/esymiaModels';
 import toast from 'react-hot-toast';
 import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../../../../../../cad_library';
+import { ThemeSelector } from '../../../../../store/tabsAndMenuItemsSlice';
 
 interface CreateNewFolderModalProps {
     setShowNewFolderModal: Function,
@@ -22,6 +23,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
 
     const user = useSelector(usersStateSelector)
     const selectedFolder = useSelector(SelectedFolderSelector) as Folder
+    const theme = useSelector(ThemeSelector)
 
     const { execQuery } = useFaunaQuery()
 
@@ -77,10 +79,10 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                            <Dialog.Panel className={`w-full max-w-md transform overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark '} p-6 text-left align-middle shadow-xl transition-all`}>
                                 <Dialog.Title
                                     as="h3"
-                                    className="text-lg font-medium leading-6 text-gray-900"
+                                    className="text-lg font-medium leading-6"
                                 >
                                     CREATE NEW FOLDER
                                 </Dialog.Title>
@@ -92,7 +94,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
                                             <input
                                                 type="text"
                                                 data-testid="folderName"
-                                                className="formControl bg-gray-100 rounded p-2 w-full mt-3"
+                                                className={`formControl ${theme === 'light' ? 'bg-gray-100 text-textColor' : 'bg-bgColorDark text-textColorDark'} rounded p-2 w-full mt-3`}
                                                 placeholder="Folder's Name"
                                                 value={folderName}
                                                 onChange={(e) => setFolderName(e.target.value)} />
@@ -116,7 +118,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
                                     {user.email &&
                                         <button
                                             type="button"
-                                            className="button buttonPrimary"
+                                            className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'}`}
                                             onClick={handleCreate}
                                         >
                                             CREATE

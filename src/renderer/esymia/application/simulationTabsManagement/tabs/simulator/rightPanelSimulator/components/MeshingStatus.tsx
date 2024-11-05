@@ -20,6 +20,7 @@ import {
   setMeshProgressLength,
   setMessageInfoModal,
   setShowInfoModal,
+  ThemeSelector,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -58,6 +59,7 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
   activeMeshing,
 }) => {
   const dispatch = useDispatch();
+  const theme = useSelector(ThemeSelector)
   const [runningMesh, setrunningMesh] = useState<
     | {
         selectedProject: Project;
@@ -137,7 +139,7 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
 
   return (
     <div
-      className={`absolute right-10 w-1/4 bottom-10 flex flex-col justify-center items-center bg-white p-3 rounded ${
+      className={`absolute right-10 w-1/4 bottom-10 flex flex-col justify-center items-center ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-3 rounded ${
         !feedbackMeshingVisible && 'hidden'
       }`}
     >
@@ -201,6 +203,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   const compress = useSelector(compressSelector);
   const [stopSpinner, setStopSpinner] = useState<boolean>(false);
   const mesherResults = useSelector(mesherResultsSelector);
+  const theme = useSelector(ThemeSelector)
 
   useEffect(() => {
     const components = selectedProject?.model?.components as ComponentEntity[];
@@ -360,7 +363,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
     <Disclosure defaultOpen>
       {({ open }) => (
         <>
-          <Disclosure.Button className="flex w-full justify-between items-center rounded-lg border border-secondaryColor px-4 py-2 text-left text-sm font-medium text-secondaryColor hover:bg-green-100 focus:outline-none focus-visible:ring focus-visible:ring-green-500/75">
+          <Disclosure.Button className={`flex w-full justify-between items-center rounded-lg border ${theme === 'light' ? 'border-secondaryColor text-secondaryColor hover:bg-green-100' : 'border-textColorDark text-textColorDark hover:bg-bgColorDark'} px-4 py-2 text-left text-sm font-medium focus:outline-none focus-visible:ring focus-visible:ring-green-500/75`}>
             <span>{selectedProject.name}</span>
             <div className="badge bg-green-500 text-white flex flex-row gap-2 items-center py-3">
               <ImSpinner className="w-4 h-4 animate-spin" />
@@ -369,13 +372,13 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             <MdKeyboardArrowUp
               className={`${
                 open ? 'rotate-180 transform' : ''
-              } h-5 w-5 text-secondaryColor`}
+              } h-5 w-5 ${theme === 'light' ? 'text-secondaryColor' : 'text-textColorDark'} `}
             />
           </Disclosure.Button>
           <Disclosure.Panel className="px-4 pb-2 pt-4 text-sm text-gray-500">
             {selectedProject.meshData.meshGenerated === 'Generating' ? (
               <div
-                className={`p-5 bg-white rounded-xl flex flex-col gap-4 items-center justify-center w-full`}
+                className={`p-5 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} rounded-xl flex flex-col gap-4 items-center justify-center w-full`}
               >
                 {stopSpinner && (
                   <ImSpinner className="animate-spin w-8 h-8 absolute top-1/2 left-1/2" />
@@ -392,7 +395,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                         {meshingStep.meshingStep === 4 ? (
                           <div className="flex flex-row w-full justify-between items-center">
                             <progress
-                              className="progress w-full mr-4"
+                              className={`progress w-full mr-4`}
                               value={1}
                               max={1}
                             />
@@ -403,14 +406,14 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                           </div>
                         ) : (
                           <progress
-                            className="progress w-full"
+                          className={`progress w-full`}
                             value={meshingStep.meshingStep}
                             max={4}
                           />
                         )}
                       </>
                     ) : (
-                      <progress className="progress w-full" />
+                      <progress className={`progress w-full`} />
                     )}
                   </div>
                 </div>
@@ -426,7 +429,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                     checkProgressLength.length > 0 ? (
                       <div className="flex flex-row w-full justify-between items-center">
                         <progress
-                          className="progress w-full mr-4"
+                          className={`progress w-full mr-4`}
                           value={checkProgressValue.index}
                           max={checkProgressLength.length}
                         />
@@ -438,7 +441,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                         )}
                       </div>
                     ) : (
-                      <progress className="progress w-full" />
+                      <progress className={`progress w-full`} />
                     )}
                   </div>
                 </div>
@@ -454,7 +457,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                         {compress !== undefined ? (
                           <div className="flex flex-row w-full justify-between items-center">
                             <progress
-                              className="progress w-full mr-4"
+                              className={`progress w-full mr-4`}
                               value={1}
                               max={1}
                             />
@@ -465,14 +468,14 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                           </div>
                         ) : (
                           <progress
-                            className="progress w-full"
+                          className={`progress w-full`}
                             max={gridsCreationLength.gridsCreationLength}
                             value={gridsCreationValue.gridsCreationValue}
                           />
                         )}
                       </>
                     ) : (
-                      <progress className="progress w-full" />
+                      <progress className={`progress w-full`} />
                     )}
                   </div>
                 </div>
@@ -488,7 +491,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                         {!compress ? (
                           <div className="flex flex-row w-full justify-between items-center">
                             <progress
-                              className="progress w-full mr-4"
+                              className={`progress w-full mr-4`}
                               value={1}
                               max={1}
                             />
@@ -498,16 +501,16 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                             />
                           </div>
                         ) : (
-                          <progress className="progress w-full" />
+                          <progress className={`progress w-full`} />
                         )}
                       </>
                     ) : (
-                      <progress className="progress w-full" />
+                      <progress className={`progress w-full`} />
                     )}
                   </div>
                 </div>
                 <div
-                  className="button w-full buttonPrimary text-center mt-4 mb-4"
+                  className={`button w-full buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} text-center mt-4 mb-4`}
                   onClick={() => {
                     dispatch(
                       setMessageInfoModal('Are you sure to stop the meshing?'),

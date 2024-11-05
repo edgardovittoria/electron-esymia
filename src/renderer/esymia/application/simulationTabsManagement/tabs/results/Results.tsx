@@ -36,7 +36,7 @@ import toast, { ToastOptions } from 'react-hot-toast';
 import { Dispatch } from '@reduxjs/toolkit';
 import { s3 } from '../../../../aws/s3Config';
 import { RiAlarmWarningFill } from 'react-icons/ri';
-import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../../../store/tabsAndMenuItemsSlice';
+import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal, ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 
 interface ResultsProps {
   selectedTabLeftPanel: string | undefined;
@@ -84,6 +84,7 @@ export const Results: React.FC<ResultsProps> = ({
   const [cloning, setcloning] = useState<boolean>(false);
   const [emergencyCommand, setEmergencyCommand] = useState(false)
   const selectedProject = useSelector(selectedProjectSelector);
+  const theme = useSelector(ThemeSelector)
   useEffect(() => {
     if(selectedProject && selectedProject.simulation && selectedProject.simulation.resultS3 && selectedProject.simulation.status === "Completed"  && !selectedProject.simulation.results.matrix_S){
       setResultsFromS3(selectedProject, dispatch)
@@ -127,12 +128,12 @@ export const Results: React.FC<ResultsProps> = ({
   return (
     <div className="flex">
       <div className="w-[6%]">
-        <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+        <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
           <div
             className={`p-2 tooltip rounded-t tooltip-right ${
               selectedTabLeftPanel === resultsLeftPanelTitle.first
-                ? 'text-white bg-primaryColor'
-                : 'text-primaryColor bg-white'
+                ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
+                : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
             }`}
             data-tip="Results"
             onClick={() => {
@@ -148,7 +149,7 @@ export const Results: React.FC<ResultsProps> = ({
           </div>
           <button
             disabled={!selectedProject?.simulation || selectedProject.simulation.status === "Running"}
-            className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
+            className={`p-2 tooltip tooltip-right relative z-10 disabled:opacity-40 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}
             data-tip="Export CSV"
             onClick={() => {
               const zip = new JSZip();
@@ -180,7 +181,7 @@ export const Results: React.FC<ResultsProps> = ({
           </button>
           <button
             disabled={!selectedProject?.simulation || selectedProject.simulation.status === "Running"}
-            className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
+            className={`p-2 tooltip rounded-b tooltip-right relative z-10 disabled:opacity-40 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}
             data-tip="Export Touchstone"
             onClick={() => {
               if (selectedProject) {
@@ -209,7 +210,7 @@ export const Results: React.FC<ResultsProps> = ({
         </div>
         {selectedTabLeftPanel && (
           <>
-            <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]">
+            <div className={`${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]`}>
               {selectedTabLeftPanel === resultsLeftPanelTitle.first && (
                 <ResultsLeftPanelTab
                   selectedPort={selectedPort ? selectedPort.name : 'undefined'}
@@ -223,17 +224,17 @@ export const Results: React.FC<ResultsProps> = ({
         )}
         {emergencyCommand && (
           <>
-            <div className="bg-white p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]">
+            <div className={`${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]`}>
               <div className="flex flex-col items-center gap-4">
                 <span>Use this command only if you are facing some issues with simulation!</span>
-                <button className="button w-full buttonPrimary text-center mt-4 mb-4"
+                <button className={`button w-full buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} text-center mt-4 mb-4`}
                   onClick={() => setResultsFromS3(selectedProject as Project, dispatch)}
                 >Force Retrive results</button>
               </div>
             </div>
           </>
         )}
-        <div className="absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 bg-white">
+        <div className={`absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}>
           <button
             disabled={selectedProject && selectedProject.simulation && selectedProject.simulation.status === "Running"}
             className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
@@ -256,7 +257,7 @@ export const Results: React.FC<ResultsProps> = ({
             )}
           </button>
         </div>
-        <div className={`absolute left-[2%] top-[370px] rounded max-h-[500px] flex flex-col items-center gap-0 ${emergencyCommand ? 'bg-primaryColor' : 'bg-white'}`}>
+        <div className={`absolute left-[2%] top-[370px] rounded max-h-[500px] flex flex-col items-center gap-0 ${emergencyCommand ? theme === 'light' ? 'bg-primaryColor' : 'bg-secondaryColorDark' : theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'}`}>
           <button
             disabled={selectedProject && selectedProject.simulation && selectedProject.simulation.status === "Running"}
             className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
@@ -307,7 +308,7 @@ export const Results: React.FC<ResultsProps> = ({
           </>
         ) : (
           <div className="absolute top-1/2 right-1/2 translate-x-1/2 flex justify-center w-[90%]">
-            <span className={alertMessageStyle}>
+            <span className={`${alertMessageStyle} ${theme === 'light' ? '' : 'text-textColorDark'}`}>
               {selectedProject &&
               selectedProject.simulation &&
               selectedProject.simulation.status == 'Queued'

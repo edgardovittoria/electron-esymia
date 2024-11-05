@@ -5,13 +5,14 @@ import { calculateModelBoundingBox } from "../../sharedElements/utilityFunctions
 import * as THREE from 'three'
 import { useDispatch, useSelector } from "react-redux";
 import { selectedProjectSelector } from "../../../../store/projectSlice";
-import { setScalingViewParamsOfMesh } from "../../../../store/tabsAndMenuItemsSlice";
+import { setScalingViewParamsOfMesh, ThemeSelector } from "../../../../store/tabsAndMenuItemsSlice";
 
 export const AlteredProportionsButton: FC<{
   threshold: number,
 }> = ({ threshold }) => {
 
   const selectedProject = useSelector(selectedProjectSelector)
+  const theme = useSelector(ThemeSelector)
 
   const calculateScalingViewParams = (selectedProject: Project) => {
     let scalingFactors = {x:1, y:1, z:1}
@@ -42,7 +43,7 @@ export const AlteredProportionsButton: FC<{
       }
     >
       <button
-        className='bg-white rounded p-2'
+        className={`${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} rounded p-2`}
         onClick={() => {
           dispatch(setScalingViewParamsOfMesh(alteredParams))
         }}

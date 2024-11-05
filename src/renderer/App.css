@@ -50,8 +50,8 @@ body{
 
 .contexify_item:not(.contexify_item--disabled):hover > .contexify_itemContent,
 .contexify_item:not(.contexify_item--disabled):focus > .contexify_itemContent {
-  background-color: #29686E !important;
-  color: white !important;
+  background-color: #77FF94 !important;
+  color: black !important;
 }
 
 .react-contexify__item:not(.react-contexify__item--disabled):hover > .react-contexify__item__content,

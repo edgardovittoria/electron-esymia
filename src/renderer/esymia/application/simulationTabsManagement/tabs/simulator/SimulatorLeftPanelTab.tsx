@@ -6,6 +6,7 @@ import {Disclosure, Switch, Transition} from '@headlessui/react'
 import {MdOutlineKeyboardArrowDown} from "react-icons/md";
 import noMaterialsIcon from '../../../../../../../assets/noMaterialsIcon.png'
 import { Material } from '../../../../../cad_library';
+import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 
 
 interface SimulatorLeftPanelTabProps {
@@ -21,6 +22,7 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
 ) => {
 
     const selectedProject = useSelector(selectedProjectSelector)
+    const theme = useSelector(ThemeSelector)
 
     return (
         <>
@@ -34,7 +36,7 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
                                 {({open}) => (
                                     <>
                                         <Disclosure.Button
-                                            className={`flex w-full justify-between rounded-lg border mb-2 px-4 py-2 text-left text-sm font-medium text-gray-500 focus:outline-none focus-visible:ring`}
+                                            className={`flex w-full justify-between rounded-lg border mb-2 px-4 py-2 text-left text-sm font-medium ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} focus:outline-none focus-visible:ring`}
                                             style={{borderColor: material.color}}
                                         >
                                             <div className="flex gap-2 items-center">
@@ -65,28 +67,28 @@ export const SimulatorLeftPanelTab: React.FC<SimulatorLeftPanelTabProps> = (
                                                 style={{borderColor: material.color}}
                                             >
                                                 <div className="flexl gap-1">
-                                                    <span className="font-bold">Conductivity: </span>
-                                                    <span>{material.conductivity}</span>
+                                                    <span className={`font-bold ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>Conductivity: </span>
+                                                    <span className={`${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>{material.conductivity}</span>
                                                 </div>
                                                 <div className="flexl gap-1">
-                                                    <span className="font-bold">Relative Permittivity: </span>
-                                                    <span>{material.permittivity}</span>
+                                                    <span className={`font-bold ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>Relative Permittivity: </span>
+                                                    <span className={`${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>{material.permittivity}</span>
                                                 </div>
                                                 <div className="flexl gap-1">
-                                                    <span className="font-bold">Relative Permeability: </span>
-                                                    <span>{material.permeability}</span>
+                                                    <span className={`font-bold ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>Relative Permeability: </span>
+                                                    <span className={`${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>{material.permeability}</span>
                                                 </div>
                                                 <div className="flexl gap-1">
-                                                    <span className="font-bold">Tangent Delta Conductivity: </span>
-                                                    <span>{material.tangent_delta_conductivity}</span>
+                                                    <span className={`font-bold ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>Tangent Delta Conductivity: </span>
+                                                    <span className={`${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>{material.tangent_delta_conductivity}</span>
                                                 </div>
                                                 <div className="flexl gap-1">
-                                                    <span className="font-bold">Tangent Delta Permittivity: </span>
-                                                    <span>{material.tangent_delta_permittivity}</span>
+                                                    <span className={`font-bold ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>Tangent Delta Permittivity: </span>
+                                                    <span className={`${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>{material.tangent_delta_permittivity}</span>
                                                 </div>
                                                 <div className="flexl gap-1">
-                                                    <span className="font-bold">Tangent Delta Permeability: </span>
-                                                    <span>{material.tangent_delta_permeability}</span>
+                                                    <span className={`font-bold ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>Tangent Delta Permeability: </span>
+                                                    <span className={`${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>{material.tangent_delta_permeability}</span>
                                                 </div>
                                             </Disclosure.Panel>
                                         </Transition>

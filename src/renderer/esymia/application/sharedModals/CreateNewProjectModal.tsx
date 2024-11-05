@@ -13,7 +13,8 @@ import {
   addProjectTab,
   setIsAlertInfoModal,
   setMessageInfoModal, setShowCreateNewProjectModal,
-  setShowInfoModal
+  setShowInfoModal,
+  ThemeSelector
 } from '../../store/tabsAndMenuItemsSlice';
 import { Project, sharingInfoUser } from '../../model/esymiaModels';
 import toast from 'react-hot-toast';
@@ -30,6 +31,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
 
   const user = useSelector(usersStateSelector);
   const selectedFolder = useSelector(SelectedFolderSelector);
+  const theme = useSelector(ThemeSelector)
 
   const { execQuery } = useFaunaQuery();
 
@@ -104,10 +106,10 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                 leaveTo='opacity-0 scale-95'
               >
                 <Dialog.Panel
-                  className='w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all'>
+                  className={`w-full max-w-md transform overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark '} p-6 text-left align-middle shadow-xl transition-all`}>
                   <Dialog.Title
                     as='h3'
-                    className='text-lg font-medium leading-6 text-gray-900'
+                    className='text-lg font-medium leading-6 '
                   >
                     CREATE NEW PROJECT
                   </Dialog.Title>
@@ -119,7 +121,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                         <input
                           type='text'
                           data-testid="projectName"
-                          className='formControl bg-gray-100 rounded p-2 w-full mt-3'
+                          className={`formControl ${theme === 'light' ? 'bg-gray-100 text-textColor' : 'bg-bgColorDark text-textColorDark'}  rounded p-2 w-full mt-3`}
                           placeholder="Project's Name"
                           value={projectName}
                           onChange={(e) => setProjectName(e.target.value)}
@@ -128,7 +130,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                       <div className='p-2'>
                         <h6>Insert Project's Description</h6>
                         <textarea
-                          className='formControl h-[100px] bg-gray-100 rounded p-2 w-full mt-3'
+                          className={`formControl h-[100px] ${theme === 'light' ? 'bg-gray-100 text-textColor' : 'bg-bgColorDark text-textColorDark'}  rounded p-2 w-full mt-3`}
                           data-testid="projectDescription"
                           placeholder="Project's Description"
                           value={projectDescription}
@@ -155,7 +157,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                     {user.email &&
                       <button
                         type='button'
-                        className='button buttonPrimary'
+                        className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'}`}
                         onClick={handleCreate}
                       >
                         CREATE

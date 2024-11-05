@@ -288,14 +288,14 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               meshGenerated === 'Queued' ||
               spinnerLoadData) &&
             'opacity-40'
-          } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
+          } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
         >
           <div className="flex">
             <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
             <h5 className="ml-2 text-[12px] xl:text-base">Meshing Info</h5>
           </div>
           <hr className="mt-1" />
-          <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
+          <div className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark border-textColorDark'}`}>
             <h6 className="xl:text-base text-center text-[12px]">
               Set quantum&apos;s dimensions
             </h6>
@@ -364,7 +364,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 !pathToExternalGridsNotFound && (
                   <div className="flex flex-row gap-4 justify-center items-center w-full mt-3">
                     <div
-                      className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200"
+                      className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:opacity-50 rounded border border-gray-200"
                       onClick={() => {
                         setRefineMode('coarsen');
                         setShowModalRefine(true);
@@ -374,7 +374,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                       <span data-testid="coarsenButton">Coarsen</span>
                     </div>
                     <div
-                      className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:bg-gray-200 rounded border border-gray-200"
+                      className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:opacity-50 rounded border border-gray-200"
                       onClick={() => {
                         setRefineMode('refine');
                         setShowModalRefine(true);
@@ -396,9 +396,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     className={
                       process.env.APP_MODE !== "test" ?
                         checkQuantumDimensionsValidity()
-                        ? 'button buttonPrimary w-[100%]'
+                        ? `button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} w-[100%]`
                         : 'button bg-gray-300 text-gray-600 opacity-70 w-[100%]'
-                        : 'button buttonPrimary w-[100%]'
+                        : `button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} w-[100%]`
                     }
                     disabled={
                       process.env.APP_MODE !== "test" ? !checkQuantumDimensionsValidity() : false
@@ -445,19 +445,19 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               (selectedProject.simulation?.status === 'Queued' ||
                 selectedProject.simulation?.status === 'Running') &&
               'opacity-40'
-            } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr bg-white p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
+            } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
           >
             <div className="flex">
               <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
               <h5 className="ml-2 text-[12px] xl:text-base">Solving Info</h5>
             </div>
             <hr className="mt-1" />
-            <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
+            <div className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
               <h6 className="text-[12px] xl:text-base">Solver Type</h6>
               <div className="mt-2">
                 <div className="flex justify-between mt-2">
                   <div className="w-full">
-                    <select className="select select-bordered select-sm w-full max-w-xs"
+                    <select className={`select select-bordered select-sm w-full max-w-xs ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark border-textColorDark'}`}
                       onChange={(e) => {
                         dispatch(setSolverType(parseInt(e.target.value) as 1|2))
                       }}
@@ -471,7 +471,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 </div>
               </div>
             </div>
-            <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
+            <div className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
               <h6 className="text-[12px] xl:text-base">Solver Iterations</h6>
               <div className="mt-2">
                 <div className="flex justify-between mt-2">
@@ -483,7 +483,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                         meshGenerated !== 'Generated'
                       }
                       min={1}
-                      className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
+                      className={`w-full p-[4px] border-[1px] ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'} text-[15px] font-bold rounded formControl`}
                       type="number"
                       step={1}
                       value={
@@ -517,7 +517,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                         meshGenerated !== 'Generated'
                       }
                       min={1}
-                      className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
+                      className={`w-full p-[4px] border-[1px] ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'} text-[15px] font-bold rounded formControl`}
                       type="number"
                       step={1}
                       value={
@@ -546,7 +546,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 </div>
               </div>
             </div>
-            <div className="mt-3 p-[10px] xl:text-left text-center border-[1px] border-secondaryColor rounded bg-[#f6f6f6]">
+            <div className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
               <h6 className="text-[12px] xl:text-base">
                 Convergence Threshold
               </h6>
@@ -561,7 +561,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                       }
                       min={0.0001}
                       max={0.1}
-                      className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[15px] font-bold rounded formControl"
+                      className={`w-full p-[4px] border-[1px] ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'} text-[15px] font-bold rounded formControl`}
                       type="number"
                       step={0.0001}
                       value={
@@ -591,7 +591,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             </div>
             {selectedProject.simulation?.status === 'Completed' ? (
               <button
-                className="button buttonPrimary w-[100%] mt-3 text-[12px] xl:text-base"
+                className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} w-[100%] mt-3 text-[12px] xl:text-base`}
                 data-testid="resultsButton"
                 onClick={() => {
                   dispatch(selectMenuItem('Results'));
@@ -606,7 +606,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               ${
                 meshGenerated !== 'Generated'
                   ? 'bg-gray-300 text-gray-600 opacity-70'
-                  : 'buttonPrimary'
+                  : `buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'}`
               }`}
                 disabled={
                   meshGenerated !== 'Generated' || pathToExternalGridsNotFound
@@ -682,16 +682,17 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({
   onChange,
   label,
 }) => {
+  const theme = useSelector(ThemeSelector)
   return (
     <div className="xl:w-[30%] w-full flex flex-col items-center relative">
-      <span className="text-[12px] xl:text-sm absolute top-[-10px] left-1/2 translate-x-[-1/2] bg-[#f6f6f6] font-bold">
+      <span className={`text-[12px] xl:text-sm absolute top-[-10px] left-1/2 translate-x-[-1/2] ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-transparent'} font-bold`}>
         {label}
       </span>
       <DebounceInput
         data-testid={dataTestId}
         disabled={disabled}
         min={0.0}
-        className="w-full p-[4px] border-[1px] border-[#a3a3a3] text-[12px] font-bold rounded formControl"
+        className={`w-full p-[4px] border-[1px] ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'} text-[12px] font-bold rounded formControl`}
         type="number"
         debounceTimeout={
           debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500
@@ -733,6 +734,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
   const [zPercentage, setZPercentage] = useState<'No' | '10%' | '50%'>('No');
 
   const dispatch = useDispatch();
+  const theme = useSelector(ThemeSelector)
 
   const [x, setx] = useState(quantumDimsInput[0])
   const [y, sety] = useState(quantumDimsInput[1])
@@ -921,7 +923,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                     </button>
                     <button
                       type="button"
-                      className="button buttonPrimary text-white"
+                      className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} text-white`}
                       onClick={() => {
                         let newQuantum: [number, number, number] = [
                           ...quantumDimsInput,

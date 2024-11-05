@@ -184,7 +184,7 @@ export const DroppableAndDraggableFolder: React.FC<
           </span>
         </div>
         {folder.owner.email === user.email && (
-          <Menu id={folder.name}>
+          <Menu id={folder.name} theme={theme}>
             <Submenu
               className='hover:text-white  text-primaryColor'
               data-testid="moveMenu"

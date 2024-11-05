@@ -329,6 +329,7 @@ const PhysicsRightPanel: FC<{
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
+  const theme = useSelector(ThemeSelector)
   return (
     <MyPanel
       tabs={[physicsRightPanelTitle.first, physicsRightPanelTitle.second]}
@@ -393,7 +394,7 @@ const PhysicsRightPanel: FC<{
         <button
           data-testid="savePhysics"
           type="button"
-          className="button buttonPrimary w-full hover:opacity-80 disabled:opacity-60"
+          className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark'} w-full hover:opacity-80 disabled:opacity-60`}
           onClick={() => setSavedPhysicsParameters(true)}
           disabled={savedPhysicsParameters}
         >

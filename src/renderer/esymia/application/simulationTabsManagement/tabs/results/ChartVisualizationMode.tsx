@@ -7,6 +7,7 @@ import { Port, Project } from '../../../../model/esymiaModels';
 import { Dataset, pairs } from './sharedElements';
 import { ExportToCsvZippedButton } from './ExportToCsvZippedButton';
 import { ExportTouchstoneButton } from './ExportTouchstoneButton';
+import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 
 interface ChartVisualizationModeProps {
   chartVisualizationMode: 'grid' | 'full';
@@ -34,6 +35,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
   graphDataToExport,
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
+  const theme = useSelector(ThemeSelector)
   const ports = selectedProject?.ports.filter(
     (p) => p.category === 'port',
   ) as Port[];
@@ -43,16 +45,16 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
     <div className="mt-8 flex justify-between">
       <div className="flex">
         <div
-          className={`box p-[5px] mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${
-            chartVisualizationMode === 'grid' ? 'border-[#0fb25b]' : ''
+          className={`box p-[5px] ${theme === 'light' ? '' : 'bg-bgColorDark2'} mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${
+            chartVisualizationMode === 'grid' ? 'border-[#0fb25b]' : 'border-bgColorDark'
           }`}
           onClick={() => setChartVisualizationMode('grid')}
         >
           <BsGrid3X3Gap size={20} color="#0fb25b" />
         </div>
         <div
-          className={`box p-[5px] ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${
-            chartVisualizationMode === 'full' ? 'border-[#0fb25b]' : ''
+          className={`box p-[5px] ${theme === 'light' ? '' : 'bg-bgColorDark2'} ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${
+            chartVisualizationMode === 'full' ? 'border-[#0fb25b]' : 'border-bgColorDark'
           }`}
           onClick={() => setChartVisualizationMode('full')}
         >
@@ -61,7 +63,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
       </div>
       <div className="flex justify-center">
         <select
-          className="select select-success w-full max-w-xs h-[35px] min-h-[35px] mr-2 text-sm"
+          className={`select select-success w-full max-w-xs h-[35px] min-h-[35px] mr-2 text-sm ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}
           onChange={(e) => setGraphToVisualize(e.currentTarget.value)}
           defaultValue={'All Graph'}
         >
@@ -70,10 +72,10 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
           <option>Y</option>
           <option>S</option>
         </select>
-        <div className="dropdown dropdown-bottom">
+        <div className={`dropdown dropdown-bottom `}>
           <label
             tabIndex={0}
-            className="select select-success h-[35px] w-[300px] min-h-[35px] mr-2 flex items-center"
+            className={`select select-success ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} h-[35px] w-[300px] min-h-[35px] mr-2 flex items-center`}
           >
             {selectedLabel.length > 2
               ? 'Open to see and select ports...'
@@ -84,7 +86,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
           </label>
           <ul
             tabIndex={0}
-            className="dropdown-content p-2 shadow bg-base-100 rounded-box w-full h-[500px] max-h-[500px] overflow-y-scroll"
+            className={`dropdown-content ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-2 shadow rounded-box w-full h-[500px] max-h-[500px] overflow-y-scroll`}
           >
             <li
               className="flex flex-row items-center justify-between p-2"
@@ -93,7 +95,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
               <span>All Ports</span>
               <input
                 type="checkbox"
-                className="checkbox checkbox-xs"
+                className={`checkbox checkbox-xs ${theme === 'light' ? '' : 'border-textColorDark'}`}
                 checked={
                   selectedLabel.filter((pc) => pc.label === 'All Ports')
                     .length > 0
@@ -119,7 +121,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
                   <span>{`${l[0]} - ${l[1]}`}</span>
                   <input
                     type="checkbox"
-                    className="checkbox checkbox-xs"
+                    className={`checkbox checkbox-xs ${theme === 'light' ? '' : 'border-textColorDark'}`}
                     checked={
                       selectedLabel.filter(
                         (pc) => pc.label === `${l[0]} - ${l[1]}`,
