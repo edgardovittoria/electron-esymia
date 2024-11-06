@@ -34,6 +34,7 @@ export const useAllowSingleSessionUser = () => {
     }
   }, [isAlertConfirmed])
 
+
   useEffect(() => {
     if (user) {
       execQuery(getUserSessionInfo, user.email as string, dispatch).then((item) => {
@@ -41,15 +42,16 @@ export const useAllowSingleSessionUser = () => {
           let logged = item[0].userSessionInfo.logged;
           if (!logged) {
             let newSessionInfo = {
-              ...item[0].userSessionInfo,
+              email: item[0].userSessionInfo.email,
+              mac: item[0].userSessionInfo.mac,
               logged: true,
             } as UserSessionInfo;
             execQuery(updateUserSessionInfo, {
-              ...item[0],
+              id: item[0].id,
               userSessionInfo: newSessionInfo,
             } as FaunaUserSessionInfo, dispatch);
             setLoggedUser({
-              ...item[0],
+              id: item[0].id,
               userSessionInfo: newSessionInfo,
             } as FaunaUserSessionInfo);
           } else {
@@ -96,15 +98,16 @@ export const useAllowSingleSessionUser = () => {
   }, [user]);
 
   const closeUserSessionOnFauna = () => {
+    console.log(loggedUser)
     if (loggedUser) {
       let newSessionInfo = {
-        email: loggedUser.userSessionInfo.email,
+        ...loggedUser.userSessionInfo,
         logged: false,
       } as UserSessionInfo;
       execQuery(updateUserSessionInfo, {
         id: loggedUser.id,
         userSessionInfo: newSessionInfo,
-      } as FaunaUserSessionInfo, dispatch);
+      } as FaunaUserSessionInfo, dispatch)
     }
     setLoggedUser(undefined)
   };
