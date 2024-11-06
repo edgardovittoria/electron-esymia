@@ -61,7 +61,7 @@ export const setResultsFromS3 = (project: Project, dispatch: Dispatch) => {
       dispatch(setIsAlertInfoModal(true));
       dispatch(setShowInfoModal(true));
     }else{
-      const results = JSON.parse(data.Body?.toString() as string).matrices as SolverOutput
+      const results = JSON.parse(data.Body?.toString() as string).matrices ? JSON.parse(data.Body?.toString() as string).matrices as SolverOutput : JSON.parse(data.Body?.toString() as string) as SolverOutput
       dispatch(
         updateSimulation({
           associatedProject: project.simulation?.associatedProject as string,

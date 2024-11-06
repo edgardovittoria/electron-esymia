@@ -24,6 +24,7 @@ import { ImSpinner } from 'react-icons/im';
 import { brokerConnectedSelector, setTheme, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
 import { useDemoMode } from './useDemoMode';
 import { MesherStatusSelector, SolverStatusSelector } from './esymia/store/pluginsSlice';
+import { useAllowSingleSessionUser } from './useAllowSingleSessionUser';
 
 // export const client = new Client({
 //   brokerURL: 'ws://localhost:15674/ws'
@@ -49,7 +50,7 @@ export default function App() {
   //let {allowedUser, remainingDemoDays} = useDemoMode()
 
   // Permette ad ogni utente di avere un'unica sessione attiva per volta. Commentare per disabilitare questo vincolo.
-  //let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
+  let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
 
   useEffect(() => {
     // window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
@@ -264,7 +265,7 @@ export default function App() {
                         onClick={() => {
                           if (process.env.APP_MODE !== 'test') {
                             window.electron.ipcRenderer.sendMessage('checkLogout');
-                            //closeUserSessionOnFauna()
+                            closeUserSessionOnFauna()
                           }
                         }}
                       >

@@ -48,5 +48,6 @@ export type FaunaUserSessionInfo = {
 
 export type UserSessionInfo = {
   email: string,
+  mac: string,
   logged: boolean
 }

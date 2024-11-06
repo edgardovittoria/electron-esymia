@@ -9,8 +9,9 @@ import {
   FaunaUserSessionInfo,
   UserSessionInfo,
 } from './esymia/model/FaunaModels';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaQuery';
+import { isConfirmedInfoModalSelector, setIsAlertInfoModal, setMessageInfoModal, setShowInfoModal } from './esymia/store/tabsAndMenuItemsSlice';
 
 export const useAllowSingleSessionUser = () => {
   const { user } = useAuth0();
@@ -19,6 +20,19 @@ export const useAllowSingleSessionUser = () => {
     FaunaUserSessionInfo | undefined
   >(undefined);
   const dispatch = useDispatch()
+  const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
+
+  useEffect(() => {
+    if(isAlertConfirmed){
+      execQuery(updateUserSessionInfo, {
+        ...loggedUser,
+        userSessionInfo: {
+          ...loggedUser?.userSessionInfo,
+          logged: false
+        },
+      } as FaunaUserSessionInfo, dispatch);
+    }
+  }, [isAlertConfirmed])
 
   useEffect(() => {
     if (user) {
@@ -40,27 +54,42 @@ export const useAllowSingleSessionUser = () => {
             } as FaunaUserSessionInfo);
           } else {
             if(process.env.APP_MODE !== 'test'){
-              window.electron.ipcRenderer.sendMessage('logout', [
-                process.env.REACT_APP_AUTH0_DOMAIN,
-              ]);
+              window.electron.ipcRenderer.invoke('getMac').then((res) => {
+                if(res !== item[0].userSessionInfo.mac){
+                  if(process.env.APP_MODE !== 'test'){
+                    window.electron.ipcRenderer.sendMessage('logout', [
+                      process.env.REACT_APP_AUTH0_DOMAIN,
+                    ]);
+                  }
+                  dispatch(
+                    setMessageInfoModal(
+                      'You are already logged in to another device. Close that connection in order to start a new one. If not possible, you can manually terminate active session using confirm button. This may cause errors if within the active session there were pending operations, so use it carefully!',
+                    ),
+                  );
+                  dispatch(setIsAlertInfoModal(false));
+                  dispatch(setShowInfoModal(true));
+                }
+              })
             }
-            alert(
-              'You are already logged in to another device. Close that connection in order to start a new one.',
-            );
           }
         } else {
-          let newUserSessionInfo = {
-            email: user.email as string,
-            logged: true,
-          } as UserSessionInfo;
-          execQuery(createUserSessionInfo, newUserSessionInfo, dispatch).then(
-            (ret: any) => {
-              setLoggedUser({
-                id: ret.ref.value.id,
-                userSessionInfo: newUserSessionInfo,
-              } as FaunaUserSessionInfo);
-            },
-          );
+          if(process.env.APP_MODE !== 'test'){
+            window.electron.ipcRenderer.invoke('getMac').then((res) => {
+              let newUserSessionInfo = {
+                email: user.email as string,
+                mac: res,
+                logged: true,
+              } as UserSessionInfo;
+              execQuery(createUserSessionInfo, newUserSessionInfo, dispatch).then(
+                (ret: any) => {
+                  setLoggedUser({
+                    id: ret.data.id,
+                    userSessionInfo: newUserSessionInfo,
+                  } as FaunaUserSessionInfo);
+                },
+              );
+            });
+          }
         }
       });
     }

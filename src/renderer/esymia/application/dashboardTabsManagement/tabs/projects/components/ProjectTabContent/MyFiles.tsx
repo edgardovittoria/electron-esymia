@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,6 +38,12 @@ const MyFiles: React.FC<MyFilesProps> = ({
   const folders = selectedFolder?.subFolders;
 
   const [path, setPath] = useState([mainFolder]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(selectFolder('root'))
+    }
+  }, [])
 
   return (
     <DndProvider backend={HTML5Backend}>

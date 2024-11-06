@@ -64,25 +64,27 @@ export const useDemoMode = () => {
   };
 
   const checkDemoPeriod = () => {
-    window.electron.ipcRenderer.invoke('getMac').then((res) => {
-      execQuery(getItemByMacAddress, res).then((item) => {
-        //console.log("mac -> ", item)
-        if (item.length !== 0) {
-          let elapsedDays = demoElapsedDays(item[0].startTime);
-          setRemainingDemoDays(DEMO_DAYS - elapsedDays);
-          if (elapsedDays >= DEMO_DAYS) {
-            setallowedUser(false);
-            alert('The trial period has expired!');
-            window.close();
+    if(process.env.APP_MODE !== 'test'){
+      window.electron.ipcRenderer.invoke('getMac').then((res) => {
+        execQuery(getItemByMacAddress, res).then((item) => {
+          //console.log("mac -> ", item)
+          if (item.length !== 0) {
+            let elapsedDays = demoElapsedDays(item[0].startTime);
+            setRemainingDemoDays(DEMO_DAYS - elapsedDays);
+            if (elapsedDays >= DEMO_DAYS) {
+              setallowedUser(false);
+              alert('The trial period has expired!');
+              window.close();
+            }
+          } else {
+            execQuery(createItemInMacAddresses, {
+              macAddress: res,
+              startTime: new Date().getTime(),
+            });
           }
-        } else {
-          execQuery(createItemInMacAddresses, {
-            macAddress: res,
-            startTime: new Date().getTime(),
-          });
-        }
+        });
       });
-    });
+    }
   };
 
   useEffect(() => {
