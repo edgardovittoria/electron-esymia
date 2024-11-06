@@ -41,19 +41,21 @@ export const useAllowSingleSessionUser = () => {
         if (item.length !== 0) {
           let logged = item[0].userSessionInfo.logged;
           if (!logged) {
-            let newSessionInfo = {
-              email: item[0].userSessionInfo.email,
-              mac: item[0].userSessionInfo.mac,
-              logged: true,
-            } as UserSessionInfo;
-            execQuery(updateUserSessionInfo, {
-              id: item[0].id,
-              userSessionInfo: newSessionInfo,
-            } as FaunaUserSessionInfo, dispatch);
-            setLoggedUser({
-              id: item[0].id,
-              userSessionInfo: newSessionInfo,
-            } as FaunaUserSessionInfo);
+            window.electron.ipcRenderer.invoke('getMac').then((mac) => {
+              let newSessionInfo = {
+                email: item[0].userSessionInfo.email,
+                mac: mac,
+                logged: true,
+              } as UserSessionInfo;
+              execQuery(updateUserSessionInfo, {
+                id: item[0].id,
+                userSessionInfo: newSessionInfo,
+              } as FaunaUserSessionInfo, dispatch);
+              setLoggedUser({
+                id: item[0].id,
+                userSessionInfo: newSessionInfo,
+              } as FaunaUserSessionInfo);
+            })
           } else {
             if(process.env.APP_MODE !== 'test'){
               window.electron.ipcRenderer.invoke('getMac').then((res) => {
