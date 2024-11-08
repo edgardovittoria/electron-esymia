@@ -294,7 +294,7 @@ export const useStorageData = () => {
   const loadGridsFromS3 = () => {
     dispatch(publishMessage({
       queue: 'management',
-      body: { message: "get grids", grids_id: selectedProject.meshData.externalGrids as string }}))
+      body: { message: "get grids", grids_id: selectedProject.meshData.externalGrids as string, id: selectedProject.faunaDocumentId }}))
   };
 
 
