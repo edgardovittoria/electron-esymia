@@ -1,9 +1,10 @@
-import { Middleware } from "@reduxjs/toolkit";
-import { Client } from "@stomp/stompjs";
+import { Middleware, ThunkMiddleware } from "@reduxjs/toolkit";
+import { Client, IMessage } from "@stomp/stompjs";
 import { callback_mesh_advices, callback_mesher_feedback, callback_mesher_grids, callback_mesher_results, callback_server_init, callback_solver_feedback, callback_solver_results } from "../esymia/application/rabbitMQFunctions";
 import { setBrokerConnected, unsetBrokerConnected } from "../esymia/store/tabsAndMenuItemsSlice";
+import { store } from "../store";
 
-export const stompMiddleware: Middleware = (dispatch) => {
+export const stompMiddleware: ThunkMiddleware = ({dispatch, getState}) => {
 
   const client = new Client({
     brokerURL: 'ws://localhost:15674/ws'
@@ -21,26 +22,26 @@ export const stompMiddleware: Middleware = (dispatch) => {
   });
 
   client.onConnect = function (frame) {
-    client.subscribe('server_init', (msg) => callback_server_init(msg, dispatch.dispatch), {ack: 'client'});
-    client.subscribe('mesh_advices', (msg) => callback_mesh_advices(msg, dispatch.dispatch), {ack: 'client'});
+    client.subscribe('server_init', (msg) => callback_server_init(msg, dispatch), {ack: 'client'});
+    client.subscribe('mesh_advices', (msg) => callback_mesh_advices(msg, dispatch, getState), {ack: 'client'});
     client.subscribe(
       'mesher_results',
-      (msg) => callback_mesher_results(msg, dispatch.dispatch),
+      (msg) => callback_mesher_results(msg, dispatch, getState),
       { ack: 'client' },
     );
     client.subscribe(
       'mesher_feedback',
-      (msg) => callback_mesher_feedback(msg, dispatch.dispatch),
+      (msg) => callback_mesher_feedback(msg, dispatch, getState),
       { ack: 'client' },
     );
-    client.subscribe('mesher_grids', (msg) => callback_mesher_grids(msg, dispatch.dispatch), {ack: 'client'});
-    client.subscribe('solver_results', (msg) => callback_solver_results(msg, dispatch.dispatch), {ack: 'client'})
-    client.subscribe('solver_feedback', (msg) => callback_solver_feedback(msg, dispatch.dispatch), {ack: 'client'})
-    dispatch.dispatch(setBrokerConnected())
+    client.subscribe('mesher_grids', (msg) => callback_mesher_grids(msg, dispatch, getState), {ack: 'client'});
+    client.subscribe('solver_results', (msg) => callback_solver_results(msg, dispatch, getState), {ack: 'client'})
+    client.subscribe('solver_feedback', (msg) => callback_solver_feedback(msg, dispatch, getState), {ack: 'client'})
+    dispatch(setBrokerConnected())
   };
 
   client.onDisconnect = function (frame) {
-    dispatch.dispatch(unsetBrokerConnected())
+    dispatch(unsetBrokerConnected())
   }
 
   client.onStompError = function (frame) {
