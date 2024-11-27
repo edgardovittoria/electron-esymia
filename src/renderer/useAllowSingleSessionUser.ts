@@ -12,6 +12,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaQuery';
 import { isConfirmedInfoModalSelector, setIsAlertInfoModal, setMessageInfoModal, setShowInfoModal } from './esymia/store/tabsAndMenuItemsSlice';
+import { useEffectNotOnMount } from './esymia/hook/useEffectNotOnMount';
 
 export const useAllowSingleSessionUser = () => {
   const { user } = useAuth0();
@@ -21,18 +22,33 @@ export const useAllowSingleSessionUser = () => {
   >(undefined);
   const dispatch = useDispatch()
   const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
+  const [openAlert, setOpenAlert] = useState(false)
 
-  useEffect(() => {
-    if(isAlertConfirmed){
-      execQuery(updateUserSessionInfo, {
-        ...loggedUser,
-        userSessionInfo: {
-          ...loggedUser?.userSessionInfo,
-          logged: false
-        },
-      } as FaunaUserSessionInfo, dispatch);
+  useEffectNotOnMount(() => {
+    console.log("isAlertConfirmed -> ", isAlertConfirmed)
+    console.log("openAlert -> ", openAlert)
+    if(openAlert){
+      if(isAlertConfirmed){
+        // execQuery(updateUserSessionInfo, {
+        //   ...loggedUser,
+        //   userSessionInfo: {
+        //     ...loggedUser?.userSessionInfo,
+        //     logged: false
+        //   },
+        // } as FaunaUserSessionInfo, dispatch).then(() => {
+        //   setOpenAlert(false)
+        // });
+        setOpenAlert(false)
+      }else{
+        if(process.env.APP_MODE !== 'test'){
+          window.electron.ipcRenderer.sendMessage('logout', [
+            process.env.REACT_APP_AUTH0_DOMAIN,
+          ]);
+        }
+        setOpenAlert(false)
+      }
     }
-  }, [isAlertConfirmed])
+  }, [openAlert, isAlertConfirmed])
 
 
   useEffect(() => {
@@ -60,11 +76,6 @@ export const useAllowSingleSessionUser = () => {
             if(process.env.APP_MODE !== 'test'){
               window.electron.ipcRenderer.invoke('getMac').then((res) => {
                 if(res !== item[0].userSessionInfo.mac){
-                  if(process.env.APP_MODE !== 'test'){
-                    window.electron.ipcRenderer.sendMessage('logout', [
-                      process.env.REACT_APP_AUTH0_DOMAIN,
-                    ]);
-                  }
                   dispatch(
                     setMessageInfoModal(
                       'You are already logged in to another device. Close that connection in order to start a new one. If not possible, you can manually terminate active session using confirm button. This may cause errors if within the active session there were pending operations, so use it carefully!',
@@ -72,6 +83,7 @@ export const useAllowSingleSessionUser = () => {
                   );
                   dispatch(setIsAlertInfoModal(false));
                   dispatch(setShowInfoModal(true));
+                  setOpenAlert(true)
                 }
               })
             }

@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  meshValidTopologySelector,
   pathToExternalGridsNotFoundSelector,
   SelectedFolderSelector,
   selectedProjectSelector,
@@ -60,6 +61,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const selectedProject = useSelector(selectedProjectSelector)
   const selectedFolder = useSelector(SelectedFolderSelector)
   const theme = useSelector(ThemeSelector)
+  const validTopology = useSelector(meshValidTopologySelector)
   const dispatch = useDispatch();
   const [resetFocus, setResetFocus] = useState(false);
   const [spinner, setSpinner] = useState<boolean>(false);
@@ -192,6 +194,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
     setSelectedTabLeftPanel(undefined)
   },[])
 
+  console.log(validTopology)
+
   return (
     <>
       {spinner && !pathToExternalGridsNotFound && (
@@ -212,6 +216,11 @@ export const Simulator: React.FC<SimulatorProps> = ({
         setResetFocus={toggleResetFocus}
       />
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
+      {validTopology !== undefined &&
+        <div className="tooltip tooltip-left absolute right-[2%] top-[180px]" data-tip={`${validTopology ? 'Mesh Topology Valid' : 'Mesh Topology NOT Valid try to refine or coarse the quantum'}`}>
+          <div className={`badge ${validTopology ? 'bg-green-500' : 'bg-red-600'} badge-lg`}></div>
+      </div>
+      }
       <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
         <div
           className={`p-2 tooltip rounded-t tooltip-right ${

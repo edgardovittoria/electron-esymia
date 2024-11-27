@@ -27,6 +27,7 @@ import {
   setExternalGrids,
   setMesh,
   setMeshGenerated,
+  setMeshValidTopology,
 } from '../../../../../../store/projectSlice';
 import { Project } from '../../../../../../model/esymiaModels';
 import { generateSTLListFromComponents } from './rightPanelFunctions';
@@ -255,6 +256,10 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
+        dispatch(setMeshValidTopology({
+          status: mesherResults.validTopology,
+          projectToUpdate: selectedProject.faunaDocumentId as string,
+        }))
       } else if (mesherResults.isValid.valid === false) {
         dispatch(
           setMessageInfoModal(
@@ -273,6 +278,10 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
+        dispatch(setMeshValidTopology({
+          status: mesherResults.validTopology,
+          projectToUpdate: selectedProject.faunaDocumentId as string,
+        }))
       } else if (
         mesherResults.error &&
         mesherResults.error === 'out of memory'
@@ -292,6 +301,10 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
+        dispatch(setMeshValidTopology({
+          status: mesherResults.validTopology,
+          projectToUpdate: selectedProject.faunaDocumentId as string,
+        }))
       } else {
         dispatch(
           setMeshGenerated({
@@ -299,6 +312,10 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
+        dispatch(setMeshValidTopology({
+          status: mesherResults.validTopology,
+          projectToUpdate: selectedProject.faunaDocumentId as string,
+        }))
         dispatch(
           setMesh({
             mesh: mesherResults.meshPath,
@@ -320,6 +337,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
               mesh: mesherResults.meshPath,
               externalGrids: mesherResults.gridsPath,
               meshGenerated: 'Generated',
+              validTopology: mesherResults.validTopology
             },
           }),
           dispatch

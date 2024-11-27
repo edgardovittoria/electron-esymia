@@ -267,6 +267,10 @@ export const ProjectSlice = createSlice({
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.meshGenerated = action.payload.status;
     },
+    setMeshValidTopology(state: ProjectState, action: PayloadAction<{ status:boolean, projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.validTopology = action.payload.status;
+    },
     setPreviousMeshStatus(state: ProjectState, action: PayloadAction<{ status: 'Not Generated' | 'Generated' | undefined, projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.previousMeshStatus = action.payload.status;
@@ -359,6 +363,7 @@ export const {
   shareFolder,
   setMesh,
   setMeshGenerated,
+  setMeshValidTopology,
   setPreviousMeshStatus,
   setMeshApproved,
   setQuantum,
@@ -404,6 +409,9 @@ export const selectedProjectSelector = (state: { projects: ProjectState }) => {
 export const meshGeneratedSelector = (state: {
   projects: ProjectState
 }) => (findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject) as Project).meshData.meshGenerated;
+export const meshValidTopologySelector = (state: {
+  projects: ProjectState
+}) => (findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject) as Project).meshData.validTopology;
 export const pathToExternalGridsNotFoundSelector = (state: {
   projects: ProjectState
 }) => (findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject) as Project).meshData.pathToExternalGridsNotFound;

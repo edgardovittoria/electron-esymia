@@ -106,6 +106,7 @@ export const callback_mesher_results = (message: any, dispatch: Function, getSta
           meshPath: res.mesh,
           isStopped: res.isStopped ? res.isStopped : false,
           isValid: res.isValid,
+          validTopology: res.validTopology,
           error: res.error,
         }),
       );

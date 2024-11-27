@@ -21,10 +21,11 @@ import {
   publishMessage,
 } from './middleware/stompMiddleware';
 import { ImSpinner } from 'react-icons/im';
-import { brokerConnectedSelector, setTheme, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
+import { brokerConnectedSelector, setTheme, showInfoModalSelector, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
 import { useDemoMode } from './useDemoMode';
 import { MesherStatusSelector, SolverStatusSelector } from './esymia/store/pluginsSlice';
 import { useAllowSingleSessionUser } from './useAllowSingleSessionUser';
+import InfoModal from './esymia/application/sharedModals/InfoModal';
 
 // export const client = new Client({
 //   brokerURL: 'ws://localhost:15674/ws'
@@ -139,6 +140,7 @@ export default function App() {
       setFeedbackMeshingVisible(true);
     }
   }, [activeMeshing.length]);
+
 
 
   return (
