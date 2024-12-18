@@ -267,7 +267,7 @@ export default function App() {
                         onClick={() => {
                           if (process.env.APP_MODE !== 'test') {
                             window.electron.ipcRenderer.sendMessage('checkLogout');
-                            closeUserSessionOnFauna()
+                            //closeUserSessionOnFauna()
                           }
                         }}
                       >

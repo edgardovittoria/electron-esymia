@@ -34,6 +34,8 @@ import {
 import { setModality } from '../../../cadmiaModality/cadmiaModalitySlice';
 import { useFaunaQuery } from '../../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { addComponent, BufferGeometryAttributes, canvasStateSelector, ComponentEntity, componentseSelector, exportToSTL, FaunaCadModel, getNewKeys, ImportActionParamsObject, ImportCadProjectButton, ImportModelFromDBModal, importStateCanvas, numberOfGeneratedKeySelector, TRANSF_PARAMS_DEFAULTS, CanvasState } from '../../../../../../cad_library';
+import { importRisGeometry } from '../../../../../../cad_library/components/importFunctions/importFunctions';
+import { SaveRisModelWithNameModal } from './components/saveRisModelWithNameModal';
 
 interface FileItemProps {}
 
@@ -65,6 +67,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
   const canvasState = useSelector(canvasStateSelector);
   const entities = useSelector(componentseSelector);
   const [modalSave, setModalSave] = useState(false);
+  const [modalRisSave, setModalRisSave] = useState(false);
   const [modalLoad, setModalLoad] = useState(false);
   const { isAuthenticated } = useAuth0();
   const selectedModel = useSelector(SelectedModelSelector);
@@ -206,7 +209,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
                         </div>
                       </span>
                     )} */}
-                    {isAuthenticated ? (
+                    {isAuthenticated && (
                       <span
                         className={navbarDropdownItemStyle}
                         onClick={() => setModalSave(true)}
@@ -216,19 +219,19 @@ export const FileItem: React.FC<FileItemProps> = () => {
                             <CloudArrowDownIcon className="w-[20px] mr-4" />
                             <p className="text-base font-medium">Save As...</p>
                           </div>
-                          {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
                         </div>
                       </span>
-                    ) : (
-                      <span className="-m-3 flex items-start rounded-lg p-2 hover:bg-black hover:text-white">
+                    )}
+                    {isAuthenticated && (
+                      <span
+                        className={navbarDropdownItemStyle}
+                        onClick={() => setModalRisSave(true)}
+                      >
                         <div className="flex justify-between w-full hover:cursor-pointer">
                           <div className="flex">
-                            <CloudArrowDownIcon className="w-[20px] mr-4 text-gray-300" />
-                            <p className="text-base font-medium text-gray-300">
-                              Save As New Model
-                            </p>
+                            <CloudArrowDownIcon className="w-[20px] mr-4" />
+                            <p className="text-base font-medium">Save As Ris Geometry</p>
                           </div>
-                          {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
                         </div>
                       </span>
                     )}
@@ -298,6 +301,33 @@ export const FileItem: React.FC<FileItemProps> = () => {
                         }}
                       />
                     </div>
+                    <div
+                      className={navbarDropdownItemStyle}
+                      onClick={onImportSTLClick}
+                    >
+                      <div className="flex justify-between w-full hover:cursor-pointer"
+                          onClick={() => dispatch(setModality("NormalSelection"))}
+                      >
+                        <div className="flex">
+                          <ArrowDownTrayIcon className="w-[20px] mr-4" />
+                          <p className="text-base font-medium">
+                            Import Ris Geometry
+                          </p>
+                        </div>
+                        {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
+                      </div>
+                      <input
+                        type="file"
+                        ref={inputRefSTL}
+                        style={{ display: 'none' }}
+                        accept=".json"
+                        onChange={(e) => {
+                          const RisFile = e.target.files;
+                          RisFile &&
+                            importRisGeometry(RisFile[0], dispatch, numberOfGeneratedKey)
+                        }}
+                      />
+                    </div>
                     <span
                       className={navbarDropdownItemStyle}
                       onClick={() => {
@@ -342,6 +372,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
         )}
       </Popover>
       {modalSave && <SaveModelWithNameModal showModalSave={setModalSave} />}
+      {modalRisSave && <SaveRisModelWithNameModal showModalSave={setModalRisSave} />}
       {modalLoad && (
         <ImportModelFromDBModal
           s3Config={s3}

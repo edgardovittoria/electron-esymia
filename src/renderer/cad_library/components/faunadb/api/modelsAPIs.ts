@@ -5,6 +5,7 @@ export type FaunaCadModel = {
     id?: string,
     name: string,
     components: string,
+    bricks?: string,
     owner_id: string,
     owner: string,
     userSharingWith?: string[]

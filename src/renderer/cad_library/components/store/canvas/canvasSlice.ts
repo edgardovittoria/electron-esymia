@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Keys } from 'faunadb';
 import { StateWithHistory } from 'redux-undo';
 import { ComponentEntity, GeometryAttributes, getNewKeys, TransformationParams } from '../..';
 import { ImportActionParamsObject } from '../../importFunctions/importFunctions';
@@ -9,7 +8,7 @@ export type CanvasState = {
     components: ComponentEntity[],
     numberOfGeneratedKey: number,
     selectedComponentKey: number,
-    lastActionType: string
+    lastActionType: string,
 }
 
 const initialState: CanvasState = {
@@ -101,9 +100,7 @@ export const CanvasSlice = createSlice({
             state.selectedComponentKey = initialState.selectedComponentKey
             state.lastActionType = initialState.lastActionType
             state.numberOfGeneratedKey = initialState.numberOfGeneratedKey
-        }
-
-
+        },
     },
     // extraReducers: {
     //     //qui inseriamo i metodi : PENDING, FULLFILLED, REJECT utili per la gestione delle richieste asincrone
@@ -130,4 +127,4 @@ export const numberOfGeneratedKeySelector = (state: { canvas: StateWithHistory<C
 export const findComponentByKey = (components: ComponentEntity[], key: number) => components.filter(component => component.keyComponent === key)[0]
 const setSelectedComponent = (state: CanvasState, keyComponentToSelect: number) => state.selectedComponentKey = keyComponentToSelect
 const setLastActionType = (state: CanvasState, actionType: string) => state.lastActionType = actionType
-const maximumKeyComponentAmong = (components: ComponentEntity[]) => components.reduce((max, component) => max = (component.keyComponent > max) ? component.keyComponent : max,0) 
+const maximumKeyComponentAmong = (components: ComponentEntity[]) => components.reduce((max, component) => max = (component.keyComponent > max) ? component.keyComponent : max,0)

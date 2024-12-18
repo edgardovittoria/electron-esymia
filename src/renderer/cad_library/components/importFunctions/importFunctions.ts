@@ -1,8 +1,9 @@
 import { Dispatch } from "@reduxjs/toolkit";
-import { getNewKeys } from "../baseShapes/shapes/cube/cube";
+import { getNewKeys, getRisCube } from "../baseShapes/shapes/cube/cube";
 import { BufferGeometryAttributes, ComponentEntity, TRANSF_PARAMS_DEFAULTS } from "../model/componentEntity/componentEntity";
 import { addComponent, importStateCanvas, CanvasState } from "../store/canvas/canvasSlice";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
+import { setFocusNotToScene } from "../../../cadmia/canvas/components/navBar/menuItems/view/viewItemSlice";
 
 //TODO: change importFromCadSTL to make it working in any case, not only for the CAD.
 export const importFromCadSTL = (STLFile: File, numberOfGeneratedKey: number, dispatch: Dispatch) => {
@@ -34,6 +35,18 @@ export const importFromCadProject = (file: File, dispatch: Dispatch, action: (pa
         actionParamsObject.canvas = JSON.parse(value)
         dispatch(action(actionParamsObject))
     })
+}
+
+export const importRisGeometry = (file: File, dispatch: Dispatch, numberOfGeneratedKey: number) => {
+  file.text().then((value) => {
+      let data:number[][] = JSON.parse(value).ris_geometry
+      const key = getNewKeys(numberOfGeneratedKey, dispatch, data.length)
+      data.forEach((item, index) => {
+        let cube = getRisCube(key[index], dispatch, item)
+        dispatch(addComponent(cube))
+      })
+      dispatch(setFocusNotToScene());
+  })
 }
 
 export type ImportActionParamsObject = {
