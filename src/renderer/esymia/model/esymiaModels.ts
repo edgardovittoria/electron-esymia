@@ -25,6 +25,7 @@ export type Project = {
   model: CanvasState,
   modelUnit?: string,
   modelS3?: string,
+  bricks?: string,
   ports: (Port | Probe | TempLumped)[],
   portsS3?: string | null,
   scatteringValue?: number,
@@ -93,8 +94,10 @@ export type Probe = {
 export type MeshData = {
   mesh?: string,
   externalGrids?: string,
+  surface?: string,
   previousMeshStatus?:  "Not Generated" | "Generated",
   meshGenerated: "Not Generated" | "Generated" | "Generating" | "Queued",
+  type: 'Standard' | 'Ris',
   meshApproved: boolean,
   quantum: [number, number, number],
   pathToExternalGridsNotFound: boolean,

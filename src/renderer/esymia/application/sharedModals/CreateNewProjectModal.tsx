@@ -51,7 +51,9 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
           meshApproved: false,
           meshGenerated: 'Not Generated',
           quantum: [0,0,0],
-          pathToExternalGridsNotFound: false
+          pathToExternalGridsNotFound: false,
+          validTopology: true,
+          type: 'Standard'
         },
         screenshot: undefined,
         owner: (selectedFolder?.owner.email === user.email) ? user : selectedFolder?.owner as UsersState,

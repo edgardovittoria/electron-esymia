@@ -136,7 +136,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
   }, [selectedProject?.meshData.meshGenerated]);
 
   useEffect(() => {
-    if (awsExternalGridsData) {
+    if (awsExternalGridsData && selectedProject?.meshData.type === 'Standard') {
       setExternalGrids(externalGridsDecode(awsExternalGridsData));
       dispatch(
         setPathToExternalGridsNotFound({
@@ -144,6 +144,9 @@ export const Simulator: React.FC<SimulatorProps> = ({
           projectToUpdate: selectedProject?.faunaDocumentId as string,
         }),
       );
+      setSpinner(false);
+    }else{
+      console.log(awsExternalGridsData)
       setSpinner(false);
     }
     return () => {

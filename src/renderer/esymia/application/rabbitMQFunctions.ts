@@ -102,8 +102,9 @@ export const callback_mesher_results = (message: any, dispatch: Function, getSta
       dispatch(
         setMesherResults({
           id: res.id,
-          gridsPath: res.grids,
+          gridsPath: res.grids ? res.grids : "",
           meshPath: res.mesh,
+          surfacePath: res.surface ? res.surface : "",
           isStopped: res.isStopped ? res.isStopped : false,
           isValid: res.isValid,
           validTopology: res.validTopology,

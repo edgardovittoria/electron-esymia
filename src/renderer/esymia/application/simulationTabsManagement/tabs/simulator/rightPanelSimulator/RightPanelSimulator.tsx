@@ -9,6 +9,7 @@ import {
   pathToExternalGridsNotFoundSelector,
   setMeshApproved,
   setMeshGenerated,
+  setMeshType,
   setPreviousMeshStatus,
   setQuantum,
   setSuggestedQuantum,
@@ -72,12 +73,12 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
     [number, number, number]
   >([0, 0, 0]);
   const meshGenerated = useSelector(meshGeneratedSelector);
-  const solverType = useSelector(solverTypeSelector)
+  const solverType = useSelector(solverTypeSelector);
   const solverIterations = useSelector(solverIterationsSelector);
   const convergenceThreshold = useSelector(convergenceTresholdSelector);
   const activeMeshing = useSelector(activeMeshingSelector);
   const activeSimulations = useSelector(activeSimulationsSelector);
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
   const quantumDimensionsLabels = ['X', 'Y', 'Z'];
   const [suggestedQuantumError, setSuggestedQuantumError] = useState<{
     active: boolean;
@@ -245,8 +246,16 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         <div
           className={`p-2 tooltip rounded-t tooltip-right ${
             sidebarItemSelected === 'Mesher'
-              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
-              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
+              ? `${
+                  theme === 'light'
+                    ? 'text-white bg-primaryColor'
+                    : 'text-textColor bg-secondaryColorDark'
+                }`
+              : `${
+                  theme === 'light'
+                    ? 'text-primaryColor bg-white'
+                    : 'text-textColorDark bg-bgColorDark2'
+                }`
           }`}
           data-tip="Mesher"
           data-testid="quantumSettings"
@@ -264,8 +273,16 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         <div
           className={`p-2 tooltip rounded-b tooltip-right ${
             sidebarItemSelected === 'Solver'
-              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
-              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
+              ? `${
+                  theme === 'light'
+                    ? 'text-white bg-primaryColor'
+                    : 'text-textColor bg-secondaryColorDark'
+                }`
+              : `${
+                  theme === 'light'
+                    ? 'text-primaryColor bg-white'
+                    : 'text-textColorDark bg-bgColorDark2'
+                }`
           }`}
           data-tip="Solver"
           data-testid="solverSettings"
@@ -288,17 +305,62 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               meshGenerated === 'Queued' ||
               spinnerLoadData) &&
             'opacity-40'
-          } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
+          } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr ${
+            theme === 'light'
+              ? 'bg-white text-textColor'
+              : 'bg-bgColorDark2 text-textColorDark'
+          } p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
         >
-          <div className="flex">
-            <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
-            <h5 className="ml-2 text-[12px] xl:text-base">Meshing Info</h5>
+          <div className="flex flex-col">
+            <div className="flex flex-row">
+              <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
+              <h5 className="ml-2 text-[12px] xl:text-base">Meshing Info</h5>
+            </div>
+            <div className="form-control">
+              <label className="label cursor-pointer">
+                <span className="label-text">Standard Mesher</span>
+                <input
+                  type="radio"
+                  name="radio-10"
+                  className="radio checked:bg-red-500"
+                  defaultChecked={selectedProject.meshData.type === 'Standard'}
+                  onClick={() => dispatch(setMeshType({type: 'Standard', projectToUpdate: selectedProject.faunaDocumentId as string}))}
+                />
+              </label>
+            </div>
+            <div className="form-control">
+              <label className="label cursor-pointer">
+                <span className="label-text">Ris Mesher</span>
+                <input
+                  type="radio"
+                  name="radio-10"
+                  className="radio checked:bg-blue-500"
+                  defaultChecked={selectedProject.meshData.type === 'Ris'}
+                  onClick={() => dispatch(setMeshType({type: 'Ris', projectToUpdate: selectedProject.faunaDocumentId as string}))}
+                />
+              </label>
+            </div>
           </div>
           <hr className="mt-1" />
-          <div className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark border-textColorDark'}`}>
-            <h6 className="xl:text-base text-center text-[12px]">
-              Set quantum&apos;s dimensions
-            </h6>
+          {suggestedQuantumError.active && (
+                  <div className="text-[12px] xl:text-base font-semibold mt-2">
+                    {suggestedQuantumError.type === 'Mesher Not Active'
+                      ? 'Mesher Down: start mesher or wait until started!'
+                      : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
+                  </div>
+                )}
+          <div
+            className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${
+              theme === 'light'
+                ? 'bg-[#f6f6f6] border-secondaryColor'
+                : 'bg-bgColorDark border-textColorDark'
+            }`}
+          >
+            {selectedProject.meshData.type !== 'Ris' && (
+              <h6 className="xl:text-base text-center text-[12px]">
+                Set quantum&apos;s dimensions
+              </h6>
+            )}
             <hr className="mt-2 border-[1px] border-gray-200" />
             {selectedProject.frequencies &&
               selectedProject.frequencies.length > 0 && (
@@ -316,76 +378,71 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   </span>
                 </div>
               )}
-            <div className="mt-2">
-              <div className="flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2">
-                {quantumDimsInput.map(
-                  (quantumComponent, indexQuantumComponent) => (
-                    <QuantumDimsInput
-                      dataTestId={'quantumInput' + indexQuantumComponent}
-                      disabled={true}
-                      //disabled={selectedProject.simulation?.status === 'Completed' || selectedProject.model?.components === undefined}
-                      key={indexQuantumComponent}
-                      label={quantumDimensionsLabels[indexQuantumComponent]}
-                      value={parseFloat(quantumComponent.toFixed(5))}
-                      onChange={(event) =>
-                        setQuantumDimsInput(
-                          quantumDimsInput.map((q, ind) =>
-                            ind === indexQuantumComponent
-                              ? parseFloat(event.target.value)
-                              : q,
-                          ) as [number, number, number],
-                        )
-                      }
-                    />
-                  ),
-                )}
-              </div>
-              {/* {selectedProject.suggestedQuantum && selectedProject && selectedProject.frequencies &&
-              <div className='text-[12px] xl:text-base font-semibold mt-2'>
-                Suggested:
-                [
-                  {selectedProject.suggestedQuantum[0].toFixed(5)},
-                  {selectedProject.suggestedQuantum[1].toFixed(5)},
-                  {selectedProject.suggestedQuantum[2].toFixed(5)}
-                ]
-              </div>
-            } */}
-              {suggestedQuantumError.active && (
-                <div className="text-[12px] xl:text-base font-semibold mt-2">
-                  {suggestedQuantumError.type === 'Mesher Not Active'
-                    ? 'Mesher Down: start mesher or wait until started!'
-                    : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
+            {selectedProject.meshData.type !== 'Ris' && (
+              <div className="mt-2">
+                <div className="flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2">
+                  {quantumDimsInput.map(
+                    (quantumComponent, indexQuantumComponent) => (
+                      <QuantumDimsInput
+                        dataTestId={'quantumInput' + indexQuantumComponent}
+                        disabled={true}
+                        //disabled={selectedProject.simulation?.status === 'Completed' || selectedProject.model?.components === undefined}
+                        key={indexQuantumComponent}
+                        label={quantumDimensionsLabels[indexQuantumComponent]}
+                        value={parseFloat(quantumComponent.toFixed(5))}
+                        onChange={(event) =>
+                          setQuantumDimsInput(
+                            quantumDimsInput.map((q, ind) =>
+                              ind === indexQuantumComponent
+                                ? parseFloat(event.target.value)
+                                : q,
+                            ) as [number, number, number],
+                          )
+                        }
+                      />
+                    ),
+                  )}
                 </div>
-              )}
-              {meshGenerated === 'Generated' &&
-                !spinnerLoadData &&
-                !selectedProject.simulation &&
-                !suggestedQuantumError.active &&
-                !pathToExternalGridsNotFound && (
-                  <div className="flex flex-row gap-4 justify-center items-center w-full mt-3">
-                    <div
-                      className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:opacity-50 rounded border border-gray-200"
-                      onClick={() => {
-                        setRefineMode('coarsen');
-                        setShowModalRefine(true);
-                      }}
-                    >
-                      <LiaCubeSolid size={25} />
-                      <span data-testid="coarsenButton">Coarsen</span>
+                {/* {selectedProject.suggestedQuantum && selectedProject && selectedProject.frequencies &&
+                <div className='text-[12px] xl:text-base font-semibold mt-2'>
+                  Suggested:
+                  [
+                    {selectedProject.suggestedQuantum[0].toFixed(5)},
+                    {selectedProject.suggestedQuantum[1].toFixed(5)},
+                    {selectedProject.suggestedQuantum[2].toFixed(5)}
+                  ]
+                </div>
+              } */}
+                {meshGenerated === 'Generated' &&
+                  !spinnerLoadData &&
+                  !selectedProject.simulation &&
+                  !suggestedQuantumError.active &&
+                  !pathToExternalGridsNotFound && (
+                    <div className="flex flex-row gap-4 justify-center items-center w-full mt-3">
+                      <div
+                        className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:opacity-50 rounded border border-gray-200"
+                        onClick={() => {
+                          setRefineMode('coarsen');
+                          setShowModalRefine(true);
+                        }}
+                      >
+                        <LiaCubeSolid size={25} />
+                        <span data-testid="coarsenButton">Coarsen</span>
+                      </div>
+                      <div
+                        className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:opacity-50 rounded border border-gray-200"
+                        onClick={() => {
+                          setRefineMode('refine');
+                          setShowModalRefine(true);
+                        }}
+                      >
+                        <LiaCubesSolid size={25} />
+                        <span>Refine</span>
+                      </div>
                     </div>
-                    <div
-                      className="flex flex-row items-center gap-2 p-2 hover:cursor-pointer hover:opacity-50 rounded border border-gray-200"
-                      onClick={() => {
-                        setRefineMode('refine');
-                        setShowModalRefine(true);
-                      }}
-                    >
-                      <LiaCubesSolid size={25} />
-                      <span>Refine</span>
-                    </div>
-                  </div>
-                )}
-            </div>
+                  )}
+              </div>
+            )}
           </div>
           <div className="w-[100%] pt-4">
             <div className="flex-column">
@@ -394,14 +451,24 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   <button
                     data-testid="generateMeshButton"
                     className={
-                      process.env.APP_MODE !== "test" ?
-                        checkQuantumDimensionsValidity()
-                        ? `button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} w-[100%]`
-                        : 'button bg-gray-300 text-gray-600 opacity-70 w-[100%]'
-                        : `button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} w-[100%]`
+                      process.env.APP_MODE !== 'test'
+                        ? checkQuantumDimensionsValidity()
+                          ? `button buttonPrimary ${
+                              theme === 'light'
+                                ? ''
+                                : 'bg-secondaryColorDark text-textColor'
+                            } w-[100%]`
+                          : 'button bg-gray-300 text-gray-600 opacity-70 w-[100%]'
+                        : `button buttonPrimary ${
+                            theme === 'light'
+                              ? ''
+                              : 'bg-secondaryColorDark text-textColor'
+                          } w-[100%]`
                     }
                     disabled={
-                      process.env.APP_MODE !== "test" ? !checkQuantumDimensionsValidity() : false
+                      process.env.APP_MODE !== 'test'
+                        ? !checkQuantumDimensionsValidity()
+                        : false
                     }
                     onClick={() => {
                       dispatch(
@@ -421,13 +488,15 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                             selectedProject.faunaDocumentId as string,
                         }),
                       );
-                      dispatch(
-                        setQuantum({
-                          quantum: quantumDimsInput,
-                          projectToUpdate:
-                            selectedProject.faunaDocumentId as string,
-                        }),
-                      );
+                      if(selectedProject.meshData.type !== "Ris"){
+                        dispatch(
+                          setQuantum({
+                            quantum: quantumDimsInput,
+                            projectToUpdate:
+                              selectedProject.faunaDocumentId as string,
+                          }),
+                        );
+                      }
                     }}
                   >
                     Generate Mesh
@@ -445,33 +514,58 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               (selectedProject.simulation?.status === 'Queued' ||
                 selectedProject.simulation?.status === 'Running') &&
               'opacity-40'
-            } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
+            } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr ${
+              theme === 'light'
+                ? 'bg-white text-textColor'
+                : 'bg-bgColorDark2 text-textColorDark'
+            } p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-fit`}
           >
             <div className="flex">
               <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
               <h5 className="ml-2 text-[12px] xl:text-base">Solving Info</h5>
             </div>
             <hr className="mt-1" />
-            <div className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
+            <div
+              className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${
+                theme === 'light'
+                  ? 'bg-[#f6f6f6] border-secondaryColor'
+                  : 'bg-bgColorDark'
+              }`}
+            >
               <h6 className="text-[12px] xl:text-base">Solver Type</h6>
               <div className="mt-2">
                 <div className="flex justify-between mt-2">
                   <div className="w-full">
-                    <select className={`select select-bordered select-sm w-full max-w-xs ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark border-textColorDark'}`}
+                    <select
+                      className={`select select-bordered select-sm w-full max-w-xs ${
+                        theme === 'light'
+                          ? 'bg-[#f6f6f6]'
+                          : 'bg-bgColorDark border-textColorDark'
+                      }`}
                       onChange={(e) => {
-                        dispatch(setSolverType(parseInt(e.target.value) as 1|2))
+                        dispatch(
+                          setSolverType(parseInt(e.target.value) as 1 | 2),
+                        );
                       }}
                     >
                       <option value={1} selected>
                         Quasi static coefficents computation
                       </option>
-                      <option value={2}>Rcc delayed coefficents computation</option>
+                      <option value={2}>
+                        Rcc delayed coefficents computation
+                      </option>
                     </select>
                   </div>
                 </div>
               </div>
             </div>
-            <div className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
+            <div
+              className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${
+                theme === 'light'
+                  ? 'bg-[#f6f6f6] border-secondaryColor'
+                  : 'bg-bgColorDark'
+              }`}
+            >
               <h6 className="text-[12px] xl:text-base">Solver Iterations</h6>
               <div className="mt-2">
                 <div className="flex justify-between mt-2">
@@ -483,7 +577,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                         meshGenerated !== 'Generated'
                       }
                       min={1}
-                      className={`w-full p-[4px] border-[1px] ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'} text-[15px] font-bold rounded formControl`}
+                      className={`w-full p-[4px] border-[1px] ${
+                        theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
+                      } text-[15px] font-bold rounded formControl`}
                       type="number"
                       step={1}
                       value={
@@ -517,7 +613,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                         meshGenerated !== 'Generated'
                       }
                       min={1}
-                      className={`w-full p-[4px] border-[1px] ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'} text-[15px] font-bold rounded formControl`}
+                      className={`w-full p-[4px] border-[1px] ${
+                        theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
+                      } text-[15px] font-bold rounded formControl`}
                       type="number"
                       step={1}
                       value={
@@ -546,7 +644,13 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 </div>
               </div>
             </div>
-            <div className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
+            <div
+              className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${
+                theme === 'light'
+                  ? 'bg-[#f6f6f6] border-secondaryColor'
+                  : 'bg-bgColorDark'
+              }`}
+            >
               <h6 className="text-[12px] xl:text-base">
                 Convergence Threshold
               </h6>
@@ -561,7 +665,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                       }
                       min={0.0001}
                       max={0.1}
-                      className={`w-full p-[4px] border-[1px] ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'} text-[15px] font-bold rounded formControl`}
+                      className={`w-full p-[4px] border-[1px] ${
+                        theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
+                      } text-[15px] font-bold rounded formControl`}
                       type="number"
                       step={0.0001}
                       value={
@@ -591,7 +697,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             </div>
             {selectedProject.simulation?.status === 'Completed' ? (
               <button
-                className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} w-[100%] mt-3 text-[12px] xl:text-base`}
+                className={`button buttonPrimary ${
+                  theme === 'light'
+                    ? ''
+                    : 'bg-secondaryColorDark text-textColor'
+                } w-[100%] mt-3 text-[12px] xl:text-base`}
                 data-testid="resultsButton"
                 onClick={() => {
                   dispatch(selectMenuItem('Results'));
@@ -606,7 +716,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               ${
                 meshGenerated !== 'Generated'
                   ? 'bg-gray-300 text-gray-600 opacity-70'
-                  : `buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'}`
+                  : `buttonPrimary ${
+                      theme === 'light'
+                        ? ''
+                        : 'bg-secondaryColorDark text-textColor'
+                    }`
               }`}
                 disabled={
                   meshGenerated !== 'Generated' || pathToExternalGridsNotFound
@@ -682,17 +796,23 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({
   onChange,
   label,
 }) => {
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
   return (
     <div className="xl:w-[30%] w-full flex flex-col items-center relative">
-      <span className={`text-[12px] xl:text-sm absolute top-[-10px] left-1/2 translate-x-[-1/2] ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-transparent'} font-bold`}>
+      <span
+        className={`text-[12px] xl:text-sm absolute top-[-10px] left-1/2 translate-x-[-1/2] ${
+          theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-transparent'
+        } font-bold`}
+      >
         {label}
       </span>
       <DebounceInput
         data-testid={dataTestId}
         disabled={disabled}
         min={0.0}
-        className={`w-full p-[4px] border-[1px] ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'} text-[12px] font-bold rounded formControl`}
+        className={`w-full p-[4px] border-[1px] ${
+          theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
+        } text-[12px] font-bold rounded formControl`}
         type="number"
         debounceTimeout={
           debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500
@@ -734,11 +854,11 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
   const [zPercentage, setZPercentage] = useState<'No' | '10%' | '50%'>('No');
 
   const dispatch = useDispatch();
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
 
-  const [x, setx] = useState(quantumDimsInput[0])
-  const [y, sety] = useState(quantumDimsInput[1])
-  const [z, setz] = useState(quantumDimsInput[2])
+  const [x, setx] = useState(quantumDimsInput[0]);
+  const [y, sety] = useState(quantumDimsInput[1]);
+  const [z, setz] = useState(quantumDimsInput[2]);
 
   return (
     <Transition appear show={showModal} as={Fragment}>
@@ -923,7 +1043,11 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                     </button>
                     <button
                       type="button"
-                      className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} text-white`}
+                      className={`button buttonPrimary ${
+                        theme === 'light'
+                          ? ''
+                          : 'bg-secondaryColorDark text-textColor'
+                      } text-white`}
                       onClick={() => {
                         let newQuantum: [number, number, number] = [
                           ...quantumDimsInput,

@@ -294,7 +294,7 @@ export const useStorageData = () => {
   const loadGridsFromS3 = () => {
     dispatch(publishMessage({
       queue: 'management',
-      body: { message: "get grids", grids_id: selectedProject.meshData.externalGrids as string, id: selectedProject.faunaDocumentId }}))
+      body: { message: "get grids", grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, id: selectedProject.faunaDocumentId }}))
   };
 
 
@@ -480,6 +480,7 @@ export const useStorageData = () => {
       boundingBoxDimension: project.boundingBoxDimension,
       frequencies: project.frequencies,
       modelS3: project.modelS3,
+      bricks: project.bricks,
       modelUnit: project.modelUnit,
       scatteringValue: project.scatteringValue,
       suggestedQuantum: project.suggestedQuantum,
@@ -489,6 +490,8 @@ export const useStorageData = () => {
         meshGenerated: 'Not Generated',
         quantum: [0, 0, 0],
         pathToExternalGridsNotFound: false,
+        validTopology: true,
+        type: 'Standard'
       },
       name: `${project?.name}_copy`,
     } as Project;
@@ -634,6 +637,8 @@ export const useStorageData = () => {
         meshGenerated: 'Not Generated',
         quantum: [0, 0, 0],
         pathToExternalGridsNotFound: false,
+        validTopology: true,
+        type: 'Standard'
       },
       name: `${project?.name}`,
     } as Project;

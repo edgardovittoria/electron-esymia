@@ -42,7 +42,7 @@ type TabsAndMenuItemsState = {
   iterations: {freqNumber: number, id: string}[],
   estimatedTime?: {estimatedTime: number, portIndex: number, id: string},
   meshAdvice: {id: string, quantum: [number, number, number]}[],
-  meshResults?: {id: string, gridsPath: string, meshPath: string, isStopped: boolean, validTopology: boolean, isValid: {valid: boolean, axis?: string}, error?: any},
+  meshResults?: {id: string, gridsPath: string, meshPath: string, surfacePath: string, isStopped: boolean, validTopology: boolean, isValid: {valid: boolean, axis?: string}, error?: any},
   solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number, error?:any }[],
   SolverResultsS3?: string,
   externalGrids?: any
@@ -170,7 +170,7 @@ export const TabsAndMenuItemsSlice = createSlice({
       state.meshAdvice = state.meshAdvice.filter(item => item.id !== action.payload.id)
       state.meshAdvice.push(action.payload)
     },
-    setMesherResults(state: TabsAndMenuItemsState, action: PayloadAction<{gridsPath: string, meshPath: string, id: string, isStopped: boolean, validTopology: boolean, isValid: {valid: boolean, axis?: string}, error?: any} | undefined>){
+    setMesherResults(state: TabsAndMenuItemsState, action: PayloadAction<{gridsPath: string, meshPath: string, surfacePath: string, id: string, isStopped: boolean, validTopology: boolean, isValid: {valid: boolean, axis?: string}, error?: any} | undefined>){
       state.meshResults = action.payload
     },
     setAWSExternalGridsData(state: TabsAndMenuItemsState, action: PayloadAction<any>){

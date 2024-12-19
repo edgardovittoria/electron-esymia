@@ -99,6 +99,7 @@ export const convertInFaunaProjectThis = (project: Project) => {
       storage: project.storage,
       model: "",
       modelS3: project.modelS3,
+      bricks: project.bricks,
       portsS3: project.portsS3,
       frequencies: project.frequencies,
       simulation: project.simulation === undefined ? null : {

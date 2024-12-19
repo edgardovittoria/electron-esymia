@@ -12,6 +12,7 @@ export type FaunaProjectDetails = {
     storage: 'local' | 'online',
     model: string,
     modelS3?: string,
+    bricks?: string,
     portsS3?: string,
     frequencies?: number[]
     simulation?: Simulation|null,

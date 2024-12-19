@@ -147,6 +147,12 @@ export const ProjectSlice = createSlice({
         selectedProject.modelS3 = action.payload;
       }
     },
+    setBricksS3(state: ProjectState, action: PayloadAction<string>) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if (selectedProject) {
+        selectedProject.bricks = action.payload;
+      }
+    },
     setModelUnit(state: ProjectState, action: PayloadAction<string>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       if (selectedProject) {
@@ -259,6 +265,10 @@ export const ProjectSlice = createSlice({
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.externalGrids = action.payload.extGrids;
     },
+    setSurface(state: ProjectState, action: PayloadAction<{ surface:string, projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.surface = action.payload.surface;
+    },
     setPathToExternalGridsNotFound(state: ProjectState, action: PayloadAction<{ status:boolean, projectToUpdate: string }>){
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.pathToExternalGridsNotFound = action.payload.status;
@@ -266,6 +276,10 @@ export const ProjectSlice = createSlice({
     setMeshGenerated(state: ProjectState, action: PayloadAction<{ status: 'Not Generated' | 'Generated' | 'Generating' | 'Queued', projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.meshGenerated = action.payload.status;
+    },
+    setMeshType(state: ProjectState, action: PayloadAction<{ type: 'Standard' | 'Ris', projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.type = action.payload.type;
     },
     setMeshValidTopology(state: ProjectState, action: PayloadAction<{ status:boolean, projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
@@ -363,14 +377,17 @@ export const {
   shareFolder,
   setMesh,
   setMeshGenerated,
+  setMeshType,
   setMeshValidTopology,
   setPreviousMeshStatus,
   setMeshApproved,
   setQuantum,
   setFolderOfElementsSharedWithUser,
   setExternalGrids,
+  setSurface,
   setModel,
   setModelS3,
+  setBricksS3,
   setModelUnit,
   setPortName,
   setBoundingBoxDimension,

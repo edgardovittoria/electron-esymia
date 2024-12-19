@@ -14,6 +14,7 @@ import {
   importModel,
   SelectedFolderSelector,
   selectedProjectSelector,
+  setBricksS3,
   setModelS3,
   setModelUnit,
 } from '../../../../store/projectSlice';
@@ -167,11 +168,13 @@ export const Modeler: React.FC<ModelerProps> = ({
             dispatch(importModel(importActionParamsObject))
             dispatch(setModelUnit(importActionParamsObject.unit))
             dispatch(setModelS3(importActionParamsObject.modelS3 as string))
+            dispatch(setBricksS3(importActionParamsObject.bricks as string))
             execQuery(
                     updateProjectInFauna,
                     convertInFaunaProjectThis({
                       ...selectedProject,
                       modelS3: importActionParamsObject.modelS3,
+                      bricks: importActionParamsObject.bricks,
                       modelUnit: importActionParamsObject.unit,
                     } as Project),
                     dispatch,

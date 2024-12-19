@@ -28,6 +28,7 @@ import {
   setMesh,
   setMeshGenerated,
   setMeshValidTopology,
+  setSurface,
 } from '../../../../../../store/projectSlice';
 import { Project } from '../../../../../../model/esymiaModels';
 import { generateSTLListFromComponents } from './rightPanelFunctions';
@@ -207,7 +208,8 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   const theme = useSelector(ThemeSelector)
 
   useEffect(() => {
-    const components = selectedProject?.model?.components as ComponentEntity[];
+    if(selectedProject.meshData.type === 'Standard'){
+      const components = selectedProject?.model?.components as ComponentEntity[];
     const objToSendToMesher = {
       STLList:
         components &&
@@ -225,6 +227,20 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
         },
       }),
     );
+    }else{
+      dispatch(
+        publishMessage({
+          queue: 'management',
+          body: {
+            message: 'compute mesh ris',
+            body: {
+              fileNameRisGeometry: selectedProject.bricks as string,
+              fileName: selectedProject.faunaDocumentId as string
+            }
+          },
+        }),
+      );
+    }
   }, []);
 
   // useEffect(() => {
@@ -306,25 +322,34 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           projectToUpdate: selectedProject.faunaDocumentId as string,
         }))
       } else {
+        if(selectedProject.meshData.type === 'Standard'){
+          dispatch(setMeshValidTopology({
+            status: mesherResults.validTopology,
+            projectToUpdate: selectedProject.faunaDocumentId as string,
+          }))
+          dispatch(
+            setExternalGrids({
+              extGrids: mesherResults.gridsPath,
+              projectToUpdate: selectedProject.faunaDocumentId as string,
+            }),
+          );
+        }else{
+          dispatch(
+            setSurface({
+              surface: mesherResults.surfacePath,
+              projectToUpdate: selectedProject.faunaDocumentId as string,
+            }),
+          );
+        }
         dispatch(
           setMeshGenerated({
             status: 'Generated',
             projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
-        dispatch(setMeshValidTopology({
-          status: mesherResults.validTopology,
-          projectToUpdate: selectedProject.faunaDocumentId as string,
-        }))
         dispatch(
           setMesh({
             mesh: mesherResults.meshPath,
-            projectToUpdate: selectedProject.faunaDocumentId as string,
-          }),
-        );
-        dispatch(
-          setExternalGrids({
-            extGrids: mesherResults.gridsPath,
             projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
@@ -336,6 +361,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
               ...selectedProject.meshData,
               mesh: mesherResults.meshPath,
               externalGrids: mesherResults.gridsPath,
+              surface: mesherResults.surfacePath,
               meshGenerated: 'Generated',
               validTopology: mesherResults.validTopology
             },
@@ -410,7 +436,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                   <div className="flex flex-row justify-between items-center w-full">
                     {meshingStep ? (
                       <>
-                        {meshingStep.meshingStep === 4 ? (
+                        {((selectedProject.meshData.type === 'Standard' && meshingStep.meshingStep === 4) || (selectedProject.meshData.type === 'Ris' && meshingStep.meshingStep === 2)) ? (
                           <div className="flex flex-row w-full justify-between items-center">
                             <progress
                               className={`progress w-full mr-4`}
@@ -426,7 +452,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                           <progress
                           className={`progress w-full`}
                             value={meshingStep.meshingStep}
-                            max={4}
+                            max={selectedProject.meshData.type === 'Standard' ? 4 : 2}
                           />
                         )}
                       </>
@@ -435,7 +461,9 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                     )}
                   </div>
                 </div>
-                <div
+                {selectedProject.meshData.type === 'Standard' &&
+                  <>
+                    <div
                   className={`flex flex-col gap-2 w-full ${
                     stopSpinner ? 'opacity-40' : 'opacity-100'
                   }`}
@@ -497,6 +525,8 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                     )}
                   </div>
                 </div>
+                  </>
+                }
                 <div
                   className={`flex flex-col gap-2 w-full ${
                     stopSpinner ? 'opacity-40' : 'opacity-100'
