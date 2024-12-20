@@ -16,7 +16,7 @@ export const SolverSlice = createSlice({
   initialState: {
     activeSimulations: 0,
     feedbackVisible: false,
-    solverType: 1,
+    solverType: 2,
     solverIterations: [1, 100],
     convergenceTreshold: 0.0001
   } as SolverState,

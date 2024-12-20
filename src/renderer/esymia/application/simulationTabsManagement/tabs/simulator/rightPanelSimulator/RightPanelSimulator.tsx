@@ -316,29 +316,39 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
               <h5 className="ml-2 text-[12px] xl:text-base">Meshing Info</h5>
             </div>
-            <div className="form-control">
-              <label className="label cursor-pointer">
-                <span className="label-text">Standard Mesher</span>
-                <input
-                  type="radio"
-                  name="radio-10"
-                  className="radio checked:bg-red-500"
-                  defaultChecked={selectedProject.meshData.type === 'Standard'}
-                  onClick={() => dispatch(setMeshType({type: 'Standard', projectToUpdate: selectedProject.faunaDocumentId as string}))}
-                />
-              </label>
-            </div>
-            <div className="form-control">
-              <label className="label cursor-pointer">
-                <span className="label-text">Ris Mesher</span>
-                <input
-                  type="radio"
-                  name="radio-10"
-                  className="radio checked:bg-blue-500"
-                  defaultChecked={selectedProject.meshData.type === 'Ris'}
-                  onClick={() => dispatch(setMeshType({type: 'Ris', projectToUpdate: selectedProject.faunaDocumentId as string}))}
-                />
-              </label>
+            <div
+              className={`mt-3 p-[15px] xl:text-left text-center border-[1px] rounded ${
+                theme === 'light'
+                  ? 'bg-[#f6f6f6] border-secondaryColor'
+                  : 'bg-bgColorDark'
+              }`}
+            >
+              <h6 className="text-[12px] xl:text-base text-center">Mesher Type</h6>
+              <div className="mt-2">
+                <div className="flex justify-between mt-2">
+                  <div className="w-full text-center">
+                    <select
+                      className={`select select-bordered select-sm w-full max-w-xs ${
+                        theme === 'light'
+                          ? 'bg-[#f6f6f6]'
+                          : 'bg-bgColorDark border-textColorDark'
+                      }`}
+                      onChange={(e) => {
+                        dispatch(
+                          setMeshType({type: e.target.value as 'Standard' | 'Ris', projectToUpdate: selectedProject.faunaDocumentId as string})
+                        );
+                      }}
+                    >
+                      <option value={"Standard"} selected>
+                        Standard Mesher
+                      </option>
+                      <option value={"Ris"}>
+                        Ris Mesher
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <hr className="mt-1" />
@@ -356,11 +366,17 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 : 'bg-bgColorDark border-textColorDark'
             }`}
           >
-            {selectedProject.meshData.type !== 'Ris' && (
+            {selectedProject.meshData.type !== 'Ris' ? (
               <h6 className="xl:text-base text-center text-[12px]">
                 Set quantum&apos;s dimensions
               </h6>
-            )}
+            ):
+            (
+              <h6 className="xl:text-base text-center text-[12px]">
+                Settings
+              </h6>
+            )
+          }
             <hr className="mt-2 border-[1px] border-gray-200" />
             {selectedProject.frequencies &&
               selectedProject.frequencies.length > 0 && (
@@ -548,11 +564,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                         );
                       }}
                     >
-                      <option value={1} selected>
-                        Quasi static coefficents computation
-                      </option>
-                      <option value={2}>
+                      <option value={2} selected>
                         Rcc delayed coefficents computation
+                      </option>
+                      <option value={1}>
+                        Quasi static coefficents computation
                       </option>
                     </select>
                   </div>

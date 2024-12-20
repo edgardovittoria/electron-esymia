@@ -273,12 +273,22 @@ const SimulationStatusItem: React.FC<{
       solverIterations,
       convergenceThreshold,
     );
-    dispatch(
-      publishMessage({
-        queue: 'management_solver',
-        body: { message: 'solving', body: objectToSendToSolver },
-      }),
-    );
+    if(associatedProject.meshData.type === 'Standard'){
+      dispatch(
+        publishMessage({
+          queue: 'management_solver',
+          body: { message: 'solving', body: objectToSendToSolver },
+        }),
+      );
+    }else{
+      dispatch(
+        publishMessage({
+          queue: 'management_solver',
+          body: { message: 'solving ris', body: objectToSendToSolver },
+        }),
+      );
+    }
+
   }, []);
 
   useEffect(() => {
