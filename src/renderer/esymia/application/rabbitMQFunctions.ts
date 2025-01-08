@@ -118,7 +118,6 @@ export const callback_mesher_results = (message: any, dispatch: Function, getSta
 export const callback_mesher_grids = (message: any, dispatch: Function, getState: Function) => {
   let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
   let res = JSON.parse(message.body);
-  console.log(res)
   projects.forEach(p => {
     if(p.faunaDocumentId === res.id){
       message.ack();

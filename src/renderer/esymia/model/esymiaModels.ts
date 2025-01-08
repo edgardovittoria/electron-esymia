@@ -128,6 +128,11 @@ export type SolverOutput = {
   freqIndex?: number
 }
 
+export type ExternalGridsRisObject = {
+  vertices: number[][]
+  materials: string[]
+}
+
 export type ExternalGridsObject = {
   externalGrids: Object,
   cell_size: CellSize,

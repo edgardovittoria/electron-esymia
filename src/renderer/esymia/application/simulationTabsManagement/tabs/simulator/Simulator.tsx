@@ -16,6 +16,7 @@ import {
   CellSize,
   CellsNumber,
   ExternalGridsObject,
+  ExternalGridsRisObject,
   Folder,
   OriginPoint,
   Project,
@@ -52,7 +53,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
   setSelectedTabLeftPanel,
 }) => {
   const [externalGrids, setExternalGrids] = useState<
-    ExternalGridsObject | undefined
+    ExternalGridsObject | ExternalGridsRisObject | undefined
   >(undefined);
   const [voxelsPainted, setVoxelsPainted] = useState(0);
   const [totalVoxels, setTotalVoxels] = useState(0);
@@ -71,6 +72,17 @@ export const Simulator: React.FC<SimulatorProps> = ({
     pathToExternalGridsNotFoundSelector,
   );
   const awsExternalGridsData = useSelector(AWSExternalGridsDataSelector);
+
+  const risExternalGridsFormat = (extGridsJson: any) => {
+    let vertices: number[][] = [];
+    for (let index = 0; index < extGridsJson.estremi_celle[0].length; index++) {
+      vertices.push([])
+    }
+    (extGridsJson.estremi_celle as number[][]).forEach((row) => {
+      row.forEach((element, rowIndex) => vertices[rowIndex].push(element))
+    });
+    return {vertices: vertices, materials: extGridsJson.materials as string[]} as ExternalGridsRisObject
+  }
 
   const externalGridsDecode = (extGridsJson: any) => {
     let gridsPairs: [string, Brick[]][] = [];
@@ -138,17 +150,16 @@ export const Simulator: React.FC<SimulatorProps> = ({
   useEffect(() => {
     if (awsExternalGridsData && selectedProject?.meshData.type === 'Standard') {
       setExternalGrids(externalGridsDecode(awsExternalGridsData));
-      dispatch(
-        setPathToExternalGridsNotFound({
-          status: false,
-          projectToUpdate: selectedProject?.faunaDocumentId as string,
-        }),
-      );
-      setSpinner(false);
-    }else{
-      console.log(awsExternalGridsData)
-      setSpinner(false);
+    }else if (awsExternalGridsData && selectedProject?.meshData.type === 'Ris') {
+      setExternalGrids(risExternalGridsFormat(awsExternalGridsData));
     }
+    dispatch(
+      setPathToExternalGridsNotFound({
+        status: false,
+        projectToUpdate: selectedProject?.faunaDocumentId as string,
+      }),
+    );
+    setSpinner(false);
     return () => {
       dispatch(unsetAWSExternalGridsData());
     };
@@ -156,8 +167,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
   useEffect(() => {
     setVoxelsPainted(0);
-    if (externalGrids) {
-      const numberOfCells = Object.values(externalGrids.externalGrids).reduce(
+    if (externalGrids && selectedProject?.meshData.type === 'Standard') {
+      const numberOfCells = Object.values((externalGrids as ExternalGridsObject).externalGrids).reduce(
         (prev, current) => {
           return prev + current.length;
         },
@@ -165,9 +176,9 @@ export const Simulator: React.FC<SimulatorProps> = ({
       );
       setVoxelsPainted(numberOfCells);
       setTotalVoxels(
-        externalGrids.n_cells.n_cells_x *
-          externalGrids.n_cells.n_cells_y *
-          externalGrids.n_cells.n_cells_z,
+        (externalGrids as ExternalGridsObject).n_cells.n_cells_x *
+          (externalGrids as ExternalGridsObject).n_cells.n_cells_y *
+          (externalGrids as ExternalGridsObject).n_cells.n_cells_z,
       );
     }
   }, [externalGrids]);
@@ -196,8 +207,6 @@ export const Simulator: React.FC<SimulatorProps> = ({
   useEffect(() => {
     setSelectedTabLeftPanel(undefined)
   },[])
-
-  console.log(validTopology)
 
   return (
     <>
@@ -283,7 +292,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
       <RightPanelSimulator
         selectedProject={selectedProject as Project}
         allMaterials={allMaterials}
-        externalGrids={externalGrids}
+        externalGrids={selectedProject?.meshData.type === 'Standard' ? (externalGrids as ExternalGridsObject) : undefined}
         spinnerLoadData={spinner}
         setsidebarItemSelected={setsidebarItemSelected}
         sidebarItemSelected={sidebarItemSelected}
