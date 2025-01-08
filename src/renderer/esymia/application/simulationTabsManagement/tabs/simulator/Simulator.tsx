@@ -148,18 +148,21 @@ export const Simulator: React.FC<SimulatorProps> = ({
   }, [selectedProject?.meshData.meshGenerated]);
 
   useEffect(() => {
-    if (awsExternalGridsData && selectedProject?.meshData.type === 'Standard') {
-      setExternalGrids(externalGridsDecode(awsExternalGridsData));
-    }else if (awsExternalGridsData && selectedProject?.meshData.type === 'Ris') {
+    if (awsExternalGridsData) {
+      if (selectedProject?.meshData.type === 'Standard'){
+        setExternalGrids(externalGridsDecode(awsExternalGridsData));
+      }
+      else if (selectedProject?.meshData.type === 'Ris') {
       setExternalGrids(risExternalGridsFormat(awsExternalGridsData));
+      }
+      dispatch(
+        setPathToExternalGridsNotFound({
+          status: false,
+          projectToUpdate: selectedProject?.faunaDocumentId as string,
+        }),
+      );
+      setSpinner(false);
     }
-    dispatch(
-      setPathToExternalGridsNotFound({
-        status: false,
-        projectToUpdate: selectedProject?.faunaDocumentId as string,
-      }),
-    );
-    setSpinner(false);
     return () => {
       dispatch(unsetAWSExternalGridsData());
     };
