@@ -38,7 +38,10 @@ import {
 import { DebounceInput } from 'react-debounce-input';
 import { LiaCubeSolid, LiaCubesSolid } from 'react-icons/lia';
 import { Dialog, Transition } from '@headlessui/react';
-import { MesherStatusSelector } from '../../../../../store/pluginsSlice';
+import {
+  MesherStatusSelector,
+  SolverStatusSelector,
+} from '../../../../../store/pluginsSlice';
 import { generateSTLListFromComponents } from './components/rightPanelFunctions';
 import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs';
@@ -87,6 +90,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const [showModalRefine, setShowModalRefine] = useState<boolean>(false);
   const [refineMode, setRefineMode] = useState<'refine' | 'coarsen'>('refine');
   const mesherStatus = useSelector(MesherStatusSelector);
+  const solverStatus = useSelector(SolverStatusSelector);
   const suggestedQuantum = useSelector(suggestedQuantumSelector);
   const meshAdvice = useSelector(meshAdviceSelector).filter(
     (item) => item.id === (selectedProject.faunaDocumentId as string),
@@ -240,6 +244,25 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
     }
   }, [externalGrids]);
 
+  useEffect(() => {
+    if (selectedProject.bricks) {
+      dispatch(
+        setMeshType({
+          type: 'Ris',
+          projectToUpdate: selectedProject.faunaDocumentId as string,
+        }),
+      );
+    }else{
+      dispatch(
+        setMeshType({
+          type: 'Standard',
+          projectToUpdate: selectedProject.faunaDocumentId as string,
+        }),
+      );
+    }
+
+  }, [selectedProject]);
+
   return (
     <>
       <div className="absolute left-[2%] top-[270px] rounded max-h-[500px] flex flex-col items-center gap-0">
@@ -323,26 +346,39 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   : 'bg-bgColorDark'
               }`}
             >
-              <h6 className="text-[12px] xl:text-base text-center">Mesher Type</h6>
+              <h6 className="text-[12px] xl:text-base text-center">
+                Mesher Type
+              </h6>
               <div className="mt-2">
                 <div className="flex justify-between mt-2">
                   <div className="w-full text-center">
                     <select
                       className={`select select-bordered select-sm w-full max-w-xs ${
                         theme === 'light'
-                          ? 'bg-[#f6f6f6]'
-                          : 'bg-bgColorDark border-textColorDark'
+                          ? 'bg-[#f6f6f6] disabled:text-black disabled:border-black disabled:cursor-not-allowed'
+                          : 'bg-bgColorDark border-textColorDark disabled:text-white disabled:cursor-not-allowed'
                       }`}
+                      disabled
                       onChange={(e) => {
                         dispatch(
-                          setMeshType({type: e.target.value as 'Standard' | 'Ris', projectToUpdate: selectedProject.faunaDocumentId as string})
+                          setMeshType({
+                            type: e.target.value as 'Standard' | 'Ris',
+                            projectToUpdate:
+                              selectedProject.faunaDocumentId as string,
+                          }),
                         );
                       }}
                     >
-                      <option value={"Standard"} selected>
+                      <option
+                        value={'Standard'}
+                        selected={!selectedProject.bricks}
+                      >
                         Standard Mesher
                       </option>
-                      <option value={"Ris"}>
+                      <option
+                        value={'Ris'}
+                        selected={selectedProject.bricks !== undefined}
+                      >
                         Ris Mesher
                       </option>
                     </select>
@@ -353,12 +389,12 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           </div>
           <hr className="mt-1" />
           {suggestedQuantumError.active && (
-                  <div className="text-[12px] xl:text-base font-semibold mt-2">
-                    {suggestedQuantumError.type === 'Mesher Not Active'
-                      ? 'Mesher Down: start mesher or wait until started!'
-                      : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
-                  </div>
-                )}
+            <div className="text-[12px] xl:text-base font-semibold mt-2">
+              {suggestedQuantumError.type === 'Mesher Not Active'
+                ? 'Mesher Down: start mesher or wait until started!'
+                : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
+            </div>
+          )}
           <div
             className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${
               theme === 'light'
@@ -366,17 +402,13 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                 : 'bg-bgColorDark border-textColorDark'
             }`}
           >
-            {selectedProject.meshData.type !== 'Ris' ? (
+            {!selectedProject.bricks ? (
               <h6 className="xl:text-base text-center text-[12px]">
                 Set quantum&apos;s dimensions
               </h6>
-            ):
-            (
-              <h6 className="xl:text-base text-center text-[12px]">
-                Settings
-              </h6>
-            )
-          }
+            ) : (
+              <h6 className="xl:text-base text-center text-[12px]">Settings</h6>
+            )}
             <hr className="mt-2 border-[1px] border-gray-200" />
             {selectedProject.frequencies &&
               selectedProject.frequencies.length > 0 && (
@@ -394,7 +426,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   </span>
                 </div>
               )}
-            {selectedProject.meshData.type !== 'Ris' && (
+            {!selectedProject.bricks && (
               <div className="mt-2">
                 <div className="flex xl:flex-row flex-col gap-2 xl:gap-0 justify-between mt-2">
                   {quantumDimsInput.map(
@@ -504,7 +536,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                             selectedProject.faunaDocumentId as string,
                         }),
                       );
-                      if(selectedProject.meshData.type !== "Ris"){
+                      if (selectedProject.meshData.type !== 'Ris') {
                         dispatch(
                           setQuantum({
                             quantum: quantumDimsInput,
@@ -728,7 +760,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             ) : (
               <button
                 data-testid="startSimulationButton"
-                className={`w-full mt-3 button text-[12px] xl:text-base disabled:bg-gray-400
+                className={`w-full mt-3 button text-[12px] xl:text-base disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:opacity-100
               ${
                 meshGenerated !== 'Generated'
                   ? 'bg-gray-300 text-gray-600 opacity-70'
@@ -739,7 +771,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     }`
               }`}
                 disabled={
-                  meshGenerated !== 'Generated' || pathToExternalGridsNotFound
+                  meshGenerated !== 'Generated' || solverStatus !== 'ready'
                 }
                 onClick={() => {
                   const simulation: Simulation = {
@@ -775,6 +807,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               >
                 Start Simulation
               </button>
+            )}
+            {solverStatus !== 'ready' && (
+              <div className="text-[12px] xl:text-base font-semibold mt-2">
+                Solver Down: start solver or wait until started!
+              </div>
             )}
           </div>
         </>
