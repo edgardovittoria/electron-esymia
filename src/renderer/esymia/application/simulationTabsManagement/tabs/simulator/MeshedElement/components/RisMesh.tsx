@@ -1,7 +1,6 @@
 import { Edges } from '@react-three/drei';
-import { FC, useEffect, useMemo, useRef } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { DoubleSide } from 'three';
-import { Material } from '../../../../../../../cad_library';
 import { useSelector } from 'react-redux';
 import { selectedProjectSelector } from '../../../../../../store/projectSlice';
 import { getMaterialListFrom } from '../../Simulator';
@@ -162,7 +161,6 @@ export const InstancedSquaresFromVertices: FC<{ externalGrids: ExternalGridsRisO
 
     const tempMatrix = new THREE.Matrix4();
     const position = new THREE.Vector3();
-    const rotationMatrix = new THREE.Matrix4();
     const scale = new THREE.Vector3();
     const instanceColors = new Float32Array(squares.length * 3);
 
