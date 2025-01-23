@@ -25,7 +25,7 @@ import {
 } from '../../../config/textMessages';
 import { ComponentEntity, FactoryShapes } from '../../../../../cad_library';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
-import { RisMesh } from './MeshedElement/components/RisMesh';
+import { InstancedSquaresFromVertices, RisMesh } from './MeshedElement/components/RisMesh';
 
 interface CanvasSimulatorProps {
   externalGrids: ExternalGridsObject | ExternalGridsRisObject | undefined;
@@ -97,7 +97,8 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({
                         ) : (
                           <>
                             {externalGrids && selectedProject?.meshData.type === 'Ris' &&
-                              <RisMesh resetFocus={setResetFocus} externalGrids={externalGrids as ExternalGridsRisObject}/>
+                              // <RisMesh resetFocus={setResetFocus} externalGrids={externalGrids as ExternalGridsRisObject}/>
+                              <InstancedSquaresFromVertices externalGrids={externalGrids as ExternalGridsRisObject} resetFocus={setResetFocus}/>
                             }
                           </>
                         )}
