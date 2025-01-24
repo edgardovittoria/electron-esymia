@@ -5,8 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   activeMeshingSelector,
   activeSimulationsSelector,
+  lambdaFactorSelector,
   meshGeneratedSelector,
   pathToExternalGridsNotFoundSelector,
+  setLambdaFactor,
   setMeshApproved,
   setMeshGenerated,
   setMeshType,
@@ -89,6 +91,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   }>({ active: false });
   const [showModalRefine, setShowModalRefine] = useState<boolean>(false);
   const [refineMode, setRefineMode] = useState<'refine' | 'coarsen'>('refine');
+  const lambdaFactor = useSelector(lambdaFactorSelector);
   const mesherStatus = useSelector(MesherStatusSelector);
   const solverStatus = useSelector(SolverStatusSelector);
   const suggestedQuantum = useSelector(suggestedQuantumSelector);
@@ -252,7 +255,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           projectToUpdate: selectedProject.faunaDocumentId as string,
         }),
       );
-    }else{
+    } else {
       dispatch(
         setMeshType({
           type: 'Standard',
@@ -260,7 +263,6 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
         }),
       );
     }
-
   }, [selectedProject]);
 
   return (
@@ -421,8 +423,25 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                       ].toExponential()}
                     </span>
                   </span>
-                  <span className="text-sm">
-                    Lambda Factor: <span className="font-bold">40</span>
+                  <span className="text-sm flex flex-row items-center justify-center gap-6">
+                    <span className="">Lambda Factor:</span>
+                    <input
+                      type="number"
+                      min={10}
+                      defaultValue={lambdaFactor}
+                      className={`w-1/5 p-[4px] border-[1px] ${
+                        theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
+                      } text-[15px] font-bold rounded formControl`}
+                      onChange={(e) => {
+                        dispatch(
+                          setLambdaFactor({
+                            lambdaFactor: parseFloat(e.target.value),
+                            projectToUpdate:
+                              selectedProject.faunaDocumentId as string,
+                          }),
+                        );
+                      }}
+                    />
                   </span>
                 </div>
               )}
@@ -494,7 +513,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           </div>
           <div className="w-[100%] pt-4">
             <div className="flex-column">
-              {meshGenerated === 'Not Generated' && (
+              {!selectedProject.simulation?.results && (
                 <div>
                   <button
                     data-testid="generateMeshButton"

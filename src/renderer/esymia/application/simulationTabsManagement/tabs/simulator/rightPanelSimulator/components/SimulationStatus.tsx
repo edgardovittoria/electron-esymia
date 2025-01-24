@@ -242,6 +242,7 @@ const SimulationStatusItem: React.FC<{
     const frequencyArray: number[] = project.frequencies as number[];
     return {
       mesherFileId: project.meshData.mesh,
+      surfaceFileId: project.meshData.surface,
       storage: project.storage,
       solverInput: {
         ports: project.ports.filter((p) => p.category === 'port'),

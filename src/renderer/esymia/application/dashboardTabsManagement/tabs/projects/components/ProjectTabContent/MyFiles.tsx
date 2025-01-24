@@ -47,7 +47,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className={`box ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} w-full h-[470px]`}>
+      <div className={`box ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} w-full h-[450px]`}>
         {/* <div className="flex p-2 gap-4 items-center">
           <div className="sm:w-3/5 w-1/5">
             <h5 className="text-base">Files</h5>

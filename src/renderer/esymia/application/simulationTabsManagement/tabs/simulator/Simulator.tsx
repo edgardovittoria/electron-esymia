@@ -42,6 +42,7 @@ import { Brick } from './rightPanelSimulator/components/createGridsExternals';
 import { GiAtomicSlashes, GiCubeforce } from 'react-icons/gi';
 import { GrClone } from 'react-icons/gr';
 import { ComponentEntity, Material } from '../../../../../cad_library';
+import { MesherStatusSelector } from '../../../../store/pluginsSlice';
 
 interface SimulatorProps {
   selectedTabLeftPanel: string | undefined;
@@ -68,12 +69,14 @@ export const Simulator: React.FC<SimulatorProps> = ({
   const [spinner, setSpinner] = useState<boolean>(false);
   const toggleResetFocus = () => setResetFocus(!resetFocus);
   const { loadMeshData, cloneProject } = useStorageData();
+  const mesherStatus = useSelector(MesherStatusSelector)
   const pathToExternalGridsNotFound = useSelector(
     pathToExternalGridsNotFoundSelector,
   );
   const awsExternalGridsData = useSelector(AWSExternalGridsDataSelector);
 
   const risExternalGridsFormat = (extGridsJson: any) => {
+    console.log(extGridsJson)
     let vertices: number[][] = [];
     for (let index = 0; index < extGridsJson.estremi_celle[0].length; index++) {
       vertices.push([])
@@ -137,7 +140,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
   useEffect(() => {
     if (
-      selectedProject?.meshData.mesh &&
+      selectedProject?.meshData.mesh && mesherStatus === "ready" &&
       (selectedProject?.meshData.meshGenerated === 'Generated' ||
         selectedProject?.meshData.meshGenerated === 'Queued')
     ) {
@@ -145,7 +148,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
       setSpinner(true);
       loadMeshData();
     }
-  }, [selectedProject?.meshData.meshGenerated]);
+  }, [selectedProject?.meshData.meshGenerated, mesherStatus]);
 
   useEffect(() => {
     if (awsExternalGridsData) {
@@ -218,12 +221,6 @@ export const Simulator: React.FC<SimulatorProps> = ({
           <ImSpinner className="animate-spin w-8 h-8" />
         </div>
       )}
-      {pathToExternalGridsNotFound && (
-        <div className="absolute bottom-16 right-1/2 translate-x-1/2 bg-white rounded-xl p-3 border border-orange-400 flex flex-row gap-2 justify-between items-center">
-          <BiInfoCircle className="text-orange-400" size={15} />
-          <span className="font-semibold">Mesh generated in another pc</span>
-        </div>
-      )}
       <CanvasSimulator
         externalGrids={externalGrids}
         selectedMaterials={selectedMaterials}
@@ -231,11 +228,11 @@ export const Simulator: React.FC<SimulatorProps> = ({
         setResetFocus={toggleResetFocus}
       />
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
-      {validTopology !== undefined &&
+      {/* {validTopology !== undefined &&
         <div className="tooltip tooltip-left absolute right-[2%] top-[180px]" data-tip={`${validTopology ? 'Mesh Topology Valid' : 'Mesh Topology NOT Valid try to refine or coarse the quantum'}`}>
           <div className={`badge ${validTopology ? 'bg-green-500' : 'bg-red-600'} badge-lg`}></div>
       </div>
-      }
+      } */}
       <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
         <div
           className={`p-2 tooltip rounded-t tooltip-right ${

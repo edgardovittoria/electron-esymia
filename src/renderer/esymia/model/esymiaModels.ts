@@ -101,7 +101,8 @@ export type MeshData = {
   meshApproved: boolean,
   quantum: [number, number, number],
   pathToExternalGridsNotFound: boolean,
-  validTopology: boolean
+  validTopology: boolean,
+  lambdaFactor?: number,
 }
 
 

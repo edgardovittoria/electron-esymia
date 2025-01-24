@@ -53,7 +53,8 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
           quantum: [0,0,0],
           pathToExternalGridsNotFound: false,
           validTopology: true,
-          type: 'Standard'
+          type: 'Standard',
+          lambdaFactor: 40
         },
         screenshot: undefined,
         owner: (selectedFolder?.owner.email === user.email) ? user : selectedFolder?.owner as UsersState,

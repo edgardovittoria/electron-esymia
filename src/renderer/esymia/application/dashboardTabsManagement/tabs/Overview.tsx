@@ -128,7 +128,7 @@ export const Overview: React.FC<OverviewProps> = ({  }) => {
       </div> */}
       <Projects/>
       <div className="lg:col-span-2 justify-between w-full">
-        <Simulations maxH="max-h-[300px]"/>
+        <Simulations maxH="max-h-[270px]"/>
       </div>
     </div>
   );

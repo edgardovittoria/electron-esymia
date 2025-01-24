@@ -41,9 +41,6 @@ export default function App() {
   const solverStatus = useSelector(SolverStatusSelector)
   const [logout, setLogout] = useState(false)
   const theme = useSelector(ThemeSelector)
-  useEffect(() => {
-    console.log(theme)
-  }, [theme])
   // const [brokerActive, setBrokerActive] = useState<boolean>(false);
   // const [progressBarValue, setProgressBarValue] = useState<number>(0)
 
@@ -51,7 +48,7 @@ export default function App() {
   //let {allowedUser, remainingDemoDays} = useDemoMode()
 
   // Permette ad ogni utente di avere un'unica sessione attiva per volta. Commentare per disabilitare questo vincolo.
-  let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
+  //let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
 
   useEffect(() => {
     // window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {

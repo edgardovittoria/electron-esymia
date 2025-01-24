@@ -153,7 +153,7 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
           )}
           {showInfoModal && <InfoModal />}
           {showCreateNewProjectModal && <CreateNewProjectModal />}
-          <div className={`${loginSpinner && 'opacity-40'} h-[97vh]`}>
+          <div className={`${loginSpinner && 'opacity-40'}`}>
             {memoizedTabsContainer}
             <MenuBar />
 

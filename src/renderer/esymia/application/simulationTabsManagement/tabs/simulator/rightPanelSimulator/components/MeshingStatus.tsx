@@ -235,7 +235,8 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             message: 'compute mesh ris',
             body: {
               fileNameRisGeometry: selectedProject.bricks as string,
-              fileName: selectedProject.faunaDocumentId as string
+              fileName: selectedProject.faunaDocumentId as string,
+              density: selectedProject.meshData.lambdaFactor
             }
           },
         }),

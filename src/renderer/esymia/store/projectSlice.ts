@@ -297,6 +297,10 @@ export const ProjectSlice = createSlice({
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.quantum = action.payload.quantum;
     },
+    setLambdaFactor(state: ProjectState, action: PayloadAction<{ lambdaFactor: number, projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.lambdaFactor = action.payload.lambdaFactor;
+    },
     setBoundingBoxDimension(state: ProjectState, action: PayloadAction<number>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       if (selectedProject) {
@@ -382,6 +386,7 @@ export const {
   setPreviousMeshStatus,
   setMeshApproved,
   setQuantum,
+  setLambdaFactor,
   setFolderOfElementsSharedWithUser,
   setExternalGrids,
   setSurface,
@@ -514,3 +519,6 @@ export const findSuggestedQuantum = (folders: Folder[], projectID: string) => {
   let project = findProjectByFaunaID(takeAllProjectsInArrayOf(folders), projectID) as Project
   return project.suggestedQuantum
 }
+export const lambdaFactorSelector = (state: {
+  projects: ProjectState
+}) => (findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject) as Project).meshData.lambdaFactor;
