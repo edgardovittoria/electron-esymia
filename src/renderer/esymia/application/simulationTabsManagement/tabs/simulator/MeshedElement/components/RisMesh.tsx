@@ -216,6 +216,7 @@ export const InstancedSquaresFromVertices: FC<{ externalGrids: ExternalGridsRisO
     <>
       <instancedMesh
         ref={meshRef}
+        frustumCulled={false}
         args={[undefined, undefined, squares.length]}
       >
         <planeGeometry args={[1, 1]} />
