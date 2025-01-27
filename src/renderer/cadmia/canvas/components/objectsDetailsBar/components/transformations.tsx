@@ -297,9 +297,9 @@ export const SetTransformationParamsModal: FC<{
                       let newRot: TransformationParamDetails = newRotation.map(
                         (r) => {
                           if (isNaN(parseFloat(r))) return 0;
-                          if (parseFloat(r) > 180) return 180;
-                          if (parseFloat(r) < -180) return -180;
-                          return parseFloat(r);
+                          if (parseFloat(r) > 180) return 180*Math.PI/180;
+                          if (parseFloat(r) < -180) return -180*Math.PI/180;
+                          return parseFloat(r)*Math.PI/180;
                         },
                       ) as TransformationParamDetails;
                       dispatch(
