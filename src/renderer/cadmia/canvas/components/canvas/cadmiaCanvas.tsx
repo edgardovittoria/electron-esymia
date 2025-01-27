@@ -2,12 +2,13 @@ import React, { FC, ReactNode, useEffect, useState } from 'react';
 import { Provider, ReactReduxContext, useSelector } from 'react-redux';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Bounds, Edges, GizmoHelper, GizmoViewport, OrbitControls, useBounds } from '@react-three/drei';
+import { Bounds, Edges, GizmoHelper, GizmoViewport, OrbitControls, Text, useBounds } from '@react-three/drei';
 import { CanvasObject } from './components/canvasObject';
 import { Controls } from './components/controls';
 import { invisibleMeshesSelector, meshesWithBordersVisibleSelector } from '../objectsDetailsBar/objectsDetailsSlice';
 import { focusToSceneSelector } from '../navBar/menuItems/view/viewItemSlice';
 import { ComponentEntity, componentseSelector, FactoryShapes, keySelectedComponenteSelector } from '../../../../cad_library';
+import { String } from 'aws-sdk/clients/apigateway';
 
 interface CadmiaCanvasProps {}
 
@@ -76,13 +77,11 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = () => {
                 keySelectedComponent={keySelectedComponent}
                 mesh={meshSelected}
               />}
-              <gridHelper
-                args={[
-                  500,
-                  100,
-                  new THREE.Color('red'),
-                  new THREE.Color('#1a1818'),
-                ]}
+              <NumberedGrid
+                divisions={200}
+                size={500}
+                gridLineColor={'#1a1818'}
+                zeroRefColor={'red'}
                 scale={[1, 1, 1]}
               />
               <OrbitControls
@@ -131,4 +130,51 @@ const MeshEdgesOnly: FC<{entity: ComponentEntity}> = ({entity}) => {
       <Edges />
     </mesh>
   )
+}
+
+
+const NumberedGrid:FC<{size:number, divisions: number, zeroRefColor: String, gridLineColor: String, scale: number[]}> = ({ size = 10, divisions = 10, zeroRefColor='red', gridLineColor='#1a1818', scale=[1,1,1]}) => {
+  const step = size / divisions; // Calcola la distanza tra le linee
+  const positions = [];
+
+  // Genera le posizioni per i numeri
+  for (let i = -size / 2; i <= size / 2; i += step) {
+    positions.push(i); // Posizioni lungo gli assi
+  }
+
+  return (
+    <>
+      {/* Griglia */}
+      <gridHelper args={[size, divisions, new THREE.Color(zeroRefColor), new THREE.Color(gridLineColor)]} scale={new THREE.Vector3(scale[0], scale[1], scale[2])}/>
+
+      {/* Numeri lungo l'asse X */}
+      {positions.map((pos) => (
+        <Text
+          key={`x-${pos}`}
+          position={[pos, 0.06, 0]} // Sopra la griglia
+          fontSize={0.1}
+          color="black"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {pos.toFixed(2)}
+        </Text>
+      ))}
+
+      {/* Numeri lungo l'asse Z */}
+      {positions.map((pos) => (
+        <Text
+          key={`z-${pos}`}
+          position={[0, 0.06, pos]} // Sopra la griglia
+          fontSize={0.1}
+          color="black"
+          anchorX="center"
+          anchorY="middle"
+          rotation={[0, Math.PI / 2, 0]} // Ruota il testo lungo l'asse Z
+        >
+          {pos.toFixed(2)}
+        </Text>
+      ))}
+    </>
+  );
 }
