@@ -27,6 +27,7 @@ import { FiEdit } from 'react-icons/fi';
 import { s3 } from '../../../../aws/s3Config';
 import { ImportActionParamsObject, ImportModelFromDBModal, CanvasState } from "../../../../../cad_library";
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
 interface ModelerProps {
   selectedTabLeftPanel: string | undefined;
   setSelectedTabLeftPanel: Function;
@@ -43,6 +44,8 @@ export const Modeler: React.FC<ModelerProps> = ({
   const theme = useSelector(ThemeSelector)
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
+  const [resetFocus, setResetFocus] = useState(false);
+  const toggleResetFocus = () => setResetFocus(!resetFocus);
 
   const [showModalLoadFromDB, setShowModalLoadFromDB] = useState(false);
 
@@ -62,7 +65,7 @@ export const Modeler: React.FC<ModelerProps> = ({
 
   return (
     <div>
-      <CanvasModeler setShowModalLoadFromDB={setShowModalLoadFromDB}/>
+      <CanvasModeler setShowModalLoadFromDB={setShowModalLoadFromDB} resetFocus={resetFocus}/>
       <StatusBar />
       <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
         <div
@@ -194,6 +197,9 @@ export const Modeler: React.FC<ModelerProps> = ({
           }
         />
       )}
+      <div className="absolute lg:left-[48%] left-[38%] gap-2 top-[180px] flex flex-row">
+        <ResetFocusButton toggleResetFocus={toggleResetFocus} />
+      </div>
     </div>
   );
 };

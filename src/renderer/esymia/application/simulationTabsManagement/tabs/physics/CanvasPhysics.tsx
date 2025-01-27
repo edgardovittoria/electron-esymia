@@ -33,6 +33,7 @@ import {
 } from '../../../config/textMessages';
 import { CircleGeometryAttributes, ComponentEntity, FactoryShapes, TransformationParams } from '../../../../../cad_library';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import { FactoryShapesEsymia } from '../../../../../cad_library/components/baseShapes/factoryShapes';
 
 interface CanvasPhysicsProps {
   setCameraPosition: Function;
@@ -134,7 +135,7 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                               }
                             }}
                           >
-                            <FactoryShapes entity={component} />
+                            <FactoryShapesEsymia entity={component} />
                             <Edges />
                           </mesh>
                         );

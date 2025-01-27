@@ -230,7 +230,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
                         <div className="flex justify-between w-full hover:cursor-pointer">
                           <div className="flex">
                             <CloudArrowDownIcon className="w-[20px] mr-4" />
-                            <p className="text-base font-medium">Save As Ris Geometry</p>
+                            <p className="text-base font-medium">Save With Ris Geometry Data</p>
                           </div>
                         </div>
                       </span>

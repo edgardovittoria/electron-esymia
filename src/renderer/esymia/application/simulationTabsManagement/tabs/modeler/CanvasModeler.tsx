@@ -19,12 +19,14 @@ import { Project } from "../../../../model/esymiaModels";
 import { setPortsFromS3 } from '../physics/Physics';
 import { setResultsFromS3 } from "../results/Results";
 import { ThemeSelector } from "../../../../store/tabsAndMenuItemsSlice";
+import { FactoryShapesEsymia } from "../../../../../cad_library/components/baseShapes/factoryShapes";
 
 interface CanvasModelerProps  {
-  setShowModalLoadFromDB: (v: boolean) => void
+  setShowModalLoadFromDB: (v: boolean) => void,
+  resetFocus: boolean
 }
 
-export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFromDB}) => {
+export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFromDB, resetFocus}) => {
   const selectedProject = useSelector(selectedProjectSelector);
   const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch()
@@ -61,9 +63,9 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFro
                     intensity={3}
                   />
                   {/* paint models */}
+                  <FocusView key={uniqid()} resetFocus={resetFocus}>
                   {selectedProject.model.components.map((component: ComponentEntity, index: number) => {
                     return (
-                      <FocusView key={uniqid()}>
                         <mesh
                           userData={{
                             keyComponent: component.keyComponent,
@@ -73,12 +75,13 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFro
                           scale={component.transformationParams.scale}
                           rotation={component.transformationParams.rotation}
                         >
-                          <FactoryShapes entity={component}/>
+                          <FactoryShapesEsymia entity={component}/>
                           <Edges/>
                         </mesh>
-                      </FocusView>
+
                     )
                   })}
+                  </FocusView>
                   {/*<Screenshot selectedProject={selectedProject}/>*/}
                   <OrbitControls makeDefault/>
                   <GizmoHelper alignment="bottom-left" margin={[150, 80]}>

@@ -26,6 +26,7 @@ import {
 import { ComponentEntity, FactoryShapes } from '../../../../../cad_library';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { InstancedSquaresFromVertices, RisMesh } from './MeshedElement/components/RisMesh';
+import { FactoryShapesEsymia } from '../../../../../cad_library/components/baseShapes/factoryShapes';
 
 interface CanvasSimulatorProps {
   externalGrids: ExternalGridsObject | ExternalGridsRisObject | undefined;
@@ -79,7 +80,7 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({
                               scale={component.transformationParams.scale}
                               rotation={component.transformationParams.rotation}
                             >
-                              <FactoryShapes entity={component} />
+                              <FactoryShapesEsymia entity={component} />
                               <Edges />
                             </mesh>
                           );

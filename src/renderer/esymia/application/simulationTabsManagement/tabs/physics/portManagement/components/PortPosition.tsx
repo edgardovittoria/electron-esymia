@@ -26,6 +26,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 				<div
 					className={`mt-3 mb-2 p-[10px] text-left border-[1px] ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-secondaryColorDark bg-bgColorDark'}`}>
 					<h6 className="xl:text-base text-[12px]">Port Position</h6>
+          <span className="text-xs my-2">If the input field is blank and you want to enter a negative number, the minus key must be pressed two times.</span>
 					<div className="mt-2">
 						<span className="xl:text-base text-[12px]">Input (X,Y,Z)</span>
 						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
@@ -232,12 +233,12 @@ interface TerminationPositionInputProps {
 const TerminationPositionInput: FC<TerminationPositionInputProps> = ({dataTestId, disabled, debounceTimeoutMilliSecs, inputStep, value, onChange}) => {
   return (
     <div className="lg:w-[30%] w-full">
-								<input
+								<DebounceInput
                   id={dataTestId}
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-black text-[12px] font-bold rounded formControl`}
 									type="number"
-                  //debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
+                  debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 1000}
 									step={inputStep ? inputStep : 0.000001}
 									value={parseFloat(value.toFixed(6))}
 									onChange={onChange}
