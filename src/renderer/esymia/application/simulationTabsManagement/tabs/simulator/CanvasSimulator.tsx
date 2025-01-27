@@ -53,7 +53,7 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({
         <ReactReduxContext.Consumer>
           {({ store }) => (
             <div className="flex flex-col">
-              <Canvas className="w-[100vw] lg:h-[70vh] xl:h-[82vh]">
+              <Canvas className="w-[100vw] lg:h-[70vh] xl:h-[82vh]" camera={{ near: 0.1, far: 10000 }}>
                 {/* <Perf/> */}
                 <Provider store={store}>
                   <pointLight position={[100, 100, 100]} intensity={0.8} />
