@@ -14,10 +14,13 @@ import { toolbarIconsHeight, toolbarIconsWidth, toolbarsHintStyle } from '../../
 import { resetFocusToScene } from '../navBar/menuItems/view/viewItemSlice';
 import { TbZoomReset } from 'react-icons/tb';
 import { addComponent, ComponentEntity, getNewKeys, numberOfGeneratedKeySelector, selectedComponentSelector } from '../../../../cad_library';
+import { IoGridSharp } from 'react-icons/io5';
 
-interface MiscToolbarProps {}
+interface MiscToolbarProps {
+  adaptGridsToScene: Function
+}
 
-export const MiscToolbar: React.FC<MiscToolbarProps> = () => {
+export const MiscToolbar: React.FC<MiscToolbarProps> = ({adaptGridsToScene}) => {
   const dispatch = useDispatch();
   const { miscToolbarOpsBasedOnModality } = useCadmiaModalityManager();
   const selectedComponent = useSelector(selectedComponentSelector);
@@ -116,6 +119,19 @@ export const MiscToolbar: React.FC<MiscToolbarProps> = () => {
             <div className={toolbarsHintStyle}>
               <span className="relative z-10 p-2 leading-none text-white whitespace-no-wrap bg-black shadow-lg rounded-md">
                 RESET SCENE FOCUS
+              </span>
+            </div>
+          </div>
+          <div
+            className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth} p-1 group bg-white`}
+            onClick={() =>
+              adaptGridsToScene()
+            }
+          >
+            <IoGridSharp className="w-8 h-8 text-black"/>
+            <div className={toolbarsHintStyle}>
+              <span className="relative z-10 p-2 leading-none text-white whitespace-no-wrap bg-black shadow-lg rounded-md">
+                ADAPT GRIDS TO SCENE
               </span>
             </div>
           </div>

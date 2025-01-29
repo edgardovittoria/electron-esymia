@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Navbar } from './components/navBar/NavBar';
 import { KeyboardEventMapper } from './components/keyboardEventMapper';
 import { CadmiaCanvas } from './components/canvas/cadmiaCanvas';
@@ -20,6 +20,13 @@ export interface CanvasProps {
 
 const CAD: React.FC<CanvasProps> = ({ setShowCad }) => {
   const { useBaseOpactityBasedOnModality } = useCadmiaModalityManager();
+  const triggerUpdate = useRef<(() => void) | null>(null);
+
+  const handleUpdateGrid = () => {
+    if (triggerUpdate.current) {
+      triggerUpdate.current(); // Aggiorna la posizione e le dimensioni delle griglie
+    }
+  }
   useBaseOpactityBasedOnModality();
   const loadingSpinner = useSelector(LoadingSpinnerSelector)
   return (
@@ -32,10 +39,10 @@ const CAD: React.FC<CanvasProps> = ({ setShowCad }) => {
         <Navbar setShowCad={setShowCad} />
         <KeyboardEventMapper />
         <div className="w-full p-0 relative">
-          <CadmiaCanvas />
+          <CadmiaCanvas triggerUpdate={triggerUpdate}/>
           <TransformationsToolBar />
           <BinaryOpsToolbar />
-          <MiscToolbar />
+          <MiscToolbar adaptGridsToScene={handleUpdateGrid}/>
           <ShapesToolbar />
           <TabbedMenu />
         </div>
