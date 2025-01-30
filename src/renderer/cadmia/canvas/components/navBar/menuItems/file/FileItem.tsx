@@ -76,8 +76,15 @@ export const FileItem: React.FC<FileItemProps> = () => {
   const { execQuery } = useFaunaQuery();
 
   const inputRefSTL = useRef(null);
+  const inputRefRis = useRef(null);
   const onImportSTLClick = () => {
     const input = inputRefSTL.current;
+    if (input) {
+      (input as HTMLInputElement).click();
+    }
+  };
+  const onImportRisClick = () => {
+    const input = inputRefRis.current;
     if (input) {
       (input as HTMLInputElement).click();
     }
@@ -289,7 +296,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
                         type="file"
                         ref={inputRefSTL}
                         style={{ display: 'none' }}
-                        accept=".stl"
+                        accept='.stl'
                         onChange={(e) => {
                           const STLFiles = e.target.files;
                           STLFiles &&
@@ -303,7 +310,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
                     </div>
                     <div
                       className={navbarDropdownItemStyle}
-                      onClick={onImportSTLClick}
+                      onClick={onImportRisClick}
                     >
                       <div className="flex justify-between w-full hover:cursor-pointer"
                           onClick={() => dispatch(setModality("NormalSelection"))}
@@ -318,7 +325,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
                       </div>
                       <input
                         type="file"
-                        ref={inputRefSTL}
+                        ref={inputRefRis}
                         style={{ display: 'none' }}
                         accept=".json"
                         onChange={(e) => {
