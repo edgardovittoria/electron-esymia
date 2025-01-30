@@ -110,7 +110,7 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
     return (
         <>
             {binaryOperationsToolbarVisible &&
-                <div className="absolute left-[150px] top-[10px] w-[150px] text-center shadow grid grid-cols-5">
+                <div className="w-[150px] text-center shadow grid grid-cols-5">
                     <div className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth} p-1 group bg-white hover:bg-gray-300
              ${binaryOp === "UNION" ? 'bg-gray-400' : 'bg-white'}
             `}

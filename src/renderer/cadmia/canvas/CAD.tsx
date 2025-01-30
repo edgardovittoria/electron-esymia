@@ -40,10 +40,12 @@ const CAD: React.FC<CanvasProps> = ({ setShowCad }) => {
         <KeyboardEventMapper />
         <div className="w-full p-0 relative">
           <CadmiaCanvas triggerUpdate={triggerUpdate}/>
-          <TransformationsToolBar />
-          <BinaryOpsToolbar />
-          <MiscToolbar adaptGridsToScene={handleUpdateGrid}/>
-          <ShapesToolbar />
+          <div className="absolute left-[15px] top-[10px] flex gap-4 items-start justify-center">
+            <MiscToolbar adaptGridsToScene={handleUpdateGrid}/>
+            <BinaryOpsToolbar />
+            <ShapesToolbar />
+            <TransformationsToolBar />
+          </div>
           <TabbedMenu />
         </div>
         <StatusBar />

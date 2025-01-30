@@ -55,7 +55,7 @@ export const MiscToolbar: React.FC<MiscToolbarProps> = ({adaptGridsToScene}) => 
   return (
     <>
       {miscToolbarVisible && (
-        <div className="absolute left-[15px] top-[10px] w-[120px] text-center shadow grid grid-cols-4">
+        <div className="gap-0 text-center shadow grid grid-cols-5">
           <div className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth} p-1 group bg-white`}>
             <DocumentDuplicateIcon
               className="w-8 h-8"

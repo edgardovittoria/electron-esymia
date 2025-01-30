@@ -18,7 +18,7 @@ export const ShapesToolbar: React.FC = () => {
   return (
     <>
       {shapesToolbarVisible && (
-        <div className={`absolute flex flex-row left-[315px] top-[10px] text-center shadow ${toolbarIconsWidth}`}>
+        <div className={`gap-0 text-center shadow grid grid-cols-5`}>
           {baseShapes.map((shape) => (
             <div
               className={`relative flex px-1 items-center justify-center group bg-white hover:bg-secondaryColor hover:text-white hover:cursor-pointer ${toolbarIconsHeight}`}
