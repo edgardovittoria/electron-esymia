@@ -1,15 +1,12 @@
 import React, {
   FC,
   ReactNode,
-  Ref,
   useCallback,
   useEffect,
-  useMemo,
-  useRef,
   useState,
 } from 'react';
 import { Provider, ReactReduxContext, useSelector } from 'react-redux';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   Bounds,
@@ -31,11 +28,9 @@ import {
   ComponentEntity,
   componentseSelector,
   FactoryShapes,
-  getObjectsFromSceneByType,
   keySelectedComponenteSelector,
   meshFrom,
 } from '../../../../cad_library';
-import { String } from 'aws-sdk/clients/apigateway';
 
 interface CadmiaCanvasProps {
   triggerUpdate: React.MutableRefObject<(() => void) | null>;

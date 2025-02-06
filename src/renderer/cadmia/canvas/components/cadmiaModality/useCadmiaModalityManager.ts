@@ -117,6 +117,7 @@ export const useCadmiaModalityManager = () => {
       transformations: modality !== 'MultipleSelection' ? true : false,
       geometryParams: modality !== 'MultipleSelection' ? true : false,
       borders: modality !== 'MultipleSelection' ? true : false,
+      selectAll: modality === 'MultipleSelection' ? true : false
     },
     outliner: {
       onClickItemAction: clickActions,
@@ -203,6 +204,8 @@ export const useCadmiaModalityManager = () => {
     }, [modality]);
   };
 
+
+
   return {
     canvasObjectOpsBasedOnModality,
     miscToolbarOpsBasedOnModality,
@@ -210,6 +213,6 @@ export const useCadmiaModalityManager = () => {
     useBaseOpactityBasedOnModality: useBaseSetupBasedOnModality,
     setOpacityNormalMode,
     meshHidingActionBasedOnModality,
-    meshUnhidingActionBasedOnModality,
+    meshUnhidingActionBasedOnModality
   };
 };

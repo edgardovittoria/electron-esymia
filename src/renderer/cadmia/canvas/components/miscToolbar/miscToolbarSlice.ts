@@ -31,6 +31,9 @@ export const MiscToolbarSlice = createSlice({
         state.multipleSelectionEntities.push(action.payload)
       }
     },
+    selectAllEntitiesForMultipleSelection(state: MiscToolbarState, action: PayloadAction<number[]>) {
+      state.multipleSelectionEntities = action.payload
+    },
     resetMultipleSelectionEntities(state: MiscToolbarState){
       state.multipleSelectionEntities = []
     }
@@ -44,7 +47,7 @@ export const MiscToolbarSlice = createSlice({
   },
 });
 
-export const { closeMiscToolbar, openMiscToolbar, toggleMiscToolbar, toggleEntitySelectionForMultipleSelection, resetMultipleSelectionEntities } = MiscToolbarSlice.actions
+export const { closeMiscToolbar, openMiscToolbar, toggleMiscToolbar, toggleEntitySelectionForMultipleSelection, resetMultipleSelectionEntities, selectAllEntitiesForMultipleSelection } = MiscToolbarSlice.actions
 
 export const miscToolbarVisibilitySelector = (state: { miscToolbar: MiscToolbarState }) => state.miscToolbar.visible
 export const multipleSelectionEntitiesKeysSelector = (state: { miscToolbar: MiscToolbarState }) => state.miscToolbar.multipleSelectionEntities

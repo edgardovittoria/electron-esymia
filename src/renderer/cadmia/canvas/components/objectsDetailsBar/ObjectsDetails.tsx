@@ -7,6 +7,7 @@ import { Outliner } from './components/outliner';
 import { BordersMeshOption } from './components/bordersMeshOption';
 import { useCadmiaModalityManager } from '../cadmiaModality/useCadmiaModalityManager';
 import { componentseSelector, selectedComponentSelector } from '../../../../cad_library';
+import { SelectAllCheckBox } from './components/selectAllCheckBox';
 
 interface ObjectsDetailsProps {}
 
@@ -20,6 +21,7 @@ export const ObjectsDetails: React.FC<ObjectsDetailsProps> = () => {
       className={`absolute bottom-0 z-10 left-0 w-[18vw] bg-white px-[20px] pt-[20px] pb-[50px] text-white text-center translate-y-0 transition border border-black border-b-0 rounded-tr-xl`}
     >
       <div className="h-full max-h-[800px] overflow-scroll">
+        { objectsDetailsOptsBasedOnModality.elementsVisibility.selectAll && <SelectAllCheckBox label='Select all: ' /> }
         <Outliner
           components={canvasComponents}
           selectedComponent={selectedComponent}
