@@ -418,9 +418,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   <span className="text-sm">
                     Max Frequency:{' '}
                     <span className="font-bold">
-                      {selectedProject.frequencies[
+                      {parseFloat(selectedProject.frequencies[
                         selectedProject.frequencies.length - 1
-                      ].toExponential()}
+                      ].toFixed(2)).toExponential()}
                     </span>
                   </span>
                   <span className="text-sm flex flex-row items-center justify-center gap-6">

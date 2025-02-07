@@ -22,7 +22,7 @@ export const ModelOutliner: React.FC<ModelOutlinerProps> = () => {
           </h5>
         </div>
       </div>
-      <div className="flex-col ml-10 mt-1">
+      <div className="flex-col ml-5 mt-1 overflow-y-scroll max-h-[300px] overflow-x-scroll max-w-[200px]">
         {selectedProject &&
           selectedProject.model?.components.map((component) => {
             return (

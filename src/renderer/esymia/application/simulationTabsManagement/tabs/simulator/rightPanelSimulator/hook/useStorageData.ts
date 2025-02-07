@@ -396,8 +396,8 @@ export const useStorageData = () => {
     }).promise().then(mesh => {
       s3.copyObject({
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-        CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`,
-        Key: `${res.id}_grids.json.gz`
+        CopySource: project.meshData.type === 'Standard' ? `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.surface}`,
+        Key: project.meshData.type === 'Standard' ? `${res.id}_grids.json.gz` : `${res.id}_surface.json.gz`
       }).promise().then(grids => {
         if(project.simulation?.resultS3){
           s3.copyObject({

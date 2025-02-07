@@ -236,7 +236,8 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             body: {
               fileNameRisGeometry: selectedProject.bricks as string,
               fileName: selectedProject.faunaDocumentId as string,
-              density: selectedProject.meshData.lambdaFactor
+              density: selectedProject.meshData.lambdaFactor,
+              freqMax: selectedProject.frequencies && selectedProject.frequencies[selectedProject.frequencies.length - 1],
             }
           },
         }),
