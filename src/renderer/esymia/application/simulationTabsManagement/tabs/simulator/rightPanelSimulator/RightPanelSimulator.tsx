@@ -390,13 +390,6 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             </div>
           </div>
           <hr className="mt-1" />
-          {suggestedQuantumError.active && (
-            <div className="text-[12px] xl:text-base font-semibold mt-2">
-              {suggestedQuantumError.type === 'Mesher Not Active'
-                ? 'Mesher Down: start mesher or wait until started!'
-                : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
-            </div>
-          )}
           <div
             className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${
               theme === 'light'
@@ -511,14 +504,21 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
               </div>
             )}
           </div>
+          {suggestedQuantumError.active && (
+            <div className="text-[12px] xl:text-base font-semibold mt-2">
+              {suggestedQuantumError.type === 'Mesher Not Active'
+                ? 'Mesher Down: start mesher or wait until started!'
+                : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
+            </div>
+          )}
           <div className="w-[100%] pt-4">
             <div className="flex-column">
-              {!selectedProject.simulation?.results && (
+              {!selectedProject.simulation?.results && mesherStatus === 'ready' && (
                 <div>
                   <button
                     data-testid="generateMeshButton"
                     className={
-                      process.env.APP_MODE !== 'test'
+                      process.env.APP_MODE !== 'test' && selectedProject.meshData.type !== 'Ris'
                         ? checkQuantumDimensionsValidity()
                           ? `button buttonPrimary ${
                               theme === 'light'
@@ -533,7 +533,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                           } w-[100%]`
                     }
                     disabled={
-                      process.env.APP_MODE !== 'test'
+                      process.env.APP_MODE !== 'test' && selectedProject.meshData.type !== 'Ris'
                         ? !checkQuantumDimensionsValidity()
                         : false
                     }

@@ -28,7 +28,7 @@ const StatusBar: React.FC<StatusBarProps> = ({
         >
           {menuItemSelected === 'Simulator' && (
             <>
-              {selectedProject.meshData.type === 'Standard' && (
+              {selectedProject.meshData.type === 'Standard' ? (
                 <div
                   className={`pr-5 ${
                     theme === 'light' ? 'text-textColor' : 'text-textColorDark'
@@ -46,6 +46,41 @@ const StatusBar: React.FC<StatusBarProps> = ({
                     {voxelsPainted}
                   </span>
                 </div>
+              ):(
+                <>
+                  <div
+                  className={`pr-5 ${
+                    theme === 'light' ? 'text-textColor' : 'text-textColorDark'
+                  }`}
+                >
+                  Number of sides:{' '}
+                  <span
+                    className={`font-bold ${
+                      theme === 'light'
+                        ? 'text-textColor'
+                        : 'text-textColorDark'
+                    }`}
+                  >
+                    {selectedProject.meshData.ASize ? selectedProject.meshData.ASize[0] : 'N/A'}
+                  </span>
+                </div>
+                <div
+                  className={`pr-5 ${
+                    theme === 'light' ? 'text-textColor' : 'text-textColorDark'
+                  }`}
+                >
+                  Number of nodes:{' '}
+                  <span
+                    className={`font-bold ${
+                      theme === 'light'
+                        ? 'text-textColor'
+                        : 'text-textColorDark'
+                    }`}
+                  >
+                    {selectedProject.meshData.ASize ? selectedProject.meshData.ASize[1] : 'N/A'}
+                  </span>
+                </div>
+                </>
               )}
             </>
           )}

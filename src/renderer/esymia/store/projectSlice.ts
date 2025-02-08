@@ -281,6 +281,10 @@ export const ProjectSlice = createSlice({
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.type = action.payload.type;
     },
+    setMeshASize(state: ProjectState, action: PayloadAction<{ ASize: number[], projectToUpdate: string }>) {
+      let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
+      if (project) project.meshData.ASize = action.payload.ASize;
+    },
     setMeshValidTopology(state: ProjectState, action: PayloadAction<{ status:boolean, projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.validTopology = action.payload.status;
@@ -382,6 +386,7 @@ export const {
   setMesh,
   setMeshGenerated,
   setMeshType,
+  setMeshASize,
   setMeshValidTopology,
   setPreviousMeshStatus,
   setMeshApproved,

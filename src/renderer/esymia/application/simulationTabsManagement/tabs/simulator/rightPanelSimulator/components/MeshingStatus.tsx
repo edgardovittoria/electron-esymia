@@ -365,7 +365,8 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
               externalGrids: mesherResults.gridsPath,
               surface: mesherResults.surfacePath,
               meshGenerated: 'Generated',
-              validTopology: mesherResults.validTopology
+              validTopology: mesherResults.validTopology,
+              ASize: mesherResults.ASize,
             },
           }),
           dispatch

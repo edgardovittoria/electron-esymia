@@ -103,6 +103,7 @@ export type MeshData = {
   pathToExternalGridsNotFound: boolean,
   validTopology: boolean,
   lambdaFactor?: number,
+  ASize?: number[],
 }
 
 

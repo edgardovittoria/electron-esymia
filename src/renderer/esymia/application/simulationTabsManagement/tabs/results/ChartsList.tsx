@@ -92,6 +92,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   const [chartsDataToVisualize, setChartsDataToVisualize] = useState(chartsOrderedIDs.map((id) =>
   chartsDataOptionsFactory(selectedProject?.simulation as Simulation, selectedProject, id, matrix_Z, matrix_Y, matrix_S, ports, selectedLabel, theme)
 ))
+  const graphsTitle = ["R", "L", "Z_Module", "Z_Phase", "G", "C", "Y_Module", "Y_Phase", "S_Module", "S_Phase", "S_dB",]
   useEffect(() => {
     let graphs: string[] = []
     if (graphToVisualize === "All Graph") {
@@ -115,7 +116,19 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   }, [graphToVisualize, selectedProject, selectedLabel])
 
 
-  const optionsWithScaleMode = (options: any, scaleMode: ScaleMode, type: "scatter"|"line") => {
+  const optionsWithScaleMode = (options: any, scaleMode: ScaleMode, type: "scatter"|"line", graphTitle: string) => {
+    let yAxisTitle = ""
+    if(graphTitle === 'R') yAxisTitle = "Ω"
+    if(graphTitle === 'L') yAxisTitle = "nH"
+    if(graphTitle === 'Z_Module') yAxisTitle = "Ω"
+    if(graphTitle === 'Z_Phase') yAxisTitle = "rad"
+    if(graphTitle === 'G') yAxisTitle = "S"
+    if(graphTitle === 'C') yAxisTitle = "F"
+    if(graphTitle === 'Y_Module') yAxisTitle = "S"
+    if(graphTitle === 'Y_Phase') yAxisTitle = "rad"
+    if(graphTitle === 'S_Module') yAxisTitle = ""
+    if(graphTitle === 'S_Phase') yAxisTitle = "rad"
+    if(graphTitle === 'S_dB') yAxisTitle = "dB"
     return {
       ...options,
         plugins: {
@@ -128,7 +141,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
           },
           title: {
             display: true,
-            text: selectedProject?.simulation && `${selectedProject.simulation.name} - ${selectedProject.modelUnit}`,
+            text: graphTitle,
             color: theme === 'light' ? "black" : "white",
           }
         },
@@ -140,6 +153,16 @@ export const ChartsList: React.FC<ChartsListProps> = ({
               ticks: {
                 color: theme === 'light' ? 'black' : 'white',
                 callback: (val: number) => scaleMode.xnotation === "exponential" ? (val.toExponential()) : (val % 1 !== 0 ? val.toFixed(2) : val)
+              },
+              title: {
+                display: true,
+                text: 'Hz',
+                font: {
+                  size: 15,
+                  weight: 'bold',
+                  lineHeight: 1.2,
+                },
+                padding: {top: 2, left: 0, right: 0, bottom: 0}
               }
             },
             y:
@@ -149,6 +172,16 @@ export const ChartsList: React.FC<ChartsListProps> = ({
                 color: theme === 'light' ? 'black' : 'white',
                 callback: (val: number) => scaleMode.ynotation === "exponential" ? (val.toExponential()) : (val % 1 !== 0 ? val.toFixed(2) : val)
               },
+              title: {
+                display: true,
+                text: yAxisTitle,
+                font: {
+                  size: 15,
+                  weight: 'bold',
+                  lineHeight: 1.2,
+                },
+                padding: {top: 0, left: 0, right: 0, bottom: 0}
+              }
             }
           },
     }
@@ -179,18 +212,18 @@ export const ChartsList: React.FC<ChartsListProps> = ({
             <>
               {ChartVisualizationMode === "full" ?
               <Line
-              options={optionsWithScaleMode(chartData.options, scaleMode[index], "line")}
+              options={optionsWithScaleMode(chartData.options, scaleMode[index], "line", graphsTitle[index])}
               data={chartData.data}
             /> :
             <Line
-              options={optionsWithScaleMode(chartData.options, {xaxis: 'logarithmic', yaxis: 'linear', xnotation: "exponential", ynotation: "decimal"}, "line")}
+              options={optionsWithScaleMode(chartData.options, {xaxis: 'logarithmic', yaxis: 'linear', xnotation: "exponential", ynotation: "decimal"}, "line", graphsTitle[index])}
               data={chartData.data}
             />
             }
             </>
                :
             <Scatter
-              options={optionsWithScaleMode(chartData.options, scaleMode[index], "scatter")}
+              options={optionsWithScaleMode(chartData.options, scaleMode[index], "scatter", graphsTitle[index])}
               data={{
                 labels: chartData.data.labels.filter((d, index) => currentFreIndexq && index < currentFreIndexq),
                 datasets: chartData.data.datasets.filter((d, index) => currentFreIndexq && index < currentFreIndexq)
@@ -393,7 +426,7 @@ const chartsDataOptionsFactory = (
   }
   switch (label) {
     case "R":
-      result = computeGraphResults('R(mOhm)', ports, matrix_Z, (index,v,innerLabels) => v[0] * 1e3)
+      result = computeGraphResults('R(mOhm)', ports, matrix_Z, (index,v,innerLabels) => v[0])
       break;
     case "L":
       result = computeGraphResults('L(nH)', ports, matrix_Z, (index,v, innerLabels) => (v[1] / (2 * Math.PI * innerLabels[index])) * 1e9)

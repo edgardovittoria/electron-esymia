@@ -19,6 +19,7 @@ import {
   setcomputingLp,
   setcomputingP,
 } from '../store/tabsAndMenuItemsSlice';
+import { setMeshASize } from '../store/projectSlice';
 
 export const callback_mesh_advices = function (
   message: IMessage,
@@ -99,6 +100,7 @@ export const callback_mesher_results = (message: any, dispatch: Function, getSta
   projects.forEach(p => {
     if(p.faunaDocumentId === res.id){
       message.ack();
+      if(res.ASize) dispatch(setMeshASize({ASize: res.ASize, projectToUpdate: res.id}))
       dispatch(
         setMesherResults({
           id: res.id,
@@ -109,6 +111,7 @@ export const callback_mesher_results = (message: any, dispatch: Function, getSta
           isValid: res.isValid,
           validTopology: res.validTopology,
           error: res.error,
+          ASize: res.ASize,
         }),
       );
     }
