@@ -329,39 +329,12 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             });
           }
         });
-        // computeMesh(
-        //   selectedProject.meshData.lambdaFactor as number,
-        //   selectedProject.frequencies
-        //     ? selectedProject.frequencies[
-        //         selectedProject.frequencies?.length - 1
-        //       ]
-        //     : 10e9,
-        //   selectedProject.bricks as string,
-        //   dispatch,
-        //   selectedProject.faunaDocumentId as string,
-        // );
       }
     }
     return () => {
       window.electron.ipcRenderer.removeAllListeners('computeMeshRis');
     }
   }, []);
-
-  // useEffect(() => {
-  //   if (
-  //     activeMeshing.length > 1 &&
-  //     activeMeshing.filter(
-  //       (am) => am.selectedProject.meshData.meshGenerated === 'Generating',
-  //     ).length === 0
-  //   ) {
-  //     dispatch(
-  //       setMeshGenerated({
-  //         status: 'Generating',
-  //         projectToUpdate: selectedProject.faunaDocumentId as string,
-  //       }),
-  //     );
-  //   }
-  // }, [activeMeshing.length]);
 
   const { execQuery } = useFaunaQuery();
 

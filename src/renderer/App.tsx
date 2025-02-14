@@ -10,10 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   activeMeshingSelector,
   activeSimulationsSelector,
-  setHomePat,
 } from './esymia/store/projectSlice';
 import { HiOutlineLogout } from 'react-icons/hi';
-import { GiSettingsKnobs } from 'react-icons/gi';
 import { FaUser } from 'react-icons/fa';
 import {
   connectStomp,
@@ -21,11 +19,8 @@ import {
   publishMessage,
 } from './middleware/stompMiddleware';
 import { ImSpinner } from 'react-icons/im';
-import { brokerConnectedSelector, setTheme, showInfoModalSelector, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
-import { useDemoMode } from './useDemoMode';
+import { brokerConnectedSelector, setTheme, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
 import { MesherStatusSelector, SolverStatusSelector } from './esymia/store/pluginsSlice';
-import { useAllowSingleSessionUser } from './useAllowSingleSessionUser';
-import InfoModal from './esymia/application/sharedModals/InfoModal';
 
 
 // export const client = new Client({
