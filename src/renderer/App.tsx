@@ -27,9 +27,11 @@ import { MesherStatusSelector, SolverStatusSelector } from './esymia/store/plugi
 import { useAllowSingleSessionUser } from './useAllowSingleSessionUser';
 import InfoModal from './esymia/application/sharedModals/InfoModal';
 
+
 // export const client = new Client({
 //   brokerURL: 'ws://localhost:15674/ws'
 // });
+
 
 
 export default function App() {
@@ -41,6 +43,7 @@ export default function App() {
   const solverStatus = useSelector(SolverStatusSelector)
   const [logout, setLogout] = useState(false)
   const theme = useSelector(ThemeSelector)
+
   // const [brokerActive, setBrokerActive] = useState<boolean>(false);
   // const [progressBarValue, setProgressBarValue] = useState<number>(0)
 

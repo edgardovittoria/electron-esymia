@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@types/numeric": "^1.2.6",
+    "mathjs": "^14.2.0",
+    "ml-matrix": "^6.12.0",
+    "ml-sparse-matrix": "^2.1.0",
+    "numeric": "^1.2.6",
+    "sparse-matrix": "^1.0.0"
+  }
+}

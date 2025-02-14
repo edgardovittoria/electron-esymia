@@ -139,14 +139,17 @@ export const Simulator: React.FC<SimulatorProps> = ({
   // }, [])
 
   useEffect(() => {
+    //caricamento dati nel caso il mesher è typescript
+    //loadMeshData(false);
     if (
-      selectedProject?.meshData.mesh && mesherStatus === "ready" &&
+      selectedProject?.meshData.mesh && 
+      //mesherStatus === "ready" &&
       (selectedProject?.meshData.meshGenerated === 'Generated' ||
         selectedProject?.meshData.meshGenerated === 'Queued')
     ) {
       setExternalGrids(undefined);
       setSpinner(true);
-      loadMeshData();
+      loadMeshData(process.env.MESHER_RIS_MODE === 'backend');
     }
   }, [selectedProject?.meshData.meshGenerated, mesherStatus]);
 

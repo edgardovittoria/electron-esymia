@@ -263,6 +263,7 @@ const SimulationStatusItem: React.FC<{
       },
       solverType: solverType,
       id: project.faunaDocumentId as string,
+      mesherType: process.env.MESHER_RIS_MODE as string,
     };
   };
 

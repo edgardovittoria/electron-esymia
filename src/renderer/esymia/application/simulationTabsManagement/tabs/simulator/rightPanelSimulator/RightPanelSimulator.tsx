@@ -513,7 +513,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           )}
           <div className="w-[100%] pt-4">
             <div className="flex-column">
-              {!selectedProject.simulation?.results && mesherStatus === 'ready' && (
+              {!selectedProject.simulation?.results 
+              //&& mesherStatus === 'ready' 
+              && (
                 <div>
                   <button
                     data-testid="generateMeshButton"
@@ -532,11 +534,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                               : 'bg-secondaryColorDark text-textColor'
                           } w-[100%]`
                     }
-                    disabled={
-                      process.env.APP_MODE !== 'test' && selectedProject.meshData.type !== 'Ris'
-                        ? !checkQuantumDimensionsValidity()
-                        : false
-                    }
+                    // disabled={
+                    //   process.env.APP_MODE !== 'test' && selectedProject.meshData.type !== 'Ris'
+                    //     ? !checkQuantumDimensionsValidity()
+                    //     : false
+                    // }
                     onClick={() => {
                       dispatch(
                         setPreviousMeshStatus({

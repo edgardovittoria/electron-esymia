@@ -29,7 +29,7 @@ import {
   readLocalFile,
 } from '../../../../../../../fileSystemAPIs/fileSystemAPIs';
 import { s3 } from '../../../../../../aws/s3Config';
-import { addProjectTab, closeProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
+import { addProjectTab, closeProjectTab, setAWSExternalGridsData } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { Brick } from '../components/createGridsExternals';
 import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
 import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
@@ -291,10 +291,27 @@ export const useStorageData = () => {
     });
   };
 
-  const loadGridsFromS3 = () => {
-    dispatch(publishMessage({
-      queue: 'management',
-      body: { message: "get grids", grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, id: selectedProject.faunaDocumentId }}))
+  const loadGridsFromS3 = (mesherBackend: boolean) => {
+    if(mesherBackend){
+      dispatch(publishMessage({
+        queue: 'management',
+        body: { message: "get grids", grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, id: selectedProject.faunaDocumentId }}))
+    }else{
+      const params = {
+        Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+        Key: selectedProject.meshData.surface as string,
+      };
+      s3.getObject(params, (err, data) => {
+        if (err) {
+          console.log(err);
+        }
+        const res = JSON.parse(data.Body?.toString() as string);
+        console.log(res)
+        dispatch(setAWSExternalGridsData(res))
+        //console.log(res)
+      });
+    }
+    
   };
 
 
@@ -363,11 +380,11 @@ export const useStorageData = () => {
   //   }
   // };
 
-  const loadMeshData = () => {
+  const loadMeshData = (mesherBackend: boolean) => {
     if (selectedProject.storage === 'local') {
-      loadGridsFromS3();
+      loadGridsFromS3(mesherBackend);
     } else {
-      loadGridsFromS3();
+      loadGridsFromS3(mesherBackend);
     }
   };
 

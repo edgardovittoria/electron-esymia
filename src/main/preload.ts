@@ -2,6 +2,7 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { readdir } from 'fs';
+import { removeAllListeners } from 'process';
 
 export type Channels =
   | 'ipc-example'
@@ -27,6 +28,7 @@ export type Channels =
   | 'meshingComputation'
   | 'solvingComputation'
   | 'checkLogout'
+  | 'computeMeshRis'
   ;
 
 const electronHandler = {
@@ -48,6 +50,9 @@ const electronHandler = {
     },
     invoke(channel: Channels, ...args: unknown[]): Promise<any> {
       return ipcRenderer.invoke(channel, ...args);
+    },
+    removeAllListeners(channel: Channels) {
+      ipcRenderer.removeAllListeners(channel);
     },
   },
 };

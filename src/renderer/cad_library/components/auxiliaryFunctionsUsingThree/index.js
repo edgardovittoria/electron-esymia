@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.meshesCollidingWithTargetMesh = exports.meshesCollidingWithTargetMeshBasedOnBoundingBox = exports.getObjectsFromSceneByType = exports.thereIsCollisionBetweenMeshes = exports.transformationParamsOf = exports.meshFrom = exports.meshWithPositionRotationScaleFromPreviousOne = exports.meshWithResetTransformationParamsFromOld = exports.meshWithColorFromOldOne = exports.meshWithcomputedGeometryBoundingFrom = void 0;
+var auxiliaryFunctionsUsingThree_1 = require("./auxiliaryFunctionsUsingThree");
+Object.defineProperty(exports, "meshWithcomputedGeometryBoundingFrom", { enumerable: true, get: function () { return auxiliaryFunctionsUsingThree_1.meshWithcomputedGeometryBoundingFrom; } });
+Object.defineProperty(exports, "meshWithColorFromOldOne", { enumerable: true, get: function () { return auxiliaryFunctionsUsingThree_1.meshWithColorFromOldOne; } });
+Object.defineProperty(exports, "meshWithResetTransformationParamsFromOld", { enumerable: true, get: function () { return auxiliaryFunctionsUsingThree_1.meshWithResetTransformationParamsFromOld; } });
+Object.defineProperty(exports, "meshWithPositionRotationScaleFromPreviousOne", { enumerable: true, get: function () { return auxiliaryFunctionsUsingThree_1.meshWithPositionRotationScaleFromPreviousOne; } });
+Object.defineProperty(exports, "meshFrom", { enumerable: true, get: function () { return auxiliaryFunctionsUsingThree_1.meshFrom; } });
+Object.defineProperty(exports, "transformationParamsOf", { enumerable: true, get: function () { return auxiliaryFunctionsUsingThree_1.transformationParamsOf; } });
+Object.defineProperty(exports, "thereIsCollisionBetweenMeshes", { enumerable: true, get: function () { return auxiliaryFunctionsUsingThree_1.thereIsCollisionBetweenMeshes; } });
+Object.defineProperty(exports, "getObjectsFromSceneByType", { enumerable: true, get: function () { return auxiliaryFunctionsUsingThree_1.getObjectsFromSceneByType; } });
+Object.defineProperty(exports, "meshesCollidingWithTargetMeshBasedOnBoundingBox", { enumerable: true, get: function () { return auxiliaryFunctionsUsingThree_1.meshesCollidingWithTargetMeshBasedOnBoundingBox; } });
+Object.defineProperty(exports, "meshesCollidingWithTargetMesh", { enumerable: true, get: function () { return auxiliaryFunctionsUsingThree_1.meshesCollidingWithTargetMesh; } });
