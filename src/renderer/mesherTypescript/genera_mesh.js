@@ -125,7 +125,7 @@ function genera_mesh(Regioni, den, freq_max, scalamento, use_escalings, material
             return induttanze.centri[p - 1].map(function (val) { return val * scalamento; });
         }),
         Zs_part: perm.map(function (p) {
-            return (induttanze.Zs_part[p - 1] / scalamento) * escalings.R;
+            return induttanze.Zs_part[p - 1]  * escalings.R;
         }),
         indici_dielettrici: [],
     };

@@ -211,7 +211,7 @@ export function genera_mesh(
     }),
 
     Zs_part: perm.map((p) => {
-      return (induttanze.Zs_part![p - 1] / scalamento) * escalings.R;
+      return induttanze.Zs_part![p - 1] * escalings.R;
     }),
 
     indici_dielettrici: [],
