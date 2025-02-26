@@ -149,11 +149,16 @@ export const Simulator: React.FC<SimulatorProps> = ({
     ) {
       setExternalGrids(undefined);
       setSpinner(true);
-      loadMeshData(process.env.MESHER_RIS_MODE === 'backend');
+      if(selectedProject?.meshData.type === 'Ris') {
+        loadMeshData(process.env.MESHER_RIS_MODE === 'backend');
+      }else {
+        loadMeshData(true);
+      }
     }
   }, [selectedProject?.meshData.meshGenerated, mesherStatus]);
 
   useEffect(() => {
+    console.log(awsExternalGridsData)
     if (awsExternalGridsData) {
       if (selectedProject?.meshData.type === 'Standard'){
         setExternalGrids(externalGridsDecode(awsExternalGridsData));

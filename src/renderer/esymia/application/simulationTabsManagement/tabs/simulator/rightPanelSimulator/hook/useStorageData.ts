@@ -5,15 +5,12 @@ import {
   Folder,
   OriginPoint,
   Project,
-  SolverOutput,
 } from '../../../../../../model/esymiaModels';
 import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
 import {
   addProject,
-  homePathSelector,
   removeProject,
   selectedProjectSelector,
-  setMeshGenerated,
   setPathToExternalGridsNotFound,
 } from '../../../../../../store/projectSlice';
 import {
@@ -40,186 +37,7 @@ import { UsersState } from '../../../../../../../cad_library/components/store/us
 export const useStorageData = () => {
   const dispatch = useDispatch();
   const selectedProject = useSelector(selectedProjectSelector) as Project;
-  const homePath = useSelector(homePathSelector);
   const { execQuery } = useFaunaQuery();
-
-  // const saveMeshAndExternalGridsToS3 = (
-  //   mesherOutput: any,
-  //   externalGrid: any,
-  // ) => {
-  //   if (selectedProject.meshData.mesh) {
-  //     deleteFileS3(selectedProject.meshData.mesh).then(() => {});
-  //   }
-  //   if (selectedProject.meshData.externalGrids) {
-  //     deleteFileS3(selectedProject.meshData.externalGrids).then(() => {});
-  //   }
-  //   const blobFile = new Blob([JSON.stringify(mesherOutput)]);
-  //   const meshFile = new File([blobFile], `mesh.json`, {
-  //     type: 'application/json',
-  //   });
-  //   uploadFileS3(meshFile, selectedProject)
-  //     .then((res) => {
-  //       if (res) {
-  //         const blobFile = new Blob([JSON.stringify(externalGrid)]);
-  //         const meshFile = new File([blobFile], `mesh.json`, {
-  //           type: 'application/json',
-  //         });
-  //         uploadFileS3(meshFile, selectedProject)
-  //           .then((resExternalGrids) => {
-  //             if (resExternalGrids) {
-  //               dispatch(
-  //                 setMeshGenerated({
-  //                   status: 'Generated',
-  //                   projectToUpdate: selectedProject.faunaDocumentId as string,
-  //                 }),
-  //               );
-  //               dispatch(
-  //                 setMesh({
-  //                   mesh: res.key,
-  //                   projectToUpdate: selectedProject.faunaDocumentId as string,
-  //                 }),
-  //               );
-  //               dispatch(
-  //                 setExternalGrids({
-  //                   extGrids: resExternalGrids.key,
-  //                   projectToUpdate: selectedProject.faunaDocumentId as string,
-  //                 }),
-  //               );
-  //               execQuery(
-  //                 updateProjectInFauna,
-  //                 convertInFaunaProjectThis({
-  //                   ...selectedProject,
-  //                   meshData: {
-  //                     ...selectedProject.meshData,
-  //                     mesh: res.key,
-  //                     externalGrids: resExternalGrids.key,
-  //                     meshGenerated: 'Generated',
-  //                   },
-  //                 }),
-  //               ).then(() => {});
-  //               return '';
-  //             }
-  //           })
-  //           .catch((err) => {
-  //             console.log(err);
-  //             toast.error('Error while saving mesh, please try again');
-  //             dispatch(
-  //               setMeshGenerated({
-  //                 status: 'Not Generated',
-  //                 projectToUpdate: selectedProject.faunaDocumentId as string,
-  //               }),
-  //             );
-  //           });
-  //       }
-  //       return '';
-  //     })
-  //     .catch((err) => console.log(err));
-  //   return 'saved';
-  // };
-
-  // const saveMeshAndExternalGridsLocal = (
-  //   mesherOutput: any,
-  //   externalGrid: any,
-  // ) => {
-  //   //join('esymiaProjects', 'mesherOutputs', selectedProject.faunaDocumentId as string, '.json')
-  //   uploadFile(
-  //     'esymiaProjects/mesherOutputs/' +
-  //       selectedProject.faunaDocumentId +
-  //       '.json',
-  //     mesherOutput,
-  //   ).then(() => {
-  //     uploadFile(
-  //       'esymiaProjects/externalGrids/' +
-  //         selectedProject.faunaDocumentId +
-  //         '.json',
-  //       externalGrid,
-  //     )
-  //       .then(() => {
-  //         dispatch(
-  //           setMeshGenerated({
-  //             status: 'Generated',
-  //             projectToUpdate: selectedProject.faunaDocumentId as string,
-  //           }),
-  //         );
-  //         dispatch(
-  //           setMesh({
-  //             mesh:
-  //               homePath +
-  //               '/esymiaProjects/mesherOutputs/' +
-  //               selectedProject.faunaDocumentId +
-  //               '.json',
-  //             projectToUpdate: selectedProject.faunaDocumentId as string,
-  //           }),
-  //         );
-  //         dispatch(
-  //           setExternalGrids({
-  //             extGrids:
-  //               homePath +
-  //               '/esymiaProjects/externalGrids/' +
-  //               selectedProject.faunaDocumentId +
-  //               '.json',
-  //             projectToUpdate: selectedProject.faunaDocumentId as string,
-  //           }),
-  //         );
-  //         execQuery(
-  //           updateProjectInFauna,
-  //           convertInFaunaProjectThis({
-  //             ...selectedProject,
-  //             meshData: {
-  //               ...selectedProject.meshData,
-  //               mesh:
-  //                 homePath +
-  //                 '/esymiaProjects/mesherOutputs/' +
-  //                 selectedProject.faunaDocumentId +
-  //                 '.json',
-  //               externalGrids:
-  //                 homePath +
-  //                 '/esymiaProjects/externalGrids/' +
-  //                 selectedProject.faunaDocumentId +
-  //                 '.json',
-  //               meshGenerated: 'Generated',
-  //             },
-  //           }),
-  //         ).then(() => {});
-  //         return '';
-  //       })
-  //       .catch((err) => {
-  //         console.log(err);
-  //         toast.error('Error while saving mesh, please try again');
-  //         dispatch(
-  //           setMeshGenerated({
-  //             status: 'Not Generated',
-  //             projectToUpdate: selectedProject.faunaDocumentId as string,
-  //           }),
-  //         );
-  //       });
-  //   });
-  // };
-
-  // const loadDataFromS3 = (
-  //   setExternalGrids: Function,
-  // ) => {
-  //   s3.getObject(
-  //     {
-  //       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-  //       Key: selectedProject.meshData.externalGrids as string,
-  //     },
-  //     (err, data) => {
-  //       if (err) {
-  //         console.log(err);
-  //       }
-  //       setExternalGrids(
-  //         JSON.parse(data.Body?.toString() as string) as ExternalGridsObject,
-  //       );
-  //       dispatch(
-  //         setMeshGenerated({
-  //           status: 'Generated',
-  //           projectToUpdate: selectedProject.faunaDocumentId as string,
-  //         }),
-  //       );
-  //     },
-  //   );
-  // };
 
   const externalGridsDecode = (extGridsJson: any) => {
     let gridsPairs: [string, Brick[]][] = [];
@@ -273,13 +91,6 @@ export const useStorageData = () => {
       selectedProject.meshData.externalGrids as string,
       selectedProject.faunaDocumentId as string,
     ).then((res) => {
-      //console.log(res)
-
-      // if(res === 'path not found'){
-      //   dispatch(setPathToExternalGridsNotFound({ status: true, projectToUpdate: selectedProject.faunaDocumentId as string }));
-      // }else{
-
-      // }
       setExternalGrids(externalGridsDecode(JSON.parse(res)));
       dispatch(
         setPathToExternalGridsNotFound({
@@ -308,7 +119,6 @@ export const useStorageData = () => {
         const res = JSON.parse(data.Body?.toString() as string);
         console.log(res)
         dispatch(setAWSExternalGridsData(res))
-        //console.log(res)
       });
     }
     
@@ -372,14 +182,6 @@ export const useStorageData = () => {
     );
   };
 
-  // const saveMeshData = (mesherOutput: any, externalGrid: any) => {
-  //   if (selectedProject.storage === 'local') {
-  //     saveMeshAndExternalGridsLocal(mesherOutput, externalGrid);
-  //   } else {
-  //     saveMeshAndExternalGridsToS3(mesherOutput, externalGrid);
-  //   }
-  // };
-
   const loadMeshData = (mesherBackend: boolean) => {
     if (selectedProject.storage === 'local') {
       loadGridsFromS3(mesherBackend);
@@ -397,11 +199,6 @@ export const useStorageData = () => {
   };
 
   const deleteProjectStoredMeshData = (project: Project) => {
-    // if (project.storage === 'local') {
-    //   deleteMeshDataLocal(project);
-    // } else {
-    //   deleteMeshDataOnline(project);
-    // }
     deleteMeshDataOnline(project);
   };
 
@@ -409,12 +206,12 @@ export const useStorageData = () => {
     s3.copyObject({
       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
       CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-      Key: `${res.id}_mesh.json.gz`
+      Key: `${process.env.MESHER_RIS_MODE === "backend" ? `${res.id}_mesh.json.gz` : `${res.id}_mesh.json.json`}`
     }).promise().then(mesh => {
       s3.copyObject({
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
         CopySource: project.meshData.type === 'Standard' ? `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.surface}`,
-        Key: project.meshData.type === 'Standard' ? `${res.id}_grids.json.gz` : `${res.id}_surface.json.gz`
+        Key: project.meshData.type === 'Standard' ? `${res.id}_grids.json.gz` : `${res.id}_surface.json.json`
       }).promise().then(grids => {
         if(project.simulation?.resultS3){
           s3.copyObject({
@@ -425,9 +222,10 @@ export const useStorageData = () => {
             clonedProject = {
               ...clonedProject,
               meshData: {
-                ...project.meshData,
-                mesh: `${res.id}_mesh.json.gz`,
-                externalGrids: `${res.id}_grids.json.gz`
+                ...clonedProject.meshData,
+                mesh: `${process.env.MESHER_RIS_MODE === "backend" ? `${res.id}_mesh.json.gz` : `${res.id}_mesh.json.json`}`,
+                externalGrids: clonedProject.meshData.type === 'Standard' ? `${res.id}_grids.json.gz` : "",
+                surface: clonedProject.meshData.type === 'Standard' ? "" : `${res.id}_surface.json.json`
               },
               ports: [],
               portsS3: `${res.id}_ports.json`,
@@ -457,9 +255,10 @@ export const useStorageData = () => {
           clonedProject = {
             ...clonedProject,
             meshData: {
-              ...project.meshData,
-              mesh: `${res.id}_mesh.json.gz`,
-              externalGrids: `${res.id}_grids.json.gz`
+              ...clonedProject.meshData,
+              mesh: `${process.env.MESHER_RIS_MODE === "backend" ? `${res.id}_mesh.json.gz` : `${res.id}_mesh.json.json`}`,
+              externalGrids: clonedProject.meshData.type === 'Standard' ? `${res.id}_grids.json.gz` : "",
+              surface: clonedProject.meshData.type === 'Standard' ? "" : `${res.id}_surface.json.json`
             },
             ports: [],
             portsS3: `${res.id}_ports.json`,
@@ -502,14 +301,7 @@ export const useStorageData = () => {
       scatteringValue: project.scatteringValue,
       suggestedQuantum: project.suggestedQuantum,
       simulation: project.simulation,
-      meshData: {
-        meshApproved: false,
-        meshGenerated: 'Not Generated',
-        quantum: [0, 0, 0],
-        pathToExternalGridsNotFound: false,
-        validTopology: true,
-        type: 'Standard'
-      },
+      meshData: project.meshData,
       name: `${project?.name}_copy`,
     } as Project;
     execQuery(createSimulationProjectInFauna, clonedProject, dispatch).then(
@@ -575,12 +367,12 @@ export const useStorageData = () => {
     s3.copyObject({
       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
       CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-      Key: `${res.id}_mesh.json.gz`
+      Key: `${process.env.MESHER_RIS_MODE === "backend" ? `${res.id}_mesh.json.gz` : `${res.id}_mesh.json.json`}`
     }).promise().then(mesh => {
       s3.copyObject({
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-        CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`,
-        Key: `${res.id}_grids.json.gz`
+        CopySource: project.meshData.type === 'Standard' ? `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.surface}`,
+        Key: `${project.meshData.type === "Standard" ? `${res.id}_grids.json.gz` : `${res.id}_surface.json.json`}`
       }).promise().then(grids => {
         if(project.simulation?.resultS3){
           s3.copyObject({
@@ -701,7 +493,6 @@ export const useStorageData = () => {
   };
 
   return {
-    //saveMeshData,
     loadMeshData,
     deleteProject,
     deleteProjectStoredMeshData,
