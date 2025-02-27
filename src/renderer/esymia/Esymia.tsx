@@ -33,6 +33,7 @@ import { BsPlugin } from 'react-icons/bs';
 import Plugins from './plugin/Plugins';
 import { useFaunaQuery } from './faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../cad_library';
+import { useStorage } from './hook/useStorage';
 export interface EsymiaProps {
   selectedTab: string;
 }
@@ -44,6 +45,7 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   // SELECTORS
   const user = useSelector(usersStateSelector);
   const tabSelected = useSelector(tabSelectedSelector);
+  const { loadFolders } = useStorage();
   const [loginSpinner, setLoginSpinner] = useState(false);
   // da scommentare nel caso esymia dovesse essere estrapolata
   /* const [alert, setAlert] = useState<boolean>(false);
@@ -101,38 +103,39 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   useEffect(() => {
     if (user.userName) {
       setLoginSpinner(true);
-      execQuery(getFoldersByOwner, user.email, dispatch).then(
-        (folders: FaunaFolder[]) => {
-          execQuery(getSimulationProjectsByOwner, user.email, dispatch).then(
-            (projects: FaunaProject[]) => {
-              const rootFaunaFolder = {
-                id: 'root',
-                folder: {
-                  name: 'My Files',
-                  owner: user,
-                  sharedWith: [],
-                  subFolders: folders
-                    .filter((f) => f.folder.parent === 'root')
-                    .map((sb) => sb.id),
-                  projectList: projects
-                    .filter((p) => p.project.parentFolder === 'root')
-                    //.filter((p) => p.project.sharedWith?.length === 0)
-                    .map((pr) => pr.id),
-                  parent: 'nobody',
-                },
-              } as FaunaFolder;
-              const folder = constructFolderStructure(
-                'root',
-                [rootFaunaFolder, ...folders],
-                projects,
-              );
-              dispatch(setProjectsFolderToUser(folder));
-              dispatch(selectFolder(folder.faunaDocumentId as string));
-              setLoginSpinner(false);
-            },
-          );
-        },
-      );
+      loadFolders(setLoginSpinner);
+      // execQuery(getFoldersByOwner, user.email, dispatch).then(
+      //   (folders: FaunaFolder[]) => {
+      //     execQuery(getSimulationProjectsByOwner, user.email, dispatch).then(
+      //       (projects: FaunaProject[]) => {
+      //         const rootFaunaFolder = {
+      //           id: 'root',
+      //           folder: {
+      //             name: 'My Files',
+      //             owner: user,
+      //             sharedWith: [],
+      //             subFolders: folders
+      //               .filter((f) => f.folder.parent === 'root')
+      //               .map((sb) => sb.id),
+      //             projectList: projects
+      //               .filter((p) => p.project.parentFolder === 'root')
+      //               //.filter((p) => p.project.sharedWith?.length === 0)
+      //               .map((pr) => pr.id),
+      //             parent: 'nobody',
+      //           },
+      //         } as FaunaFolder;
+      //         const folder = constructFolderStructure(
+      //           'root',
+      //           [rootFaunaFolder, ...folders],
+      //           projects,
+      //         );
+      //         dispatch(setProjectsFolderToUser(folder));
+      //         dispatch(selectFolder(folder.faunaDocumentId as string));
+      //         setLoginSpinner(false);
+      //       },
+      //     );
+      //   },
+      // );
     }
   }, [user.userName]);
 
@@ -158,7 +161,7 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
             <MenuBar />
 
             {tabSelected === 'DASHBOARD' ? (
-              <DashboardTabsContentFactory />
+              <DashboardTabsContentFactory  setLoadingSpinner={setLoginSpinner}/>
             ) : (
               <SimulationTabsContentFactory />
             )}

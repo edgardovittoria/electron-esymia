@@ -10,9 +10,10 @@ import noResultsIconForProject from '../../../../../../assets/noResultsIconForPr
 import { Projects } from './projects/Projects';
 
 interface OverviewProps {
+  setLoadingSpinner: (value: boolean) => void;
 }
 
-export const Overview: React.FC<OverviewProps> = ({  }) => {
+export const Overview: React.FC<OverviewProps> = ({ setLoadingSpinner }) => {
   const dispatch = useDispatch();
   const projects = useSelector(projectsSelector);
   // const [cardMenuHovered, setCardMenuHovered] = useState(false);
@@ -126,7 +127,7 @@ export const Overview: React.FC<OverviewProps> = ({  }) => {
           className="absolute right-0 bottom-0 sm:bottom-[-40px] sm:w-[280px] sm:h-[280px] w-[180px] h-[180px]"
         />
       </div> */}
-      <Projects/>
+      <Projects setLoadingSpinner={setLoadingSpinner}/>
       <div className="lg:col-span-2 justify-between w-full">
         <Simulations maxH="max-h-[270px]"/>
       </div>

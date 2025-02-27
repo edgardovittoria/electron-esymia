@@ -5,20 +5,23 @@ import { Simulations } from './tabs/Simulations';
 import { Projects } from './tabs/projects/Projects';
 import { selectedMenuItemSelector } from '../../store/tabsAndMenuItemsSlice';
 
-interface DashboardTabsContentFactoryProps {}
+interface DashboardTabsContentFactoryProps {
+  setLoadingSpinner: (value: boolean) => void;
+}
 
 export const DashboardTabsContentFactory: React.FC<
   DashboardTabsContentFactoryProps
-> = () => {
+> = ({setLoadingSpinner}) => {
 
   const menuItemSelected = useSelector(selectedMenuItemSelector);
+
 
 
   switch (menuItemSelected) {
     case 'Overview':
       return (
         <div className="w-full px-10 flex mx-auto pt-5">
-          <Overview />
+          <Overview setLoadingSpinner={setLoadingSpinner}/>
           {/* <RightPanel /> */}
         </div>
       );
@@ -26,7 +29,7 @@ export const DashboardTabsContentFactory: React.FC<
     case 'Projects':
       return (
         <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] overflow-y-scroll h-[85vh]">
-          <Projects />
+          <Projects setLoadingSpinner={setLoadingSpinner}/>
           {/* <RightPanel /> */}
         </div>
       );

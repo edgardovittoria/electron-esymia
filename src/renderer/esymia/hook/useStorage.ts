@@ -60,11 +60,7 @@ export const useStorage = () => {
 
   // };
   const loadFolders = (setLoginSpinner: (v: boolean) => void) => {
-    if (process.env.STORAGE_MODE === 'local') {
-      //loadProjectsLocal(setLoginSpinner);
-    } else {
-      loadProjectsOnline(setLoginSpinner);
-    }
+    loadProjectsOnline(setLoginSpinner);
   };
   return { loadFolders };
 };

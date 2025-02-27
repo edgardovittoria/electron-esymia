@@ -14,25 +14,34 @@ import { CreateNewFolderModal } from '../CreateNewFolderModal';
 import noProjectsIcon2 from '../../../../../../../../../assets/noProjectsIcon2.png';
 import noProjectsIcon2Dark from '../../../../../../../../../assets/noProjectsIcon2Dark.png';
 import { Folder } from '../../../../../../model/esymiaModels';
-import { setShowCreateNewProjectModal, ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
+import {
+  setShowCreateNewProjectModal,
+  ThemeSelector,
+} from '../../../../../../store/tabsAndMenuItemsSlice';
+import { IoReload } from 'react-icons/io5';
+import { useStorage } from '../../../../../../hook/useStorage';
 
 export interface MyFilesProps {
   showCreateNewFolderModal: boolean;
   setShowCreateNewFolderModal: Function;
   showSearchUser: boolean;
   setShowSearchUser: (v: boolean) => void;
+  setLoadingSpinner: (v: boolean) => void;
 }
 
 const MyFiles: React.FC<MyFilesProps> = ({
   showCreateNewFolderModal,
   setShowCreateNewFolderModal,
   showSearchUser,
-  setShowSearchUser
+  setShowSearchUser,
+  setLoadingSpinner,
 }) => {
-  const mainFolder = useSelector(mainFolderSelector)
+  const mainFolder = useSelector(mainFolderSelector);
   const selectedFolder = useSelector(SelectedFolderSelector);
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
   const dispatch = useDispatch();
+
+  const { loadFolders } = useStorage()
 
   const projects = selectedFolder?.projectList;
   const folders = selectedFolder?.subFolders;
@@ -41,13 +50,19 @@ const MyFiles: React.FC<MyFilesProps> = ({
 
   useEffect(() => {
     return () => {
-      dispatch(selectFolder('root'))
-    }
-  }, [])
+      dispatch(selectFolder('root'));
+    };
+  }, []);
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className={`box ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} w-full h-[450px]`}>
+      <div
+        className={`box ${
+          theme === 'light'
+            ? 'bg-white text-textColor'
+            : 'bg-bgColorDark2 text-textColorDark'
+        } w-full h-[450px]`}
+      >
         {/* <div className="flex p-2 gap-4 items-center">
           <div className="sm:w-3/5 w-1/5">
             <h5 className="text-base">Files</h5>
@@ -67,50 +82,65 @@ const MyFiles: React.FC<MyFilesProps> = ({
         </div> */}
 
         <div className="flex flex-row justify-between">
-        <div className="px-[12px] text-[18px] w-5/6">
-
-          {path.map((p, index) => {
-            return (
-              <div className="inline-block p-2" key={index}>
-                {index !== path.length - 1 ? (
-                  <div>
+          <div className="px-[12px] text-[18px] w-5/6">
+            {path.map((p, index) => {
+              return (
+                <div className="inline-block p-2" key={index}>
+                  {index !== path.length - 1 ? (
+                    <div>
+                      <span
+                        className={`hover:underline hover:cursor-pointer text-sm ${
+                          theme === 'light'
+                            ? 'text-textColor'
+                            : 'text-textColorDark'
+                        }`}
+                        onClick={() => {
+                          const newPath = path.filter((p, i) => i <= index);
+                          setPath(newPath);
+                          if (newPath.length > 1) {
+                            dispatch(selectFolder(p.faunaDocumentId as string));
+                          } else {
+                            dispatch(selectFolder('root'));
+                          }
+                        }}
+                      >
+                        {p.name}
+                      </span>
+                      <span> &gt; </span>
+                    </div>
+                  ) : (
                     <span
-                      className={`hover:underline hover:cursor-pointer text-sm ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}
-                      onClick={() => {
-                        const newPath = path.filter((p, i) => i <= index);
-                        setPath(newPath);
-                        if(newPath.length > 1){
-                          dispatch(selectFolder(p.faunaDocumentId as string));
-                        }else{
-                          dispatch(selectFolder('root'))
-                        }
-                      }}
+                      className={`font-bold text-sm ${
+                        theme === 'light'
+                          ? 'text-textColor'
+                          : 'text-textColorDark'
+                      }`}
                     >
                       {p.name}
                     </span>
-                    <span> &gt; </span>
-                  </div>
-                ) : (
-                  <span className={`font-bold text-sm ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>{p.name}</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex p-2 gap-4 items-center w-1/6">
-          <div
-            className={`text-end text-sm ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} hover:cursor-pointer hover:underline`}
-            onClick={() => dispatch(setShowCreateNewProjectModal(true))}
-          >
-            + New Project
+                  )}
+                </div>
+              );
+            })}
           </div>
-          <div
-            className={`text-end text-sm ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} hover:cursor-pointer hover:underline`}
-            onClick={() => setShowCreateNewFolderModal(true)}
-          >
-            + New Folder
+          <div className="flex p-2 gap-4 items-center w-1/6">
+            <div
+              className={`text-end text-sm ${
+                theme === 'light' ? 'text-textColor' : 'text-textColorDark'
+              } hover:cursor-pointer hover:underline`}
+              onClick={() => dispatch(setShowCreateNewProjectModal(true))}
+            >
+              + New Project
+            </div>
+            <div
+              className={`text-end text-sm ${
+                theme === 'light' ? 'text-textColor' : 'text-textColorDark'
+              } hover:cursor-pointer hover:underline`}
+              onClick={() => setShowCreateNewFolderModal(true)}
+            >
+              + New Folder
+            </div>
           </div>
-        </div>
         </div>
 
         <div className="w-full text-left p-[20px] h-[80%]">
@@ -118,8 +148,11 @@ const MyFiles: React.FC<MyFilesProps> = ({
           folders &&
           (projects.length > 0 || folders.length > 0) ? (
             <>
-
-              <h5 className={`w-[100%] text-sm font-semibold uppercase p-2 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>
+              <h5
+                className={`w-[100%] text-sm font-semibold uppercase p-2 ${
+                  theme === 'light' ? 'text-textColor' : 'text-textColorDark'
+                }`}
+              >
                 Folders
               </h5>
 
@@ -136,20 +169,37 @@ const MyFiles: React.FC<MyFilesProps> = ({
                 })}
               </div>
 
-              <h5 className={`w-[100%] mt-4 mb-2 text-sm font-semibold uppercase p-2 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>
-                Projects
-              </h5>
+              <div className="flex flex-row gap-2 items-center w-[100%] mt-4 mb-2">
+                <h5
+                  className={`text-sm font-semibold uppercase p-2 ${
+                    theme === 'light' ? 'text-textColor' : 'text-textColorDark'
+                  }`}
+                >
+                  Projects
+                </h5>
+                <div className="tooltip tooltip-top hover:cursor-pointer hover:opacity-90" data-tip="Reload Projects"
+                  onClick={() => {
+                    setLoadingSpinner(true)
+                    loadFolders(setLoadingSpinner)
+                  }}
+                >
+                  <IoReload size={20}/>
+                </div>
+                
+              </div>
 
-              <div data-testid="projectsBox" className="grid xl:grid-cols-8 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 overflow-scroll max-h-[250px] pb-3">
-                {projects
-                  .map((project) => {
-                    return (
-                      <DraggableProjectCard
-                        project={project}
-                        key={project.faunaDocumentId}
-                      />
-                    );
-                  })}
+              <div
+                data-testid="projectsBox"
+                className="grid xl:grid-cols-8 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 overflow-scroll max-h-[250px] pb-3"
+              >
+                {projects.map((project) => {
+                  return (
+                    <DraggableProjectCard
+                      project={project}
+                      key={project.faunaDocumentId}
+                    />
+                  );
+                })}
               </div>
             </>
           ) : (
@@ -161,12 +211,16 @@ const MyFiles: React.FC<MyFilesProps> = ({
               />
               <p>No projects for now.</p>
               <button
-                className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} lg:text-base text-sm mt-5`}
+                className={`button buttonPrimary ${
+                  theme === 'light'
+                    ? ''
+                    : 'bg-secondaryColorDark text-textColor'
+                } lg:text-base text-sm mt-5`}
                 data-toggle="modal"
                 data-target="#createNewProjectModal"
                 data-testid="createProjectButton"
                 onClick={() => {
-                  dispatch(setShowCreateNewProjectModal(true))
+                  dispatch(setShowCreateNewProjectModal(true));
                 }}
               >
                 CREATE YOUR FIRST PROJECT
