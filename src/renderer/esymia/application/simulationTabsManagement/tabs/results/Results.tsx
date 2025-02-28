@@ -1,21 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  deleteSimulation,
   findSelectedPort,
   SelectedFolderSelector,
   selectedProjectSelector,
   selectPort,
-  selectProject,
-  setMeshApproved,
   updateSimulation,
 } from '../../../../store/projectSlice';
 import { ChartVisualizationMode } from './ChartVisualizationMode';
 import { ChartsList } from './ChartsList';
 import { ResultsLeftPanelTab } from './ResultsLeftPanelTab';
-import { MyPanel } from '../../sharedElements/MyPanel';
-import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { Folder, Port, Project, Simulation, SolverOutput } from '../../../../model/esymiaModels';
 import {
   alertMessageStyle,
@@ -96,6 +90,7 @@ export const Results: React.FC<ResultsProps> = ({
   const ports = selectedProject?.ports.filter(
     (p) => p.category === 'port',
   ) as Port[];
+  const [colorArray, setcolorArray] = useState<string[]>(randomColours(ports.length*ports.length));
   const labels = pairs(ports.map((p) => p.name));
   const [selectedLabel, setSelectedLabel] = useState<
     { label: string; id: number }[]
@@ -124,6 +119,18 @@ export const Results: React.FC<ResultsProps> = ({
   useEffect(() => {
     setSelectedTabLeftPanel(undefined)
   },[])
+  
+  function randomColours(quan: number) {
+    let colours = [];
+    for (let i = 0; i < quan; i++) {
+      colours.push(
+        `rgb(${Math.round(Math.random() * 255)}, ${Math.round(
+          Math.random() * 255,
+        )}, ${Math.round(Math.random() * 255)})`,
+      );
+    }
+    return colours;
+  }
 
   return (
     <div className="flex">
@@ -303,6 +310,7 @@ export const Results: React.FC<ResultsProps> = ({
                 setGraphsData={setGraphDataToExport}
                 currentFreIndexq={selectedProject.simulation.results.freqIndex}
                 ChartVisualizationMode={chartVisualizationMode}
+                colorArray={colorArray}
               />
             </div>
           </>

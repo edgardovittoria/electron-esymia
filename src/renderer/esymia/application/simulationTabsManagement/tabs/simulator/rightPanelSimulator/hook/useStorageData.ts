@@ -33,6 +33,7 @@ import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliar
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { CanvasState } from '../../../../../../../cad_library';
 import { UsersState } from '../../../../../../../cad_library/components/store/users/usersSlice';
+import { GetObjectRequest } from 'aws-sdk/clients/s3';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();
@@ -108,16 +109,16 @@ export const useStorageData = () => {
         queue: 'management',
         body: { message: "get grids", grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, id: selectedProject.faunaDocumentId }}))
     }else{
-      const params = {
+      const params:GetObjectRequest = {
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
         Key: selectedProject.meshData.surface as string,
+        ResponseCacheControl: 'no-cache',
       };
       s3.getObject(params, (err, data) => {
         if (err) {
           console.log(err);
         }
         const res = JSON.parse(data.Body?.toString() as string);
-        console.log(res)
         dispatch(setAWSExternalGridsData(res))
       });
     }
