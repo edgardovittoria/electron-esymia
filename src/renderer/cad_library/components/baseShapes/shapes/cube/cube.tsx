@@ -59,9 +59,9 @@ export function getRisCube(key: number, dispatch: Dispatch, coords: number[]) {
       transformationParams: {...TRANSF_PARAMS_DEFAULTS, position: [(coords[0]+coords[1])/2, (coords[2]+coords[3])/2, (coords[4]+coords[5])/2]},
       previousTransformationParams: TRANSF_PARAMS_DEFAULTS,
       geometryAttributes: {
-          width: coords[1]-coords[0],
-          depth: coords[5]-coords[4],
-          height: coords[3]-coords[2],
+          width: Math.abs(coords[1]-coords[0]),
+          depth: Math.abs(coords[5]-coords[4]),
+          height: Math.abs(coords[3]-coords[2]),
           depthSegments: 1,
           heigthSegments: 1,
           widthSegments: 1
