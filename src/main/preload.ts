@@ -29,6 +29,7 @@ export type Channels =
   | 'solvingComputation'
   | 'checkLogout'
   | 'computeMeshRis'
+  | 'stopMeshing'
   ;
 
 const electronHandler = {

@@ -326,14 +326,13 @@ ipcMain.on('exportTouchstone', (e, args) => {
 
 ipcMain.on('computeMeshRis', (e, args) => {
   const worker = new Worker(path.join(__dirname, '../renderer/mesherTypescript/mainfile.js'), {workerData: args})
+  
+  ipcMain.on('stopMeshing', (e, args) => {
+    worker.terminate()
+  });
 
-  //worker.postMessage(args)
   worker.on('message', (result) => {
-    console.log("result")
     e.reply('computeMeshRis', result)
-    // if(result !== 'meshingStep1' && result !== 'meshingStep2'){
-    //  worker.terminate()
-    // }
   });
 
   worker.on('error', (error) => {
@@ -343,8 +342,6 @@ ipcMain.on('computeMeshRis', (e, args) => {
   worker.on('exit', (code) => {
     if (code !== 0) console.error(`Worker stopped with exit code ${code}`);
   });
-  // const [den, freq_max, bricksS3, projectID] = args
-  // const {mesh, superfici} = computeMeshV2(den, freq_max, bricksS3, projectID)
 })
 
 

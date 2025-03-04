@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   findSelectedPort,
@@ -119,6 +119,34 @@ export const Results: React.FC<ResultsProps> = ({
   useEffect(() => {
     setSelectedTabLeftPanel(undefined)
   },[])
+
+  const memoizedChartList = useMemo(
+      () => (
+        <ChartsList
+                graphToVisualize={graphToVisualize}
+                selectedLabel={selectedLabel}
+                setGraphsData={setGraphDataToExport}
+                currentFreIndexq={selectedProject?.simulation?.results.freqIndex}
+                ChartVisualizationMode={chartVisualizationMode}
+                colorArray={colorArray}
+              />
+      ),
+      [selectedProject, selectedLabel, graphToVisualize, chartVisualizationMode, colorArray],
+    );
+
+    const memoizedChartVisualizzationMode = useMemo(
+      () => (
+        <ChartsList
+                graphToVisualize={graphToVisualize}
+                selectedLabel={selectedLabel}
+                setGraphsData={setGraphDataToExport}
+                currentFreIndexq={selectedProject?.simulation?.results.freqIndex}
+                ChartVisualizationMode={chartVisualizationMode}
+                colorArray={colorArray}
+              />
+      ),
+      [selectedProject, selectedLabel, graphToVisualize, chartVisualizationMode, colorArray],
+    );
   
   function randomColours(quan: number) {
     let colours = [];
@@ -304,14 +332,15 @@ export const Results: React.FC<ResultsProps> = ({
                   : 'grid grid-cols-2 gap-4 overflow-scroll max-h-[77vh] pb-10'
               }
             >
-              <ChartsList
+              {/* <ChartsList
                 graphToVisualize={graphToVisualize}
                 selectedLabel={selectedLabel}
                 setGraphsData={setGraphDataToExport}
                 currentFreIndexq={selectedProject.simulation.results.freqIndex}
                 ChartVisualizationMode={chartVisualizationMode}
                 colorArray={colorArray}
-              />
+              /> */}
+              {memoizedChartList}
             </div>
           </>
         ) : (

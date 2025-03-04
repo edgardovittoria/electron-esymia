@@ -469,15 +469,33 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   useEffect(() => {
     if (isAlertConfirmed) {
       if (!isAlert) {
+        if(process.env.MESHER_RIS_MODE === 'backend' || selectedProject.meshData.type === "Standard") {
+          dispatch(
+            publishMessage({
+              queue: 'management',
+              body: {
+                message: 'stop computation',
+                id: selectedProject.faunaDocumentId as string,
+              },
+            }),
+          );
+        }else{
+          window.electron.ipcRenderer.sendMessage('stopMeshing', []);
+        }
         dispatch(
-          publishMessage({
-            queue: 'management',
-            body: {
-              message: 'stop computation',
-              id: selectedProject.faunaDocumentId as string,
-            },
+          setMeshGenerated({
+            status: selectedProject.meshData.previousMeshStatus as "Not Generated" | "Generated",
+            projectToUpdate: selectedProject.faunaDocumentId as string,
           }),
         );
+        dispatch(setMeshingProgress(undefined));
+        dispatch(setMeshProgressLength(undefined));
+        dispatch(setMeshProgress(undefined));
+        dispatch(setGridsCreationValue(undefined));
+        dispatch(setGridsCreationLength(undefined));
+        dispatch(setCompress(undefined));
+        dispatch(setMesherResults(undefined));
+        setrunningMesh(undefined);
       } else {
         dispatch(
           setMeshGenerated({
