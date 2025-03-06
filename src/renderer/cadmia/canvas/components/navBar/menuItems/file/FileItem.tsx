@@ -327,7 +327,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
                         type="file"
                         ref={inputRefRis}
                         style={{ display: 'none' }}
-                        accept=".json"
+                        accept=".txt"
                         onChange={(e) => {
                           const RisFile = e.target.files;
                           RisFile &&
