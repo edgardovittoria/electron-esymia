@@ -411,9 +411,11 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                   <span className="text-sm">
                     Max Frequency:{' '}
                     <span className="font-bold">
-                      {parseFloat(selectedProject.frequencies[
-                        selectedProject.frequencies.length - 1
-                      ].toFixed(2)).toExponential()}
+                      {parseFloat(
+                        selectedProject.frequencies[
+                          selectedProject.frequencies.length - 1
+                        ].toFixed(2),
+                      ).toExponential()}
                     </span>
                   </span>
                   <span className="text-sm flex flex-row items-center justify-center gap-6">
@@ -421,8 +423,9 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     <input
                       type="number"
                       min={10}
+                      disabled={selectedProject.meshData.type === 'Standard'}
                       defaultValue={lambdaFactor}
-                      className={`w-1/5 p-[4px] border-[1px] ${
+                      className={`w-1/5 p-[4px] border-[1px] disabled:border-none ${
                         theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
                       } text-[15px] font-bold rounded formControl`}
                       onChange={(e) => {
@@ -506,72 +509,81 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           </div>
           {suggestedQuantumError.active && (
             <div className="text-[12px] xl:text-base font-semibold mt-2">
-              {suggestedQuantumError.type === 'Mesher Not Active'
-                ? 'Mesher Down: start mesher or wait until started!'
-                : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
+              {(selectedProject.meshData.type !== 'Ris' && process.env.MESHER_RIS_MODE==="backend") || (selectedProject.meshData.type === "Ris" && process.env.MESHER_RIS_MODE==="backend") || selectedProject.meshData.type === "Standard" && (
+                <>
+                  {suggestedQuantumError.type === 'Mesher Not Active'
+                    ? 'Mesher Down: start mesher or wait until started!'
+                    : 'Unable to suggest quantum: Frequencies not set, go back to Physics tab to set them'}
+                </>
+              )}
             </div>
           )}
           <div className="w-[100%] pt-4">
             <div className="flex-column">
-              {!selectedProject.simulation?.results 
-              //&& mesherStatus === 'ready' 
-              && (
-                <div>
-                  <button
-                    data-testid="generateMeshButton"
-                    className={
-                      process.env.APP_MODE !== 'test' && selectedProject.meshData.type !== 'Ris'
-                        ? checkQuantumDimensionsValidity()
-                          ? `button buttonPrimary ${
+              {!selectedProject.simulation?.results &&
+                ((selectedProject.meshData.type === 'Standard' &&
+                  selectedProject.meshData.meshGenerated === 'Not Generated') ||
+                  selectedProject.meshData.type === 'Ris') && (
+                  //&& mesherStatus === 'ready'
+                  <div>
+                    <button
+                      data-testid="generateMeshButton"
+                      className={
+                        process.env.APP_MODE !== 'test' &&
+                        selectedProject.meshData.type !== 'Ris'
+                          ? checkQuantumDimensionsValidity()
+                            ? `button buttonPrimary ${
+                                theme === 'light'
+                                  ? ''
+                                  : 'bg-secondaryColorDark text-textColor'
+                              } w-[100%]`
+                            : 'button bg-gray-300 text-gray-600 opacity-70 w-[100%] cursor-not-allowed'
+                          : `button buttonPrimary ${
                               theme === 'light'
                                 ? ''
                                 : 'bg-secondaryColorDark text-textColor'
                             } w-[100%]`
-                          : 'button bg-gray-300 text-gray-600 opacity-70 w-[100%]'
-                        : `button buttonPrimary ${
-                            theme === 'light'
-                              ? ''
-                              : 'bg-secondaryColorDark text-textColor'
-                          } w-[100%]`
-                    }
-                    // disabled={
-                    //   process.env.APP_MODE !== 'test' && selectedProject.meshData.type !== 'Ris'
-                    //     ? !checkQuantumDimensionsValidity()
-                    //     : false
-                    // }
-                    onClick={() => {
-                      dispatch(
-                        setPreviousMeshStatus({
-                          status: selectedProject.meshData.meshGenerated as
-                            | 'Not Generated'
-                            | 'Generated',
-                          projectToUpdate:
-                            selectedProject.faunaDocumentId as string,
-                        }),
-                      );
-                      dispatch(
-                        setMeshGenerated({
-                          status:
-                            activeMeshing.length > 0 ? 'Queued' : 'Generating',
-                          projectToUpdate:
-                            selectedProject.faunaDocumentId as string,
-                        }),
-                      );
-                      if (selectedProject.meshData.type !== 'Ris') {
+                      }
+                      disabled={
+                        process.env.APP_MODE !== 'test' && selectedProject.meshData.type !== 'Ris'
+                          ? !checkQuantumDimensionsValidity()
+                          : false
+                      }
+                      onClick={() => {
                         dispatch(
-                          setQuantum({
-                            quantum: quantumDimsInput,
+                          setPreviousMeshStatus({
+                            status: selectedProject.meshData.meshGenerated as
+                              | 'Not Generated'
+                              | 'Generated',
                             projectToUpdate:
                               selectedProject.faunaDocumentId as string,
                           }),
                         );
-                      }
-                    }}
-                  >
-                    Generate Mesh
-                  </button>
-                </div>
-              )}
+                        dispatch(
+                          setMeshGenerated({
+                            status:
+                              activeMeshing.length > 0
+                                ? 'Queued'
+                                : 'Generating',
+                            projectToUpdate:
+                              selectedProject.faunaDocumentId as string,
+                          }),
+                        );
+                        if (selectedProject.meshData.type !== 'Ris') {
+                          dispatch(
+                            setQuantum({
+                              quantum: quantumDimsInput,
+                              projectToUpdate:
+                                selectedProject.faunaDocumentId as string,
+                            }),
+                          );
+                        }
+                      }}
+                    >
+                      Generate Mesh
+                    </button>
+                  </div>
+                )}
             </div>
           </div>
         </div>
