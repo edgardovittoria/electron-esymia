@@ -60,9 +60,9 @@ function isValidBox(box: RisBox): boolean {
 
 function checkOverlap(box1: RisBox, box2: RisBox): boolean {
   // Controlla se c'è una separazione lungo uno degli assi
-  if (box1.xMax < box2.xMin || box1.xMin > box2.xMax) return false;
-  if (box1.yMax < box2.yMin || box1.yMin > box2.yMax) return false;
-  if (box1.zMax < box2.zMin || box1.zMin > box2.zMax) return false;
+  if (box1.xMax <= box2.xMin || box1.xMin >= box2.xMax) return false;
+  if (box1.yMax <= box2.yMin || box1.yMin >= box2.yMax) return false;
+  if (box1.zMax <= box2.zMin || box1.zMin >= box2.zMax) return false;
   // Se non c'è separazione lungo nessuno degli assi, allora c'è sovrapposizione
   return true;
 }
