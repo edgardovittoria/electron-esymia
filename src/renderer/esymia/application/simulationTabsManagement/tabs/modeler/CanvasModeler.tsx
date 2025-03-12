@@ -41,9 +41,9 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFro
     if(selectedProject?.portsS3 && selectedProject.ports.length === 0){
       setPortsFromS3(selectedProject, dispatch)
     }
-    if(selectedProject && selectedProject.simulation && selectedProject.simulation.resultS3 && selectedProject.simulation.status === "Completed" && !selectedProject.simulation.results.matrix_S){
-      setResultsFromS3(selectedProject, dispatch)
-    }
+    // if(selectedProject && selectedProject.simulation && selectedProject.simulation.resultS3 && selectedProject.simulation.status === "Completed" && !selectedProject.simulation.results.matrix_S){
+    //   setResultsFromS3(selectedProject, dispatch)
+    // }
   }, [])
 
 

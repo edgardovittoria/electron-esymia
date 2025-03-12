@@ -568,6 +568,7 @@ const chartsDataOptionsFactory = (
     const labels = pairs(ports.map((p) => p.name));
     let innerLabels = project && project.frequencies ? project.frequencies : [];
     let matrices: number[][] = [];
+    console.log(matrix[0])
     for (let i = 0; i < ports.length * ports.length; i++) {
       matrices.push([]);
       matrix[i].forEach((m) => {

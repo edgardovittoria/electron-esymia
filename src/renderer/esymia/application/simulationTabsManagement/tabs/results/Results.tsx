@@ -10,7 +10,13 @@ import {
 import { ChartVisualizationMode } from './ChartVisualizationMode';
 import { ChartsList } from './ChartsList';
 import { ResultsLeftPanelTab } from './ResultsLeftPanelTab';
-import { Folder, Port, Project, Simulation, SolverOutput } from '../../../../model/esymiaModels';
+import {
+  Folder,
+  Port,
+  Project,
+  Simulation,
+  SolverOutput,
+} from '../../../../model/esymiaModels';
 import {
   alertMessageStyle,
   emptyResultsMessage,
@@ -30,7 +36,13 @@ import toast, { ToastOptions } from 'react-hot-toast';
 import { Dispatch } from '@reduxjs/toolkit';
 import { s3 } from '../../../../aws/s3Config';
 import { RiAlarmWarningFill } from 'react-icons/ri';
-import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal, ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import {
+  setMessageInfoModal,
+  setIsAlertInfoModal,
+  setShowInfoModal,
+  ThemeSelector,
+} from '../../../../store/tabsAndMenuItemsSlice';
+import { publishMessage } from '../../../../../middleware/stompMiddleware';
 
 interface ResultsProps {
   selectedTabLeftPanel: string | undefined;
@@ -46,7 +58,7 @@ export const setResultsFromS3 = (project: Project, dispatch: Dispatch) => {
     if (err) {
       console.log(err);
     }
-    if(!data){
+    if (!data) {
       dispatch(
         setMessageInfoModal(
           'Results not found. launch a simulation or wait if there is one running',
@@ -54,19 +66,20 @@ export const setResultsFromS3 = (project: Project, dispatch: Dispatch) => {
       );
       dispatch(setIsAlertInfoModal(true));
       dispatch(setShowInfoModal(true));
-    }else{
-      const results = JSON.parse(data.Body?.toString() as string).matrices ? JSON.parse(data.Body?.toString() as string).matrices as SolverOutput : JSON.parse(data.Body?.toString() as string) as SolverOutput
+    } else {
+      const results = JSON.parse(data.Body?.toString() as string).matrices
+        ? (JSON.parse(data.Body?.toString() as string).matrices as SolverOutput)
+        : (JSON.parse(data.Body?.toString() as string) as SolverOutput);
       dispatch(
         updateSimulation({
           associatedProject: project.simulation?.associatedProject as string,
           value: {
             ...project.simulation,
-            results: results
+            results: results,
           } as Simulation,
         }),
       );
     }
-
   });
 };
 
@@ -76,25 +89,53 @@ export const Results: React.FC<ResultsProps> = ({
 }) => {
   const { cloneProject } = useStorageData();
   const [cloning, setcloning] = useState<boolean>(false);
-  const [emergencyCommand, setEmergencyCommand] = useState(false)
+  const [emergencyCommand, setEmergencyCommand] = useState(false);
   const selectedProject = useSelector(selectedProjectSelector);
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
   useEffect(() => {
-    if(selectedProject && selectedProject.simulation && selectedProject.simulation.resultS3 && selectedProject.simulation.status === "Completed"  && !selectedProject.simulation.results.matrix_S){
-      setResultsFromS3(selectedProject, dispatch)
+    if (
+      selectedProject &&
+      selectedProject.simulation &&
+      selectedProject.simulation.resultS3 &&
+      selectedProject.simulation.status === 'Completed' &&
+      !selectedProject.simulation.results.matrix_S
+    ) {
+      //setResultsFromS3(selectedProject, dispatch)
+      dispatch(
+        publishMessage({
+          queue: 'management_solver',
+          body: {
+            message: 'get results',
+            body: {
+              portIndex: 0,
+              fileId: selectedProject.simulation.resultS3,
+            },
+          },
+        }),
+      );
     }
-  }, [])
+  }, []);
   const selectedFolder = useSelector(SelectedFolderSelector);
   let selectedPort = findSelectedPort(selectedProject);
   const dispatch = useDispatch();
   const ports = selectedProject?.ports.filter(
     (p) => p.category === 'port',
   ) as Port[];
-  const [colorArray, setcolorArray] = useState<string[]>(randomColours(ports.length*ports.length));
+  const [colorArray, setcolorArray] = useState<string[]>(
+    randomColours(ports.length * ports.length),
+  );
   const labels = pairs(ports.map((p) => p.name));
   const [selectedLabel, setSelectedLabel] = useState<
     { label: string; id: number }[]
-  >([{ label: (selectedProject && selectedProject?.ports.length > 0) ? `${labels[0][0]} - ${labels[0][1]}` : "", id: 0 }]);
+  >([
+    {
+      label:
+        selectedProject && selectedProject?.ports.length > 0
+          ? `${labels[0][0]} - ${labels[0][1]}`
+          : '',
+      id: 0,
+    },
+  ]);
   const [chartsScaleMode, setChartsScaleMode] = useState<
     'logarithmic' | 'linear'
   >('logarithmic');
@@ -117,37 +158,49 @@ export const Results: React.FC<ResultsProps> = ({
   // }, [selectedProject]);
 
   useEffect(() => {
-    setSelectedTabLeftPanel(undefined)
-  },[])
+    setSelectedTabLeftPanel(undefined);
+  }, []);
 
   const memoizedChartList = useMemo(
-      () => (
-        <ChartsList
-                graphToVisualize={graphToVisualize}
-                selectedLabel={selectedLabel}
-                setGraphsData={setGraphDataToExport}
-                currentFreIndexq={selectedProject?.simulation?.results.freqIndex}
-                ChartVisualizationMode={chartVisualizationMode}
-                colorArray={colorArray}
-              />
-      ),
-      [selectedProject, selectedLabel, graphToVisualize, chartVisualizationMode, colorArray],
-    );
+    () => (
+      <ChartsList
+        graphToVisualize={graphToVisualize}
+        selectedLabel={selectedLabel}
+        setGraphsData={setGraphDataToExport}
+        currentFreIndexq={selectedProject?.simulation?.results.freqIndex}
+        ChartVisualizationMode={chartVisualizationMode}
+        colorArray={colorArray}
+      />
+    ),
+    [
+      selectedProject,
+      selectedLabel,
+      graphToVisualize,
+      chartVisualizationMode,
+      colorArray,
+    ],
+  );
 
-    const memoizedChartVisualizzationMode = useMemo(
-      () => (
-        <ChartsList
-                graphToVisualize={graphToVisualize}
-                selectedLabel={selectedLabel}
-                setGraphsData={setGraphDataToExport}
-                currentFreIndexq={selectedProject?.simulation?.results.freqIndex}
-                ChartVisualizationMode={chartVisualizationMode}
-                colorArray={colorArray}
-              />
-      ),
-      [selectedProject, selectedLabel, graphToVisualize, chartVisualizationMode, colorArray],
-    );
-  
+  const memoizedChartVisualizzationMode = useMemo(
+    () => (
+      <ChartsList
+        graphToVisualize={graphToVisualize}
+        selectedLabel={selectedLabel}
+        setGraphsData={setGraphDataToExport}
+        currentFreIndexq={selectedProject?.simulation?.results.freqIndex}
+        ChartVisualizationMode={chartVisualizationMode}
+        colorArray={colorArray}
+      />
+    ),
+    [
+      selectedProject,
+      selectedLabel,
+      graphToVisualize,
+      chartVisualizationMode,
+      colorArray,
+    ],
+  );
+
   function randomColours(quan: number) {
     let colours = [];
     for (let i = 0; i < quan; i++) {
@@ -167,8 +220,16 @@ export const Results: React.FC<ResultsProps> = ({
           <div
             className={`p-2 tooltip rounded-t tooltip-right ${
               selectedTabLeftPanel === resultsLeftPanelTitle.first
-                ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
-                : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
+                ? `${
+                    theme === 'light'
+                      ? 'text-white bg-primaryColor'
+                      : 'text-textColor bg-secondaryColorDark'
+                  }`
+                : `${
+                    theme === 'light'
+                      ? 'text-primaryColor bg-white'
+                      : 'text-textColorDark bg-bgColorDark2'
+                  }`
             }`}
             data-tip="Results"
             onClick={() => {
@@ -176,15 +237,22 @@ export const Results: React.FC<ResultsProps> = ({
                 setSelectedTabLeftPanel(undefined);
               } else {
                 setSelectedTabLeftPanel(resultsLeftPanelTitle.first);
-                setEmergencyCommand(false)
+                setEmergencyCommand(false);
               }
             }}
           >
             <AiOutlineBarChart style={{ width: '25px', height: '25px' }} />
           </div>
           <button
-            disabled={!selectedProject?.simulation || selectedProject.simulation.status === "Running"}
-            className={`p-2 tooltip tooltip-right relative z-10 disabled:opacity-40 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}
+            disabled={
+              !selectedProject?.simulation ||
+              selectedProject.simulation.status === 'Running'
+            }
+            className={`p-2 tooltip tooltip-right relative z-10 disabled:opacity-40 ${
+              theme === 'light'
+                ? 'bg-white text-textColor'
+                : 'bg-bgColorDark2 text-textColorDark'
+            }`}
             data-tip="Export CSV"
             onClick={() => {
               const zip = new JSZip();
@@ -215,8 +283,15 @@ export const Results: React.FC<ResultsProps> = ({
             <BsFiletypeCsv style={{ width: '25px', height: '25px' }} />
           </button>
           <button
-            disabled={!selectedProject?.simulation || selectedProject.simulation.status === "Running"}
-            className={`p-2 tooltip rounded-b tooltip-right relative z-10 disabled:opacity-40 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}
+            disabled={
+              !selectedProject?.simulation ||
+              selectedProject.simulation.status === 'Running'
+            }
+            className={`p-2 tooltip rounded-b tooltip-right relative z-10 disabled:opacity-40 ${
+              theme === 'light'
+                ? 'bg-white text-textColor'
+                : 'bg-bgColorDark2 text-textColorDark'
+            }`}
             data-tip="Export Touchstone"
             onClick={() => {
               if (selectedProject) {
@@ -245,7 +320,13 @@ export const Results: React.FC<ResultsProps> = ({
         </div>
         {selectedTabLeftPanel && (
           <>
-            <div className={`${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]`}>
+            <div
+              className={`${
+                theme === 'light'
+                  ? 'bg-white text-textColor'
+                  : 'bg-bgColorDark2 text-textColorDark'
+              } p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]`}
+            >
               {selectedTabLeftPanel === resultsLeftPanelTitle.first && (
                 <ResultsLeftPanelTab
                   selectedPort={selectedPort ? selectedPort.name : 'undefined'}
@@ -259,19 +340,47 @@ export const Results: React.FC<ResultsProps> = ({
         )}
         {emergencyCommand && (
           <>
-            <div className={`${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]`}>
+            <div
+              className={`${
+                theme === 'light'
+                  ? 'bg-white text-textColor'
+                  : 'bg-bgColorDark2 text-textColorDark'
+              } p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]`}
+            >
               <div className="flex flex-col items-center gap-4">
-                <span>Use this command only if you are facing some issues with simulation!</span>
-                <button className={`button w-full buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} text-center mt-4 mb-4`}
-                  onClick={() => setResultsFromS3(selectedProject as Project, dispatch)}
-                >Force Retrive results</button>
+                <span>
+                  Use this command only if you are facing some issues with
+                  simulation!
+                </span>
+                <button
+                  className={`button w-full buttonPrimary ${
+                    theme === 'light'
+                      ? ''
+                      : 'bg-secondaryColorDark text-textColor'
+                  } text-center mt-4 mb-4`}
+                  onClick={() =>
+                    setResultsFromS3(selectedProject as Project, dispatch)
+                  }
+                >
+                  Force Retrive results
+                </button>
               </div>
             </div>
           </>
         )}
-        <div className={`absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}>
+        <div
+          className={`absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
+            theme === 'light'
+              ? 'bg-white text-textColor'
+              : 'bg-bgColorDark2 text-textColorDark'
+          }`}
+        >
           <button
-            disabled={selectedProject && selectedProject.simulation && selectedProject.simulation.status === "Running"}
+            disabled={
+              selectedProject &&
+              selectedProject.simulation &&
+              selectedProject.simulation.status === 'Running'
+            }
             className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
             data-tip="Clone Project"
             onClick={() => {
@@ -292,14 +401,28 @@ export const Results: React.FC<ResultsProps> = ({
             )}
           </button>
         </div>
-        <div className={`absolute left-[2%] top-[370px] rounded max-h-[500px] flex flex-col items-center gap-0 ${emergencyCommand ? theme === 'light' ? 'bg-primaryColor' : 'bg-secondaryColorDark' : theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'}`}>
+        <div
+          className={`absolute left-[2%] top-[370px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
+            emergencyCommand
+              ? theme === 'light'
+                ? 'bg-primaryColor'
+                : 'bg-secondaryColorDark'
+              : theme === 'light'
+              ? 'bg-white'
+              : 'bg-bgColorDark2'
+          }`}
+        >
           <button
-            disabled={selectedProject && selectedProject.simulation && selectedProject.simulation.status === "Running"}
+            disabled={
+              selectedProject &&
+              selectedProject.simulation &&
+              selectedProject.simulation.status === 'Running'
+            }
             className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
             data-tip="Emergency Command"
             onClick={() => {
-              setEmergencyCommand(!emergencyCommand)
-              setSelectedTabLeftPanel(undefined)
+              setEmergencyCommand(!emergencyCommand);
+              setSelectedTabLeftPanel(undefined);
             }}
           >
             <RiAlarmWarningFill
@@ -345,7 +468,11 @@ export const Results: React.FC<ResultsProps> = ({
           </>
         ) : (
           <div className="absolute top-1/2 right-1/2 translate-x-1/2 flex justify-center w-[90%]">
-            <span className={`${alertMessageStyle} ${theme === 'light' ? '' : 'text-textColorDark'}`}>
+            <span
+              className={`${alertMessageStyle} ${
+                theme === 'light' ? '' : 'text-textColorDark'
+              }`}
+            >
               {selectedProject &&
               selectedProject.simulation &&
               selectedProject.simulation.status == 'Queued'
