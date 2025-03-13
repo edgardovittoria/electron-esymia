@@ -17,6 +17,15 @@ interface ScalingViewParams {
   z:number
 }
 
+export interface resultsViewItem {
+  portIndex: number,
+  results: {
+    matrixS: number[][][],
+    matrixY: number[][][],
+    matrixZ: number[][][],
+  }
+}
+
 type TabsAndMenuItemsState = {
   tabSelected: string;
   projectsTabs: Project[];
@@ -44,6 +53,7 @@ type TabsAndMenuItemsState = {
   meshAdvice: {id: string, quantum: [number, number, number]}[],
   meshResults?: {id: string, gridsPath: string, meshPath: string, surfacePath: string, isStopped: boolean, validTopology: boolean, isValid: {valid: boolean, axis?: string}, error?: any, ASize?: number[]},
   solverResults: {id: string, matrices: SolverOutput, isStopped: boolean, partial: boolean, freqIndex?: number, error?:any }[],
+  resultsView: resultsViewItem[]
   SolverResultsS3?: string,
   externalGrids?: any
   brokerConnected: boolean,
@@ -72,6 +82,7 @@ export const TabsAndMenuItemsSlice = createSlice({
     iterations: [],
     meshAdvice: [],
     solverResults: [],
+    resultsView: [],
     brokerConnected: false,
     theme: 'light'
   } as TabsAndMenuItemsState,
@@ -200,7 +211,18 @@ export const TabsAndMenuItemsSlice = createSlice({
     },
     setTheme(state: TabsAndMenuItemsState, action: PayloadAction<'light' | 'dark'>){
       state.theme = action.payload
-    }
+    },
+    addItemToResultsView(state: TabsAndMenuItemsState, action: PayloadAction<resultsViewItem>){
+      if(state.resultsView.filter(r => r.portIndex === action.payload.portIndex).length === 0){
+        state.resultsView.push(action.payload)
+      }
+    },
+    removeItemToResultsView(state: TabsAndMenuItemsState, action: PayloadAction<number>){
+      state.resultsView = state.resultsView.filter(r => r.portIndex !== action.payload)
+    },
+    resetItemToResultsView(state: TabsAndMenuItemsState){
+      state.resultsView = []
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -247,7 +269,10 @@ export const {
   unsetBrokerConnected,
   setAWSExternalGridsData,
   unsetAWSExternalGridsData,
-  setTheme
+  setTheme,
+  addItemToResultsView,
+  removeItemToResultsView,
+  resetItemToResultsView
 } = TabsAndMenuItemsSlice.actions;
 
 
@@ -346,6 +371,10 @@ export const mesherResultsSelector = (state: {
 export const solverResultsSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState
 }) => state.tabsAndMenuItems.solverResults;
+
+export const solverResultsViewSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState
+}) => state.tabsAndMenuItems.resultsView;
 
 export const solverResultsS3Selector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState

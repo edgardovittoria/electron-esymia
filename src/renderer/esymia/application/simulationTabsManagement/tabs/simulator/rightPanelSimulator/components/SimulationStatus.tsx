@@ -293,64 +293,64 @@ const SimulationStatusItem: React.FC<{
 
   }, []);
 
-  useEffect(() => {
-    if (solverResults) {
-      if (solverResults.error) {
-        dispatch(
-          setMessageInfoModal(
-            'Memory error, the computation can not be run, try a larger quantum if possible!',
-          ),
-        );
-        dispatch(setIsAlertInfoModal(true));
-        dispatch(setShowInfoModal(true));
-        dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
-        dispatch(
-          setMeshApproved({
-            approved: false,
-            projectToUpdate: associatedProject.faunaDocumentId as string,
-          }),
-        );
-        dispatch(unsetComputingLp(simulation.associatedProject as string));
-        dispatch(unsetComputingP(simulation.associatedProject as string));
-        dispatch(unsetIterations(simulation.associatedProject as string));
-        dispatch(unsetSolverResults(simulation.associatedProject as string));
-      } else {
-        if (solverResults.isStopped) {
-          dispatch(
-            deleteSimulation(associatedProject.faunaDocumentId as string),
-          );
-          dispatch(
-            setMeshApproved({
-              approved: false,
-              projectToUpdate: associatedProject.faunaDocumentId as string,
-            }),
-          );
-          dispatch(unsetComputingLp(simulation.associatedProject as string));
-          dispatch(unsetComputingP(simulation.associatedProject as string));
-          dispatch(unsetIterations(simulation.associatedProject as string));
-          dispatch(unsetSolverResults(simulation.associatedProject as string));
-        } else {
-          if(solverResults.partial){
-            const simulationUpdated: Simulation = {
-              ...simulation,
-              results: {
-                ...solverResults.matrices,
-                freqIndex: solverResults.freqIndex,
-              },
-              ended: Date.now().toString(),
-              status: solverResults.partial ? 'Running' : 'Completed',
-            };
-            dispatch(
-              updateSimulation({
-                associatedProject: simulation.associatedProject,
-                value: simulationUpdated,
-              }),
-            );
-          }
-        }
-      }
-    }
-  }, [solverResults]);
+  // useEffect(() => {
+  //   if (solverResults) {
+  //     if (solverResults.error) {
+  //       dispatch(
+  //         setMessageInfoModal(
+  //           'Memory error, the computation can not be run, try a larger quantum if possible!',
+  //         ),
+  //       );
+  //       dispatch(setIsAlertInfoModal(true));
+  //       dispatch(setShowInfoModal(true));
+  //       dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
+  //       dispatch(
+  //         setMeshApproved({
+  //           approved: false,
+  //           projectToUpdate: associatedProject.faunaDocumentId as string,
+  //         }),
+  //       );
+  //       dispatch(unsetComputingLp(simulation.associatedProject as string));
+  //       dispatch(unsetComputingP(simulation.associatedProject as string));
+  //       dispatch(unsetIterations(simulation.associatedProject as string));
+  //       dispatch(unsetSolverResults(simulation.associatedProject as string));
+  //     } else {
+  //       if (solverResults.isStopped) {
+  //         dispatch(
+  //           deleteSimulation(associatedProject.faunaDocumentId as string),
+  //         );
+  //         dispatch(
+  //           setMeshApproved({
+  //             approved: false,
+  //             projectToUpdate: associatedProject.faunaDocumentId as string,
+  //           }),
+  //         );
+  //         dispatch(unsetComputingLp(simulation.associatedProject as string));
+  //         dispatch(unsetComputingP(simulation.associatedProject as string));
+  //         dispatch(unsetIterations(simulation.associatedProject as string));
+  //         dispatch(unsetSolverResults(simulation.associatedProject as string));
+  //       } else {
+  //         if(solverResults.partial){
+  //           const simulationUpdated: Simulation = {
+  //             ...simulation,
+  //             results: {
+  //               ...solverResults.matrices,
+  //               freqIndex: solverResults.freqIndex,
+  //             },
+  //             ended: Date.now().toString(),
+  //             status: solverResults.partial ? 'Running' : 'Completed',
+  //           };
+  //           dispatch(
+  //             updateSimulation({
+  //               associatedProject: simulation.associatedProject,
+  //               value: simulationUpdated,
+  //             }),
+  //           );
+  //         }
+  //       }
+  //     }
+  //   }
+  // }, [solverResults]);
 
   useEffect(() => {
     if(solverResultsS3){
@@ -370,18 +370,18 @@ const SimulationStatusItem: React.FC<{
         dispatch,
       ).then(() => {
         setRunningSimulation(undefined);
-        // dispatch(
-        //   updateSimulation({
-        //     associatedProject: simulation.associatedProject,
-        //     value: {
-        //       ...simulationUpdatedCompleted,
-        //       results: {
-        //         ...solverResults.matrices,
-        //         freqIndex: solverResults.freqIndex,
-        //       },
-        //     },
-        //   }),
-        // );
+        dispatch(
+          updateSimulation({
+            associatedProject: simulation.associatedProject,
+            value: {
+              ...simulationUpdatedCompleted,
+              // results: {
+              //   ...solverResults.matrices,
+              //   freqIndex: solverResults.freqIndex,
+              // },
+            },
+          }),
+        );
         dispatch(unsetComputingLp(simulation.associatedProject as string));
         dispatch(unsetComputingP(simulation.associatedProject as string));
         dispatch(unsetIterations(simulation.associatedProject as string));

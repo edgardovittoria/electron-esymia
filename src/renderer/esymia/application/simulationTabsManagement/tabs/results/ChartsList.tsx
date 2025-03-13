@@ -16,7 +16,7 @@ import { useSelector } from 'react-redux';
 import { selectedProjectSelector } from '../../../../store/projectSlice';
 import { VscSettings } from 'react-icons/vsc';
 import { Dataset, pairs } from './sharedElements';
-import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import { solverResultsViewSelector, ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { color } from 'chart.js/helpers';
 import { plugins } from '../../../../../../../postcss.config';
 import { title } from 'process';
@@ -78,6 +78,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   colorArray,
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
+  const resultsView = useSelector(solverResultsViewSelector)
   const theme = useSelector(ThemeSelector);
   const [showGraphsSettings, setShowGraphsSettings] = useState<boolean[]>(
     defaultShowGraphsSettings(11),
@@ -85,15 +86,20 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   const ports = selectedProject?.ports.filter(
     (p) => p.category === 'port',
   ) as Port[];
-  const matrix_Z = JSON.parse(
-    (selectedProject?.simulation as Simulation).results.matrix_Z,
-  );
-  const matrix_Y = JSON.parse(
-    (selectedProject?.simulation as Simulation).results.matrix_Y,
-  );
-  const matrix_S = JSON.parse(
-    (selectedProject?.simulation as Simulation).results.matrix_S,
-  );
+
+  const [matrixZ, setmatrixZ] = useState<{portIndex: number, matrix: number[][][]}[]>([])
+  const [matrixS, setmatrixS] = useState<{portIndex: number, matrix: number[][][]}[]>([])
+  const [matrixY, setmatrixY] = useState<{portIndex: number, matrix: number[][][]}[]>([])
+
+
+  useEffect(() => {
+    console.log(resultsView)
+    if(resultsView.length > 0){
+      setmatrixZ(resultsView.map(r => ({portIndex: r.portIndex, matrix: r.results.matrixZ})))
+      setmatrixS(resultsView.map(r => ({portIndex: r.portIndex, matrix: r.results.matrixS})))
+      setmatrixY(resultsView.map(r => ({portIndex: r.portIndex, matrix: r.results.matrixY})))
+    }
+  }, [resultsView])
   const [scaleMode, setScaleMode] = useState<ScaleMode[]>(
     defaultScaleModes(11),
   );
@@ -116,9 +122,9 @@ export const ChartsList: React.FC<ChartsListProps> = ({
         selectedProject?.simulation as Simulation,
         selectedProject,
         id,
-        matrix_Z,
-        matrix_Y,
-        matrix_S,
+        matrixZ,
+        matrixY,
+        matrixS,
         ports,
         selectedLabel,
         theme,
@@ -170,9 +176,9 @@ export const ChartsList: React.FC<ChartsListProps> = ({
         selectedProject?.simulation as Simulation,
         selectedProject,
         id,
-        matrix_Z,
-        matrix_Y,
-        matrix_S,
+        matrixZ,
+        matrixY,
+        matrixS,
         ports,
         selectedLabel,
         theme,
@@ -182,7 +188,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     setChartsDataToVisualize(charts);
     setScaleMode(defaultScaleModes(graphs.length));
     setGraphsData(charts);
-  }, [graphToVisualize, selectedProject, selectedLabel]);
+  }, [graphToVisualize, selectedProject, selectedLabel, matrixZ, matrixY, matrixS]);
 
   const optionsWithScaleMode = (
     options: any,
@@ -537,9 +543,9 @@ const chartsDataOptionsFactory = (
   simulation: Simulation,
   project: Project | undefined,
   label: string,
-  matrix_Z: any[][][][],
-  matrix_Y: any[][][][],
-  matrix_S: any[][][][],
+  matrixZ: {portIndex: number, matrix: number[][][]}[],
+  matrixY: {portIndex: number, matrix: number[][][]}[],
+  matrixS: {portIndex: number, matrix: number[][][]}[],
   ports: Port[],
   selectedLabel: { label: string; id: number }[],
   theme: 'light' | 'dark',
@@ -558,27 +564,40 @@ const chartsDataOptionsFactory = (
   const computeGraphResults = (
     unit: string,
     ports: Port[],
-    matrix: any[][][][],
+    matrix: {portIndex: number, matrix: number[][][]}[],
     getGraphFormulaResult: (
       index: number,
-      v: any[],
+      v: number[],
       innerLabels: number[],
     ) => number,
   ) => {
     const labels = pairs(ports.map((p) => p.name));
     let innerLabels = project && project.frequencies ? project.frequencies : [];
-    let matrices: number[][] = [];
-    console.log(matrix[0])
-    for (let i = 0; i < ports.length * ports.length; i++) {
+    let matrices: {portIndex: number, value: number}[][] = [];
+    matrix.forEach((mat, i) => {
       matrices.push([]);
-      matrix[i].forEach((m) => {
-        m.forEach((v, index) => {
-          (matrices[i] as Array<number>).push(
-            getGraphFormulaResult(index, v, innerLabels),
-          );
-        });
-      });
-    }
+      (mat.matrix)[0].forEach((m, index) => {
+        (matrices[i] as Array<{portIndex: number, value: number}>).push(
+          {portIndex: mat.portIndex, value: getGraphFormulaResult(index, m, innerLabels)},
+        );
+      })
+    })
+    // for (let i = 0; i < matrix.length; i++) {
+    //   matrices.push([]);
+    //   (matrix[i].matrix)[0].forEach((m, index) => {
+    //     (matrices[i] as Array<number>).push(
+    //       getGraphFormulaResult(index, m, innerLabels),
+    //     );
+    //   })
+
+    //   // matrix[i].forEach((m) => {
+    //   //   m.forEach((v, index) => {
+    //   //     (matrices[i] as Array<number>).push(
+    //   //       getGraphFormulaResult(index, v, innerLabels),
+    //   //     );
+    //   //   });
+    //   // });
+    // }
     const datasets = matrices.reduce((dats, m, index) => {
       if (selectedLabel.filter((l) => l.label === 'All Ports').length > 0) {
         dats.push({
@@ -631,7 +650,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'R(mOhm)',
         ports,
-        matrix_Z,
+        matrixZ,
         (index, v, innerLabels) => v[0],
       );
       break;
@@ -639,7 +658,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'L(nH)',
         ports,
-        matrix_Z,
+        matrixZ,
         (index, v, innerLabels) =>
           (v[1] / (2 * Math.PI * innerLabels[index])) * 1e9,
       );
@@ -648,7 +667,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'Z Module',
         ports,
-        matrix_Z,
+        matrixZ,
         (index, v, innerLabels) => Math.sqrt(v[0] * v[0] + v[1] * v[1]),
       );
       break;
@@ -656,7 +675,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'Z Phase',
         ports,
-        matrix_Z,
+        matrixZ,
         (index, v, innerLabels) => Math.atan2(v[1], v[0]),
       );
       break;
@@ -664,7 +683,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'G(S)',
         ports,
-        matrix_Y,
+        matrixY,
         (index, v, innerLabels) => v[0],
       );
       break;
@@ -672,7 +691,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'C(F)',
         ports,
-        matrix_Y,
+        matrixY,
         (index, v, innerLabels) => v[1] / (2 * Math.PI * innerLabels[index]),
       );
       break;
@@ -680,7 +699,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'Y Module',
         ports,
-        matrix_Y,
+        matrixY,
         (index, v, innerLabels) => Math.sqrt(v[0] * v[0] + v[1] * v[1]),
       );
       break;
@@ -688,7 +707,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'Y Phase',
         ports,
-        matrix_Y,
+        matrixY,
         (index, v, innerLabels) => Math.atan2(v[1], v[0]),
       );
       break;
@@ -696,7 +715,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'S Module',
         ports,
-        matrix_S,
+        matrixS,
         (index, v, innerLabels) => Math.sqrt(v[0] * v[0] + v[1] * v[1]),
       );
       break;
@@ -704,7 +723,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'S Phase',
         ports,
-        matrix_S,
+        matrixS,
         (index, v, innerLabels) => Math.atan2(v[1], v[0]),
       );
       break;
@@ -712,7 +731,7 @@ const chartsDataOptionsFactory = (
       result = computeGraphResults(
         'S dB',
         ports,
-        matrix_S,
+        matrixS,
         (index, v, innerLabels) =>
           20 * Math.log10(Math.sqrt(v[0] * v[0] + v[1] * v[1])),
       );

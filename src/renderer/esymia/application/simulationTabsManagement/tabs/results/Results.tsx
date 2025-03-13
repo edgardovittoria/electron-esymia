@@ -41,6 +41,7 @@ import {
   setIsAlertInfoModal,
   setShowInfoModal,
   ThemeSelector,
+  resetItemToResultsView,
 } from '../../../../store/tabsAndMenuItemsSlice';
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
 
@@ -157,29 +158,13 @@ export const Results: React.FC<ResultsProps> = ({
   //   setSelectedLabel([{ label: 'All Ports', id: 0 }]);
   // }, [selectedProject]);
 
+
   useEffect(() => {
     setSelectedTabLeftPanel(undefined);
+    return () => {
+      dispatch(resetItemToResultsView())
+    }
   }, []);
-
-  const memoizedChartList = useMemo(
-    () => (
-      <ChartsList
-        graphToVisualize={graphToVisualize}
-        selectedLabel={selectedLabel}
-        setGraphsData={setGraphDataToExport}
-        currentFreIndexq={selectedProject?.simulation?.results.freqIndex}
-        ChartVisualizationMode={chartVisualizationMode}
-        colorArray={colorArray}
-      />
-    ),
-    [
-      selectedProject,
-      selectedLabel,
-      graphToVisualize,
-      chartVisualizationMode,
-      colorArray,
-    ],
-  );
 
   const memoizedChartVisualizzationMode = useMemo(
     () => (
@@ -436,7 +421,7 @@ export const Results: React.FC<ResultsProps> = ({
       <div className="w-[90%]">
         {selectedProject &&
         selectedProject.simulation &&
-        selectedProject.simulation.results.matrix_S ? (
+        selectedProject.simulation.resultS3 ? (
           <>
             <ChartVisualizationMode
               chartVisualizationMode={chartVisualizationMode}
@@ -455,15 +440,14 @@ export const Results: React.FC<ResultsProps> = ({
                   : 'grid grid-cols-2 gap-4 overflow-scroll max-h-[77vh] pb-10'
               }
             >
-              {/* <ChartsList
+              <ChartsList
                 graphToVisualize={graphToVisualize}
                 selectedLabel={selectedLabel}
                 setGraphsData={setGraphDataToExport}
                 currentFreIndexq={selectedProject.simulation.results.freqIndex}
                 ChartVisualizationMode={chartVisualizationMode}
                 colorArray={colorArray}
-              /> */}
-              {memoizedChartList}
+              />
             </div>
           </>
         ) : (

@@ -3,6 +3,7 @@ import { Project, SolverOutput } from '../model/esymiaModels';
 import { takeAllProjectsIn } from '../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
 import { setMesherStatus, setSolverStatus } from '../store/pluginsSlice';
 import {
+  addItemToResultsView,
   setAWSExternalGridsData,
   setCompress,
   setEstimatedTime,
@@ -156,6 +157,13 @@ export const callback_solver_feedback = (message: any, dispatch: Function, getSt
 export const callback_solver_results = (message: any, dispatch: Function, getState: Function) => {
   let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
   let res = JSON.parse(message.body);
+  console.log(res)
+  if(res.portIndex !== undefined){
+    dispatch(addItemToResultsView({
+      portIndex: parseInt(res.portIndex),
+      results: res.results
+    }))
+  }
   projects.forEach(p => {
     if(p.faunaDocumentId === res.id){
       message.ack();
