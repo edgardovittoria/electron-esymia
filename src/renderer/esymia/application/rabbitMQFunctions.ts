@@ -4,6 +4,7 @@ import { takeAllProjectsIn } from '../store/auxiliaryFunctions/managementProject
 import { setMesherStatus, setSolverStatus } from '../store/pluginsSlice';
 import {
   addItemToResultsView,
+  resetItemToResultsView,
   setAWSExternalGridsData,
   setCompress,
   setEstimatedTime,
@@ -158,7 +159,14 @@ export const callback_solver_results = (message: any, dispatch: Function, getSta
   let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
   let res = JSON.parse(message.body);
   console.log(res)
-  if(res.portIndex !== undefined){
+  if(res.portIndex !== undefined && res.partial){
+    dispatch(resetItemToResultsView())
+    dispatch(addItemToResultsView({
+      portIndex: parseInt(res.portIndex),
+      results: res.results,
+      freqIndex: res.freqIndex
+    }))
+  }else{
     dispatch(addItemToResultsView({
       portIndex: parseInt(res.portIndex),
       results: res.results

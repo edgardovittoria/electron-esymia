@@ -42,6 +42,7 @@ import {
   setShowInfoModal,
   ThemeSelector,
   resetItemToResultsView,
+  solverResultsViewSelector,
 } from '../../../../store/tabsAndMenuItemsSlice';
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
 
@@ -117,6 +118,7 @@ export const Results: React.FC<ResultsProps> = ({
     }
   }, []);
   const selectedFolder = useSelector(SelectedFolderSelector);
+  const resultsView = useSelector(solverResultsViewSelector)
   let selectedPort = findSelectedPort(selectedProject);
   const dispatch = useDispatch();
   const ports = selectedProject?.ports.filter(
@@ -165,26 +167,6 @@ export const Results: React.FC<ResultsProps> = ({
       dispatch(resetItemToResultsView())
     }
   }, []);
-
-  const memoizedChartVisualizzationMode = useMemo(
-    () => (
-      <ChartsList
-        graphToVisualize={graphToVisualize}
-        selectedLabel={selectedLabel}
-        setGraphsData={setGraphDataToExport}
-        currentFreIndexq={selectedProject?.simulation?.results.freqIndex}
-        ChartVisualizationMode={chartVisualizationMode}
-        colorArray={colorArray}
-      />
-    ),
-    [
-      selectedProject,
-      selectedLabel,
-      graphToVisualize,
-      chartVisualizationMode,
-      colorArray,
-    ],
-  );
 
   function randomColours(quan: number) {
     let colours = [];
@@ -421,7 +403,7 @@ export const Results: React.FC<ResultsProps> = ({
       <div className="w-[90%]">
         {selectedProject &&
         selectedProject.simulation &&
-        selectedProject.simulation.resultS3 ? (
+        resultsView.length > 0 ? (
           <>
             <ChartVisualizationMode
               chartVisualizationMode={chartVisualizationMode}
@@ -444,7 +426,7 @@ export const Results: React.FC<ResultsProps> = ({
                 graphToVisualize={graphToVisualize}
                 selectedLabel={selectedLabel}
                 setGraphsData={setGraphDataToExport}
-                currentFreIndexq={selectedProject.simulation.results.freqIndex}
+                currentFreIndexq={resultsView[0].freqIndex}
                 ChartVisualizationMode={chartVisualizationMode}
                 colorArray={colorArray}
               />

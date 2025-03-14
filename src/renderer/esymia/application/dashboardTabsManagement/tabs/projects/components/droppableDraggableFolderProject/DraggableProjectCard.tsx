@@ -84,7 +84,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
     <>
       {cloning && <ImSpinner className='animate-spin w-8 h-8 absolute top-1/2 right-1/2 z-100'/>}
       <div
-        className={`flex flex-col border-2 relative ${theme === 'light' ? 'text-textColor border-green-200 hover:border-secondaryColor' : 'text-textColorDark bg-bgColorDark border-textColorDark hover:border-secondaryColorDark'}  rounded-lg hover:cursor-pointer`}
+        className={`flex flex-col border relative ${theme === 'light' ? 'text-textColor border-green-200 hover:border-secondaryColor' : 'text-textColorDark bg-bgColorDark border-textColorDark hover:border-secondaryColorDark'}  rounded-lg hover:cursor-pointer`}
         key={project.name}
         data-testid={project.name}
         data-tip={project.name}
@@ -100,7 +100,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
       >
         {project.shared && <div className={`badge ${theme === 'light' ? 'badge-neutral' : 'bg-secondaryColorDark'}  absolute bottom-[-10px] right-1/2  translate-x-1/2`}>shared</div>}
         <div className="tooltip tooltip-bottom" data-tip={project.name}>
-          <h5 className="text-center text-base" role="Handle" ref={dragPreview}>
+          <h5 className="text-center text-sm" role="Handle" ref={dragPreview}>
             {project.name.length > 15
               ? `${project.name.substring(0, 15)}...`
               : project.name}
@@ -109,7 +109,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
         <div>
           {theme === 'light' ?
           <img
-          className="w-[60%] md:w-[80%] mx-auto"
+          className="w-[50%] md:w-[60%] mx-auto"
           alt="project_screenshot"
           src={noResultsIconForProject}
         /> :

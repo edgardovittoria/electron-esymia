@@ -385,10 +385,20 @@ export const ChartsList: React.FC<ChartsListProps> = ({
                   labels: chartData.data.labels.filter(
                     (d, index) => currentFreIndexq && index < currentFreIndexq,
                   ),
-                  datasets: chartData.data.datasets.filter(
-                    (d, index) => currentFreIndexq && index < currentFreIndexq,
-                  ),
+                  // datasets: chartData.data.datasets[0].data.filter(
+                  //   (d, index) => currentFreIndexq && index < currentFreIndexq,
+                  // ),
+                  datasets: chartData.data.datasets.map((d) => {
+                    d.data = d.data.filter(
+                      (d1, index) =>
+                        currentFreIndexq && index < currentFreIndexq,
+                    );
+                    console.log("curr freq idx: ", currentFreIndexq)
+                    console.log("idx: ", index)
+                    return d;
+                  }),
                 }}
+                //data={chartData.data}
               />
             )}
           </div>
@@ -614,7 +624,6 @@ const chartsDataOptionsFactory = (
     }
     let datasets: Dataset[] = [];
     matrices.forEach((mat) => {
-      console.log(mat[0].portIndex);
       datasets.push({
         label: `${labels[mat[0].portIndex][0]} - ${
           labels[mat[0].portIndex][1]
@@ -624,6 +633,7 @@ const chartsDataOptionsFactory = (
         backgroundColor: 'white',
       });
     });
+
 
     let options = {
       responsive: true,

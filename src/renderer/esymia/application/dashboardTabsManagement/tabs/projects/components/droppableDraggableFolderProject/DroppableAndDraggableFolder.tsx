@@ -158,7 +158,7 @@ export const DroppableAndDraggableFolder: React.FC<
   return (
     <>
       <div
-        className={`flex items-center py-[5px] px-[10px] border-2 ${theme === 'light' ? 'text-textColor bg-white border-gray-300 hover:border-gray-600' : 'text-textColorDark bg-bgColorDark hover:border-secondaryColorDark'}  rounded-lg hover:cursor-pointer w-full`}
+        className={`flex items-center py-[2px] px-[5px] border ${theme === 'light' ? 'text-textColor bg-white border-gray-300 hover:border-gray-600' : 'text-textColorDark bg-bgColorDark hover:border-secondaryColorDark'}  rounded-lg hover:cursor-pointer w-full`}
         ref={(ref) => {
           drag(drop(ref));
         }}
@@ -175,9 +175,9 @@ export const DroppableAndDraggableFolder: React.FC<
           dispatch(selectFolder(folder.faunaDocumentId as string));
         }}
       >
-        <IoMdFolder className={`mr-2 w-[35px] h-[35px] ${theme === 'light' ? 'text-gray-500' : 'text-textColorDark'}`} />
+        <IoMdFolder className={`mr-2 w-[30px] h-[30px] ${theme === 'light' ? 'text-gray-500' : 'text-textColorDark'}`} />
         <div className="tooltip tooltip-right" data-tip={folder.name}>
-          <span className={`font-bold text-base ${theme === 'light' ? 'text-gray-500' : 'text-textColorDark'}`}>
+          <span className={`font-bold text-sm ${theme === 'light' ? 'text-gray-500' : 'text-textColorDark'}`}>
             {folder.name.length > 25
               ? `${folder.name.substring(0, 25)}...`
               : folder.name}

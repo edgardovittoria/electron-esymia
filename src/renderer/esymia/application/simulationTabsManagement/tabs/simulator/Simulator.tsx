@@ -229,8 +229,8 @@ export const Simulator: React.FC<SimulatorProps> = ({
           <ImSpinner className="animate-spin w-8 h-8" />
         </div>
       )}
-      {(mesherStatus === "idle" || mesherStatus === "starting") &&
-        <div className='absolute top-1/2 left-1/2 -translate-x-1/2'>Mesher Down: start mesher or wait until started to visualize the!</div>
+      {(process.env.MESHER_RIS_MODE === "backend" && (mesherStatus === "idle" || mesherStatus === "starting")) &&
+        <div className='absolute top-1/2 left-1/2 -translate-x-1/2'>Mesher Down: start mesher or wait until started to visualize the mesh!</div>
       }
       <CanvasSimulator
         externalGrids={externalGrids}

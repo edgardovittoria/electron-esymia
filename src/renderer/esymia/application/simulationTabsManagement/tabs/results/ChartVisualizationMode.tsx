@@ -71,14 +71,15 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
           <GiHamburgerMenu size={20} color="#0fb25b" />
         </div>
       </div>
-      <div className="flex justify-center">
+      <div className="flex justify-center items-center">
         <select
-          className={`select select-success w-full max-w-xs h-[35px] min-h-[35px] mr-2 text-sm ${
+          className={`select select-success disabled:opacity-35 disabled:hover:cursor-not-allowed w-full max-w-xs h-[35px] min-h-[35px] mr-2 text-sm ${
             theme === 'light'
               ? 'bg-white text-textColor'
               : 'bg-bgColorDark2 text-textColorDark'
           }`}
           onChange={(e) => setGraphToVisualize(e.currentTarget.value)}
+          disabled={selectedProject?.simulation?.status !== "Completed"}
           defaultValue={'All Graph'}
         >
           <option>All Graph</option>
@@ -86,7 +87,9 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
           <option>Y</option>
           <option>S</option>
         </select>
-        <div className={`dropdown dropdown-bottom `}>
+        <button className={`dropdown dropdown-bottom disabled:opacity-35 disabled:hover:cursor-not-allowed`} 
+          disabled={selectedProject?.simulation?.status !== "Completed"}
+        >
           <label
             tabIndex={0}
             className={`select select-success ${
@@ -108,7 +111,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
               theme === 'light'
                 ? 'bg-white text-textColor'
                 : 'bg-bgColorDark2 text-textColorDark'
-            } p-2 shadow rounded-box w-full h-[500px] max-h-[500px] overflow-y-scroll`}
+            } p-2 shadow rounded-box w-full h-fit max-h-[500px] overflow-y-scroll`}
           >
             {labels.map((l, index) => {
               return (
@@ -162,7 +165,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
               );
             })}
           </ul>
-        </div>
+        </button>
       </div>
       {/* <ExportToCsvZippedButton
         buttonLabel="Export all graphs to csv"

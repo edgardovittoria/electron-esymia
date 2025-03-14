@@ -23,7 +23,8 @@ export interface resultsViewItem {
     matrixS: number[][][],
     matrixY: number[][][],
     matrixZ: number[][][],
-  }
+  },
+  freqIndex?: number
 }
 
 type TabsAndMenuItemsState = {
