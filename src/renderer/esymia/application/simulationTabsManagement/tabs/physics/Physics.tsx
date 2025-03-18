@@ -44,7 +44,7 @@ import { IoMdInformationCircleOutline } from 'react-icons/io';
 import { calculateModelBoundingBox } from '../../sharedElements/utilityFunctions';
 import { FaReact } from 'react-icons/fa';
 import { SiAzurefunctions } from 'react-icons/si';
-import { GiAtom } from 'react-icons/gi';
+import { GiAtom, GiRadialBalance } from 'react-icons/gi';
 import { GrClone, GrStatusInfo } from 'react-icons/gr';
 import { RiListIndefinite } from 'react-icons/ri';
 import { ImSpinner } from 'react-icons/im';
@@ -60,6 +60,9 @@ import { deleteFileS3, uploadFileS3 } from '../../../../aws/mesherAPIs';
 import { Dispatch } from '@reduxjs/toolkit';
 import { savePortsOnS3 } from './savePortsOnS3';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import { TbWavesElectricity } from 'react-icons/tb';
+import { PlaneWaveSettingsModal } from './planeWave/PlaneWaveSettingsModal';
+import { RadialFieldSettingsModal } from './planeWave/RadialFieldSettingsModal';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string | undefined;
@@ -75,10 +78,10 @@ export const setPortsFromS3 = (project: Project, dispatch: Dispatch) => {
     if (err) {
       console.log(err);
     }
-    const ports:(Port | Probe)[] = JSON.parse(data.Body?.toString() as string)
-    ports.forEach(p => {
-      dispatch(addPorts(p))
-    })
+    const ports: (Port | Probe)[] = JSON.parse(data.Body?.toString() as string);
+    ports.forEach((p) => {
+      dispatch(addPorts(p));
+    });
   });
 };
 
@@ -87,15 +90,15 @@ export const Physics: React.FC<PhysicsProps> = ({
   setSelectedTabLeftPanel,
 }) => {
   useEffect(() => {
-    if(selectedProject?.portsS3 && selectedProject.ports.length === 0){
-      setPortsFromS3(selectedProject, dispatch)
+    if (selectedProject?.portsS3 && selectedProject.ports.length === 0) {
+      setPortsFromS3(selectedProject, dispatch);
     }
-  }, [])
+  }, []);
   const { cloneProject } = useStorageData();
   const [cloning, setcloning] = useState<boolean>(false);
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedFolder = useSelector(SelectedFolderSelector);
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
   const { execQuery } = useFaunaQuery();
   const dispatch = useDispatch();
   const [savedPhysicsParameters, setSavedPhysicsParameters] = useState(true);
@@ -115,9 +118,14 @@ export const Physics: React.FC<PhysicsProps> = ({
 
   useEffectNotOnMount(() => {
     if (selectedProject && savedPhysicsParameters) {
-      if(selectedProject.ports.length > 0){
-        savePortsOnS3(selectedProject.ports, selectedProject, dispatch, execQuery)
-      }else{
+      if (selectedProject.ports.length > 0) {
+        savePortsOnS3(
+          selectedProject.ports,
+          selectedProject,
+          dispatch,
+          execQuery,
+        );
+      } else {
         execQuery(
           updateProjectInFauna,
           convertInFaunaProjectThis(selectedProject),
@@ -164,7 +172,11 @@ export const Physics: React.FC<PhysicsProps> = ({
               <ResetFocusButton toggleResetFocus={toggleResetFocus} />
               <div className="">
                 <div
-                  className={`tooltip rounded tooltip-right ${theme === 'light' ? 'bg-white text-blue-500' : 'bg-bgColorDark2 text-blue-300'} p-2`}
+                  className={`tooltip rounded tooltip-right ${
+                    theme === 'light'
+                      ? 'bg-white text-blue-500'
+                      : 'bg-bgColorDark2 text-blue-300'
+                  } p-2`}
                   data-tip="Port Positioning Info"
                   onClick={() => setShowAdvices(!showAdvices)}
                 >
@@ -205,7 +217,13 @@ export const Physics: React.FC<PhysicsProps> = ({
         selectedTabLeftPanel={selectedTabLeftPanel}
         setSelectedTabLeftPanel={setSelectedTabLeftPanel}
       />
-      <div className={`absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}>
+      <div
+        className={`absolute left-[2%] top-[420px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
+          theme === 'light'
+            ? 'bg-white text-textColor'
+            : 'bg-bgColorDark2 text-textColorDark'
+        }`}
+      >
         <button
           disabled={
             selectedProject &&
@@ -238,9 +256,15 @@ export const Physics: React.FC<PhysicsProps> = ({
 };
 
 const PositioningPortsInfo: FC = () => {
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
   return (
-    <div className={`fixed bottom-20 right-5 flex flex-col ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} shadow-2xl text-sm text-start p-[10px] max-w-[300px] max-h-[300px] overflow-y-scroll`}>
+    <div
+      className={`fixed bottom-20 right-5 flex flex-col ${
+        theme === 'light'
+          ? 'bg-white text-textColor'
+          : 'bg-bgColorDark2 text-textColorDark'
+      } shadow-2xl text-sm text-start p-[10px] max-w-[300px] max-h-[300px] overflow-y-scroll`}
+    >
       <span className="font-semibold">
         Once you have added a new termination, you can place it in the following
         ways:
@@ -275,8 +299,8 @@ const SurfaceAdvicesButton: FC<{
   surfaceAdvices: boolean;
   setSurfaceAdvices: Function;
 }> = ({ surfaceAdvices, setSurfaceAdvices }) => {
-  const selectedProject = useSelector(selectedProjectSelector)
-  const theme = useSelector(ThemeSelector)
+  const selectedProject = useSelector(selectedProjectSelector);
+  const theme = useSelector(ThemeSelector);
   return (
     <div
       className="tooltip"
@@ -285,9 +309,17 @@ const SurfaceAdvicesButton: FC<{
       }
     >
       <button
-        className={`${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} rounded p-2 disabled:opacity-40`}
+        className={`${
+          theme === 'light'
+            ? 'bg-white text-textColor'
+            : 'bg-bgColorDark2 text-textColorDark'
+        } rounded p-2 disabled:opacity-40`}
         onClick={() => setSurfaceAdvices(!surfaceAdvices)}
-        disabled={selectedProject && selectedProject?.simulation?.resultS3 ? true : false }
+        disabled={
+          selectedProject && selectedProject?.simulation?.resultS3
+            ? true
+            : false
+        }
       >
         {surfaceAdvices ? (
           <BiShow className="h-5 w-5 text-green-300 hover:text-secondaryColor" />
@@ -329,7 +361,7 @@ const PhysicsRightPanel: FC<{
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
   return (
     <MyPanel
       tabs={[physicsRightPanelTitle.first, physicsRightPanelTitle.second]}
@@ -394,7 +426,9 @@ const PhysicsRightPanel: FC<{
         <button
           data-testid="savePhysics"
           type="button"
-          className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark'} w-full hover:opacity-80 disabled:opacity-60`}
+          className={`button buttonPrimary ${
+            theme === 'light' ? '' : 'bg-secondaryColorDark'
+          } w-full hover:opacity-80 disabled:opacity-60`}
           onClick={() => setSavedPhysicsParameters(true)}
           disabled={savedPhysicsParameters}
         >
@@ -429,16 +463,28 @@ const PhysicsRightSidebar: FC<{
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
+  const [planeWaweModalOpen, setplaneWaweModalOpen] = useState(false)
+  const [radialFieldModalOpen, setradialFieldModalOpen] = useState(false)
   return (
     <>
       {/* <PhysicsLeftPanelTab /> */}
-      <div className={`absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0`}>
+      <div
+        className={`absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0`}
+      >
         <div
           className={`p-2 tooltip rounded-t tooltip-right ${
             selectedTabLeftPanel === 'Termination List'
-              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
-              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
+              ? `${
+                  theme === 'light'
+                    ? 'text-white bg-primaryColor'
+                    : 'text-textColor bg-secondaryColorDark'
+                }`
+              : `${
+                  theme === 'light'
+                    ? 'text-primaryColor bg-white'
+                    : 'text-textColorDark bg-bgColorDark2'
+                }`
           }`}
           data-tip="Terminations List"
           onClick={() => {
@@ -455,8 +501,16 @@ const PhysicsRightSidebar: FC<{
         <div
           className={`p-2 tooltip tooltip-right ${
             selectedTabRightPanel === physicsRightPanelTitle.first
-              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
-              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
+              ? `${
+                  theme === 'light'
+                    ? 'text-white bg-primaryColor'
+                    : 'text-textColor bg-secondaryColorDark'
+                }`
+              : `${
+                  theme === 'light'
+                    ? 'text-primaryColor bg-white'
+                    : 'text-textColorDark bg-bgColorDark2'
+                }`
           }`}
           data-testid="terminationSettings"
           data-tip="Terminations Settings"
@@ -474,8 +528,16 @@ const PhysicsRightSidebar: FC<{
         <div
           className={`p-2 tooltip rounded-b tooltip-right ${
             selectedTabRightPanel === physicsRightPanelTitle.second
-              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
-              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
+              ? `${
+                  theme === 'light'
+                    ? 'text-white bg-primaryColor'
+                    : 'text-textColor bg-secondaryColorDark'
+                }`
+              : `${
+                  theme === 'light'
+                    ? 'text-primaryColor bg-white'
+                    : 'text-textColorDark bg-bgColorDark2'
+                }`
           }`}
           data-testid="frequenciesSettings"
           data-tip="Frequencies"
@@ -491,8 +553,42 @@ const PhysicsRightSidebar: FC<{
           <SiAzurefunctions style={{ width: '25px', height: '25px' }} />
         </div>
       </div>
+      <div
+        className={`absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0`}
+      >
+        <div
+          className={`p-2 tooltip rounded-t hover:cursor-pointer hover:opacity-80 tooltip-right ${
+            theme === 'light'
+              ? 'text-primaryColor bg-white'
+              : 'text-textColorDark bg-bgColorDark2'
+          }`}
+          data-tip="Plane Wave"
+          onClick={() => setplaneWaweModalOpen(true)}
+        >
+          <TbWavesElectricity style={{ width: '25px', height: '25px' }} />
+        </div>
+        <div
+          className={`p-2 tooltip rounded-b hover:cursor-pointer hover:opacity-80 tooltip-right ${
+            theme === 'light'
+              ? 'text-primaryColor bg-white'
+              : 'text-textColorDark bg-bgColorDark2'
+          }`}
+          data-tip="Radial field"
+          onClick={() => setradialFieldModalOpen(true)}
+        >
+          <GiRadialBalance style={{ width: '25px', height: '25px' }} />
+        </div>
+      </div>
+      {planeWaweModalOpen && <PlaneWaveSettingsModal setModalOpen={setplaneWaweModalOpen}/>}
+      {radialFieldModalOpen && <RadialFieldSettingsModal setModalOpen={setradialFieldModalOpen}/>}
       {(selectedTabRightPanel || selectedTabLeftPanel) && (
-        <div className={`${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded w-1/5`}>
+        <div
+          className={`${
+            theme === 'light'
+              ? 'bg-white text-textColor'
+              : 'bg-bgColorDark2 text-textColorDark'
+          } p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded w-1/5`}
+        >
           {selectedTabLeftPanel === 'Termination List' && (
             <PhysicsLeftPanelTab />
           )}
@@ -566,7 +662,9 @@ const PhysicsRightSidebar: FC<{
               <button
                 data-testid="savePhysics"
                 type="button"
-                className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark'} text-sm w-full hover:opacity-80 disabled:opacity-60`}
+                className={`button buttonPrimary ${
+                  theme === 'light' ? '' : 'bg-secondaryColorDark'
+                } text-sm w-full hover:opacity-80 disabled:opacity-60`}
                 onClick={() => setSavedPhysicsParameters(true)}
                 disabled={savedPhysicsParameters}
               >

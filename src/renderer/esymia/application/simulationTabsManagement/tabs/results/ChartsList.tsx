@@ -20,9 +20,8 @@ import {
   solverResultsViewSelector,
   ThemeSelector,
 } from '../../../../store/tabsAndMenuItemsSlice';
-import { color } from 'chart.js/helpers';
-import { plugins } from '../../../../../../../postcss.config';
-import { title } from 'process';
+import zoomPlugin, { pan } from 'chartjs-plugin-zoom';
+
 
 ChartJS.register(
   CategoryScale,
@@ -33,6 +32,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
+  zoomPlugin
 );
 
 interface ChartsListProps {
@@ -252,6 +252,20 @@ export const ChartsList: React.FC<ChartsListProps> = ({
           text: graphTitle,
           color: theme === 'light' ? 'black' : 'white',
         },
+        // zoom: {
+        //   pan: {
+        //     enabled: true
+        //   },
+        //   zoom: {
+        //     wheel: {
+        //       enabled: true,
+        //     },
+        //     pinch: {
+        //       enabled: true
+        //     },
+        //     mode: 'xy',
+        //   }
+        // }
       },
       type: type,
       scales: {
@@ -640,6 +654,13 @@ const chartsDataOptionsFactory = (
       layout: {
         padding: {
           right: 20,
+        },
+      },
+      plugins: {
+        decimation: {
+          enabled: true,
+          algorithm: 'min-max',
+          threshold: 100
         },
       },
       scale: {

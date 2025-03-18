@@ -11,18 +11,21 @@ import {
   selectPort,
   updatePortPosition,
 } from '../../../../store/projectSlice';
-import { Canvas, ThreeEvent, useThree } from '@react-three/fiber';
+import { Canvas, ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { FocusView } from '../../sharedElements/FocusView';
 import uniqid from 'uniqid';
 import {
   Edges,
   GizmoHelper,
+  GizmoViewcube,
   GizmoViewport,
+  Helper,
+  Html,
   Line,
   OrbitControls,
 } from '@react-three/drei';
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import EdgesGenerator from './EdgesGenerator';
 import { Port, Probe, TempLumped } from '../../../../model/esymiaModels';
 import { PortControls } from './portManagement/PortControls';
@@ -31,7 +34,12 @@ import {
   alertMessageStyle,
   comeBackToModelerMessage,
 } from '../../../config/textMessages';
-import { CircleGeometryAttributes, ComponentEntity, FactoryShapes, TransformationParams } from '../../../../../cad_library';
+import {
+  CircleGeometryAttributes,
+  ComponentEntity,
+  FactoryShapes,
+  TransformationParams,
+} from '../../../../../cad_library';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { FactoryShapesEsymia } from '../../../../../cad_library/components/baseShapes/factoryShapes';
 
@@ -53,7 +61,7 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
   const selectedPort = findSelectedPort(selectedProject);
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
   const mesh = useRef<THREE.Mesh[]>([]);
   const [pointerEvent, setPointerEvent] = useState<
     ThreeEvent<MouseEvent> | undefined
@@ -129,7 +137,10 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                             scale={component.transformationParams.scale}
                             rotation={component.transformationParams.rotation}
                             onDoubleClick={(e) => {
-                              if (selectedPort && !selectedProject.simulation?.resultS3) {
+                              if (
+                                selectedPort &&
+                                !selectedProject.simulation?.resultS3
+                              ) {
                                 setPointerEvent(e);
                                 setSurfaceAdvices(false);
                               }
@@ -163,6 +174,15 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                       labelColor="white"
                     />
                   </GizmoHelper>
+                  {/* <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
+                    <GizmoViewcube
+                      color='black'
+                      textColor='white'
+                      strokeColor='green'
+                      faces={['X', 'X', 'Y', 'Y', 'Z', 'Z']}
+                      font='40px Inter var, Arial, sans-serif'
+                    />
+                  </GizmoHelper> */}
                   {/*<Screenshot selectedProject={selectedProject} />*/}
                 </Provider>
               </Canvas>
@@ -171,7 +191,13 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
         </ReactReduxContext.Consumer>
       ) : (
         <div className="absolute top-1/2">
-          <span className={`${alertMessageStyle} ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}>{comeBackToModelerMessage}</span>
+          <span
+            className={`${alertMessageStyle} ${
+              theme === 'light' ? 'text-textColor' : 'text-textColorDark'
+            }`}
+          >
+            {comeBackToModelerMessage}
+          </span>
         </div>
       )}
     </div>
@@ -182,7 +208,6 @@ const PhysicsPortsDrawer: FC = () => {
   const size = useSelector(boundingBoxDimensionSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
-
 
   const componentEntityFrom = (
     port: Port | TempLumped,
@@ -195,22 +220,27 @@ const PhysicsPortsDrawer: FC = () => {
         radius: (size as number) / 100,
         segments: 20,
       } as CircleGeometryAttributes,
-      name: (inputOrOutput === 'in') ? 'inputPort' + port.name : 'outputPort' + port.name,
+      name:
+        inputOrOutput === 'in'
+          ? 'inputPort' + port.name
+          : 'outputPort' + port.name,
       orbitEnabled: false,
       transformationParams: {
-        position: (inputOrOutput === 'in') ? port.inputElement : port.outputElement,
+        position:
+          inputOrOutput === 'in' ? port.inputElement : port.outputElement,
         rotation: [0, 0, 0],
         scale: [1, 1, 1],
       } as TransformationParams,
       previousTransformationParams: {
-        position: (inputOrOutput === 'in') ? port.inputElement : port.outputElement,
+        position:
+          inputOrOutput === 'in' ? port.inputElement : port.outputElement,
         rotation: [0, 0, 0],
         scale: [1, 1, 1],
       } as TransformationParams,
       opacity: 1,
       transparency: false,
     } as ComponentEntity;
-    return entity
+    return entity;
   };
 
   return (
@@ -224,7 +254,10 @@ const PhysicsPortsDrawer: FC = () => {
                 position={port.inputElement}
                 onClick={() => dispatch(selectPort(port.name))}
               >
-                <FactoryShapes entity={componentEntityFrom(port, 'in')} color="#00ff00" />
+                <FactoryShapes
+                  entity={componentEntityFrom(port, 'in')}
+                  color="#00ff00"
+                />
               </mesh>
 
               <mesh

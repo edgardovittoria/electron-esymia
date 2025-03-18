@@ -104,6 +104,7 @@
     "axios": "^0.24.0",
     "browser-image-compression": "^1.0.17",
     "chart.js": "^3.7.0",
+    "chartjs-plugin-zoom": "^2.2.0",
     "cypress-mock-websocket-plugin": "^2.0.0",
     "daisyui": "^4.11.1",
     "electron-debug": "^3.2.0",
