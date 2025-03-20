@@ -39,7 +39,8 @@ export type Project = {
   faunaDocumentId?: string,
   parentFolder: string,
   boundingBoxDimension?: number,
-  suggestedQuantum?: [number, number, number]
+  suggestedQuantum?: [number, number, number],
+  radialFieldParameters?: RadialFieldParameters
 }
 
 export type TempLumped = {
@@ -158,4 +159,10 @@ export type CellsNumber = {
   n_cells_x: number,
   n_cells_y: number,
   n_cells_z: number,
+}
+
+export type RadialFieldParameters = {
+  radius: number,
+  center: {x:number, y:number, z:number},
+  plane: string
 }

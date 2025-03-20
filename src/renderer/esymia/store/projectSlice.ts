@@ -11,6 +11,7 @@ import {
   Port,
   Probe,
   Project,
+  RadialFieldParameters,
   RLCParams,
   sharingInfoUser,
   Simulation,
@@ -334,6 +335,18 @@ export const ProjectSlice = createSlice({
       if (selectedProject) {
         selectedProject.frequencies = action.payload;
       }
+    },
+    setRadialFieldParametres(state: ProjectState, action: PayloadAction<RadialFieldParameters>) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if (selectedProject) {
+        selectedProject.radialFieldParameters = action.payload;
+      }
+    },
+    unsetRadialFieldParametres(state: ProjectState) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if (selectedProject) {
+        selectedProject.radialFieldParameters = undefined;
+      }
     }
   },
   extraReducers: (builder) => {
@@ -407,7 +420,9 @@ export const {
   setFrequencies,
   setPathToExternalGridsNotFound,
   deleteAllLumped,
-  deleteAllPorts
+  deleteAllPorts,
+  setRadialFieldParametres,
+  unsetRadialFieldParametres
 } = ProjectSlice.actions;
 
 const selectTabEffects = (state: ProjectState, tab: string) => {

@@ -5,7 +5,6 @@ import {
   useSelector,
 } from 'react-redux';
 import {
-  boundingBoxDimensionSelector,
   findSelectedPort,
   selectedProjectSelector,
   selectPort,
@@ -42,6 +41,8 @@ import {
 } from '../../../../../cad_library';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { FactoryShapesEsymia } from '../../../../../cad_library/components/baseShapes/factoryShapes';
+import { boundingBoxDimensionSelector } from '../../../../store/projectSlice';
+import { GizmoArrowViewport } from './planeWave/components/GizmoArrowViewport';
 
 interface CanvasPhysicsProps {
   setCameraPosition: Function;
@@ -63,6 +64,11 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
   const selectedPort = findSelectedPort(selectedProject);
   const theme = useSelector(ThemeSelector);
   const mesh = useRef<THREE.Mesh[]>([]);
+  const getTarget = () => {
+    return mesh.current
+      ? mesh.current[0].getWorldPosition(new THREE.Vector3())
+      : new THREE.Vector3()
+  }
   const [pointerEvent, setPointerEvent] = useState<
     ThreeEvent<MouseEvent> | undefined
   >(undefined);
@@ -103,6 +109,8 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
     }
   }, [pointerEvent]);
 
+  const boundingBoxDimension = useSelector(boundingBoxDimensionSelector);
+
   return (
     <div className="flex justify-center">
       {selectedProject && selectedProject.model?.components ? (
@@ -121,6 +129,27 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                   {/* paint models */}
                   <CanvasInfo setCameraPosition={setCameraPosition} />
                   <FocusView resetFocus={resetFocus}>
+                    {boundingBoxDimension &&
+                      selectedProject.radialFieldParameters && (
+                        <>
+                          <Circle
+                            radius={boundingBoxDimension}
+                            center={calculateCenter(mesh.current)}
+                            plane={selectedProject.radialFieldParameters.plane}
+                            boundingBox={boundingBoxDimension}
+                            color={getColourBasedOnPlane(selectedProject.radialFieldParameters.plane)[0]}
+                          />
+                          <Circle
+                            radius={boundingBoxDimension}
+                            center={calculateCenter(mesh.current)}
+                            plane={getOrthogonalPlane(
+                              selectedProject.radialFieldParameters.plane,
+                            )}
+                            boundingBox={boundingBoxDimension}
+                            color={getColourBasedOnPlane(selectedProject.radialFieldParameters.plane)[1]}
+                          />
+                        </>
+                      )}
                     {selectedProject.model.components.map(
                       (component: ComponentEntity, index: number) => {
                         return (
@@ -168,22 +197,23 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                   />
                   {/*<Screenshot selectedProject={selectedProject}/>*/}
                   <OrbitControls makeDefault />
-                  <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
+                  <GizmoHelper alignment="bottom-left" margin={[150, 80]} renderPriority={1} onTarget={getTarget}>
                     <GizmoViewport
                       axisColors={['red', '#40ff00', 'blue']}
                       labelColor="white"
                     />
                   </GizmoHelper>
-                  {/* <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
-                    <GizmoViewcube
-                      color='black'
-                      textColor='white'
-                      strokeColor='green'
-                      faces={['X', 'X', 'Y', 'Y', 'Z', 'Z']}
-                      font='40px Inter var, Arial, sans-serif'
-                    />
-                  </GizmoHelper> */}
-                  {/*<Screenshot selectedProject={selectedProject} />*/}
+                  <GizmoHelper alignment="top-right" margin={[180, 150]} renderPriority={2} onTarget={getTarget}>
+                    {/* <GizmoViewport
+                      axisColors={['red', '#40ff00', 'blue']}
+                      labelColor="white"
+                    /> */}
+                    <GizmoArrowViewport axisColors={['red', '#40ff00', 'blue']}
+                      directionX={new THREE.Vector3(1,0,0)}
+                      directionY={new THREE.Vector3(0,1,0)}
+                      directionZ={new THREE.Vector3(0,0,1)}
+                      />
+                  </GizmoHelper>
                 </Provider>
               </Canvas>
             </div>
@@ -368,3 +398,86 @@ const CanvasInfo: React.FC<{ setCameraPosition: Function }> = ({
   }, []);
   return <></>;
 };
+
+const Circle: React.FC<{
+  radius: number;
+  center: { x: number; y: number; z: number };
+  plane: string;
+  boundingBox: number;
+  color: string;
+}> = ({ radius, center, plane, boundingBox, color }) => {
+  const { x, y, z } = center;
+
+  // Determina la rotazione in base al piano scelto
+
+  const rotations = {
+    xy: new THREE.Euler(0, 0, 0), // Giace sul piano XY
+    xz: new THREE.Euler(Math.PI / 2, 0, 0), // Giace sul piano XZ
+    yz: new THREE.Euler(0, Math.PI / 2, 0), // Giace sul piano YZ
+  };
+  let rotation = new THREE.Euler(0, 0, 0);
+  if (plane === 'xy') {
+    rotation = rotations.xy;
+  } else if (plane === 'xz') {
+    rotation = rotations.xz;
+  } else {
+    rotation = rotations.yz;
+  }
+  return (
+    <mesh position={[x, y, z]} rotation={rotation}>
+      <ringGeometry args={[radius - 0.01 * boundingBox, radius, 64]} />
+      <meshBasicMaterial color={new THREE.Color(color)} side={2} />
+    </mesh>
+  );
+};
+
+function getOrthogonalPlane(plane: string) {
+  switch (plane) {
+    case 'xy':
+      return 'xz';
+      break;
+    case 'xz':
+      return 'yz';
+      break;
+    case 'yz':
+      return 'xy';
+    default:
+      return 'xy';
+      break;
+  }
+}
+
+function calculateCenter(objects: THREE.Mesh[]) {
+  if (objects.length === 0) return { x: 0, y: 0, z: 0 };
+
+  const sum = objects.reduce(
+    (acc, obj) => ({
+      x: acc.x + obj.position.x,
+      y: acc.y + obj.position.y,
+      z: acc.z + obj.position.z,
+    }),
+    { x: 0, y: 0, z: 0 },
+  );
+
+  return {
+    x: sum.x / objects.length,
+    y: sum.y / objects.length,
+    z: sum.z / objects.length,
+  };
+}
+
+function getColourBasedOnPlane(plane: string){
+  switch (plane) {
+    case 'xy':
+      return ['red', 'blue'];
+      break;
+    case 'xz':
+      return ['#40ff00', 'blue'];
+      break;
+    case 'yz':
+      return ['red', '#40ff00'];
+    default:
+      return 'xy';
+      break;
+  }
+}
