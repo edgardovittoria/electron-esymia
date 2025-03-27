@@ -40,15 +40,13 @@ import {
   unsetIterations,
   unsetSolverResults,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
-import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
 import { PiClockCountdownBold } from 'react-icons/pi';
 import { ImSpinner } from 'react-icons/im';
 import { TbTrashXFilled } from 'react-icons/tb';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { ComponentEntity } from '../../../../../../../cad_library';
-import { uploadFileS3 } from '../../../../../../aws/mesherAPIs';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean;
@@ -184,13 +182,13 @@ const SimulationStatusItem: React.FC<{
   setRunningSimulation,
 }) => {
   const computingP = useSelector(computingPSelector).filter(
-    (item) => item.id === associatedProject.faunaDocumentId,
+    (item) => item.id === associatedProject.id,
   )[0];
   const computingLpx = useSelector(computingLpSelector).filter(
-    (item) => item.id === associatedProject.faunaDocumentId,
+    (item) => item.id === associatedProject.id,
   )[0];
   const iterations = useSelector(iterationsSelector).filter(
-    (item) => item.id === associatedProject.faunaDocumentId,
+    (item) => item.id === associatedProject.id,
   )[0];
   const estimatedTime = useSelector(estimatedTimeSelector);
   const solverType = useSelector(solverTypeSelector);
@@ -199,33 +197,33 @@ const SimulationStatusItem: React.FC<{
   const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
   const isAlert = useSelector(isAlertInfoModalSelector);
   const solverResults = useSelector(solverResultsSelector).filter(
-    (item) => item.id === associatedProject.faunaDocumentId,
+    (item) => item.id === associatedProject.id,
   )[0];
   const solverResultsS3 = useSelector(solverResultsS3Selector)
   const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch();
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
 
   useEffect(() => {
     if (isAlertConfirmed) {
       if (!isAlert) {
-        dispatch(deleteSimulation(associatedProject.faunaDocumentId as string));
+        dispatch(deleteSimulation(associatedProject.id as string));
         dispatch(
           setMeshApproved({
             approved: false,
-            projectToUpdate: associatedProject.faunaDocumentId as string,
+            projectToUpdate: associatedProject.id as string,
           }),
         );
-        dispatch(unsetComputingLp(associatedProject.faunaDocumentId as string));
-        dispatch(unsetComputingP(associatedProject.faunaDocumentId as string));
-        dispatch(unsetIterations(associatedProject.faunaDocumentId as string));
-        dispatch(unsetSolverResults(associatedProject.faunaDocumentId as string));
+        dispatch(unsetComputingLp(associatedProject.id as string));
+        dispatch(unsetComputingP(associatedProject.id as string));
+        dispatch(unsetIterations(associatedProject.id as string));
+        dispatch(unsetSolverResults(associatedProject.id as string));
         dispatch(
           publishMessage({
             queue: 'management_solver',
             body: {
               message: 'stop_computation',
-              id: associatedProject.faunaDocumentId as string,
+              id: associatedProject.id as string,
             },
           }),
         );
@@ -262,7 +260,7 @@ const SimulationStatusItem: React.FC<{
         convergenceThreshold,
       },
       solverType: solverType,
-      id: project.faunaDocumentId as string,
+      id: project.id as string,
       mesherType: process.env.MESHER_RIS_MODE as string,
     };
   };
@@ -361,12 +359,12 @@ const SimulationStatusItem: React.FC<{
         ended: Date.now().toString(),
         status: 'Completed',
       };
-      execQuery(
-        updateProjectInFauna,
-        convertInFaunaProjectThis({
+      execQuery2(
+        createOrUpdateProjectInDynamoDB,
+        {
           ...associatedProject,
           simulation: simulationUpdatedCompleted,
-        } as Project),
+        } as Project,
         dispatch,
       ).then(() => {
         setRunningSimulation(undefined);

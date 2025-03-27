@@ -1,5 +1,5 @@
 import { CanvasState, UsersState } from "../../cad_library"
-import { MeshData, Port, Probe, sharingInfoUser, Signal, Simulation } from "./esymiaModels"
+import { MeshData, PlaneWaveParameters, Port, Probe, RadialFieldParameters, sharingInfoUser, Signal, Simulation } from "./esymiaModels"
 
 export type FaunaProject = {
     id: string,
@@ -25,7 +25,9 @@ export type FaunaProjectDetails = {
     boundingBoxDimension?: number,
     suggestedQuantum?: [number, number, number]
     scatteringValue?: number,
-    modelUnit: string
+    modelUnit: string,
+    planeWaveParameters: PlaneWaveParameters,
+    radialFieldParameters: RadialFieldParameters
 }
 
 export type FaunaFolder = {

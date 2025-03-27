@@ -45,12 +45,9 @@ import {
   SolverStatusSelector,
 } from '../../../../../store/pluginsSlice';
 import { generateSTLListFromComponents } from './components/rightPanelFunctions';
-import { convertInFaunaProjectThis } from '../../../../../faunadb/apiAuxiliaryFunctions';
-import { updateProjectInFauna } from '../../../../../faunadb/projectsFolderAPIs';
 import { publishMessage } from '../../../../../../middleware/stompMiddleware';
 import { TbServerBolt } from 'react-icons/tb';
-import { GiCubeforce, GiMeshBall } from 'react-icons/gi';
-import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaQuery';
+import { GiMeshBall } from 'react-icons/gi';
 import { ComponentEntity, Material } from '../../../../../../cad_library';
 
 interface RightPanelSimulatorProps {
@@ -73,7 +70,6 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   setSelectedTabLeftPanel,
 }) => {
   const dispatch = useDispatch();
-  const { execQuery } = useFaunaQuery();
   const [quantumDimsInput, setQuantumDimsInput] = useState<
     [number, number, number]
   >([0, 0, 0]);
@@ -96,7 +92,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
   const solverStatus = useSelector(SolverStatusSelector);
   const suggestedQuantum = useSelector(suggestedQuantumSelector);
   const meshAdvice = useSelector(meshAdviceSelector).filter(
-    (item) => item.id === (selectedProject.faunaDocumentId as string),
+    (item) => item.id === (selectedProject.id as string),
   )[0];
   const pathToExternalGridsNotFound = useSelector(
     pathToExternalGridsNotFoundSelector,
@@ -127,7 +123,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
             components &&
             allMaterials &&
             generateSTLListFromComponents(allMaterials, components),
-          id: selectedProject.faunaDocumentId as string,
+          id: selectedProject.id as string,
         };
         dispatch(
           publishMessage({
@@ -212,18 +208,6 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
           ),
         ]),
       );
-      // execQuery(
-      //   updateProjectInFauna,
-      //   convertInFaunaProjectThis({
-      //     ...selectedProject,
-      //     suggestedQuantum: [
-      //       parseFloat(meshAdvice.quantum[0].toFixed(5)),
-      //       parseFloat(meshAdvice.quantum[1].toFixed(5)),
-      //       parseFloat(meshAdvice.quantum[2].toFixed(5)),
-      //     ],
-      //   } as Project),
-      //   dispatch,
-      // ).then();
     }
   }, [meshAdvice]);
 
@@ -252,14 +236,14 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
       dispatch(
         setMeshType({
           type: 'Ris',
-          projectToUpdate: selectedProject.faunaDocumentId as string,
+          projectToUpdate: selectedProject.id as string,
         }),
       );
     } else {
       dispatch(
         setMeshType({
           type: 'Standard',
-          projectToUpdate: selectedProject.faunaDocumentId as string,
+          projectToUpdate: selectedProject.id as string,
         }),
       );
     }
@@ -366,7 +350,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                           setMeshType({
                             type: e.target.value as 'Standard' | 'Ris',
                             projectToUpdate:
-                              selectedProject.faunaDocumentId as string,
+                              selectedProject.id as string,
                           }),
                         );
                       }}
@@ -433,7 +417,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                           setLambdaFactor({
                             lambdaFactor: parseFloat(e.target.value),
                             projectToUpdate:
-                              selectedProject.faunaDocumentId as string,
+                              selectedProject.id as string,
                           }),
                         );
                       }}
@@ -556,7 +540,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                               | 'Not Generated'
                               | 'Generated',
                             projectToUpdate:
-                              selectedProject.faunaDocumentId as string,
+                              selectedProject.id as string,
                           }),
                         );
                         dispatch(
@@ -566,7 +550,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                                 ? 'Queued'
                                 : 'Generating',
                             projectToUpdate:
-                              selectedProject.faunaDocumentId as string,
+                              selectedProject.id as string,
                           }),
                         );
                         if (selectedProject.meshData.type !== 'Ris') {
@@ -574,7 +558,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                             setQuantum({
                               quantum: quantumDimsInput,
                               projectToUpdate:
-                                selectedProject.faunaDocumentId as string,
+                                selectedProject.id as string,
                             }),
                           );
                         }
@@ -815,7 +799,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     status:
                       activeSimulations.length === 0 ? 'Running' : 'Queued',
                     associatedProject:
-                      selectedProject?.faunaDocumentId as string,
+                      selectedProject?.id as string,
                     solverAlgoParams: {
                       solverType: solverType,
                       innerIteration: solverIterations[0],
@@ -833,7 +817,7 @@ export const RightPanelSimulator: React.FC<RightPanelSimulatorProps> = ({
                     setMeshApproved({
                       approved: true,
                       projectToUpdate:
-                        selectedProject.faunaDocumentId as string,
+                        selectedProject.id as string,
                     }),
                   );
                 }}
@@ -1205,7 +1189,7 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                               | 'Not Generated'
                               | 'Generated',
                             projectToUpdate:
-                              selectedProject.faunaDocumentId as string,
+                              selectedProject.id as string,
                           }),
                         );
                         dispatch(
@@ -1215,14 +1199,14 @@ const ModalRefineCoarse: FC<ModalRefineCoarseProps> = ({
                                 ? 'Queued'
                                 : 'Generating',
                             projectToUpdate:
-                              selectedProject.faunaDocumentId as string,
+                              selectedProject.id as string,
                           }),
                         );
                         dispatch(
                           setQuantum({
                             quantum: newQuantum,
                             projectToUpdate:
-                              selectedProject.faunaDocumentId as string,
+                              selectedProject.id as string,
                           }),
                         );
                         setXPercentage('No');

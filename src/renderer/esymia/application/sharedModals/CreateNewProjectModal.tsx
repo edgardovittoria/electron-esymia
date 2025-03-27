@@ -1,9 +1,5 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import {
-  addIDInFolderProjectsList,
-  createSimulationProjectInFauna
-} from '../../faunadb/projectsFolderAPIs';
 import {
   addProject,
   SelectedFolderSelector
@@ -11,15 +7,14 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addProjectTab,
-  setIsAlertInfoModal,
-  setMessageInfoModal, setShowCreateNewProjectModal,
-  setShowInfoModal,
+  setShowCreateNewProjectModal,
   ThemeSelector
 } from '../../store/tabsAndMenuItemsSlice';
 import { Project, sharingInfoUser } from '../../model/esymiaModels';
 import toast from 'react-hot-toast';
-import { useFaunaQuery } from '../../faunadb/hook/useFaunaQuery';
 import { CanvasState, UsersState, usersStateSelector } from '../../../cad_library';
+import { useDynamoDBQuery } from '../dynamoDB/hook/useDynamoDBQuery';
+import { addIDInProjectListInDynamoDB, createOrUpdateProjectInDynamoDB } from '../dynamoDB/projectsFolderApi';
 
 interface CreateNewProjectModalProps {
 }
@@ -33,7 +28,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
   const selectedFolder = useSelector(SelectedFolderSelector);
   const theme = useSelector(ThemeSelector)
 
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
 
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
@@ -41,6 +36,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
   const handleCreate = () => {
     if (projectName.length > 0) {
       let newProject: Project = {
+        id: crypto.randomUUID(),
         storage: process.env.STORAGE_MODE as string as ('local' | 'online'),
         name: projectName,
         description: projectDescription,
@@ -58,17 +54,13 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         },
         screenshot: undefined,
         owner: (selectedFolder?.owner.email === user.email) ? user : selectedFolder?.owner as UsersState,
-        sharedWith: (selectedFolder?.faunaDocumentId === 'root') ? [] as sharingInfoUser[] : selectedFolder?.sharedWith as sharingInfoUser[],
-        parentFolder: selectedFolder?.faunaDocumentId as string
+        sharedWith: (selectedFolder?.id === 'root') ? [] as sharingInfoUser[] : selectedFolder?.sharedWith as sharingInfoUser[],
+        parentFolder: selectedFolder?.id as string
       };
-      execQuery(createSimulationProjectInFauna, newProject, dispatch).then((res: any) => {
-        newProject = {
-          ...newProject,
-          faunaDocumentId: res.id
-        } as Project;
-        (selectedFolder?.faunaDocumentId !== 'root') && execQuery(
-          addIDInFolderProjectsList,
-          newProject.faunaDocumentId,
+      execQuery2(createOrUpdateProjectInDynamoDB, newProject, dispatch).then((res: any) => {
+        (selectedFolder?.id !== 'root') && execQuery2(
+          addIDInProjectListInDynamoDB,
+          newProject.id,
           selectedFolder
         );
         dispatch(addProject(newProject));

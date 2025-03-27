@@ -1,5 +1,4 @@
 import React from 'react';
-import { GiPowerButton } from 'react-icons/gi';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   deleteSimulation,
@@ -8,14 +7,13 @@ import {
 } from '../../../../store/projectSlice';
 import noResultsIcon from '../../../../../../../assets/noResultsIconForProject.png';
 import noResultsIconDark from '../../../../../../../assets/noResultsIconForProjectDark.png';
-import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
-import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
 import { Project } from '../../../../model/esymiaModels';
 import { ImSpinner } from 'react-icons/im';
-import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 import { deleteFileS3 } from '../../../../aws/mesherAPIs';
 import { msToTime } from '../../../dashboardTabsManagement/tabs/Simulations';
-import { ThemeSelector, unsetComputingLp, unsetComputingP, unsetIterations, unsetSolverResults } from '../../../../store/tabsAndMenuItemsSlice';
+import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
 
 interface ResultsLeftPanelTabProps {
   selectedPort: string;
@@ -29,7 +27,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch();
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   return (
     <>
       {selectedProject &&
@@ -120,27 +118,27 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                     onClick={() => {
                       dispatch(
                         deleteSimulation(
-                          selectedProject.faunaDocumentId as string,
+                          selectedProject.id as string,
                         ),
                       );
                       dispatch(
                         setMeshApproved({
                           approved: false,
                           projectToUpdate:
-                            selectedProject?.faunaDocumentId as string,
+                            selectedProject?.id as string,
                         }),
                       );
                       deleteFileS3(selectedProject.simulation?.resultS3 as string).then(() => {
-                        execQuery(
-                          updateProjectInFauna,
-                          convertInFaunaProjectThis({
+                        execQuery2(
+                          createOrUpdateProjectInDynamoDB,
+                          {
                             ...selectedProject,
                             simulation: undefined,
                             meshData: {
                               ...selectedProject?.meshData,
                               meshApproved: false,
                             },
-                          } as Project),
+                          } as Project,
                           dispatch,
                         );
                       })

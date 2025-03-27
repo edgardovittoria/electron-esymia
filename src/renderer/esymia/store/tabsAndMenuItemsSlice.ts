@@ -92,21 +92,21 @@ export const TabsAndMenuItemsSlice = createSlice({
       setTab(state, action.payload);
     },
     addProjectTab(state: TabsAndMenuItemsState, action: PayloadAction<Project>) {
-      if (!(state.projectsTabs.filter((projectTab) => projectTab.faunaDocumentId === action.payload.faunaDocumentId).length > 0)) {
+      if (!(state.projectsTabs.filter((projectTab) => projectTab.id === action.payload.id).length > 0)) {
         state.projectsTabs.push(action.payload);
       }
-      setTab(state, action.payload.faunaDocumentId as string);
+      setTab(state, action.payload.id as string);
     },
     updateProjectTab(state: TabsAndMenuItemsState, action: PayloadAction<Project>) {
       state.projectsTabs = state.projectsTabs.map(pt => {
-        if(pt.faunaDocumentId === action.payload.faunaDocumentId){
+        if(pt.id === action.payload.id){
           pt = action.payload
         }
         return pt
       })
     },
     closeProjectTab(state: TabsAndMenuItemsState, action: PayloadAction<string>) {
-      state.projectsTabs = state.projectsTabs.filter((projectTab) => projectTab.faunaDocumentId !== action.payload);
+      state.projectsTabs = state.projectsTabs.filter((projectTab) => projectTab.id !== action.payload);
       if (state.menuItemSelected !== 'Projects') setTab(state, 'DASHBOARD');
     },
     selectMenuItem(state: TabsAndMenuItemsState, action: PayloadAction<string>) {

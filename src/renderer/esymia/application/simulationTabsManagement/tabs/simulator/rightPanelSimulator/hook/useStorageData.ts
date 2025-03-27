@@ -13,12 +13,6 @@ import {
   selectedProjectSelector,
   setPathToExternalGridsNotFound,
 } from '../../../../../../store/projectSlice';
-import {
-  createSimulationProjectInFauna,
-  deleteSimulationProjectFromFauna,
-  addIDInFolderProjectsList,
-  updateProjectInFauna
-} from '../../../../../../faunadb/projectsFolderAPIs';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -29,16 +23,16 @@ import { s3 } from '../../../../../../aws/s3Config';
 import { addProjectTab, closeProjectTab, setAWSExternalGridsData } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { Brick } from '../components/createGridsExternals';
 import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
-import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { CanvasState } from '../../../../../../../cad_library';
 import { UsersState } from '../../../../../../../cad_library/components/store/users/usersSlice';
 import { GetObjectRequest } from 'aws-sdk/clients/s3';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { addIDInProjectListInDynamoDB, createOrUpdateProjectInDynamoDB, deleteSimulationProjectFromDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();
   const selectedProject = useSelector(selectedProjectSelector) as Project;
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
 
   const externalGridsDecode = (extGridsJson: any) => {
     let gridsPairs: [string, Brick[]][] = [];
@@ -90,13 +84,13 @@ export const useStorageData = () => {
   ) => {
     readLocalFile(
       selectedProject.meshData.externalGrids as string,
-      selectedProject.faunaDocumentId as string,
+      selectedProject.id as string,
     ).then((res) => {
       setExternalGrids(externalGridsDecode(JSON.parse(res)));
       dispatch(
         setPathToExternalGridsNotFound({
           status: false,
-          projectToUpdate: selectedProject.faunaDocumentId as string,
+          projectToUpdate: selectedProject.id as string,
         }),
       );
       setSpinner(false);
@@ -107,7 +101,7 @@ export const useStorageData = () => {
     if(mesherBackend){
       dispatch(publishMessage({
         queue: 'management',
-        body: { message: "get grids", grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, id: selectedProject.faunaDocumentId }}))
+        body: { message: "get grids", grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, id: selectedProject.id }}))
     }else{
       const params:GetObjectRequest = {
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
@@ -161,11 +155,11 @@ export const useStorageData = () => {
     deleteMeshDataOnline(project);
     deleteResultsOnline(project)
     deletePortsOnline(project)
-    dispatch(removeProject(project.faunaDocumentId as string));
-    dispatch(closeProjectTab(project.faunaDocumentId as string));
-    execQuery(
-      deleteSimulationProjectFromFauna,
-      project.faunaDocumentId,
+    dispatch(removeProject(project.id as string));
+    dispatch(closeProjectTab(project.id as string));
+    execQuery2(
+      deleteSimulationProjectFromDynamoDB,
+      project.id,
       project.parentFolder,
       dispatch
     );
@@ -173,11 +167,11 @@ export const useStorageData = () => {
 
   const deleteProjectLocal = (project: Project) => {
     deleteMeshDataLocal(project);
-    dispatch(removeProject(project.faunaDocumentId as string));
-    dispatch(closeProjectTab(project.faunaDocumentId as string));
-    execQuery(
-      deleteSimulationProjectFromFauna,
-      project.faunaDocumentId,
+    dispatch(removeProject(project.id as string));
+    dispatch(closeProjectTab(project.id as string));
+    execQuery2(
+      deleteSimulationProjectFromDynamoDB,
+      project.id,
       project.parentFolder,
       dispatch
     );
@@ -207,42 +201,41 @@ export const useStorageData = () => {
     s3.copyObject({
       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
       CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-      Key: `${process.env.MESHER_RIS_MODE === "backend" ? `${res.id}_mesh.json.gz` : `${res.id}_mesh.json.json`}`
+      Key: `${process.env.MESHER_RIS_MODE === "backend" ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`
     }).promise().then(mesh => {
       s3.copyObject({
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
         CopySource: project.meshData.type === 'Standard' ? `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.surface}`,
-        Key: project.meshData.type === 'Standard' ? `${res.id}_grids.json.gz` : `${res.id}_surface.json.json`
+        Key: project.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : `${clonedProject.id}_surface.json.json`
       }).promise().then(grids => {
         if(project.simulation?.resultS3){
           s3.copyObject({
             Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
             CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.simulation.resultS3}`,
-            Key: `${res.id}_results.json`
+            Key: `${clonedProject.id}_results.json`
           }).promise().then(results => {
             clonedProject = {
               ...clonedProject,
               meshData: {
                 ...clonedProject.meshData,
-                mesh: `${process.env.MESHER_RIS_MODE === "backend" ? `${res.id}_mesh.json.gz` : `${res.id}_mesh.json.json`}`,
-                externalGrids: clonedProject.meshData.type === 'Standard' ? `${res.id}_grids.json.gz` : "",
-                surface: clonedProject.meshData.type === 'Standard' ? "" : `${res.id}_surface.json.json`
+                mesh: `${process.env.MESHER_RIS_MODE === "backend" ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`,
+                externalGrids: clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : "",
+                surface: clonedProject.meshData.type === 'Standard' ? "" : `${clonedProject.id}_surface.json.json`
               },
               ports: [],
-              portsS3: `${res.id}_ports.json`,
+              portsS3: `${clonedProject.id}_ports.json`,
               simulation: {
                 ...clonedProject.simulation,
-                associatedProject: res.id,
+                associatedProject: clonedProject.id,
                 name: `${clonedProject.name} - sim`,
-                resultS3: `${res.id}_results.json`
+                resultS3: `${clonedProject.id}_results.json`
               },
-              faunaDocumentId: res.id
             } as Project;
-            execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
-              selectedFolder?.faunaDocumentId !== 'root' &&
-                execQuery(
-                  addIDInFolderProjectsList,
-                  clonedProject.faunaDocumentId,
+            execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
+              selectedFolder?.id !== 'root' &&
+                execQuery2(
+                  addIDInProjectListInDynamoDB,
+                  clonedProject.id,
                   selectedFolder,
                   dispatch
                 );
@@ -257,19 +250,18 @@ export const useStorageData = () => {
             ...clonedProject,
             meshData: {
               ...clonedProject.meshData,
-              mesh: `${process.env.MESHER_RIS_MODE === "backend" ? `${res.id}_mesh.json.gz` : `${res.id}_mesh.json.json`}`,
-              externalGrids: clonedProject.meshData.type === 'Standard' ? `${res.id}_grids.json.gz` : "",
-              surface: clonedProject.meshData.type === 'Standard' ? "" : `${res.id}_surface.json.json`
+              mesh: `${process.env.MESHER_RIS_MODE === "backend" ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`,
+              externalGrids: clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : "",
+              surface: clonedProject.meshData.type === 'Standard' ? "" : `${clonedProject.id}_surface.json.json`
             },
             ports: [],
-            portsS3: `${res.id}_ports.json`,
-            faunaDocumentId: res.id
+            portsS3: `${clonedProject.id}_ports.json`,
           } as Project;
-          execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
-            selectedFolder?.faunaDocumentId !== 'root' &&
-              execQuery(
-                addIDInFolderProjectsList,
-                clonedProject.faunaDocumentId,
+          execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
+            selectedFolder?.id !== 'root' &&
+              execQuery2(
+                addIDInProjectListInDynamoDB,
+                clonedProject.id,
                 selectedFolder,
                 dispatch
               );
@@ -286,6 +278,7 @@ export const useStorageData = () => {
 
   const cloneProject = (project: Project, selectedFolder: Folder, setCloning: (v:boolean) => void) => {
     let clonedProject = {
+      id: crypto.randomUUID(),
       description: project.description,
       model: {} as CanvasState,
       owner: project.owner,
@@ -305,13 +298,13 @@ export const useStorageData = () => {
       meshData: project.meshData,
       name: `${project?.name}_copy`,
     } as Project;
-    execQuery(createSimulationProjectInFauna, clonedProject, dispatch).then(
+    execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(
       (res: any) => {
         if(project.portsS3){
           s3.copyObject({
             Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
             CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.portsS3}`,
-            Key: `${res.id}_ports.json`
+            Key: `${clonedProject.id}_ports.json`
           }).promise().then(() => {
             if(project.meshData.meshGenerated === "Generated"){
               cloneMeshAndGridsS3(res, project, clonedProject, selectedFolder, setCloning)
@@ -319,14 +312,13 @@ export const useStorageData = () => {
               clonedProject = {
                 ...clonedProject,
                 ports: [],
-                portsS3: `${res.id}_ports.json`,
-                faunaDocumentId: res.id,
+                portsS3: `${clonedProject.id}_ports.json`,
               } as Project;
-              execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
-                selectedFolder?.faunaDocumentId !== 'root' &&
-                  execQuery(
-                    addIDInFolderProjectsList,
-                    clonedProject.faunaDocumentId,
+              execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
+                selectedFolder?.id !== 'root' &&
+                  execQuery2(
+                    addIDInProjectListInDynamoDB,
+                    clonedProject.id,
                     selectedFolder,
                     dispatch
                   );
@@ -341,15 +333,11 @@ export const useStorageData = () => {
           if(project.meshData.meshGenerated === "Generated"){
             cloneMeshAndGridsS3(res, project, clonedProject, selectedFolder, setCloning)
           }else{
-            clonedProject = {
-              ...clonedProject,
-              faunaDocumentId: res.id,
-            } as Project;
-            selectedFolder?.faunaDocumentId !== 'root' &&
-            execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
-              execQuery(
-                addIDInFolderProjectsList,
-                clonedProject.faunaDocumentId,
+            selectedFolder?.id !== 'root' &&
+            execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
+              execQuery2(
+                addIDInProjectListInDynamoDB,
+                clonedProject.id,
                 selectedFolder,
                 dispatch
               );
@@ -368,37 +356,36 @@ export const useStorageData = () => {
     s3.copyObject({
       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
       CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-      Key: `${process.env.MESHER_RIS_MODE === "backend" ? `${res.id}_mesh.json.gz` : `${res.id}_mesh.json.json`}`
+      Key: `${process.env.MESHER_RIS_MODE === "backend" ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`
     }).promise().then(mesh => {
       s3.copyObject({
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
         CopySource: project.meshData.type === 'Standard' ? `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.surface}`,
-        Key: `${project.meshData.type === "Standard" ? `${res.id}_grids.json.gz` : `${res.id}_surface.json.json`}`
+        Key: `${project.meshData.type === "Standard" ? `${clonedProject.id}_grids.json.gz` : `${clonedProject.id}_surface.json.json`}`
       }).promise().then(grids => {
         if(project.simulation?.resultS3){
           s3.copyObject({
             Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
             CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.simulation.resultS3}`,
-            Key: `${res.id}_results.json`
+            Key: `${clonedProject.id}_results.json`
           }).promise().then(results => {
             clonedProject = {
               ...clonedProject,
               meshData: {
                 ...project.meshData,
-                mesh: `${res.id}_mesh.json.gz`,
-                externalGrids: `${res.id}_grids.json.gz`
+                mesh: `${clonedProject.id}_mesh.json.gz`,
+                externalGrids: `${clonedProject.id}_grids.json.gz`
               },
               ports: [],
-              portsS3: `${res.id}_ports.json`,
+              portsS3: `${clonedProject.id}_ports.json`,
               simulation: {
                 ...clonedProject.simulation,
-                associatedProject: res.id,
+                associatedProject: clonedProject.id,
                 name: `${clonedProject.name} - sim`,
-                resultS3: `${res.id}_results.json`
+                resultS3: `${clonedProject.id}_results.json`
               },
-              faunaDocumentId: res.id
             } as Project;
-            execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
+            execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
               setShowSearchUser(false)
               toast.success('Sharing Successful!!');
             })
@@ -408,14 +395,13 @@ export const useStorageData = () => {
             ...clonedProject,
             meshData: {
               ...project.meshData,
-              mesh: `${res.id}_mesh.json.gz`,
-              externalGrids: `${res.id}_grids.json.gz`
+              mesh: `${clonedProject.id}_mesh.json.gz`,
+              externalGrids: `${clonedProject.id}_grids.json.gz`
             },
             ports: [],
-            portsS3: `${res.id}_ports.json`,
-            faunaDocumentId: res.id
+            portsS3: `${clonedProject.id}_ports.json`,
           } as Project;
-          execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
+          execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
             setShowSearchUser(false)
             toast.success('Sharing Successful!!');
           })
@@ -426,6 +412,7 @@ export const useStorageData = () => {
 
   const shareProject = (project: Project, userToShare: UsersState, setShowSearchUser: Function) => {
     let clonedProject = {
+      id: crypto.randomUUID(),
       description: project.description,
       model: {} as CanvasState,
       owner: userToShare,
@@ -452,13 +439,13 @@ export const useStorageData = () => {
       },
       name: `${project?.name}`,
     } as Project;
-    execQuery(createSimulationProjectInFauna, clonedProject, dispatch).then(
+    execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(
       (res: any) => {
         if(project.portsS3){
           s3.copyObject({
             Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
             CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.portsS3}`,
-            Key: `${res.id}_ports.json`
+            Key: `${clonedProject.id}_ports.json`
           }).promise().then(() => {
             if(project.meshData.meshGenerated === "Generated"){
               shareMeshAndGridsS3(res, project, clonedProject, setShowSearchUser)
@@ -466,10 +453,9 @@ export const useStorageData = () => {
               clonedProject = {
                 ...clonedProject,
                 ports: [],
-                portsS3: `${res.id}_ports.json`,
-                faunaDocumentId: res.id,
+                portsS3: `${clonedProject.id}_ports.json`,
               } as Project;
-              execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
+              execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
                 setShowSearchUser(false)
                 toast.success('Sharing Successful!!');
               })
@@ -479,11 +465,7 @@ export const useStorageData = () => {
           if(project.meshData.meshGenerated === "Generated"){
             shareMeshAndGridsS3(res, project, clonedProject, setShowSearchUser)
           }else{
-            clonedProject = {
-              ...clonedProject,
-              faunaDocumentId: res.id,
-            } as Project;
-            execQuery(updateProjectInFauna, convertInFaunaProjectThis(clonedProject), dispatch).then(() => {
+            execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
               setShowSearchUser(false)
               toast.success('Sharing Successful!!');
             })

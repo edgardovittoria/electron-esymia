@@ -1,13 +1,13 @@
 import React, { Fragment, useState } from 'react';
-import { createFolderInFauna, addIDInSubFoldersList } from "../../../../../faunadb/projectsFolderAPIs";
 import { useDispatch, useSelector } from "react-redux";
 import { addFolder, SelectedFolderSelector } from "../../../../../store/projectSlice";
 import { Dialog, Transition } from "@headlessui/react";
 import { Folder } from '../../../../../model/esymiaModels';
 import toast from 'react-hot-toast';
-import { useFaunaQuery } from '../../../../../faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../../../../../../cad_library';
 import { ThemeSelector } from '../../../../../store/tabsAndMenuItemsSlice';
+import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
+import { addIDInSubFoldersListInDynamoDB, createOrUpdateFolderInDynamoDB } from '../../../../dynamoDB/projectsFolderApi';
 
 interface CreateNewFolderModalProps {
     setShowNewFolderModal: Function,
@@ -25,7 +25,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
     const selectedFolder = useSelector(SelectedFolderSelector) as Folder
     const theme = useSelector(ThemeSelector)
 
-    const { execQuery } = useFaunaQuery()
+    const { execQuery2 } = useDynamoDBQuery()
 
     const [folderName, setFolderName] = useState("");
 
@@ -40,12 +40,12 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
                 sharedWith: [],
                 projectList: [],
                 subFolders: [],
-                parent: selectedFolder.faunaDocumentId as string,
+                parent: selectedFolder.id as string,
+                id: crypto.randomUUID(),
             }
-            execQuery(createFolderInFauna, newFolder, dispatch).then((ret: any) => {
-                newFolder = { ...newFolder, faunaDocumentId: ret.id }
+            execQuery2(createOrUpdateFolderInDynamoDB, newFolder, dispatch).then((res: any) => {
                 dispatch(addFolder(newFolder));
-                (selectedFolder.faunaDocumentId !== 'root') && execQuery(addIDInSubFoldersList, newFolder.faunaDocumentId, selectedFolder, dispatch)
+                (selectedFolder.id !== 'root') && execQuery2(addIDInSubFoldersListInDynamoDB, newFolder.id, selectedFolder, dispatch)
             })
             setShowNewFolderModal(false)
         } else {

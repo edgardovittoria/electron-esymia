@@ -1,4 +1,4 @@
-import React, { useState, CSSProperties, FC } from 'react';
+import { useState, CSSProperties, FC } from 'react';
 
 import {
   useCSVReader,
@@ -8,14 +8,11 @@ import {
 import { Vector3 } from 'three';
 import {
   addPorts,
-  boundingBoxDimensionSelector,
   selectedProjectSelector,
   setFrequencies,
-  setPortsS3,
   setScatteringValue,
 } from '../../../../store/projectSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { classNames } from '../../../../../cadmia/canvas/components/navBar/NavBar';
 import {
   generateTerminationName,
   getDefaultLumped,
@@ -23,12 +20,10 @@ import {
 } from './portManagement/selectPorts/portLumpedProbeGenerator';
 import { BsFiletypeCsv } from 'react-icons/bs';
 import { Port, Probe } from '../../../../model/esymiaModels';
-import { deleteFileS3, uploadFileS3 } from '../../../../aws/mesherAPIs';
-import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
-import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { savePortsOnS3 } from './savePortsOnS3';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
 
 const GREY = '#CCC';
 const GREY_LIGHT = 'rgba(255, 255, 255, 0.4)';
@@ -114,7 +109,7 @@ export const LumpedImportFromCSV: FC = () => {
   );
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
-  const { execQuery } = useFaunaQuery()
+  const { execQuery2 } = useDynamoDBQuery()
 
   type CSVDataRow = {
     name?: string;
@@ -184,7 +179,7 @@ export const LumpedImportFromCSV: FC = () => {
               ports.push(port)
             }
           });
-          savePortsOnS3(ports, selectedProject, dispatch, execQuery)
+          savePortsOnS3(ports, selectedProject, dispatch, execQuery2)
         }
         setZoneHover(false);
       }}
@@ -266,7 +261,7 @@ export const PortImportFromCSV:FC = () => {
   );
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
-  const { execQuery } = useFaunaQuery()
+  const { execQuery2 } = useDynamoDBQuery()
 
   type CSVDataRow = {
     name?: string;
@@ -330,7 +325,7 @@ export const PortImportFromCSV:FC = () => {
               ports.push(port)
             }
           });
-          savePortsOnS3(ports, selectedProject, dispatch, execQuery)
+          savePortsOnS3(ports, selectedProject, dispatch, execQuery2)
         }
         setZoneHover(false);
       }}
@@ -411,7 +406,7 @@ export const FrequenciesImportFromCSV:FC = () => {
   );
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
-  const { execQuery } = useFaunaQuery()
+  const { execQuery2 } = useDynamoDBQuery()
 
   type CSVDataRow = {
     Frequencies: string
@@ -442,12 +437,12 @@ export const FrequenciesImportFromCSV:FC = () => {
           });
           if(frequencies.length > 0){
             dispatch(setFrequencies(frequencies))
-            execQuery(
-              updateProjectInFauna,
-              convertInFaunaProjectThis({
+            execQuery2(
+              createOrUpdateProjectInDynamoDB,
+              {
                 ...selectedProject,
                 frequencies: frequencies
-              }),
+              },
               dispatch,
             ).then(() => {});
           }

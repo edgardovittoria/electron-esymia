@@ -20,12 +20,11 @@ import { isTerminationNameValid } from './portManagement/selectPorts/portLumpedP
 import { DebounceInput } from 'react-debounce-input';
 import toast from 'react-hot-toast';
 import { MdDeleteSweep } from 'react-icons/md';
-import { deleteFileS3, uploadFileS3 } from '../../../../aws/mesherAPIs';
-import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
-import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
+import { deleteFileS3 } from '../../../../aws/mesherAPIs';
 import { savePortsOnS3 } from './savePortsOnS3';
 import { isConfirmedInfoModalSelector, setIsAlertInfoModal, setMessageInfoModal, setShowInfoModal, ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
 
 interface PhysicsLeftPanelTabProps {}
 
@@ -33,7 +32,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   const dispatch = useDispatch();
   const selectedProject = useSelector(selectedProjectSelector);
   const [portRename, setPortRename] = useState('');
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const isConfirmedInfoModal = useSelector(isConfirmedInfoModalSelector)
   const [deleteAllType, setDeleteAllType] = useState("port")
 
@@ -49,16 +48,16 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
         (p) => p.category !== 'port',
       );
       if (ports.length > 0) {
-        savePortsOnS3(ports, selectedProject, dispatch, execQuery);
+        savePortsOnS3(ports, selectedProject, dispatch, execQuery2);
       } else {
         deleteFileS3(selectedProject.portsS3 as string);
         dispatch(setPortsS3(undefined));
-        execQuery(
-          updateProjectInFauna,
-          convertInFaunaProjectThis({
+        execQuery2(
+          createOrUpdateProjectInDynamoDB,
+          {
             ...selectedProject,
             portsS3: null,
-          }),
+          },
           dispatch,
         ).then(() => {});
       }
@@ -68,16 +67,16 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
         (p) => p.category !== 'lumped',
       );
       if (ports.length > 0) {
-        savePortsOnS3(ports, selectedProject, dispatch, execQuery);
+        savePortsOnS3(ports, selectedProject, dispatch, execQuery2);
       } else {
         deleteFileS3(selectedProject.portsS3 as string);
         dispatch(setPortsS3(undefined));
-        execQuery(
-          updateProjectInFauna,
-          convertInFaunaProjectThis({
+        execQuery2(
+          createOrUpdateProjectInDynamoDB,
+          {
             ...selectedProject,
             portsS3: null,
-          }),
+          },
           dispatch,
         ).then(() => {});
       }
@@ -238,7 +237,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                                           ports,
                                           selectedProject,
                                           dispatch,
-                                          execQuery,
+                                          execQuery2,
                                         );
                                       } else {
                                         toast.error(
@@ -265,19 +264,19 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                                     ports,
                                     selectedProject,
                                     dispatch,
-                                    execQuery,
+                                    execQuery2,
                                   );
                                 } else {
                                   deleteFileS3(
                                     selectedProject.portsS3 as string,
                                   );
                                   dispatch(setPortsS3(undefined));
-                                  execQuery(
-                                    updateProjectInFauna,
-                                    convertInFaunaProjectThis({
+                                  execQuery2(
+                                    createOrUpdateProjectInDynamoDB,
+                                    {
                                       ...selectedProject,
                                       portsS3: null,
-                                    }),
+                                    },
                                     dispatch,
                                   ).then(() => {});
                                 }

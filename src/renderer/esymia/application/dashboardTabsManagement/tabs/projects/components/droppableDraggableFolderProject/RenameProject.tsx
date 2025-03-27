@@ -2,11 +2,10 @@ import React, {Fragment, useState} from 'react';
 import {Dialog, Transition} from "@headlessui/react";
 import {useDispatch} from "react-redux";
 import { renameProject } from '../../../../../../store/projectSlice';
-import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
 import { Project } from '../../../../../../model/esymiaModels';
-import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { updateProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 
 interface RenameProjectProps {
@@ -24,7 +23,7 @@ export const RenameProject: React.FC<RenameProjectProps> = (
 
     const [name, setName] = useState("");
 
-    const {execQuery} = useFaunaQuery()
+    const {execQuery2} = useDynamoDBQuery()
 
 
     return(
@@ -78,21 +77,21 @@ export const RenameProject: React.FC<RenameProjectProps> = (
                                             className="button buttonPrimary py-1 px-2 text-sm"
                                             onClick={() => {
                                                 dispatch(renameProject({
-                                                    projectToRename: projectToRename.faunaDocumentId as string,
+                                                    projectToRename: projectToRename.id as string,
                                                     name: name,
                                                 }))
                                                 dispatch(updateProjectTab({
                                                   ...projectToRename,
                                                   name: name
                                                 }))
-                                                execQuery(updateProjectInFauna, convertInFaunaProjectThis({
+                                                execQuery2(createOrUpdateProjectInDynamoDB, {
                                                     ...projectToRename,
                                                     name: name,
                                                     simulation: {
                                                       ...projectToRename.simulation,
                                                       name: `${name} - sim`
                                                     }
-                                                } as Project), dispatch)
+                                                } as Project, dispatch)
                                                 handleClose()
                                             }}
                                         >

@@ -43,6 +43,8 @@ import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { FactoryShapesEsymia } from '../../../../../cad_library/components/baseShapes/factoryShapes';
 import { boundingBoxDimensionSelector } from '../../../../store/projectSlice';
 import { GizmoArrowViewport } from './planeWave/components/GizmoArrowViewport';
+import { FieldVectors } from './planeWave/components/FieldVectors';
+import { computeFieldsComponents } from './planeWave/utility/computeFieldsComponents';
 
 interface CanvasPhysicsProps {
   setCameraPosition: Function;
@@ -67,8 +69,8 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
   const getTarget = () => {
     return mesh.current
       ? mesh.current[0].getWorldPosition(new THREE.Vector3())
-      : new THREE.Vector3()
-  }
+      : new THREE.Vector3();
+  };
   const [pointerEvent, setPointerEvent] = useState<
     ThreeEvent<MouseEvent> | undefined
   >(undefined);
@@ -135,18 +137,26 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                           <Circle
                             radius={boundingBoxDimension}
                             center={calculateCenter(mesh.current)}
-                            plane={selectedProject.radialFieldParameters.plane}
+                            plane={'xy'}
                             boundingBox={boundingBoxDimension}
-                            color={getColourBasedOnPlane(selectedProject.radialFieldParameters.plane)[0]}
+                            //color={getColourBasedOnPlane('xy')[0]}
+                            color={"black"}
                           />
                           <Circle
                             radius={boundingBoxDimension}
                             center={calculateCenter(mesh.current)}
-                            plane={getOrthogonalPlane(
-                              selectedProject.radialFieldParameters.plane,
-                            )}
+                            plane={getOrthogonalPlane('xy')}
                             boundingBox={boundingBoxDimension}
-                            color={getColourBasedOnPlane(selectedProject.radialFieldParameters.plane)[1]}
+                            //color={getColourBasedOnPlane('xy')[1]}
+                            color={"black"}
+                          />
+                          <Circle
+                            radius={boundingBoxDimension}
+                            center={calculateCenter(mesh.current)}
+                            plane={getOrthogonalPlane('xz')}
+                            boundingBox={boundingBoxDimension}
+                            //color={getColourBasedOnPlane('xz')[0]}
+                            color='black'
                           />
                         </>
                       )}
@@ -197,23 +207,43 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                   />
                   {/*<Screenshot selectedProject={selectedProject}/>*/}
                   <OrbitControls makeDefault />
-                  <GizmoHelper alignment="bottom-left" margin={[150, 80]} renderPriority={1} onTarget={getTarget}>
+                  <GizmoHelper
+                    alignment="bottom-left"
+                    margin={[150, 80]}
+                    renderPriority={1}
+                    onTarget={getTarget}
+                  >
                     <GizmoViewport
                       axisColors={['red', '#40ff00', 'blue']}
                       labelColor="white"
                     />
                   </GizmoHelper>
-                  <GizmoHelper alignment="top-right" margin={[180, 150]} renderPriority={2} onTarget={getTarget}>
-                    {/* <GizmoViewport
-                      axisColors={['red', '#40ff00', 'blue']}
-                      labelColor="white"
-                    /> */}
-                    <GizmoArrowViewport axisColors={['red', '#40ff00', 'blue']}
-                      directionX={new THREE.Vector3(1,0,0)}
-                      directionY={new THREE.Vector3(0,1,0)}
-                      directionZ={new THREE.Vector3(0,0,1)}
+                  {selectedProject.planeWaveParameters && (
+                    <GizmoHelper
+                      alignment="bottom-right"
+                      margin={[250, 300]}
+                      renderPriority={2}
+                      onTarget={getTarget}
+                    >
+                      <GizmoArrowViewport
+                        axisColors={['black', 'black', 'black']}
+                        directionX={new THREE.Vector3(1, 0, 0)}
+                        directionY={new THREE.Vector3(0, 1, 0)}
+                        directionZ={new THREE.Vector3(0, 0, 1)}
+                        theta={selectedProject.planeWaveParameters.input.theta}
+                        phi={selectedProject.planeWaveParameters.input.phi}
+                        E={selectedProject.planeWaveParameters.output.E}
+                        K={selectedProject.planeWaveParameters.output.K}
+                        H={selectedProject.planeWaveParameters.output.H}
+                        E_theta_v={
+                          selectedProject.planeWaveParameters.output.E_theta_v
+                        }
+                        E_phi_v={
+                          selectedProject.planeWaveParameters.output.E_phi_v
+                        }
                       />
-                  </GizmoHelper>
+                    </GizmoHelper>
+                  )}
                 </Provider>
               </Canvas>
             </div>
@@ -466,7 +496,7 @@ function calculateCenter(objects: THREE.Mesh[]) {
   };
 }
 
-function getColourBasedOnPlane(plane: string){
+function getColourBasedOnPlane(plane: string) {
   switch (plane) {
     case 'xy':
       return ['red', 'blue'];

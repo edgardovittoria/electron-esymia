@@ -257,11 +257,11 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
                             if (
                               projectsTabs.filter(
                                 (p) =>
-                                  p.faunaDocumentId === proj?.faunaDocumentId,
+                                  p.id === proj?.id,
                               ).length > 0
                             ) {
                               dispatch(
-                                selectTab(proj.faunaDocumentId as string),
+                                selectTab(proj.id as string),
                               );
                             } else {
                               dispatch(addProjectTab(proj));

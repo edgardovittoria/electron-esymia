@@ -98,7 +98,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
                           const newPath = path.filter((p, i) => i <= index);
                           setPath(newPath);
                           if (newPath.length > 1) {
-                            dispatch(selectFolder(p.faunaDocumentId as string));
+                            dispatch(selectFolder(p.id as string));
                           } else {
                             dispatch(selectFolder('root'));
                           }
@@ -160,7 +160,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
                 {folders.map((folder) => {
                   return (
                     <DroppableAndDraggableFolder
-                      key={folder.faunaDocumentId}
+                      key={folder.id}
                       folder={folder}
                       path={path}
                       setPath={setPath}
@@ -196,7 +196,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
                   return (
                     <DraggableProjectCard
                       project={project}
-                      key={project.faunaDocumentId}
+                      key={project.id}
                     />
                   );
                 })}

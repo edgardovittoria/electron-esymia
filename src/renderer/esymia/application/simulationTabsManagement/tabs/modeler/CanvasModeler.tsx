@@ -1,23 +1,16 @@
-import React, {ReactNode, useEffect, useState} from "react";
-import { Canvas, useThree } from '@react-three/fiber';
+import React, {useEffect} from "react";
+import { Canvas } from '@react-three/fiber';
 import * as THREE from "three";
 import {OrbitControls, GizmoHelper, GizmoViewport, Edges} from "@react-three/drei";
 import {GiCubeforce} from "react-icons/gi";
 import uniqid from "uniqid"
-import { Vector3 } from 'three';
 import { Provider, ReactReduxContext, useDispatch, useSelector } from 'react-redux';
 import { importModel, selectedProjectSelector, setModelS3, setModelUnit } from '../../../../store/projectSlice';
 import { setModelInfoFromS3 } from '../../../dashboardTabsManagement/tabs/shared/utilFunctions';
 import { FocusView } from '../../sharedElements/FocusView';
 import { uploadFileS3 } from '../../../../aws/mesherAPIs';
-import { s3 } from '../../../../aws/s3Config';
-import { FactoryShapes, ImportActionParamsObject, ImportCadProjectButton, ImportModelFromDBModal, CanvasState, ComponentTypes, GeometryAttributes, Material, TransformationParams, ComponentEntity } from "../../../../../cad_library";
-import { useFaunaQuery } from "../../../../faunadb/hook/useFaunaQuery";
-import { updateProjectInFauna } from "../../../../faunadb/projectsFolderAPIs";
-import { convertInFaunaProjectThis } from "../../../../faunadb/apiAuxiliaryFunctions";
-import { Project } from "../../../../model/esymiaModels";
+import { ImportActionParamsObject, ImportCadProjectButton, ComponentEntity } from "../../../../../cad_library";
 import { setPortsFromS3 } from '../physics/Physics';
-import { setResultsFromS3 } from "../results/Results";
 import { ThemeSelector } from "../../../../store/tabsAndMenuItemsSlice";
 import { FactoryShapesEsymia } from "../../../../../cad_library/components/baseShapes/factoryShapes";
 
@@ -30,7 +23,6 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFro
   const selectedProject = useSelector(selectedProjectSelector);
   const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch()
-  const { execQuery } = useFaunaQuery()
 
 
 
@@ -108,7 +100,7 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFro
                 unit: importActionParamsObject.unit
               })
               let blobFile = new Blob([model])
-              let modelFile = new File([blobFile], `${selectedProject?.faunaDocumentId}_model_esymia.json`, {type: 'application/json'})
+              let modelFile = new File([blobFile], `${selectedProject?.id}_model_esymia.json`, {type: 'application/json'})
               uploadFileS3(modelFile).then(res => {
                 if (res) {
                   dispatch(setModelS3(res.key))
@@ -116,7 +108,7 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFro
               })
             }}
             actionParams={
-              {id: selectedProject?.faunaDocumentId, unit: "mm"} as ImportActionParamsObject
+              {id: selectedProject?.id, unit: "mm"} as ImportActionParamsObject
             }>
             {/* <GiCubeforce
                             style={{width: "25px", height: "25px", marginRight: "5px"}}
@@ -134,39 +126,6 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({setShowModalLoadFro
           </button>
         </div>
       )}
-      {/* {showModalLoadFromDB && (
-        <ImportModelFromDBModal
-          s3Config={s3}
-          bucket={process.env.REACT_APP_AWS_BUCKET_NAME as string}
-          showModalLoad={setShowModalLoadFromDB}
-          importAction={(importActionParamsObject) => {
-            dispatch(importModel(importActionParamsObject))
-            dispatch(setModelUnit(importActionParamsObject.unit))
-            dispatch(setModelS3(importActionParamsObject.modelS3 as string))
-            execQuery(
-                    updateProjectInFauna,
-                    convertInFaunaProjectThis({
-                      ...selectedProject,
-                      modelS3: importActionParamsObject.modelS3,
-                      modelUnit: importActionParamsObject.unit,
-                    } as Project),
-                    dispatch,
-                  ).then(() => {});
-          }}
-          importActionParams={
-            {
-              canvas: {
-                components: [],
-                lastActionType: "",
-                numberOfGeneratedKey: 0,
-                selectedComponentKey: 0,
-              } as CanvasState,
-              unit: "mm",
-              id: selectedProject?.faunaDocumentId,
-            } as ImportActionParamsObject
-          }
-        />
-      )} */}
     </div>
   );
 }

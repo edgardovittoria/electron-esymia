@@ -82,7 +82,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 
 	useEffect(() => {
 		return () => {
-			dispatch(selectFolder(myFilesFolder.faunaDocumentId as string))
+			dispatch(selectFolder(myFilesFolder.id as string))
 		}
 	}, []);
 
@@ -100,14 +100,14 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
             <button
               className="md:w-1/5 text-end text-sm text-primaryColor hover:text-secondaryColor disabled:hover:no-underline hover:cursor-pointer hover:underline disabled:opacity-60"
               onClick={() => dispatch(setShowCreateNewProjectModal(true))}
-              disabled={selectedFolder?.faunaDocumentId === "shared_root"}
+              disabled={selectedFolder?.id === "shared_root"}
             >
               + New Project
             </button>
             <button
               className="md:w-1/5 text-sm text-center text-primaryColor hover:text-secondaryColor disabled:hover:no-underline hover:cursor-pointer hover:underline disabled:opacity-60"
               onClick={() => setShowCreateNewFolderModal(true)}
-              disabled={selectedFolder?.faunaDocumentId === "shared_root"}
+              disabled={selectedFolder?.id === "shared_root"}
             >
               + New Folder
             </button>
@@ -125,7 +125,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
                       onClick={() => {
                         const newPath = path.filter((p, i) => i <= index);
                         setPath(newPath);
-                        dispatch(selectFolder(p.faunaDocumentId as string));
+                        dispatch(selectFolder(p.id as string));
                       }}
                     >
                       {p.name}
@@ -155,7 +155,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
                   {selectedFolder.subFolders.map((folder) => {
                     return (
                       <DroppableAndDraggableFolder
-                        key={folder.faunaDocumentId}
+                        key={folder.id}
                         folder={folder}
                         path={path}
                         setPath={setPath}
@@ -174,7 +174,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
                       return (
                         <DraggableProjectCard
                           project={project}
-                          key={project.faunaDocumentId}
+                          key={project.id}
                         />
                       );
                     })}

@@ -21,6 +21,11 @@ import {
 import { ImSpinner } from 'react-icons/im';
 import { brokerConnectedSelector, setTheme, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
 import { MesherStatusSelector, SolverStatusSelector } from './esymia/store/pluginsSlice';
+import { dynamoDB } from './esymia/aws/s3Config';
+import log from 'electron-log';
+import { useDynamoDBQuery } from './esymia/application/dynamoDB/hook/useDynamoDBQuery';
+import { getItemDynamoDB, putItemDynamoDB } from './esymia/application/dynamoDB/projectsFolderApi';
+import { convertFromDynamoDBFormat, convertToDynamoDBFormat } from './esymia/application/dynamoDB/utility/formatDynamoDBData';
 
 
 // export const client = new Client({
@@ -53,6 +58,43 @@ export default function App() {
     //   dispatch(setHomePat(res));
     // });
     //window.electron.ipcRenderer.sendMessage('runBroker', []);
+    
+    // let params = {
+    //   TableName: "Test",
+    //   Key: {
+    //     id: {N: "001"}
+    //   }
+    // };
+
+    // var params = {
+    //   TableName: "Test",
+    //   Item: convertToDynamoDBFormat( {
+    //     id: 11,
+    //     nome: "Giovanni",
+    //     bool: false,
+    //     stringArray: ["pippo", "gino"],
+    //     numberArray: [1,2],
+    //     obj: {
+    //       x:1,
+    //       s: "pippo"
+    //     }
+    //   }),
+    // };
+
+    
+
+    //dynamoDB.getItem(params).promise().then(res => console.log(res));
+    // var params = {
+    //   TableName: "Test",
+    //   Item: {
+    //     id: { N: "001" },
+    //     nome: { S: "Richard Roe" },
+    //   },
+    // };
+
+    // dynamoDB.putItem(params).promise().then(res => console.log(res));
+
+
 
     dispatch(connectStomp());
     return () => {

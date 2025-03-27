@@ -9,7 +9,6 @@ import {
   SelectedFolderSelector,
   selectedProjectSelector,
   setBoundingBoxDimension,
-  setPortsS3,
 } from '../../../../store/projectSlice';
 import { PhysicsLeftPanelTab } from './PhysicsLeftPanelTab';
 import { CreatePorts } from './portManagement/selectPorts/CreatePorts';
@@ -28,11 +27,8 @@ import {
 } from '../../../../model/esymiaModels';
 import {
   ExportPhisicsToCSV,
-  ImportExportPhysicsSetup,
 } from './ImportExportPhysicsSetup';
 import StatusBar from '../../sharedElements/StatusBar';
-import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
 import { Vector3 } from 'three';
 import { CanvasPhysics } from './CanvasPhysics';
 import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
@@ -42,7 +38,6 @@ import FrequenciesDef from './frequenciesDef/FrequenciesDef';
 import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
 import { calculateModelBoundingBox } from '../../sharedElements/utilityFunctions';
-import { FaReact } from 'react-icons/fa';
 import { SiAzurefunctions } from 'react-icons/si';
 import { GiAtom, GiRadialBalance } from 'react-icons/gi';
 import { GrClone, GrStatusInfo } from 'react-icons/gr';
@@ -54,15 +49,15 @@ import {
   LumpedImportFromCSV,
   PortImportFromCSV,
 } from './ImportPhysicsFromCSV';
-import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 import { s3 } from '../../../../aws/s3Config';
-import { deleteFileS3, uploadFileS3 } from '../../../../aws/mesherAPIs';
 import { Dispatch } from '@reduxjs/toolkit';
 import { savePortsOnS3 } from './savePortsOnS3';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { TbWavesElectricity } from 'react-icons/tb';
 import { PlaneWaveSettingsModal } from './planeWave/PlaneWaveSettingsModal';
 import { RadialFieldSettingsModal } from './planeWave/RadialFieldSettingsModal';
+import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string | undefined;
@@ -99,7 +94,7 @@ export const Physics: React.FC<PhysicsProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedFolder = useSelector(SelectedFolderSelector);
   const theme = useSelector(ThemeSelector);
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const dispatch = useDispatch();
   const [savedPhysicsParameters, setSavedPhysicsParameters] = useState(true);
   const [selectedTabRightPanel, setSelectedTabRightPanel] = useState<
@@ -123,12 +118,12 @@ export const Physics: React.FC<PhysicsProps> = ({
           selectedProject.ports,
           selectedProject,
           dispatch,
-          execQuery,
+          execQuery2,
         );
       } else {
-        execQuery(
-          updateProjectInFauna,
-          convertInFaunaProjectThis(selectedProject),
+        execQuery2(
+          createOrUpdateProjectInDynamoDB,
+          selectedProject,
           dispatch,
         ).then(() => {});
       }
@@ -573,7 +568,7 @@ const PhysicsRightSidebar: FC<{
               ? 'text-primaryColor bg-white'
               : 'text-textColorDark bg-bgColorDark2'
           }`}
-          data-tip="Radial field"
+          data-tip="Radiation Diagram"
           onClick={() => setradialFieldModalOpen(true)}
         >
           <GiRadialBalance style={{ width: '25px', height: '25px' }} />

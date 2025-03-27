@@ -61,26 +61,26 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
           {projectsTabs.map((projectTab) => {
             return (
               <li
-                key={projectTab.faunaDocumentId}
+                key={projectTab.id}
                 className={`${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} rounded-t`}
               >
                 <div
                   className={
-                    tabSelected === projectTab.faunaDocumentId
+                    tabSelected === projectTab.id
                       ? `px-3 py-3 ${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} flex items-center rounded-t`
                       : `px-3 py-3 ${theme === 'light' ? 'bg-white opacity-60' : 'bg-bgColorDark2 opacity-60'} flex items-center`
                   }
                 >
                   <div
                     className={
-                      tabSelected === projectTab.faunaDocumentId
+                      tabSelected === projectTab.id
                         ? `${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} font-bold text-sm`
                         : 'text-gray-400 hover:cursor-pointer text-sm'
                     }
                     aria-current="page"
                     onClick={() => {
-                      dispatch(selectTab(projectTab.faunaDocumentId as string));
-                      dispatch(selectProject(projectTab.faunaDocumentId));
+                      dispatch(selectTab(projectTab.id as string));
+                      dispatch(selectProject(projectTab.id));
                     }}
                   >
                     {projectTab.name}
@@ -89,7 +89,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                     className="ml-8"
                     onClick={() => {
                       dispatch(
-                        closeProjectTab(projectTab.faunaDocumentId as string),
+                        closeProjectTab(projectTab.id as string),
                       );
                       dispatch(selectProject(undefined));
                     }}
@@ -102,7 +102,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
           })}
           <li className="nav-item m-auto mx-4">
             <FaPlus
-              onClick={() => (selectedFolder?.faunaDocumentId !== "shared_root") && dispatch(setShowCreateNewProjectModal(true))}
+              onClick={() => (selectedFolder?.id !== "shared_root") && dispatch(setShowCreateNewProjectModal(true))}
               className="w-[12px] h-[12px] text-gray-400"
             />
           </li>

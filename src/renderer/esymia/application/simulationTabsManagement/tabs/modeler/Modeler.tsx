@@ -1,5 +1,4 @@
 import { Materials } from './Materials';
-import { MyPanel } from '../../sharedElements/MyPanel';
 import { Models } from '../../sharedElements/Models';
 import { ModelOutliner } from '../../sharedElements/ModelOutliner';
 import StatusBar from '../../sharedElements/StatusBar';
@@ -7,7 +6,7 @@ import { CanvasModeler } from './CanvasModeler';
 import { modelerLeftPanelTitle } from '../../../config/panelTitles';
 import { GiAtomicSlashes, GiCubeforce } from 'react-icons/gi';
 import { useEffect, useState } from 'react';
-import { GrClone, GrUpdate } from 'react-icons/gr';
+import { GrClone } from 'react-icons/gr';
 import { useStorageData } from '../simulator/rightPanelSimulator/hook/useStorageData';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -20,14 +19,13 @@ import {
 } from '../../../../store/projectSlice';
 import { Folder, Project } from '../../../../model/esymiaModels';
 import { ImSpinner } from 'react-icons/im';
-import { convertInFaunaProjectThis } from '../../../../faunadb/apiAuxiliaryFunctions';
-import { updateProjectInFauna } from '../../../../faunadb/projectsFolderAPIs';
-import { useFaunaQuery } from '../../../../faunadb/hook/useFaunaQuery';
 import { FiEdit } from 'react-icons/fi';
 import { s3 } from '../../../../aws/s3Config';
 import { ImportActionParamsObject, ImportModelFromDBModal, CanvasState } from "../../../../../cad_library";
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
+import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
 interface ModelerProps {
   selectedTabLeftPanel: string | undefined;
   setSelectedTabLeftPanel: Function;
@@ -42,7 +40,7 @@ export const Modeler: React.FC<ModelerProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedFolder = useSelector(SelectedFolderSelector);
   const theme = useSelector(ThemeSelector)
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery()
   const dispatch = useDispatch();
   const [resetFocus, setResetFocus] = useState(false);
   const toggleResetFocus = () => setResetFocus(!resetFocus);
@@ -52,16 +50,6 @@ export const Modeler: React.FC<ModelerProps> = ({
   useEffect(() => {
     setSelectedTabLeftPanel(undefined);
   }, []);
-
-  // useEffect(() => {
-  //   if (selectedProject?.model.components) {
-  //     execQuery(
-  //       updateProjectInFauna,
-  //       convertInFaunaProjectThis(selectedProject),
-  //       dispatch,
-  //     ).then(() => {});
-  //   }
-  // }, [selectedProject?.model.components]);
 
   return (
     <div>
@@ -172,14 +160,14 @@ export const Modeler: React.FC<ModelerProps> = ({
             dispatch(setModelUnit(importActionParamsObject.unit))
             dispatch(setModelS3(importActionParamsObject.modelS3 as string))
             dispatch(setBricksS3(importActionParamsObject.bricks as string))
-            execQuery(
-                    updateProjectInFauna,
-                    convertInFaunaProjectThis({
+            execQuery2(
+                    createOrUpdateProjectInDynamoDB,
+                    {
                       ...selectedProject,
                       modelS3: importActionParamsObject.modelS3,
                       bricks: importActionParamsObject.bricks,
                       modelUnit: importActionParamsObject.unit,
-                    } as Project),
+                    } as Project,
                     dispatch,
                   ).then(() => {});
           }}
@@ -192,7 +180,7 @@ export const Modeler: React.FC<ModelerProps> = ({
                 selectedComponentKey: 0,
               } as CanvasState,
               unit: "mm",
-              id: selectedProject?.faunaDocumentId,
+              id: selectedProject?.id,
             } as ImportActionParamsObject
           }
         />

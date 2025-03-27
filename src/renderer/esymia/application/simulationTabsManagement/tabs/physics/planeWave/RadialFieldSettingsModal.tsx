@@ -2,8 +2,14 @@ import { Transition, Dialog } from '@headlessui/react';
 import React, { Fragment, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ThemeSelector } from '../../../../../store/tabsAndMenuItemsSlice';
-import { selectedProjectSelector, setRadialFieldParametres, unsetRadialFieldParametres } from '../../../../../store/projectSlice';
+import {
+  selectedProjectSelector,
+  setRadialFieldParametres,
+  unsetRadialFieldParametres,
+} from '../../../../../store/projectSlice';
 import { RadialFieldParameters } from '../../../../../model/esymiaModels';
+import { createOrUpdateProjectInDynamoDB } from '../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
 
 interface RadialFieldSettingsModalProps {
   setModalOpen: (v: boolean) => void;
@@ -13,13 +19,24 @@ export const RadialFieldSettingsModal: React.FC<
   RadialFieldSettingsModalProps
 > = ({ setModalOpen }) => {
   const theme = useSelector(ThemeSelector);
-  const selectedProject = useSelector(selectedProjectSelector)
-  const dispatch = useDispatch()
-  const [radius, setRadius] = useState(selectedProject ? selectedProject.radialFieldParameters?.radius : 0);
-  const [centerX, setcenterX] = useState(selectedProject ? selectedProject.radialFieldParameters?.center.x : 0)
-  const [centerY, setcenterY] = useState(selectedProject ? selectedProject.radialFieldParameters?.center.y : 0)
-  const [centerZ, setcenterZ] = useState(selectedProject ? selectedProject.radialFieldParameters?.center.z : 0)
-  const [plane, setplane] = useState(selectedProject ? selectedProject.radialFieldParameters?.plane : "xy")
+  const selectedProject = useSelector(selectedProjectSelector);
+  const { execQuery2 } = useDynamoDBQuery()
+  const dispatch = useDispatch();
+  const [radius, setRadius] = useState(
+    selectedProject ? selectedProject.radialFieldParameters?.radius : 0,
+  );
+  const [centerX, setcenterX] = useState(
+    selectedProject ? selectedProject.radialFieldParameters?.center.x : 0,
+  );
+  const [centerY, setcenterY] = useState(
+    selectedProject ? selectedProject.radialFieldParameters?.center.y : 0,
+  );
+  const [centerZ, setcenterZ] = useState(
+    selectedProject ? selectedProject.radialFieldParameters?.center.z : 0,
+  );
+  const [plane, setplane] = useState(
+    selectedProject ? selectedProject.radialFieldParameters?.plane : 'xy',
+  );
   return (
     <>
       <Transition appear show={true} as={Fragment}>
@@ -65,7 +82,7 @@ export const RadialFieldSettingsModal: React.FC<
                     as="h3"
                     className="text-lg font-medium leading-6 "
                   >
-                    RADIAL FIELD SETTINGS
+                    RADIATION DIAGRAM SETTINGS
                   </Dialog.Title>
                   <hr className="mt-2 mb-3" />
                   <div className="flex flex-col">
@@ -136,16 +153,18 @@ export const RadialFieldSettingsModal: React.FC<
                         </div>
                       </div>
                     </div>
-                    <div className="p-2">
+                    {/* <div className="p-2">
                       <h6>Select plane</h6>
-                      <select defaultValue={plane} className="select border-black mt-2"
+                      <select
+                        defaultValue={plane}
+                        className="select border-black mt-2"
                         onChange={(e) => setplane(e.currentTarget.value)}
                       >
                         <option>xy</option>
                         <option>xz</option>
                         <option>yz</option>
                       </select>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="mt-4 flex justify-between">
@@ -162,8 +181,19 @@ export const RadialFieldSettingsModal: React.FC<
                       type="button"
                       className="button bg-red-500 text-white"
                       onClick={() => {
-                        dispatch(unsetRadialFieldParametres())
-                        setModalOpen(false);
+                        dispatch(unsetRadialFieldParametres());
+                        if (selectedProject) {
+                          execQuery2(
+                            createOrUpdateProjectInDynamoDB,
+                            {
+                              ...selectedProject,
+                              radialFieldParameters: undefined,
+                            },
+                            dispatch,
+                          ).then(() => {
+                            setModalOpen(false);
+                          });
+                        }
                       }}
                     >
                       UNSET
@@ -176,13 +206,30 @@ export const RadialFieldSettingsModal: React.FC<
                           : 'bg-secondaryColorDark text-textColor'
                       }`}
                       onClick={() => {
-                        let radialFieldParameters:RadialFieldParameters = {
-                            radius: radius? radius : 0,
-                            center: {x: centerX ? centerX : 0, y: centerY ? centerY : 0, z:centerZ ? centerZ : 0},
-                            plane: plane ? plane : "xy"
+                        let radialFieldParameters: RadialFieldParameters = {
+                          radius: radius ? radius : 0,
+                          center: {
+                            x: centerX ? centerX : 0,
+                            y: centerY ? centerY : 0,
+                            z: centerZ ? centerZ : 0,
+                          },
+                          plane: plane ? plane : 'xy',
+                        };
+                        dispatch(
+                          setRadialFieldParametres(radialFieldParameters),
+                        );
+                        if (selectedProject) {
+                          execQuery2(
+                            createOrUpdateProjectInDynamoDB,
+                            {
+                              ...selectedProject,
+                              radialFieldParameters: radialFieldParameters,
+                            },
+                            dispatch,
+                          ).then(() => {
+                            setModalOpen(false);
+                          });
                         }
-                        dispatch(setRadialFieldParametres(radialFieldParameters))
-                        setModalOpen(false);
                       }}
                     >
                       SET

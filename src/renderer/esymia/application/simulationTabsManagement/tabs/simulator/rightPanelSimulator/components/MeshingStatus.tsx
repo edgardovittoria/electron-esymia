@@ -35,18 +35,16 @@ import { Project } from '../../../../../../model/esymiaModels';
 import { generateSTLListFromComponents } from './rightPanelFunctions';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
-import { updateProjectInFauna } from '../../../../../../faunadb/projectsFolderAPIs';
-import { convertInFaunaProjectThis } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
 import { Disclosure } from '@headlessui/react';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { PiClockCountdownBold } from 'react-icons/pi';
 import { TbTrashXFilled } from 'react-icons/tb';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { ComponentEntity, Material } from '../../../../../../../cad_library';
 import { s3 } from '../../../../../../aws/s3Config';
 import { uploadFileS3 } from '../../../../../../aws/mesherAPIs';
-import { ipcRenderer } from 'electron';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;
@@ -102,8 +100,8 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
         if (
           queuedMesh.filter(
             (qm) =>
-              qm.selectedProject.faunaDocumentId ===
-              am.selectedProject.faunaDocumentId,
+              qm.selectedProject.id ===
+              am.selectedProject.id,
           ).length === 0
         ) {
           setqueuedMesh((prev) => [...prev, am]);
@@ -116,7 +114,7 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
         setMeshGenerated({
           status: 'Generating',
           projectToUpdate: item
-            ? (item.selectedProject.faunaDocumentId as string)
+            ? (item.selectedProject.id as string)
             : '',
         }),
       );
@@ -124,8 +122,8 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
         setqueuedMesh(
           queuedMesh.filter(
             (qm) =>
-              qm.selectedProject.faunaDocumentId !==
-              item.selectedProject.faunaDocumentId,
+              qm.selectedProject.id !==
+              item.selectedProject.id,
           ),
         );
         setrunningMesh({
@@ -217,7 +215,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           allMaterials &&
           generateSTLListFromComponents(allMaterials, components),
         quantum: quantumDimsInput,
-        fileName: selectedProject.faunaDocumentId as string,
+        fileName: selectedProject.id as string,
       };
       dispatch(
         publishMessage({
@@ -237,7 +235,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
               message: 'compute mesh ris',
               body: {
                 fileNameRisGeometry: selectedProject.bricks as string,
-                fileName: selectedProject.faunaDocumentId as string,
+                fileName: selectedProject.id as string,
                 density: selectedProject.meshData.lambdaFactor,
                 freqMax:
                   selectedProject.frequencies &&
@@ -267,7 +265,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                 ]
               : 10e9,
             res.bricks,
-            selectedProject.faunaDocumentId as string,
+            selectedProject.id as string,
           ]);
         });
         window.electron.ipcRenderer.on('computeMeshRis', (arg: any) => {
@@ -275,14 +273,14 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             dispatch(
               setMeshingProgress({
                 meshingStep: 1,
-                id: selectedProject.faunaDocumentId as string,
+                id: selectedProject.id as string,
               }),
             );
           } else if (arg === 'meshingStep2') {
             dispatch(
               setMeshingProgress({
                 meshingStep: 2,
-                id: selectedProject.faunaDocumentId as string,
+                id: selectedProject.id as string,
               }),
             );
           } else {
@@ -291,13 +289,13 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             const blobFileMesh = new Blob([meshToUploadToS3]);
             const meshFile = new File(
               [blobFileMesh],
-              `${selectedProject.faunaDocumentId}_mesh.json`,
+              `${selectedProject.id}_mesh.json`,
             );
             const surfacesToUploadToS3 = JSON.stringify(superfici);
             const blobFileSurfaces = new Blob([surfacesToUploadToS3]);
             const surfacesFile = new File(
               [blobFileSurfaces],
-              `${selectedProject.faunaDocumentId}_surface.json`,
+              `${selectedProject.id}_surface.json`,
             );
             uploadFileS3(meshFile).then((resMesh) => {
               console.log('mesh uploaded :', resMesh);
@@ -306,7 +304,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                   console.log('surfaces uploaded :', resSurface);
                   dispatch(
                     setMesherResults({
-                      id: selectedProject.faunaDocumentId as string,
+                      id: selectedProject.id as string,
                       gridsPath: '',
                       meshPath: resMesh.key,
                       surfacePath: resSurface ? resSurface.key : '',
@@ -321,7 +319,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                     setMeshASize({
                       ASize: mesh.ASize,
                       projectToUpdate:
-                        selectedProject.faunaDocumentId as string,
+                        selectedProject.id as string,
                     }),
                   );
                 });
@@ -336,23 +334,23 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
     }
   }, []);
 
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
 
   useEffect(() => {
-    if (mesherResults && mesherResults.id === selectedProject.faunaDocumentId) {
+    if (mesherResults && mesherResults.id === selectedProject.id) {
       if (mesherResults.isStopped) {
         dispatch(
           setMeshGenerated({
             status: selectedProject.meshData.previousMeshStatus as
               | 'Not Generated'
               | 'Generated',
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: selectedProject.id as string,
           }),
         );
         dispatch(
           setMeshValidTopology({
             status: mesherResults.validTopology,
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: selectedProject.id as string,
           }),
         );
       } else if (mesherResults.isValid.valid === false) {
@@ -370,13 +368,13 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             status: selectedProject.meshData.previousMeshStatus as
               | 'Not Generated'
               | 'Generated',
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: selectedProject.id as string,
           }),
         );
         dispatch(
           setMeshValidTopology({
             status: mesherResults.validTopology,
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: selectedProject.id as string,
           }),
         );
       } else if (
@@ -395,13 +393,13 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             status: selectedProject.meshData.previousMeshStatus as
               | 'Not Generated'
               | 'Generated',
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: selectedProject.id as string,
           }),
         );
         dispatch(
           setMeshValidTopology({
             status: mesherResults.validTopology,
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: selectedProject.id as string,
           }),
         );
       } else {
@@ -409,38 +407,38 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           dispatch(
             setMeshValidTopology({
               status: mesherResults.validTopology,
-              projectToUpdate: selectedProject.faunaDocumentId as string,
+              projectToUpdate: selectedProject.id as string,
             }),
           );
           dispatch(
             setExternalGrids({
               extGrids: mesherResults.gridsPath,
-              projectToUpdate: selectedProject.faunaDocumentId as string,
+              projectToUpdate: selectedProject.id as string,
             }),
           );
         } else {
           dispatch(
             setSurface({
               surface: mesherResults.surfacePath,
-              projectToUpdate: selectedProject.faunaDocumentId as string,
+              projectToUpdate: selectedProject.id as string,
             }),
           );
         }
         dispatch(
           setMeshGenerated({
             status: 'Generated',
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: selectedProject.id as string,
           }),
         );
         dispatch(
           setMesh({
             mesh: mesherResults.meshPath,
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: selectedProject.id as string,
           }),
         );
-        execQuery(
-          updateProjectInFauna,
-          convertInFaunaProjectThis({
+        execQuery2(
+          createOrUpdateProjectInDynamoDB,
+          {
             ...selectedProject,
             meshData: {
               ...selectedProject.meshData,
@@ -451,7 +449,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
               validTopology: mesherResults.validTopology,
               ASize: mesherResults.ASize,
             },
-          }),
+          },
           dispatch,
         ).then(() => {});
       }
@@ -475,7 +473,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
               queue: 'management',
               body: {
                 message: 'stop computation',
-                id: selectedProject.faunaDocumentId as string,
+                id: selectedProject.id as string,
               },
             }),
           );
@@ -485,7 +483,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
         dispatch(
           setMeshGenerated({
             status: selectedProject.meshData.previousMeshStatus as "Not Generated" | "Generated",
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: selectedProject.id as string,
           }),
         );
         dispatch(setMeshingProgress(undefined));
@@ -500,7 +498,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
         dispatch(
           setMeshGenerated({
             status: 'Not Generated',
-            projectToUpdate: selectedProject.faunaDocumentId as string,
+            projectToUpdate: selectedProject.id as string,
           }),
         );
       }
@@ -745,15 +743,15 @@ const QueuedMeshingStatusItem: React.FC<QueuedMeshingStatusItemProps> = ({
           setqueuedMeshing((prev) =>
             prev.filter(
               (item) =>
-                item.selectedProject.faunaDocumentId !==
-                project.selectedProject.faunaDocumentId,
+                item.selectedProject.id !==
+                project.selectedProject.id,
             ),
           );
           dispatch(
             setMeshGenerated({
               status: project.meshStatus,
               projectToUpdate: project.selectedProject
-                .faunaDocumentId as string,
+                .id as string,
             }),
           );
         }}

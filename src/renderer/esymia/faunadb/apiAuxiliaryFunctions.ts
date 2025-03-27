@@ -27,7 +27,7 @@ export const constructFolderStructure = (
   const rootProjects = rootFaunaProjects.map((p) => convertInProjectThis(p));
   const root = {
     ...rootFaunaFolder.folder,
-    faunaDocumentId: rootFaunaFolder.id,
+    id: rootFaunaFolder.id,
     subFolders:
       rootFaunaFolder.folder.subFolders.length > 0
         ? rootFaunaFolder.folder.subFolders.map((sf) =>
@@ -77,7 +77,7 @@ export const convertInProjectThis = (faunaProject: FaunaProject) => {
   const project: Project = {
     ...faunaProject.project,
     ports: [],
-    faunaDocumentId: faunaProject.id,
+    id: faunaProject.id,
     storage: faunaProject.project.storage,
     simulation:
       faunaProject.project.simulation === undefined ||
@@ -92,7 +92,7 @@ export const convertInProjectThis = (faunaProject: FaunaProject) => {
 
 export const convertInFaunaProjectThis = (project: Project) => {
   const faunaProject: FaunaProject = {
-    id: project.faunaDocumentId as string,
+    id: project.id as string,
     project: {
       name: project.name,
       description: project.description,
@@ -114,7 +114,9 @@ export const convertInFaunaProjectThis = (project: Project) => {
       parentFolder: project.parentFolder,
       scatteringValue: project.scatteringValue,
       suggestedQuantum: project.suggestedQuantum,
-      modelUnit: project.modelUnit
+      modelUnit: project.modelUnit,
+      planeWaveParameters: project.planeWaveParameters,
+      radialFieldParameters: project.radialFieldParameters
     } as FaunaProjectDetails,
   };
   return faunaProject;
@@ -125,8 +127,8 @@ export const convertInFaunaFolderDetailsThis = (
 ): FaunaFolderDetails => {
   const faunaFolder = {
     ...folder,
-    subFolders: folder.subFolders.map((sf) => sf.faunaDocumentId as string),
-    projectList: folder.projectList.map((p) => p.faunaDocumentId as string),
+    subFolders: folder.subFolders.map((sf) => sf.id as string),
+    projectList: folder.projectList.map((p) => p.id as string),
   } as FaunaFolderDetails;
   return faunaFolder;
 };

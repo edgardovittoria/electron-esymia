@@ -90,18 +90,18 @@ export const DroppableAndDraggableFolder: React.FC<
     if (dragDone) {
       //console.log(dragItem)
       const objectToMove: Project | Folder = dragItem
-      if (objectToMove && objectToMove.faunaDocumentId !== dropTargetFolder.faunaDocumentId) {
+      if (objectToMove && objectToMove.id !== dropTargetFolder.id) {
         if ('model' in objectToMove) {
           dispatch(
             moveProject({
               objectToMove,
-              targetFolder: dropTargetFolder.faunaDocumentId as string,
+              targetFolder: dropTargetFolder.id as string,
             }),
           );
           execQuery(
             moveProjectInFauna,
             {
-              faunaDocumentId: objectToMove?.faunaDocumentId,
+              id: objectToMove?.id,
               description: objectToMove?.description as string,
               frequencies: objectToMove?.frequencies,
               meshData: objectToMove?.meshData as MeshData,
@@ -114,7 +114,7 @@ export const DroppableAndDraggableFolder: React.FC<
               storage: objectToMove?.storage as "local" | "online",
               simulation: undefined,
               sharedWith: objectToMove?.sharedWith as sharingInfoUser[],
-              parentFolder: dropTargetFolder.faunaDocumentId,
+              parentFolder: dropTargetFolder.id,
             } as Project,
             objectToMove.parentFolder,
             dispatch
@@ -123,19 +123,19 @@ export const DroppableAndDraggableFolder: React.FC<
           dispatch(
             moveFolder({
               objectToMove: objectToMove as Folder,
-              targetFolder: dropTargetFolder.faunaDocumentId as string,
+              targetFolder: dropTargetFolder.id as string,
             }),
           );
           execQuery(
             moveFolderInFauna,
             {
-              faunaDocumentId: objectToMove.faunaDocumentId,
+              id: objectToMove.id,
               name: objectToMove.name,
               owner: objectToMove.owner,
               projectList: objectToMove.projectList,
               sharedWith: objectToMove.sharedWith,
               subFolders: objectToMove.subFolders,
-              parent: dropTargetFolder.faunaDocumentId,
+              parent: dropTargetFolder.id,
             } as Folder,
             (objectToMove as Folder).parent,
             dispatch
@@ -172,7 +172,7 @@ export const DroppableAndDraggableFolder: React.FC<
         }}
         onDoubleClick={() => {
           setPath([...path, folder]);
-          dispatch(selectFolder(folder.faunaDocumentId as string));
+          dispatch(selectFolder(folder.id as string));
         }}
       >
         <IoMdFolder className={`mr-2 w-[30px] h-[30px] ${theme === 'light' ? 'text-gray-500' : 'text-textColorDark'}`} />
@@ -198,25 +198,25 @@ export const DroppableAndDraggableFolder: React.FC<
               {allProjectFolders
                 .filter(
                   (n) =>
-                    n.faunaDocumentId !== folder.parent &&
-                    n.faunaDocumentId !== folder.faunaDocumentId,
+                    n.id !== folder.parent &&
+                    n.id !== folder.id,
                 )
                 .map((f) => {
                   return (
-                    <div key={f.faunaDocumentId}>
+                    <div key={f.id}>
                       <Item
-                        data-testid={f.faunaDocumentId}
+                        data-testid={f.id}
                         onClick={(p) => {
                           p.event.stopPropagation();
                           dispatch(
                             moveFolder({
                               objectToMove: folder,
-                              targetFolder: f.faunaDocumentId as string,
+                              targetFolder: f.id as string,
                             }),
                           );
                           execQuery(
                             moveFolderInFauna,
-                            { ...folder, parent: f.faunaDocumentId } as Folder,
+                            { ...folder, parent: f.id } as Folder,
                             folder.parent,
                             dispatch
                           );
@@ -259,7 +259,7 @@ export const DroppableAndDraggableFolder: React.FC<
                 p.event.stopPropagation();
                 execQuery(
                   deleteFolderFromFauna,
-                  folder.faunaDocumentId,
+                  folder.id,
                   folder.parent,
                   dispatch
                 );

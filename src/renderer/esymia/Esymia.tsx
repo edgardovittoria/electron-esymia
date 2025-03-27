@@ -6,22 +6,8 @@ import {
   tabSelectedSelector,
 } from './store/tabsAndMenuItemsSlice';
 import {
-
-  selectFolder,
-  setProjectsFolderToUser} from './store/projectSlice';
-import {
   ActivePluginsSelector,
-  MesherStatusSelector,
-  SolverStatusSelector,
-  addActivePlugin,
-  setMesherStatus,
-  setSolverStatus,
 } from './store/pluginsSlice';
-import {
-  getFoldersByOwner,
-  getSimulationProjectsByOwner} from './faunadb/projectsFolderAPIs';
-import { FaunaFolder, FaunaProject } from './model/FaunaModels';
-import { constructFolderStructure } from './faunadb/apiAuxiliaryFunctions';
 import { TabsContainer } from './application/TabsContainer';
 import { ImSpinner } from 'react-icons/im';
 import InfoModal from './application/sharedModals/InfoModal';
@@ -29,18 +15,14 @@ import { CreateNewProjectModal } from './application/sharedModals/CreateNewProje
 import { MenuBar } from './application/MenuBar';
 import { DashboardTabsContentFactory } from './application/dashboardTabsManagement/DashboardTabsContentFactory';
 import { SimulationTabsContentFactory } from './application/simulationTabsManagement/SimulationTabsContentFactory';
-import { BsPlugin } from 'react-icons/bs';
 import Plugins from './plugin/Plugins';
-import { useFaunaQuery } from './faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../cad_library';
 import { useStorage } from './hook/useStorage';
 export interface EsymiaProps {
   selectedTab: string;
 }
 
-
 const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
-
   const dispatch = useDispatch();
   // SELECTORS
   const user = useSelector(usersStateSelector);
@@ -66,7 +48,6 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
       setFeedbackMeshingVisible(true);
     }
   }, [activeMeshing.length]); */
-
 
   const activePlugins = useSelector(ActivePluginsSelector);
   const [pluginsVisible, setPluginsVisible] = useState<boolean>(true);
@@ -97,59 +78,30 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   //   }
   // }, [user.userName]);
 
-  const { execQuery } = useFaunaQuery();
 
   // USE EFFECT
   useEffect(() => {
     if (user.userName) {
       setLoginSpinner(true);
       loadFolders(setLoginSpinner);
-      // execQuery(getFoldersByOwner, user.email, dispatch).then(
-      //   (folders: FaunaFolder[]) => {
-      //     execQuery(getSimulationProjectsByOwner, user.email, dispatch).then(
-      //       (projects: FaunaProject[]) => {
-      //         const rootFaunaFolder = {
-      //           id: 'root',
-      //           folder: {
-      //             name: 'My Files',
-      //             owner: user,
-      //             sharedWith: [],
-      //             subFolders: folders
-      //               .filter((f) => f.folder.parent === 'root')
-      //               .map((sb) => sb.id),
-      //             projectList: projects
-      //               .filter((p) => p.project.parentFolder === 'root')
-      //               //.filter((p) => p.project.sharedWith?.length === 0)
-      //               .map((pr) => pr.id),
-      //             parent: 'nobody',
-      //           },
-      //         } as FaunaFolder;
-      //         const folder = constructFolderStructure(
-      //           'root',
-      //           [rootFaunaFolder, ...folders],
-      //           projects,
-      //         );
-      //         dispatch(setProjectsFolderToUser(folder));
-      //         dispatch(selectFolder(folder.faunaDocumentId as string));
-      //         setLoginSpinner(false);
-      //       },
-      //     );
-      //   },
-      // );
     }
   }, [user.userName]);
 
   // MEMOIZED COMPONENTS
   const memoizedTabsContainer = useMemo(
     () => (
-      <TabsContainer user={user} setPluginModalVisible={setPluginsVisible} pluginModalVisible={pluginsVisible} />
+      <TabsContainer
+        user={user}
+        setPluginModalVisible={setPluginsVisible}
+        pluginModalVisible={pluginsVisible}
+      />
     ),
     [user, pluginsVisible],
   );
 
   return (
     <>
-      {selectedTab === 'esymia' &&
+      {selectedTab === 'esymia' && (
         <div className="lg:h-[97vh] h-screen overflow-x-hidden">
           {loginSpinner && (
             <ImSpinner className="animate-spin w-12 h-12 absolute left-1/2 top-1/2" />
@@ -161,7 +113,9 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
             <MenuBar />
 
             {tabSelected === 'DASHBOARD' ? (
-              <DashboardTabsContentFactory  setLoadingSpinner={setLoginSpinner}/>
+              <DashboardTabsContentFactory
+                setLoadingSpinner={setLoginSpinner}
+              />
             ) : (
               <SimulationTabsContentFactory />
             )}
@@ -217,7 +171,7 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
             )}
           </div>
         </div>
-      }
+      )}
     </>
   );
 };

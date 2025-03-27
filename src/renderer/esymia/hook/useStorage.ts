@@ -1,23 +1,23 @@
-import { getFoldersByOwner, getSimulationProjectsByOwner } from '../faunadb/projectsFolderAPIs';
 import { FaunaFolder, FaunaProject } from '../model/FaunaModels';
 import { constructFolderStructure } from '../faunadb/apiAuxiliaryFunctions';
-import { homePathSelector, selectFolder, setProjectsFolderToUser } from '../store/projectSlice';
+import { selectFolder, setProjectsFolderToUser } from '../store/projectSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { getDirContents, readLocalFile } from '../../fileSystemAPIs/fileSystemAPIs';
-import { Folder, Project } from '../model/esymiaModels';
-import { useFaunaQuery } from '../faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../../cad_library';
+import { useDynamoDBQuery } from '../application/dynamoDB/hook/useDynamoDBQuery';
+import { getFolderByUserEmail, getSimulationProjectsByUserEmail } from '../application/dynamoDB/projectsFolderApi';
+import { convertFromDynamoDBFormat } from '../application/dynamoDB/utility/formatDynamoDBData';
 
 export const useStorage = () => {
-  const { execQuery } = useFaunaQuery();
   const user = useSelector(usersStateSelector);
   const dispatch = useDispatch();
-  const homePath = useSelector(homePathSelector)
+  const { execQuery2 } = useDynamoDBQuery()
   const loadProjectsOnline = (setLoginSpinner: (v: boolean) => void) => {
-    execQuery(getFoldersByOwner, user.email, dispatch).then(
-      (folders: FaunaFolder[]) => {
-        execQuery(getSimulationProjectsByOwner, user.email, dispatch).then(
-          (projects: FaunaProject[]) => {
+    execQuery2(getFolderByUserEmail, user.email, dispatch).then(
+      (resFolders) => {
+        let folders = resFolders.Items.map((f: any) => ({id: f.id.S, folder: convertFromDynamoDBFormat(f)} as FaunaFolder))
+        execQuery2(getSimulationProjectsByUserEmail, user.email, dispatch).then(
+          (resProjects) => {
+            let projects = resProjects.Items.map((p: any) => ({id: p.id.S, project: convertFromDynamoDBFormat(p)} as FaunaProject))
             const rootFaunaFolder = {
               id: 'root',
               folder: {
@@ -25,11 +25,11 @@ export const useStorage = () => {
                 owner: user,
                 sharedWith: [],
                 subFolders: folders
-                  .filter((f) => f.folder.parent === 'root')
-                  .map((sb) => sb.id),
+                  .filter((f: any) => f.folder.parent === 'root')
+                  .map((sb: { id: any; }) => sb.id),
                 projectList: projects
-                  .filter((p) => p.project.parentFolder === 'root')
-                  .map((pr) => pr.id),
+                  .filter((p: { project: { parentFolder: string; }; }) => p.project.parentFolder === 'root')
+                  .map((pr: { id: any; }) => pr.id),
                 parent: 'nobody'
               }
             } as FaunaFolder;
@@ -39,45 +39,15 @@ export const useStorage = () => {
               projects
             );
             dispatch(setProjectsFolderToUser(folder));
-            dispatch(selectFolder(folder.faunaDocumentId as string));
+            dispatch(selectFolder(folder.id as string));
             setLoginSpinner(false);
           }
         );
       }
     );
   };
-  // const loadProjectsLocal = (setLoginSpinner: (v: boolean) => void) => {
-  //   const folder = constructFolderStructureLocal(
-  //     'projectsDir',
-  //     [],
-  //     user,
-  //     homePath
-  //   );
-  //   console.log(folder);
-  //   dispatch(setProjectsFolderToUser({ ...folder, faunaDocumentId: 'root', parent: 'nobody', name: 'My Files' }));
-  //   dispatch(selectFolder(folder.faunaDocumentId as string));
-  //   setLoginSpinner(false);
-
-  // };
   const loadFolders = (setLoginSpinner: (v: boolean) => void) => {
     loadProjectsOnline(setLoginSpinner);
   };
   return { loadFolders };
 };
-
-// const constructFolderStructureLocal = (name: string, parents: string[], user: UsersState, homePath: string) => {
-//   let projects: Project[] =  getDirContents([homePath, ...parents, name]).filter((p: string) => p.endsWith('.json')).map((s: string) => JSON.parse(readLocalFile([homePath, ...parents, name, s]) as string) as Project);
-//   let folders: Folder[] = getDirContents([...parents, name]).filter((f: string) => !f.endsWith('.json')).map((s: string) => {
-//     return  constructFolderStructureLocal(s, [...parents, name], user, homePath);
-//   });
-
-//   return {
-//     name: name,
-//     faunaDocumentId: name,
-//     owner: user,
-//     parent: parents[parents.length - 1],
-//     projectList: projects,
-//     subFolders: folders,
-//     sharedWith: []
-//   } as Folder;
-// };

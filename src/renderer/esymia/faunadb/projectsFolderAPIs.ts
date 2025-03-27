@@ -144,7 +144,7 @@ export const addIDInSubFoldersList = async (
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
     .query(
-      faunaQuery`Folders.byId(${selectedFolder.faunaDocumentId as string})!.update(${{subFolders: [...folder.subFolders, folderFaunaID]}})`
+      faunaQuery`Folders.byId(${selectedFolder.id as string})!.update(${{subFolders: [...folder.subFolders, folderFaunaID]}})`
     )
     .catch((err) => {
       dispatch(
@@ -168,7 +168,7 @@ export const removeIDInSubFoldersList = async (
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
     .query(
-      faunaQuery`Folders.byId(${selectedFolder.faunaDocumentId as string})!.update(${{subFolders: [
+      faunaQuery`Folders.byId(${selectedFolder.id as string})!.update(${{subFolders: [
         ...folder.subFolders.filter((id) => id !== folderFaunaID),
       ]}})`
     )
@@ -213,7 +213,7 @@ export const removeIDInFolderProjectsList = async (
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
     .query(
-      faunaQuery`Folders.byId(${selectedFolder.faunaDocumentId as string})!.update(${{projectList: [
+      faunaQuery`Folders.byId(${selectedFolder.id as string})!.update(${{projectList: [
         ...folder.projectList.filter((id) => id !== projectFaunaID)
       ]}})`
     )
@@ -261,7 +261,7 @@ export const addIDInFolderProjectsList = async (
   const folder = convertInFaunaFolderDetailsThis(selectedFolder);
   const response = await faunaClient
     .query(
-      faunaQuery`Folders.byId(${selectedFolder.faunaDocumentId as string})!.update(${{projectList: [...folder.projectList, projectFaunaID]}})`
+      faunaQuery`Folders.byId(${selectedFolder.id as string})!.update(${{projectList: [...folder.projectList, projectFaunaID]}})`
     )
     .catch((err) => {
       dispatch(
@@ -305,7 +305,7 @@ export const updateFolderInFauna = async (
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery`Folders.byId(${folderToUpdate.faunaDocumentId as string})!.update(${convertInFaunaFolderDetailsThis(folderToUpdate)})`
+      faunaQuery`Folders.byId(${folderToUpdate.id as string})!.update(${convertInFaunaFolderDetailsThis(folderToUpdate)})`
     )
     .catch((err) => {
       dispatch(
@@ -328,16 +328,16 @@ export const moveFolderInFauna = async (
 ) => {
   faunaClient
     .query(
-      faunaQuery`Folders.byId(${folderToMove.faunaDocumentId as string})!.update(${convertInFaunaFolderDetailsThis(folderToMove)})`
+      faunaQuery`Folders.byId(${folderToMove.id as string})!.update(${convertInFaunaFolderDetailsThis(folderToMove)})`
     )
     .then(() => {
       oldParent !== 'root' &&
         faunaClient.query(
-          faunaQuery`remove_subfolders_from_folder(${folderToMove.faunaDocumentId as string}, ${oldParent})`
+          faunaQuery`remove_subfolders_from_folder(${folderToMove.id as string}, ${oldParent})`
         );
       folderToMove.parent !== 'root' &&
         faunaClient.query(
-          faunaQuery`add_subfolder_to_folder(${folderToMove.faunaDocumentId as string}, ${folderToMove.parent})`
+          faunaQuery`add_subfolder_to_folder(${folderToMove.id as string}, ${folderToMove.parent})`
         );
     })
     .catch((err) => {
@@ -360,18 +360,18 @@ export const moveProjectInFauna = async (
 ) => {
   faunaClient
     .query(
-      faunaQuery`SimulationProjects.byId(${projectToUpdate.faunaDocumentId as string})!.update(${{
+      faunaQuery`SimulationProjects.byId(${projectToUpdate.id as string})!.update(${{
         ...convertInFaunaProjectThis(projectToUpdate).project,
       } as FaunaProjectDetails})`
     )
     .then(() => {
       oldParent !== 'root' &&
         faunaClient.query(
-          faunaQuery`remove_project_from_folder(${projectToUpdate.faunaDocumentId as string}, ${oldParent})`
+          faunaQuery`remove_project_from_folder(${projectToUpdate.id as string}, ${oldParent})`
         );
       projectToUpdate.parentFolder !== 'root' &&
         faunaClient.query(
-          faunaQuery`add_project_to_folder(${projectToUpdate.faunaDocumentId as string}, ${projectToUpdate.parentFolder})`
+          faunaQuery`add_project_to_folder(${projectToUpdate.id as string}, ${projectToUpdate.parentFolder})`
         );
     })
     .catch((err) => {

@@ -5,31 +5,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { SearchUser } from './components/SearchUser';
 import {
-  addProject,
-  shareFolder,
-  shareProject
-} from '../../../../../../../store/projectSlice';
-import {
-  addIDInFolderProjectsList,
-  createSimulationProjectInFauna,
-  recursiveUpdateSharingInfoFolderInFauna,
-  updateProjectInFauna
-} from '../../../../../../../faunadb/projectsFolderAPIs';
-import {
   Folder,
-  MeshData,
-  Port,
-  Probe,
   Project,
-  sharingInfoUser,
-  TempLumped,
 } from '../../../../../../../model/esymiaModels';
-import { convertInFaunaProjectThis } from '../../../../../../../faunadb/apiAuxiliaryFunctions';
 import toast from 'react-hot-toast';
-import { addProjectTab, setShowCreateNewProjectModal } from '../../../../../../../store/tabsAndMenuItemsSlice';
-import { useFaunaQuery } from '../../../../../../../faunadb/hook/useFaunaQuery';
-import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../../cad_library';
+import { UsersState, usersStateSelector } from '../../../../../../../../cad_library';
 import { useStorageData } from '../../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
+import { useDynamoDBQuery } from '../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { recursiveUpdateSharingInfoFolderInDynamoDB } from '../../../../../../dynamoDB/projectsFolderApi';
 
 interface SearchUserAndShareProps {
   setShowSearchUser: (v: boolean) => void;
@@ -44,7 +27,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
 }) => {
   const [users, setUsers] = useState<UsersState[]>([]);
   const [shareDone, setShareDone] = useState<boolean>(false);
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery()
   const [selected, setSelected] = useState({} as UsersState);
   const [query, setQuery] = useState('');
   const [spinner, setSpinner] = useState(true);
@@ -107,7 +90,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
 
   useEffect(() => {
     if (shareDone) {
-      execQuery(recursiveUpdateSharingInfoFolderInFauna, folderToShare, dispatch)
+      execQuery2(recursiveUpdateSharingInfoFolderInDynamoDB, folderToShare, dispatch)
         .then(() => {
           setShowSearchUser(false);
           toast.success('Sharing Successful!');

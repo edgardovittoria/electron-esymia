@@ -5,6 +5,8 @@ import {updateFolderInFauna} from "../../../../../../faunadb/projectsFolderAPIs"
 import { renameFolder } from '../../../../../../store/projectSlice';
 import { Folder } from '../../../../../../model/esymiaModels';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateFolderInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 interface RenameFolderProps {
     folderToRename: Folder,
@@ -21,7 +23,7 @@ export const RenameFolder: React.FC<RenameFolderProps> = (
 
     const [name, setName] = useState("");
 
-    const {execQuery} = useFaunaQuery()
+    const { execQuery2 } = useDynamoDBQuery()
 
     return(
         <Transition appear show={true} as={Fragment}>
@@ -77,7 +79,7 @@ export const RenameFolder: React.FC<RenameFolderProps> = (
                                                     folderToRename: folderToRename,
                                                     name: name
                                                 }))
-                                                execQuery(updateFolderInFauna, {
+                                                execQuery2(createOrUpdateFolderInDynamoDB, {
                                                     ...folderToRename,
                                                     name: name
                                                 } as Folder, dispatch)

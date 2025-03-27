@@ -8,6 +8,7 @@ import { addProjectTab, closeProjectTab, selectMenuItem, selectTab } from './tab
 import { deleteFileS3 } from '../aws/mesherAPIs';
 import {
   Folder,
+  PlaneWaveParameters,
   Port,
   Probe,
   Project,
@@ -75,21 +76,21 @@ export const ProjectSlice = createSlice({
     }>) {
       removeFolderFromStore(state, action.payload.objectToMove);
       let targetF = folderByID(state, action.payload.targetFolder);
-      targetF?.subFolders.push({ ...action.payload.objectToMove, parent: targetF.faunaDocumentId } as Folder);
+      targetF?.subFolders.push({ ...action.payload.objectToMove, parent: targetF.id } as Folder);
     },
     moveProject(state: ProjectState, action: PayloadAction<{
       objectToMove: Project,
       targetFolder: string
     }>) {
-      removeProjectFromStore(state, action.payload.objectToMove.faunaDocumentId as string);
+      removeProjectFromStore(state, action.payload.objectToMove.id as string);
       let targetF = folderByID(state, action.payload.targetFolder);
       targetF?.projectList.push({
         ...action.payload.objectToMove,
-        parentFolder: targetF.faunaDocumentId
+        parentFolder: targetF.id
       } as Project);
     },
     shareProject(state: ProjectState, action: PayloadAction<{ projectToShare: Project, user: sharingInfoUser }>) {
-      let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.projectToShare.faunaDocumentId);
+      let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), action.payload.projectToShare.id);
       (project && project.sharedWith) && project.sharedWith.push(action.payload.user);
     },
     shareFolder(state: ProjectState, action: PayloadAction<{ folderToShare: string, user: sharingInfoUser }>) {
@@ -107,12 +108,12 @@ export const ProjectSlice = createSlice({
         if(project.simulation && project.simulation.name){
           project.simulation.name = `${action.payload.name} - sim`
         }
-        selectedFolder.projectList = selectedFolder.projectList.filter(p => p.faunaDocumentId !== project?.faunaDocumentId);
+        selectedFolder.projectList = selectedFolder.projectList.filter(p => p.id !== project?.id);
         selectedFolder.projectList.push(project);
       }
     },
     renameFolder(state: ProjectState, action: PayloadAction<{ folderToRename: Folder, name: string }>) {
-      let selectedFolder = folderByID(state, action.payload.folderToRename.faunaDocumentId);
+      let selectedFolder = folderByID(state, action.payload.folderToRename.id);
       if (selectedFolder) selectedFolder.name = action.payload.name;
     },
     selectProject(state: ProjectState, action: PayloadAction<string | undefined>) {
@@ -347,6 +348,18 @@ export const ProjectSlice = createSlice({
       if (selectedProject) {
         selectedProject.radialFieldParameters = undefined;
       }
+    },
+    setPlaneWaveParametres(state: ProjectState, action: PayloadAction<PlaneWaveParameters>) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if (selectedProject) {
+        selectedProject.planeWaveParameters = action.payload;
+      }
+    },
+    unsetPlaneWaveParametres(state: ProjectState) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if (selectedProject) {
+        selectedProject.planeWaveParameters = undefined;
+      }
     }
   },
   extraReducers: (builder) => {
@@ -358,11 +371,11 @@ export const ProjectSlice = createSlice({
         selectTabEffects(state, 'DASHBOARD');
       })
       .addCase(addProjectTab, (state, action) => {
-        selectTabEffects(state, action.payload.faunaDocumentId as string);
+        selectTabEffects(state, action.payload.id as string);
       })
       .addCase(selectMenuItem, (state, action) => {
         if (action.payload === 'Projects') {
-          state.selectedFolder = state.projects.faunaDocumentId;
+          state.selectedFolder = state.projects.id;
         }
       });
   }
@@ -422,7 +435,9 @@ export const {
   deleteAllLumped,
   deleteAllPorts,
   setRadialFieldParametres,
-  unsetRadialFieldParametres
+  unsetRadialFieldParametres,
+  setPlaneWaveParametres,
+  unsetPlaneWaveParametres
 } = ProjectSlice.actions;
 
 const selectTabEffects = (state: ProjectState, tab: string) => {
@@ -462,7 +477,7 @@ export const allProjectFoldersSelector = (state: { projects: ProjectState }) => 
   return recursiveFindFolders(state.projects.projects, allFolders);
 };
 export const findProjectByFaunaID = (projects: Project[], faunaDocumentId: string | undefined) => {
-  return (faunaDocumentId !== undefined) ? projects.filter(project => project.faunaDocumentId === faunaDocumentId)[0] : undefined;
+  return (faunaDocumentId !== undefined) ? projects.filter(project => project.id === faunaDocumentId)[0] : undefined;
 };
 export const findSelectedPort = (project: Project | undefined) => (project) ? project.ports.filter(port => port.isSelected)[0] : undefined;
 export const boundingBoxDimensionSelector = (state: { projects: ProjectState }) => {
@@ -471,9 +486,9 @@ export const boundingBoxDimensionSelector = (state: { projects: ProjectState }) 
 };
 export const folderByID = (state: ProjectState, folderID: string | undefined) => {
   if (folderID) {
-    let folders = recursiveFindFolders(state.projects, [] as Folder[]).filter(f => f.faunaDocumentId === folderID);
+    let folders = recursiveFindFolders(state.projects, [] as Folder[]).filter(f => f.id === folderID);
     if (folders.length > 0) return folders[0];
-    folders = recursiveFindFolders(state.sharedElements, [] as Folder[]).filter(f => f.faunaDocumentId === folderID);
+    folders = recursiveFindFolders(state.sharedElements, [] as Folder[]).filter(f => f.id === folderID);
     if (folders.length > 0) return folders[0];
   }
   return undefined;

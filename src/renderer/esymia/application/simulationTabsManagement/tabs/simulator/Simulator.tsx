@@ -169,7 +169,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
       dispatch(
         setPathToExternalGridsNotFound({
           status: false,
-          projectToUpdate: selectedProject?.faunaDocumentId as string,
+          projectToUpdate: selectedProject?.id as string,
         }),
       );
       setSpinner(false);

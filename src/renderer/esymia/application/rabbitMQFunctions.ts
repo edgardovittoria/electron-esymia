@@ -33,7 +33,7 @@ export const callback_mesh_advices = function (
 
   let res = JSON.parse(message.body);
   projects.forEach(p => {
-    if(p.faunaDocumentId === res.id){
+    if(p.id === res.id){
       dispatch(setMeshAdvice({ quantum: JSON.parse(res.quantum), id: res.id }));
       message.ack();
     }
@@ -59,7 +59,7 @@ export const callback_mesher_feedback = (message: any, dispatch: Function, getSt
   if (message.body) {
     let body = JSON.parse(message.body);
     projects.forEach(p => {
-      if(p.faunaDocumentId === body.id){
+      if(p.id === body.id){
         message.ack();
         if (body['length']) {
           dispatch(
@@ -100,7 +100,7 @@ export const callback_mesher_results = (message: any, dispatch: Function, getSta
   let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
   let res = JSON.parse(message.body);
   projects.forEach(p => {
-    if(p.faunaDocumentId === res.id){
+    if(p.id === res.id){
       message.ack();
       if(res.ASize) dispatch(setMeshASize({ASize: res.ASize, projectToUpdate: res.id}))
       dispatch(
@@ -125,7 +125,7 @@ export const callback_mesher_grids = (message: any, dispatch: Function, getState
   let res = JSON.parse(message.body);
   console.log(res)
   projects.forEach(p => {
-    if(p.faunaDocumentId === res.id){
+    if(p.id === res.id){
       message.ack();
       res.grids_exist && dispatch(setAWSExternalGridsData(res.grids));
     }
@@ -137,7 +137,7 @@ export const callback_solver_feedback = (message: any, dispatch: Function, getSt
   if (message.body) {
     let body = JSON.parse(message.body);
     projects.forEach(p => {
-      if(p.faunaDocumentId === body.id){
+      if(p.id === body.id){
         message.ack();
         if (body['computingP']) {
           dispatch(setcomputingP({ done: body['computingP'], id: body['id'] }));
@@ -173,7 +173,7 @@ export const callback_solver_results = (message: any, dispatch: Function, getSta
     }))
   }
   projects.forEach(p => {
-    if(p.faunaDocumentId === res.id){
+    if(p.id === res.id){
       message.ack();
       if(!res.error){
         dispatch(

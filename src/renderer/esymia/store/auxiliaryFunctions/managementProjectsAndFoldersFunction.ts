@@ -4,14 +4,14 @@ import { folderByID, ProjectState } from "../projectSlice";
 export const removeProjectFromStore = (state: ProjectState, projectToRemove: string) => {
     let selectedFolder = folderByID(state, state.selectedFolder)
     if (selectedFolder){
-        selectedFolder.projectList = selectedFolder.projectList.filter(p => p.faunaDocumentId !== projectToRemove)
+        selectedFolder.projectList = selectedFolder.projectList.filter(p => p.id !== projectToRemove)
     }
 }
 
 export const removeFolderFromStore = (state: ProjectState, folderToRemove: Folder) => {
     let parentFolder = folderByID(state, folderToRemove.parent)
     if (parentFolder){
-        parentFolder.subFolders = parentFolder.subFolders.filter(f => f.faunaDocumentId !== folderToRemove.faunaDocumentId)
+        parentFolder.subFolders = parentFolder.subFolders.filter(f => f.id !== folderToRemove.id)
     }
 }
 

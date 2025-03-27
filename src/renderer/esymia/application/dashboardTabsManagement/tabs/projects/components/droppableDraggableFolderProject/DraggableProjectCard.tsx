@@ -140,25 +140,25 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
             >
               {allProjectFolders
                 .filter(
-                  (n) => n.faunaDocumentId !== selectedFolder.faunaDocumentId,
+                  (n) => n.id !== selectedFolder.id,
                 )
                 .map((f) => {
                   return (
-                    <div key={f.faunaDocumentId}>
+                    <div key={f.id}>
                       <Item
-                        data-testid={f.faunaDocumentId}
+                        data-testid={f.id}
                         onClick={(p) => {
                           p.event.stopPropagation();
                           dispatch(
                             moveProject({
                               objectToMove: project,
-                              targetFolder: f.faunaDocumentId as string,
+                              targetFolder: f.id as string,
                             }),
                           );
                           execQuery(
                             moveProjectInFauna,
                             {
-                              faunaDocumentId: project?.faunaDocumentId,
+                              id: project?.id,
                               description: project?.description as string,
                               frequencies: project?.frequencies,
                               meshData: project?.meshData as MeshData,
@@ -171,7 +171,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                               storage: project?.storage as "local" | "online",
                               simulation: undefined,
                               sharedWith: project?.sharedWith as sharingInfoUser[],
-                              parentFolder: f.faunaDocumentId,
+                              parentFolder: f.id,
                             } as Project,
                             project.parentFolder,
                             dispatch
