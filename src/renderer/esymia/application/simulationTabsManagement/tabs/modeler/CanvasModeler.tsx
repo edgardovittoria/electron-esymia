@@ -69,7 +69,6 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({
                 camera={{ position: [0, -3, 0], up: [0, 0, 1], fov: 50 }}
               >
                 <Provider store={store}>
-                  <group rotation={[-Math.PI / 2, 0, 0]}>
                     <pointLight position={[100, 100, 100]} intensity={0.8} />
                     <hemisphereLight
                       color={'#ffffff'}
@@ -108,7 +107,6 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({
                       <group rotation={[-Math.PI / 2, 0, 0]} />
                     </GizmoHelper>
                     {/*<Screenshot selectedProject={selectedProject} />*/}
-                  </group>
                 </Provider>
               </Canvas>
             </div>

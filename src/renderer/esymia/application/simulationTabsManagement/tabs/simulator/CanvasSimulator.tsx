@@ -63,7 +63,6 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({
               >
                 {/* <Perf/> */}
                 <Provider store={store}>
-                  <group rotation={[-Math.PI / 2, 0, 0]}>
                     <pointLight position={[100, 100, 100]} intensity={0.8} />
                     <hemisphereLight
                       color={'#ffffff'}
@@ -134,7 +133,6 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({
                       />
                       <group rotation={[-Math.PI / 2, 0, 0]} />
                     </GizmoHelper>
-                  </group>
                   {/*<Screenshot selectedProject={selectedProject} />*/}
                 </Provider>
               </Canvas>

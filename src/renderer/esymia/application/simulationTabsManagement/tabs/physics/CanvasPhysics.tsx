@@ -124,7 +124,6 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                 camera={{ position: [0, -3, 0], up: [0, 0, 1], fov: 50 }}
               >
                 <Provider store={store}>
-                  <group rotation={[-Math.PI / 2, 0, 0]}>
                     <pointLight position={[100, 100, 100]} intensity={0.8} />
                     <hemisphereLight
                       color={'#ffffff'}
@@ -251,7 +250,6 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                         />
                       </GizmoHelper>
                     )}
-                  </group>
                 </Provider>
               </Canvas>
             </div>
