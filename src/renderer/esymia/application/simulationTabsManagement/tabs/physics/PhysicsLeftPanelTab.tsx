@@ -50,7 +50,9 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
       if (ports.length > 0) {
         savePortsOnS3(ports, selectedProject, dispatch, execQuery2);
       } else {
-        deleteFileS3(selectedProject.portsS3 as string);
+        if(selectedProject.portsS3){
+          deleteFileS3(selectedProject.portsS3 as string);
+        }
         dispatch(setPortsS3(undefined));
         execQuery2(
           createOrUpdateProjectInDynamoDB,
@@ -69,7 +71,9 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
       if (ports.length > 0) {
         savePortsOnS3(ports, selectedProject, dispatch, execQuery2);
       } else {
-        deleteFileS3(selectedProject.portsS3 as string);
+        if(selectedProject.portsS3){
+          deleteFileS3(selectedProject.portsS3 as string);
+        }
         dispatch(setPortsS3(undefined));
         execQuery2(
           createOrUpdateProjectInDynamoDB,
@@ -267,9 +271,11 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                                     execQuery2,
                                   );
                                 } else {
-                                  deleteFileS3(
-                                    selectedProject.portsS3 as string,
-                                  );
+                                  if(selectedProject.portsS3){
+                                    deleteFileS3(
+                                      selectedProject.portsS3 as string,
+                                    );
+                                  }
                                   dispatch(setPortsS3(undefined));
                                   execQuery2(
                                     createOrUpdateProjectInDynamoDB,
