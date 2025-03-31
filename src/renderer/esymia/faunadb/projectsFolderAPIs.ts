@@ -1,10 +1,10 @@
 import { Folder, Project } from '../model/esymiaModels';
 import {
-  FaunaFolder,
-  FaunaFolderDetails,
-  FaunaProjectDetails,
+  DynamoFolder,
+  DynamoFolderDetails,
+  DynamoProjectDetails,
   UserSessionInfo,
-} from '../model/FaunaModels';
+} from '../model/DynamoModels';
 import {
   recursiveFindFolders,
   takeAllProjectsIn,
@@ -20,7 +20,7 @@ import {
 } from '../store/tabsAndMenuItemsSlice';
 import { Dispatch } from '@reduxjs/toolkit';
 import { Client, fql, QuerySuccess } from 'fauna';
-import { FaunaProject, FaunaUserSessionInfo } from '../model/FaunaModels';
+import { DynamoProject, DynamoUserSessionInfo } from '../model/DynamoModels';
 
 
 export const getFoldersByOwner = async (
@@ -39,7 +39,7 @@ export const getFoldersByOwner = async (
     dispatch(setIsAlertInfoModal(false));
     dispatch(setShowInfoModal(true));
   });
-  let res:FaunaFolder[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, folder: {...item} as FaunaFolderDetails}})
+  let res:DynamoFolder[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, folder: {...item} as DynamoFolderDetails}})
   return res
 };
 
@@ -60,7 +60,7 @@ export const getSimulationProjectsByOwner = async (
       dispatch(setIsAlertInfoModal(false));
       dispatch(setShowInfoModal(true));
     });
-    let res:FaunaProject[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, project: {...item} as FaunaProjectDetails}})
+    let res:DynamoProject[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, project: {...item} as DynamoProjectDetails}})
   return res;
 };
 
@@ -74,7 +74,7 @@ export const createFolderInFauna = async (
     ...folderToSave,
     projectList: [],
     subFolders: [],
-  } as FaunaFolderDetails})`
+  } as DynamoFolderDetails})`
   const response = await faunaClient.query(query)
     .catch((err) => {
       dispatch(
@@ -237,7 +237,7 @@ export const createSimulationProjectInFauna = async (
 ) => {
   const response = await faunaClient
     .query(
-      faunaQuery`SimulationProjects.create(${{...convertInFaunaProjectThis(projectToSave).project as FaunaProjectDetails}})`
+      faunaQuery`SimulationProjects.create(${{...convertInFaunaProjectThis(projectToSave).project as DynamoProjectDetails}})`
     )
     .catch((err) => {
       dispatch(
@@ -278,7 +278,7 @@ export const addIDInFolderProjectsList = async (
 export const updateProjectInFauna = async (
   faunaClient: Client,
   faunaQuery: typeof fql,
-  projectToUpdate: FaunaProject,
+  projectToUpdate: DynamoProject,
   dispatch: Dispatch,
 ) => {
   const response = await faunaClient
@@ -362,7 +362,7 @@ export const moveProjectInFauna = async (
     .query(
       faunaQuery`SimulationProjects.byId(${projectToUpdate.id as string})!.update(${{
         ...convertInFaunaProjectThis(projectToUpdate).project,
-      } as FaunaProjectDetails})`
+      } as DynamoProjectDetails})`
     )
     .then(() => {
       oldParent !== 'root' &&
@@ -404,7 +404,7 @@ export const getSharedSimulationProjects = async (
       dispatch(setIsAlertInfoModal(false));
       dispatch(setShowInfoModal(true));
     });
-    let res:FaunaProject[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, project: {...item} as FaunaProjectDetails}})
+    let res:DynamoProject[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, project: {...item} as DynamoProjectDetails}})
   return res
 };
 
@@ -427,7 +427,7 @@ export const getSharedFolders = async (
       dispatch(setIsAlertInfoModal(false));
       dispatch(setShowInfoModal(true));
     });
-    let res:FaunaFolder[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, folder: {...item} as FaunaFolderDetails}})
+    let res:DynamoFolder[] = ((response as QuerySuccess<any>).data.data as any[]).map((item:any) => {return {id: item.id, folder: {...item} as DynamoFolderDetails}})
   return res;
 };
 
@@ -471,14 +471,14 @@ export const getUserSessionInfo = async (
       dispatch(setIsAlertInfoModal(false));
       dispatch(setShowInfoModal(true));
     });
-    let res:FaunaUserSessionInfo[] = ((response as QuerySuccess<any>).data.data as any[]).map((item: any) => {return {id: item.id, userSessionInfo: {...item} as UserSessionInfo}})
+    let res:DynamoUserSessionInfo[] = ((response as QuerySuccess<any>).data.data as any[]).map((item: any) => {return {id: item.id, userSessionInfo: {...item} as UserSessionInfo}})
   return res;
 };
 
 export const updateUserSessionInfo = async (
   faunaClient: Client,
   faunaQuery: typeof fql,
-  userSessionInfo: FaunaUserSessionInfo,
+  userSessionInfo: DynamoUserSessionInfo,
   dispatch: Dispatch,
 ) => {
   const response = await faunaClient

@@ -15,15 +15,12 @@ import {
 import {
   recursiveFindFolders,
   takeAllProjectsIn,
+  takeAllProjectsInArrayOf,
 } from '../../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
-
-export const getItemDynamoDB = async (params: any) => {
-  return await dynamoDB.getItem(params).promise();
-};
-
-export const putItemDynamoDB = async (params: any) => {
-  return await dynamoDB.putItem(params).promise();
-};
+import {
+  convertInDynamoFolderDetailsThis,
+  convertInDynamoProjectThis,
+} from './utility/apiAuxiliaryFunctions';
 
 export const getFolderByUserEmail = async (
   email: string,
@@ -87,7 +84,9 @@ export const createOrUpdateProjectInDynamoDB = async (
 ) => {
   let params: PutItemInput = {
     TableName: 'SimulationProjects',
-    Item: convertToDynamoDBFormat(projectToSave),
+    Item: convertToDynamoDBFormat(
+      convertInDynamoProjectThis(projectToSave).project,
+    ),
   };
   return await dynamoDB
     .putItem(params)
@@ -106,12 +105,22 @@ export const createOrUpdateProjectInDynamoDB = async (
 export const deleteSimulationProjectFromDynamoDB = async (
   projectToDelete: string,
   parentFolder: string,
+  selectedFolder: Folder,
   dispatch: Dispatch,
 ) => {
   let params: DeleteItemInput = {
     TableName: 'SimulationProjects',
-    Key: {"id": {S: projectToDelete}},
+    Key: { id: { S: projectToDelete } },
   };
+  if (parentFolder !== 'root') {
+    let folder: Folder = {
+      ...selectedFolder,
+      projectList: selectedFolder.projectList.filter(
+        (p) => p.id !== projectToDelete,
+      ),
+    };
+    createOrUpdateFolderInDynamoDB(folder, dispatch);
+  }
   return await dynamoDB
     .deleteItem(params)
     .promise()
@@ -124,26 +133,18 @@ export const deleteSimulationProjectFromDynamoDB = async (
       dispatch(setIsAlertInfoModal(false));
       dispatch(setShowInfoModal(true));
     });
-    //TODO:inserire cancellazione ricorsiva
-  //   faunaClient
-  //     .query(
-  //       faunaQuery`SimulationProjects.byId(${projectToDelete})!.delete()`
-  //     )
-  //     .then(() => {
-  //       parentFolder !== 'root' &&
-  //         faunaClient.query(
-  //           faunaQuery`remove_project_from_folder(${projectToDelete}, ${parentFolder})`
-  //         );
-  //     });
 };
 
 export const createOrUpdateFolderInDynamoDB = async (
   folderToSave: Folder,
   dispatch: Dispatch,
 ) => {
+  console.log("pippo")
   let params: PutItemInput = {
     TableName: 'Folders',
-    Item: convertToDynamoDBFormat(folderToSave),
+    Item: convertToDynamoDBFormat(
+      convertInDynamoFolderDetailsThis(folderToSave),
+    ),
   };
   return await dynamoDB
     .putItem(params)
@@ -219,4 +220,123 @@ export const recursiveUpdateSharingInfoFolderInDynamoDB = async (
   allFolders.forEach((f) => createOrUpdateFolderInDynamoDB(f, dispatch));
   const allProjects = takeAllProjectsIn(folderToUpdate);
   allProjects.forEach((p) => createOrUpdateProjectInDynamoDB(p, dispatch));
+};
+
+export const moveProjectInDynamoDB = async (
+  projectToUpdate: Project,
+  selectedFolder: Folder,
+  targetFolder: Folder,
+  dispatch: Dispatch,
+) => {
+  return await createOrUpdateProjectInDynamoDB(projectToUpdate, dispatch)
+    .then(() => {
+      if (selectedFolder.id !== 'root') {
+        let folder: Folder = {
+          ...selectedFolder,
+          projectList: selectedFolder.projectList.filter(
+            (p) => p.id !== projectToUpdate.id,
+          ),
+        };
+        createOrUpdateFolderInDynamoDB(folder, dispatch);
+      }
+      if (projectToUpdate.parentFolder !== 'root') {
+        let newFolder: Folder = {
+          ...targetFolder,
+          projectList: [...targetFolder.projectList, projectToUpdate],
+        };
+        createOrUpdateFolderInDynamoDB(newFolder, dispatch);
+      }
+    })
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
+};
+
+export const moveFolderInDynamoDB = async (
+  folderToMove: Folder,
+  selectedFolder: Folder,
+  targetFolder: Folder,
+  dispatch: Dispatch,
+) => {
+  return await createOrUpdateFolderInDynamoDB(folderToMove, dispatch)
+    .then(() => {
+      if (selectedFolder.id !== 'root') {
+        let folder: Folder = {
+          ...selectedFolder,
+          subFolders: selectedFolder.subFolders.filter(
+            (sb) => sb.id !== folderToMove.id,
+          ),
+        };
+        createOrUpdateFolderInDynamoDB(folder, dispatch);
+      }
+      if (folderToMove.parent !== 'root') {
+        let newFolder: Folder = {
+          ...targetFolder,
+          subFolders: [...targetFolder.subFolders, folderToMove],
+        };
+        createOrUpdateFolderInDynamoDB(newFolder, dispatch);
+      }
+    })
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
+};
+
+export const deleteFolderFromDynamoDB = async (
+  folderToDelete: Folder,
+  selectedFolder: Folder,
+  dispatch: Dispatch,
+) => {
+  recursiveFindFolders(folderToDelete, []).forEach((f) => {
+    f.projectList.forEach((p) => {
+      let params: DeleteItemInput = {
+        TableName: 'SimulationProjects',
+        Key: { id: { S: p.id } },
+      };
+      dynamoDB.deleteItem(params).promise().then(() => {
+        console.log("deleted project : ", p.id)
+      });
+    });
+  });
+  recursiveFindFolders(folderToDelete, []).forEach((f) => {
+    let params: DeleteItemInput = {
+      TableName: 'Folders',
+      Key: { id: { S: f.id } },
+    };
+    dynamoDB.deleteItem(params).promise().then(() => {
+      console.log("deleted folder : ", f.id)
+    });
+  })
+  if (selectedFolder.id !== 'root') {
+    let folder: Folder = {
+      ...selectedFolder,
+      subFolders: selectedFolder.subFolders.filter(
+        (sb) => sb.id !== folderToDelete.id,
+      ),
+    };
+    console.log(folder)
+    return await createOrUpdateFolderInDynamoDB(folder, dispatch).catch(
+      (err) => {
+        dispatch(
+          setMessageInfoModal(
+            'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+          ),
+        );
+        dispatch(setIsAlertInfoModal(false));
+        dispatch(setShowInfoModal(true));
+      },
+    );
+  }
 };

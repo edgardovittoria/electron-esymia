@@ -14,7 +14,7 @@ import { CreateNewFolderModal } from '../CreateNewFolderModal';
 import noProjectsIcon2 from '../../../../../../../../../assets/noProjectsIcon2.png';
 import { Folder } from '../../../../../../model/esymiaModels';
 import { getSharedFolders, getSharedSimulationProjects } from '../../../../../../faunadb/projectsFolderAPIs';
-import { FaunaFolder, FaunaProject } from '../../../../../../model/FaunaModels';
+import { DynamoFolder, DynamoProject } from '../../../../../../model/DynamoModels';
 import {
 	constructFolderStructure,
 	faunaFolderHaveParentInList,
@@ -45,9 +45,9 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 
 	useEffect(() => {
     setSpinner(true)
-		execQuery(getSharedFolders, user.email, dispatch).then((folders: FaunaFolder[]) => {
+		execQuery(getSharedFolders, user.email, dispatch).then((folders: DynamoFolder[]) => {
 			execQuery(getSharedSimulationProjects, user.email, dispatch).then(
-				(projects: FaunaProject[]) => {
+				(projects: DynamoProject[]) => {
 					const sharedElementsRootFolder = {
 						id: 'shared_root',
 						folder: {
@@ -67,7 +67,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 								.map((p) => p.id),
 							parent: 'nobody',
 						},
-					} as FaunaFolder;
+					} as DynamoFolder;
 					const folder = constructFolderStructure(
 						'shared_root',
 						[sharedElementsRootFolder, ...folders],

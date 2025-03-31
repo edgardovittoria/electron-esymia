@@ -1,16 +1,16 @@
 import { CanvasState } from '../../cad_library';
 import { Folder, Project, sharingInfoUser, SolverOutput } from '../model/esymiaModels';
 import {
-  FaunaFolder,
-  FaunaFolderDetails,
-  FaunaProject,
-  FaunaProjectDetails,
-} from '../model/FaunaModels';
+  DynamoFolder,
+  DynamoFolderDetails,
+  DynamoProject,
+  DynamoProjectDetails,
+} from '../model/DynamoModels';
 
 export const constructFolderStructure = (
   folderID: string,
-  all_folders: FaunaFolder[],
-  all_projects: FaunaProject[],
+  all_folders: DynamoFolder[],
+  all_projects: DynamoProject[],
 ) => {
   const rootFaunaFolder = all_folders.filter(
     (faunaFolder) => faunaFolder.id === folderID,
@@ -44,36 +44,36 @@ export const constructFolderStructure = (
 };
 
 export const faunaProjectInList = (
-  project: FaunaProject,
-  projectsList: FaunaProject[],
+  project: DynamoProject,
+  projectsList: DynamoProject[],
 ) => {
   return projectsList.filter((p) => p.id === project.id).length > 0;
 };
 
 export const faunaFolderInList = (
-  folder: FaunaFolder,
-  folderList: FaunaFolder[],
+  folder: DynamoFolder,
+  folderList: DynamoFolder[],
 ) => {
   return folderList.filter((f) => f.id === folder.id).length > 0;
 };
 
 export const faunaFolderHaveParentInList = (
-  folder: FaunaFolder,
-  folderList: FaunaFolder[],
+  folder: DynamoFolder,
+  folderList: DynamoFolder[],
 ) => {
   return folderList.filter((f) => folder.folder.parent === f.id).length > 0;
 };
 
 export const faunaProjectHaveParentInFolderList = (
-  project: FaunaProject,
-  folderList: FaunaFolder[],
+  project: DynamoProject,
+  folderList: DynamoFolder[],
 ) => {
   return (
     folderList.filter((f) => f.id === project.project.parentFolder).length > 0
   );
 };
 
-export const convertInProjectThis = (faunaProject: FaunaProject) => {
+export const convertInProjectThis = (faunaProject: DynamoProject) => {
   const project: Project = {
     ...faunaProject.project,
     ports: [],
@@ -91,9 +91,10 @@ export const convertInProjectThis = (faunaProject: FaunaProject) => {
 };
 
 export const convertInFaunaProjectThis = (project: Project) => {
-  const faunaProject: FaunaProject = {
+  const faunaProject: DynamoProject = {
     id: project.id as string,
     project: {
+      id: project.id,
       name: project.name,
       description: project.description,
       storage: project.storage,
@@ -117,18 +118,18 @@ export const convertInFaunaProjectThis = (project: Project) => {
       modelUnit: project.modelUnit,
       planeWaveParameters: project.planeWaveParameters,
       radialFieldParameters: project.radialFieldParameters
-    } as FaunaProjectDetails,
+    } as DynamoProjectDetails,
   };
   return faunaProject;
 };
 
 export const convertInFaunaFolderDetailsThis = (
   folder: Folder,
-): FaunaFolderDetails => {
+): DynamoFolderDetails => {
   const faunaFolder = {
     ...folder,
     subFolders: folder.subFolders.map((sf) => sf.id as string),
     projectList: folder.projectList.map((p) => p.id as string),
-  } as FaunaFolderDetails;
+  } as DynamoFolderDetails;
   return faunaFolder;
 };

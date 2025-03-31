@@ -151,7 +151,7 @@ export const useStorageData = () => {
       );
   }
 
-  const deleteProjectOnline = (project: Project) => {
+  const deleteProjectOnline = (project: Project, selectedFolder:Folder) => {
     deleteMeshDataOnline(project);
     deleteResultsOnline(project)
     deletePortsOnline(project)
@@ -161,11 +161,12 @@ export const useStorageData = () => {
       deleteSimulationProjectFromDynamoDB,
       project.id,
       project.parentFolder,
+      selectedFolder,
       dispatch
     );
   };
 
-  const deleteProjectLocal = (project: Project) => {
+  const deleteProjectLocal = (project: Project, selectedFolder: Folder) => {
     deleteMeshDataLocal(project);
     dispatch(removeProject(project.id as string));
     dispatch(closeProjectTab(project.id as string));
@@ -173,6 +174,7 @@ export const useStorageData = () => {
       deleteSimulationProjectFromDynamoDB,
       project.id,
       project.parentFolder,
+      selectedFolder,
       dispatch
     );
   };
@@ -185,11 +187,11 @@ export const useStorageData = () => {
     }
   };
 
-  const deleteProject = (project: Project) => {
+  const deleteProject = (project: Project, selectedFodler: Folder) => {
     if (project.storage === 'local') {
-      deleteProjectOnline(project);
+      deleteProjectOnline(project, selectedFodler);
     } else {
-      deleteProjectOnline(project);
+      deleteProjectOnline(project, selectedFodler);
     }
   };
 

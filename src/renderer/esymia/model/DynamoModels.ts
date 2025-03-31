@@ -1,12 +1,12 @@
 import { CanvasState, UsersState } from "../../cad_library"
 import { MeshData, PlaneWaveParameters, Port, Probe, RadialFieldParameters, sharingInfoUser, Signal, Simulation } from "./esymiaModels"
 
-export type FaunaProject = {
+export type DynamoProject = {
     id: string,
-    project: FaunaProjectDetails
+    project: DynamoProjectDetails
 }
 
-export type FaunaProjectDetails = {
+export type DynamoProjectDetails = {
     name: string,
     description: string,
     storage: 'local' | 'online',
@@ -30,12 +30,12 @@ export type FaunaProjectDetails = {
     radialFieldParameters: RadialFieldParameters
 }
 
-export type FaunaFolder = {
+export type DynamoFolder = {
     id: string,
-    folder: FaunaFolderDetails
+    folder: DynamoFolderDetails
 }
 
-export type FaunaFolderDetails = {
+export type DynamoFolderDetails = {
     name: string,
     owner: UsersState,
     sharedWith?: sharingInfoUser[],
@@ -44,7 +44,7 @@ export type FaunaFolderDetails = {
     parent: string,
 }
 
-export type FaunaUserSessionInfo = {
+export type DynamoUserSessionInfo = {
   id: string,
   userSessionInfo: UserSessionInfo
 }

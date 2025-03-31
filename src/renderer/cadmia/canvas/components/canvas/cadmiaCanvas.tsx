@@ -53,14 +53,10 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
         {({ store }) => (
           <Canvas
             className="w-full h-full bg-gradient-to-b from-gray-700 to-gray-100"
-            camera={{
-              position: [0, 50, 0],
-              fov: 20,
-              far: 1000,
-              near: 0.1,
-            }}
+            camera={{ position: [0, -50, 0], up: [0, 0, 1], fov: 50, far: 1000, near: 0.1 }}
           >
             <Provider store={store}>
+            <group rotation={[-Math.PI / 2, 0, 0]}>
               <pointLight position={[100, 100, 100]} intensity={1.8} />
               <pointLight position={[-100, -100, 100]} intensity={1.8} />
               <hemisphereLight
@@ -135,7 +131,9 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
                   axisColors={['red', 'green', 'blue']}
                   labelColor="white"
                 />
+                <group rotation={[-Math.PI / 2, 0, 0]}/>
               </GizmoHelper>
+              </group>
             </Provider>
           </Canvas>
         )}

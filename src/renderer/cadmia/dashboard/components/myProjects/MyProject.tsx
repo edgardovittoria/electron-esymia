@@ -18,7 +18,7 @@ import { useFaunaQuery } from '../../../../esymia/faunadb/hook/useFaunaQuery';
 import { FaunaCadModel, resetState } from '../../../../cad_library';
 import { getSimulationProjectsByOwner } from '../../../../esymia/faunadb/projectsFolderAPIs';
 import { useAuth0 } from '@auth0/auth0-react';
-import { FaunaProject } from '../../../../esymia/model/FaunaModels';
+import { DynamoProject } from '../../../../esymia/model/DynamoModels';
 import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
 
 export interface ContextMenuProps {
@@ -54,7 +54,7 @@ const MyProject: React.FC<ContextMenuProps> = ({
 
   useEffect(() => {
     execQuery(getSimulationProjectsByOwner, user?.email, dispatch).then(
-      (projects: FaunaProject[]) => {
+      (projects: DynamoProject[]) => {
         projects.forEach((p) => {
           if (p.project.modelS3 === model.components) {
             setModelErasable(false);

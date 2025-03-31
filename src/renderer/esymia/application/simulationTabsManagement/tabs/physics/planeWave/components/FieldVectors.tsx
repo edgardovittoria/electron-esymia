@@ -56,6 +56,7 @@ export const VectorArrow: FC<VectorArrowProps> = ({
       position={start.clone().add(dir.clone().multiplyScalar(1.1))}
       fontSize={0.1}
       color={color}
+      rotation={[Math.PI / 2, 0, 0]}
     >
       {label}
     </Text>
@@ -89,17 +90,19 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
   E_phi_v = normalize(E_phi_v);
 
   // Creazione delle curve theta e phi
-  console.log(theta)
   const thetaCurve = generateCurve(theta, phi, 'theta');
-  console.log(thetaCurve)
   const phiCurve = generateCurve(phi, theta, 'phi');
+
+  const x = phiCurve[phiCurve.length - 1].x;
+  const y = phiCurve[phiCurve.length - 1].y;
+  const z = phiCurve[phiCurve.length - 1].z;
 
   return (
     <>
       {/* Vettori */}
       <VectorArrow start={K} dir={E} color="blue" label="E" />
       <VectorArrow
-        start={new THREE.Vector3(0, 0, 0)}
+        start={new THREE.Vector3(K.x, K.y, K.z)}
         dir={K}
         color="gray"
         label="K"
@@ -108,6 +111,50 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
       <VectorArrow start={K} dir={E_phi_v} color="purple" label="Eφ" />
       <VectorArrow start={K} dir={H} color="red" label="H" />
 
+      <Line
+        points={[new THREE.Vector3(0, 0, 0), new THREE.Vector3(-0.5, 0, 0)]}
+        color="black"
+        lineWidth={1}
+        dashed
+        dashSize={0.1}
+        gapSize={0.05}
+      />
+
+      <Line
+        points={[new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -0.5, 0)]}
+        color="black"
+        lineWidth={1}
+        dashed
+        dashSize={0.1}
+        gapSize={0.05}
+      />
+
+      <Line
+        points={[new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -0.5)]}
+        color="black"
+        lineWidth={1}
+        dashed
+        dashSize={0.1}
+        gapSize={0.05}
+      />
+
+      <Line
+        points={[new THREE.Vector3(0, 0, 0), new THREE.Vector3(K.x, K.y, K.z)]}
+        color="black"
+        lineWidth={1}
+        dashed
+        dashSize={0.1}
+        gapSize={0.05}
+      />
+
+      <Line
+        points={[K, new THREE.Vector3(x, y, z)]}
+        color="black"
+        lineWidth={1}
+        dashed
+        dashSize={0.1}
+        gapSize={0.05}
+      />
       {/* Curve Theta e Phi */}
       <Line
         points={thetaCurve}
@@ -119,9 +166,10 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
       />
       <Text
         position={thetaCurve[Math.floor(thetaCurve.length / 2)]} // Posizione al centro
+        rotation={[Math.PI / 2, 0, 0]}
         fontSize={0.1}
         color="green"
-        anchorX={-.13}
+        anchorX={-0.13}
         anchorY="middle"
       >
         θ
@@ -136,9 +184,10 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
       />
       <Text
         position={phiCurve[Math.floor(phiCurve.length / 2)]} // Posizione al centro
+        rotation={[Math.PI / 2, 0, 0]}
         fontSize={0.1}
         color="purple"
-        anchorX={-.13}
+        anchorX={-0.13}
         anchorY="middle"
       >
         φ

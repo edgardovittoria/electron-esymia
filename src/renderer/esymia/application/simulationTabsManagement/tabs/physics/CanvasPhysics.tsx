@@ -119,131 +119,139 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
         <ReactReduxContext.Consumer>
           {({ store }) => (
             <div className="flex flex-col">
-              <Canvas className="w-[100vw] lg:h-[70vh] xl:h-[82vh]">
+              <Canvas
+                className="w-[100vw] lg:h-[70vh] xl:h-[82vh]"
+                camera={{ position: [0, -3, 0], up: [0, 0, 1], fov: 50 }}
+              >
                 <Provider store={store}>
-                  <pointLight position={[100, 100, 100]} intensity={0.8} />
-                  <hemisphereLight
-                    color={'#ffffff'}
-                    groundColor={new THREE.Color('#b9b9b9')}
-                    position={[-7, 25, 13]}
-                    intensity={3}
-                  />
-                  {/* paint models */}
-                  <CanvasInfo setCameraPosition={setCameraPosition} />
-                  <FocusView resetFocus={resetFocus}>
-                    {boundingBoxDimension &&
-                      selectedProject.radialFieldParameters && (
-                        <>
-                          <Circle
-                            radius={boundingBoxDimension}
-                            center={calculateCenter(mesh.current)}
-                            plane={'xy'}
-                            boundingBox={boundingBoxDimension}
-                            //color={getColourBasedOnPlane('xy')[0]}
-                            color={"black"}
-                          />
-                          <Circle
-                            radius={boundingBoxDimension}
-                            center={calculateCenter(mesh.current)}
-                            plane={getOrthogonalPlane('xy')}
-                            boundingBox={boundingBoxDimension}
-                            //color={getColourBasedOnPlane('xy')[1]}
-                            color={"black"}
-                          />
-                          <Circle
-                            radius={boundingBoxDimension}
-                            center={calculateCenter(mesh.current)}
-                            plane={getOrthogonalPlane('xz')}
-                            boundingBox={boundingBoxDimension}
-                            //color={getColourBasedOnPlane('xz')[0]}
-                            color='black'
-                          />
-                        </>
+                  <group rotation={[-Math.PI / 2, 0, 0]}>
+                    <pointLight position={[100, 100, 100]} intensity={0.8} />
+                    <hemisphereLight
+                      color={'#ffffff'}
+                      groundColor={new THREE.Color('#b9b9b9')}
+                      position={[-7, 25, 13]}
+                      intensity={3}
+                    />
+                    {/* paint models */}
+                    <CanvasInfo setCameraPosition={setCameraPosition} />
+                    <FocusView resetFocus={resetFocus}>
+                      {boundingBoxDimension &&
+                        selectedProject.radialFieldParameters && (
+                          <>
+                            <Circle
+                              radius={boundingBoxDimension}
+                              center={calculateCenter(mesh.current)}
+                              plane={'xy'}
+                              boundingBox={boundingBoxDimension}
+                              //color={getColourBasedOnPlane('xy')[0]}
+                              color={'black'}
+                            />
+                            <Circle
+                              radius={boundingBoxDimension}
+                              center={calculateCenter(mesh.current)}
+                              plane={getOrthogonalPlane('xy')}
+                              boundingBox={boundingBoxDimension}
+                              //color={getColourBasedOnPlane('xy')[1]}
+                              color={'black'}
+                            />
+                            <Circle
+                              radius={boundingBoxDimension}
+                              center={calculateCenter(mesh.current)}
+                              plane={getOrthogonalPlane('xz')}
+                              boundingBox={boundingBoxDimension}
+                              //color={getColourBasedOnPlane('xz')[0]}
+                              color="black"
+                            />
+                          </>
+                        )}
+                      {selectedProject.model.components.map(
+                        (component: ComponentEntity, index: number) => {
+                          return (
+                            <mesh
+                              ref={(el) => {
+                                setMesh(el, index);
+                              }}
+                              userData={{
+                                keyComponent: component.keyComponent,
+                                isSelected: false,
+                              }}
+                              key={uniqid()}
+                              position={component.transformationParams.position}
+                              scale={component.transformationParams.scale}
+                              rotation={component.transformationParams.rotation}
+                              onDoubleClick={(e) => {
+                                if (
+                                  selectedPort &&
+                                  !selectedProject.simulation?.resultS3
+                                ) {
+                                  setPointerEvent(e);
+                                  setSurfaceAdvices(false);
+                                }
+                              }}
+                            >
+                              <FactoryShapesEsymia entity={component} />
+                              <Edges />
+                            </mesh>
+                          );
+                        },
                       )}
-                    {selectedProject.model.components.map(
-                      (component: ComponentEntity, index: number) => {
-                        return (
-                          <mesh
-                            ref={(el) => {
-                              setMesh(el, index);
-                            }}
-                            userData={{
-                              keyComponent: component.keyComponent,
-                              isSelected: false,
-                            }}
-                            key={uniqid()}
-                            position={component.transformationParams.position}
-                            scale={component.transformationParams.scale}
-                            rotation={component.transformationParams.rotation}
-                            onDoubleClick={(e) => {
-                              if (
-                                selectedPort &&
-                                !selectedProject.simulation?.resultS3
-                              ) {
-                                setPointerEvent(e);
-                                setSurfaceAdvices(false);
-                              }
-                            }}
-                          >
-                            <FactoryShapesEsymia entity={component} />
-                            <Edges />
-                          </mesh>
-                        );
-                      },
-                    )}
-                  </FocusView>
-                  {surfaceAdvices && (
-                    <EdgesGenerator
-                      meshRef={mesh}
-                      inputPortPositioned={inputPortPositioned as boolean}
-                      setInputPortPositioned={
-                        setInputPortPositioned as Function
-                      }
-                    />
-                  )}
-                  <PhysicsPortsDrawer />
-                  <PhysicsPortsControlsDrawer
-                    setSavedPortParameters={setSavedPortParameters}
-                  />
-                  {/*<Screenshot selectedProject={selectedProject}/>*/}
-                  <OrbitControls makeDefault />
-                  <GizmoHelper
-                    alignment="bottom-left"
-                    margin={[150, 80]}
-                    renderPriority={1}
-                    onTarget={getTarget}
-                  >
-                    <GizmoViewport
-                      axisColors={['red', '#40ff00', 'blue']}
-                      labelColor="white"
-                    />
-                  </GizmoHelper>
-                  {selectedProject.planeWaveParameters && (
-                    <GizmoHelper
-                      alignment="bottom-right"
-                      margin={[250, 300]}
-                      renderPriority={2}
-                      onTarget={getTarget}
-                    >
-                      <GizmoArrowViewport
-                        axisColors={['black', 'black', 'black']}
-                        directionX={new THREE.Vector3(1, 0, 0)}
-                        directionY={new THREE.Vector3(0, 1, 0)}
-                        directionZ={new THREE.Vector3(0, 0, 1)}
-                        theta={selectedProject.planeWaveParameters.input.theta}
-                        phi={selectedProject.planeWaveParameters.input.phi}
-                        E={selectedProject.planeWaveParameters.output.E}
-                        K={selectedProject.planeWaveParameters.output.K}
-                        H={selectedProject.planeWaveParameters.output.H}
-                        E_theta_v={
-                          selectedProject.planeWaveParameters.output.E_theta_v
-                        }
-                        E_phi_v={
-                          selectedProject.planeWaveParameters.output.E_phi_v
+                    </FocusView>
+                    {surfaceAdvices && (
+                      <EdgesGenerator
+                        meshRef={mesh}
+                        inputPortPositioned={inputPortPositioned as boolean}
+                        setInputPortPositioned={
+                          setInputPortPositioned as Function
                         }
                       />
+                    )}
+                    <PhysicsPortsDrawer />
+                    <PhysicsPortsControlsDrawer
+                      setSavedPortParameters={setSavedPortParameters}
+                    />
+                    {/*<Screenshot selectedProject={selectedProject}/>*/}
+                    <OrbitControls makeDefault />
+                    <GizmoHelper
+                      alignment="bottom-left"
+                      margin={[150, 80]}
+                      renderPriority={1}
+                      onTarget={getTarget}
+                    >
+                      <GizmoViewport
+                        axisColors={['red', '#40ff00', 'blue']}
+                        labelColor="white"
+                      />
+                      <group rotation={[-Math.PI / 2, 0, 0]} />
                     </GizmoHelper>
-                  )}
+                    {selectedProject.planeWaveParameters && (
+                      <GizmoHelper
+                        alignment="bottom-right"
+                        margin={[400, 300]}
+                        renderPriority={2}
+                        onTarget={getTarget}
+                      >
+                        <GizmoArrowViewport
+                          axisColors={['black', 'black', 'black']}
+                          directionX={new THREE.Vector3(1, 0, 0)}
+                          directionY={new THREE.Vector3(0, 1, 0)}
+                          directionZ={new THREE.Vector3(0, 0, 1)}
+                          theta={
+                            selectedProject.planeWaveParameters.input.theta
+                          }
+                          phi={selectedProject.planeWaveParameters.input.phi}
+                          E={selectedProject.planeWaveParameters.output.E}
+                          K={selectedProject.planeWaveParameters.output.K}
+                          H={selectedProject.planeWaveParameters.output.H}
+                          E_theta_v={
+                            selectedProject.planeWaveParameters.output.E_theta_v
+                          }
+                          E_phi_v={
+                            selectedProject.planeWaveParameters.output.E_phi_v
+                          }
+                        />
+                      </GizmoHelper>
+                    )}
+                  </group>
                 </Provider>
               </Canvas>
             </div>

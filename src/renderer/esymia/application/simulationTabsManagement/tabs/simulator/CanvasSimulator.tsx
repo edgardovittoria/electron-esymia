@@ -25,7 +25,10 @@ import {
 } from '../../../config/textMessages';
 import { ComponentEntity, FactoryShapes } from '../../../../../cad_library';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
-import { InstancedSquaresFromVertices, RisMesh } from './MeshedElement/components/RisMesh';
+import {
+  InstancedSquaresFromVertices,
+  RisMesh,
+} from './MeshedElement/components/RisMesh';
 import { FactoryShapesEsymia } from '../../../../../cad_library/components/baseShapes/factoryShapes';
 
 interface CanvasSimulatorProps {
@@ -54,66 +57,84 @@ export const CanvasSimulator: React.FC<CanvasSimulatorProps> = ({
         <ReactReduxContext.Consumer>
           {({ store }) => (
             <div className="flex flex-col">
-              <Canvas className="w-[100vw] lg:h-[70vh] xl:h-[82vh]" camera={{ near: 0.1, far: 10000 }}>
+              <Canvas
+                className="w-[100vw] lg:h-[70vh] xl:h-[82vh]"
+                camera={{ position: [0, -3, 0], up: [0, 0, 1], fov: 50 }}
+              >
                 {/* <Perf/> */}
                 <Provider store={store}>
-                  <pointLight position={[100, 100, 100]} intensity={0.8} />
-                  <hemisphereLight
-                    color={'#ffffff'}
-                    groundColor={new THREE.Color('#b9b9b9')}
-                    position={[-7, 25, 13]}
-                    intensity={3}
-                  />
-                  {/* paint models */}
-                  <FocusView resetFocus={resetFocus}>
-                    {!mesherOutput || pathToExternalGridsNotFound ? (
-                      selectedProject.model.components.map(
-                        (component: ComponentEntity) => {
-                          return (
-                            <mesh
-                              userData={{
-                                keyComponent: component.keyComponent,
-                                isSelected: false,
-                              }}
-                              key={uniqid()}
-                              position={component.transformationParams.position}
-                              scale={component.transformationParams.scale}
-                              rotation={component.transformationParams.rotation}
-                            >
-                              <FactoryShapesEsymia entity={component} />
-                              <Edges />
-                            </mesh>
-                          );
-                        },
-                      )
-                    ) : (
-                      <>
-                        {externalGrids &&
-                        selectedProject?.meshData.type === 'Standard' ? (
-                          <MeshedElement
-                            resetFocus={setResetFocus}
-                            externalGrids={externalGrids as ExternalGridsObject}
-                            selectedMaterials={selectedMaterials}
-                          />
-                        ) : (
-                          <>
-                            {externalGrids && selectedProject?.meshData.type === 'Ris' &&
-                              // <RisMesh resetFocus={setResetFocus} externalGrids={externalGrids as ExternalGridsRisObject}/>
-                              <InstancedSquaresFromVertices externalGrids={externalGrids as ExternalGridsRisObject} resetFocus={setResetFocus}/>
-                            }
-                          </>
-                        )}
-                      </>
-                    )}
-                  </FocusView>
-                  {/*<Screenshot selectedProject={selectedProject}/>*/}
-                  <OrbitControls makeDefault />
-                  <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
-                    <GizmoViewport
-                      axisColors={['red', '#40ff00', 'blue']}
-                      labelColor="white"
+                  <group rotation={[-Math.PI / 2, 0, 0]}>
+                    <pointLight position={[100, 100, 100]} intensity={0.8} />
+                    <hemisphereLight
+                      color={'#ffffff'}
+                      groundColor={new THREE.Color('#b9b9b9')}
+                      position={[-7, 25, 13]}
+                      intensity={3}
                     />
-                  </GizmoHelper>
+                    {/* paint models */}
+                    <FocusView resetFocus={resetFocus}>
+                      {!mesherOutput || pathToExternalGridsNotFound ? (
+                        selectedProject.model.components.map(
+                          (component: ComponentEntity) => {
+                            return (
+                              <mesh
+                                userData={{
+                                  keyComponent: component.keyComponent,
+                                  isSelected: false,
+                                }}
+                                key={uniqid()}
+                                position={
+                                  component.transformationParams.position
+                                }
+                                scale={component.transformationParams.scale}
+                                rotation={
+                                  component.transformationParams.rotation
+                                }
+                              >
+                                <FactoryShapesEsymia entity={component} />
+                                <Edges />
+                              </mesh>
+                            );
+                          },
+                        )
+                      ) : (
+                        <>
+                          {externalGrids &&
+                          selectedProject?.meshData.type === 'Standard' ? (
+                            <MeshedElement
+                              resetFocus={setResetFocus}
+                              externalGrids={
+                                externalGrids as ExternalGridsObject
+                              }
+                              selectedMaterials={selectedMaterials}
+                            />
+                          ) : (
+                            <>
+                              {externalGrids &&
+                                selectedProject?.meshData.type === 'Ris' && (
+                                  // <RisMesh resetFocus={setResetFocus} externalGrids={externalGrids as ExternalGridsRisObject}/>
+                                  <InstancedSquaresFromVertices
+                                    externalGrids={
+                                      externalGrids as ExternalGridsRisObject
+                                    }
+                                    resetFocus={setResetFocus}
+                                  />
+                                )}
+                            </>
+                          )}
+                        </>
+                      )}
+                    </FocusView>
+                    {/*<Screenshot selectedProject={selectedProject}/>*/}
+                    <OrbitControls makeDefault />
+                    <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
+                      <GizmoViewport
+                        axisColors={['red', '#40ff00', 'blue']}
+                        labelColor="white"
+                      />
+                      <group rotation={[-Math.PI / 2, 0, 0]} />
+                    </GizmoHelper>
+                  </group>
                   {/*<Screenshot selectedProject={selectedProject} />*/}
                 </Provider>
               </Canvas>

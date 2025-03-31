@@ -6,9 +6,9 @@ import {
   updateUserSessionInfo,
 } from './esymia/faunadb/projectsFolderAPIs';
 import {
-  FaunaUserSessionInfo,
+  DynamoUserSessionInfo,
   UserSessionInfo,
-} from './esymia/model/FaunaModels';
+} from './esymia/model/DynamoModels';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaQuery';
 import { isConfirmedInfoModalSelector, setIsAlertInfoModal, setMessageInfoModal, setShowInfoModal } from './esymia/store/tabsAndMenuItemsSlice';
@@ -18,7 +18,7 @@ export const useAllowSingleSessionUser = () => {
   const { user } = useAuth0();
   const { execQuery } = useFaunaQuery();
   const [loggedUser, setLoggedUser] = useState<
-    FaunaUserSessionInfo | undefined
+    DynamoUserSessionInfo | undefined
   >(undefined);
   const dispatch = useDispatch()
   const isAlertConfirmed = useSelector(isConfirmedInfoModalSelector);
@@ -66,11 +66,11 @@ export const useAllowSingleSessionUser = () => {
               execQuery(updateUserSessionInfo, {
                 id: item[0].id,
                 userSessionInfo: newSessionInfo,
-              } as FaunaUserSessionInfo, dispatch);
+              } as DynamoUserSessionInfo, dispatch);
               setLoggedUser({
                 id: item[0].id,
                 userSessionInfo: newSessionInfo,
-              } as FaunaUserSessionInfo);
+              } as DynamoUserSessionInfo);
             })
           } else {
             if(process.env.APP_MODE !== 'test'){
@@ -101,7 +101,7 @@ export const useAllowSingleSessionUser = () => {
                   setLoggedUser({
                     id: ret.data.id,
                     userSessionInfo: newUserSessionInfo,
-                  } as FaunaUserSessionInfo);
+                  } as DynamoUserSessionInfo);
                 },
               );
             });
@@ -121,7 +121,7 @@ export const useAllowSingleSessionUser = () => {
       execQuery(updateUserSessionInfo, {
         id: loggedUser.id,
         userSessionInfo: newSessionInfo,
-      } as FaunaUserSessionInfo, dispatch)
+      } as DynamoUserSessionInfo, dispatch)
     }
     setLoggedUser(undefined)
   };

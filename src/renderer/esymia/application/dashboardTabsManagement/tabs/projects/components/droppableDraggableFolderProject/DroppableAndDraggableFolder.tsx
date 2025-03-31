@@ -33,6 +33,8 @@ import { useStorageData } from '../../../../../simulationTabsManagement/tabs/sim
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../cad_library';
 import { ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { deleteFolderFromDynamoDB, moveFolderInDynamoDB, moveProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 interface DroppableAndDraggableFolderProps {
   folder: Folder;
@@ -44,12 +46,11 @@ export const DroppableAndDraggableFolder: React.FC<
   DroppableAndDraggableFolderProps
 > = ({ folder, path, setPath }) => {
   const dispatch = useDispatch();
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery()
   const selectedFolder = useSelector(SelectedFolderSelector) as Folder;
   const allProjectFolders = useSelector(allProjectFoldersSelector);
   const user = useSelector(usersStateSelector);
   const theme = useSelector(ThemeSelector)
-  const { deleteProject } = useStorageData()
   const [showRename, setShowRename] = useState(false);
   const [showSearchUser, setShowSearchUser] = useState(false);
 
@@ -70,7 +71,7 @@ export const DroppableAndDraggableFolder: React.FC<
         setDragDone(true);
       },
     }),
-    [selectedFolder.name, selectedFolder.projectList],
+    [selectedFolder.name, selectedFolder.projectList.length],
   );
 
   const [{ isDragging }, drag] = useDrag(
@@ -81,7 +82,7 @@ export const DroppableAndDraggableFolder: React.FC<
         isDragging: monitor.isDragging(),
       }),
     }),
-    [selectedFolder.name, selectedFolder.projectList.length],
+    [selectedFolder.name, selectedFolder.subFolders.length],
   );
 
   const dragAndDropManager = useDragDropManager();
@@ -98,8 +99,8 @@ export const DroppableAndDraggableFolder: React.FC<
               targetFolder: dropTargetFolder.id as string,
             }),
           );
-          execQuery(
-            moveProjectInFauna,
+          execQuery2(
+            moveProjectInDynamoDB,
             {
               id: objectToMove?.id,
               description: objectToMove?.description as string,
@@ -116,7 +117,8 @@ export const DroppableAndDraggableFolder: React.FC<
               sharedWith: objectToMove?.sharedWith as sharingInfoUser[],
               parentFolder: dropTargetFolder.id,
             } as Project,
-            objectToMove.parentFolder,
+            selectedFolder,
+            dropTargetFolder,
             dispatch
           );
         } else {
@@ -126,8 +128,8 @@ export const DroppableAndDraggableFolder: React.FC<
               targetFolder: dropTargetFolder.id as string,
             }),
           );
-          execQuery(
-            moveFolderInFauna,
+          execQuery2(
+            moveFolderInDynamoDB,
             {
               id: objectToMove.id,
               name: objectToMove.name,
@@ -137,7 +139,8 @@ export const DroppableAndDraggableFolder: React.FC<
               subFolders: objectToMove.subFolders,
               parent: dropTargetFolder.id,
             } as Folder,
-            (objectToMove as Folder).parent,
+            selectedFolder,
+            dropTargetFolder,
             dispatch
           );
         }
@@ -214,10 +217,11 @@ export const DroppableAndDraggableFolder: React.FC<
                               targetFolder: f.id as string,
                             }),
                           );
-                          execQuery(
-                            moveFolderInFauna,
+                          execQuery2(
+                            moveFolderInDynamoDB,
                             { ...folder, parent: f.id } as Folder,
-                            folder.parent,
+                            selectedFolder,
+                            f,
                             dispatch
                           );
                           hideAll();
@@ -257,15 +261,15 @@ export const DroppableAndDraggableFolder: React.FC<
             <Item
               onClick={(p) => {
                 p.event.stopPropagation();
-                execQuery(
-                  deleteFolderFromFauna,
-                  folder.id,
-                  folder.parent,
+                execQuery2(
+                  deleteFolderFromDynamoDB,
+                  folder,
+                  selectedFolder,
                   dispatch
-                );
-                takeAllProjectsInArrayOf([folder]).forEach(p => { deleteProject(p) })
-                dispatch(removeFolder(folder));
-                hideAll();
+                ).then(() => {
+                  dispatch(removeFolder(folder));
+                  hideAll();
+                })
               }}
               className='hover:text-white  text-primaryColor'
               data-testid="deleteButtonFolder"

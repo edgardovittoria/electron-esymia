@@ -64,7 +64,7 @@ export const GizmoArrowViewport = ({
           color={new THREE.Color(colorX).getHex()}
           length={lenght}
         />
-        <Text position={new THREE.Vector3(directionX.x + 0.2, directionX.y, directionX.z)} fontSize={0.1} color={"black"}>
+        <Text position={new THREE.Vector3(directionX.x + 0.2, directionX.y, directionX.z)} rotation={[Math.PI / 2, 0, 0]} fontSize={0.1} color={"black"}>
               X
             </Text>
         <ArrowHelper
@@ -72,7 +72,7 @@ export const GizmoArrowViewport = ({
           color={new THREE.Color(colorY).getHex()}
           length={lenght}
         />
-        <Text position={new THREE.Vector3(directionY.x, directionY.y +0.2, directionY.z)} fontSize={0.1} color={"black"}>
+        <Text position={new THREE.Vector3(directionY.x, directionY.y +0.2, directionY.z)} rotation={[Math.PI / 2, 0, 0]} fontSize={0.1} color={"black"}>
               Y
             </Text>
         <ArrowHelper
@@ -80,7 +80,7 @@ export const GizmoArrowViewport = ({
           color={new THREE.Color(colorZ).getHex()}
           length={lenght}
         />
-        <Text position={new THREE.Vector3(directionZ.x, directionZ.y, directionZ.z + 0.2)} fontSize={0.1} color={"black"}>
+        <Text position={new THREE.Vector3(directionZ.x, directionZ.y, directionZ.z + 0.2)} rotation={[Math.PI / 2, 0, 0]} fontSize={0.1} color={"black"}>
               Z
             </Text>
         <FieldVectors

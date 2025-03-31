@@ -36,6 +36,8 @@ import { GrClone } from 'react-icons/gr';
 import { ImSpinner } from 'react-icons/im';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../cad_library';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { moveProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 interface DraggableProjectCardProps {
   project: Project;
@@ -45,7 +47,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
   project,
 }) => {
   const dispatch = useDispatch();
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const { deleteProject } = useStorageData()
   const selectedFolder = useSelector(SelectedFolderSelector) as Folder;
   const allProjectFolders = useSelector(allProjectFoldersSelector);
@@ -155,8 +157,8 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                               targetFolder: f.id as string,
                             }),
                           );
-                          execQuery(
-                            moveProjectInFauna,
+                          execQuery2(
+                            moveProjectInDynamoDB,
                             {
                               id: project?.id,
                               description: project?.description as string,
@@ -173,7 +175,8 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                               sharedWith: project?.sharedWith as sharingInfoUser[],
                               parentFolder: f.id,
                             } as Project,
-                            project.parentFolder,
+                            selectedFolder,
+                            f,
                             dispatch
                           );
                           hideAll();
@@ -227,7 +230,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
               data-testid="deleteButton"
               onClick={(p) => {
                 p.event.stopPropagation();
-                deleteProject(project)
+                deleteProject(project, selectedFolder)
                 hideAll();
               }}
               className='hover:text-white  text-primaryColor'

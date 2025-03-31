@@ -1,4 +1,4 @@
-import { FaunaFolder, FaunaProject } from '../model/FaunaModels';
+import { DynamoFolder, DynamoProject } from '../model/DynamoModels';
 import { constructFolderStructure } from '../faunadb/apiAuxiliaryFunctions';
 import { selectFolder, setProjectsFolderToUser } from '../store/projectSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,10 +14,10 @@ export const useStorage = () => {
   const loadProjectsOnline = (setLoginSpinner: (v: boolean) => void) => {
     execQuery2(getFolderByUserEmail, user.email, dispatch).then(
       (resFolders) => {
-        let folders = resFolders.Items.map((f: any) => ({id: f.id.S, folder: convertFromDynamoDBFormat(f)} as FaunaFolder))
+        let folders = resFolders.Items.map((f: any) => ({id: f.id.S, folder: convertFromDynamoDBFormat(f)} as DynamoFolder))
         execQuery2(getSimulationProjectsByUserEmail, user.email, dispatch).then(
           (resProjects) => {
-            let projects = resProjects.Items.map((p: any) => ({id: p.id.S, project: convertFromDynamoDBFormat(p)} as FaunaProject))
+            let projects = resProjects.Items.map((p: any) => ({id: p.id.S, project: convertFromDynamoDBFormat(p)} as DynamoProject))
             const rootFaunaFolder = {
               id: 'root',
               folder: {
@@ -32,7 +32,7 @@ export const useStorage = () => {
                   .map((pr: { id: any; }) => pr.id),
                 parent: 'nobody'
               }
-            } as FaunaFolder;
+            } as DynamoFolder;
             const folder = constructFolderStructure(
               'root',
               [rootFaunaFolder, ...folders],
