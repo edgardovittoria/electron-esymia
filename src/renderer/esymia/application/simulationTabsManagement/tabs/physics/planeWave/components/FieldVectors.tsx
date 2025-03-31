@@ -100,16 +100,16 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
   return (
     <>
       {/* Vettori */}
-      <VectorArrow start={K} dir={E} color="blue" label="E" />
+      <VectorArrow start={K} dir={E} color="blue" label="Ê" />
       <VectorArrow
         start={new THREE.Vector3(K.x, K.y, K.z)}
         dir={K}
         color="gray"
-        label="K"
+        label="K̂"
       />
-      <VectorArrow start={K} dir={E_theta_v} color="green" label="Eθ" />
-      <VectorArrow start={K} dir={E_phi_v} color="purple" label="Eφ" />
-      <VectorArrow start={K} dir={H} color="red" label="H" />
+      <VectorArrow start={K} dir={E_theta_v} color="green" label="Êθ" />
+      <VectorArrow start={K} dir={E_phi_v} color="purple" label="Êφ" />
+      <VectorArrow start={K} dir={H} color="red" label="Ĥ" />
 
       <Line
         points={[new THREE.Vector3(0, 0, 0), new THREE.Vector3(-0.5, 0, 0)]}
