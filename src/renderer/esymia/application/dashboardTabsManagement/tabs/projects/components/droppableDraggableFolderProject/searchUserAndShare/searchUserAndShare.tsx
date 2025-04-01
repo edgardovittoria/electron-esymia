@@ -11,8 +11,9 @@ import {
 import toast from 'react-hot-toast';
 import { UsersState, usersStateSelector } from '../../../../../../../../cad_library';
 import { useStorageData } from '../../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
-import { useDynamoDBQuery } from '../../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { recursiveUpdateSharingInfoFolderInDynamoDB } from '../../../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { recursiveUpdateSharingInfoFolderInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
+
 
 interface SearchUserAndShareProps {
   setShowSearchUser: (v: boolean) => void;

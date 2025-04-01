@@ -9,8 +9,8 @@ import {
 } from '../../../../../store/projectSlice';
 import { PlaneWaveParameters } from '../../../../../model/esymiaModels';
 import { computeFieldsComponents } from './utility/computeFieldsComponents';
-import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../../dynamoDB/projectsFolderApi';
 
 interface PlaneWaveSettingsModalProps {
   setModalOpen: (v: boolean) => void;

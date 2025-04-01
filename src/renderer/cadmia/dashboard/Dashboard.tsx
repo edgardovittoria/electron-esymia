@@ -20,6 +20,9 @@ import { useFaunaQuery } from '../../esymia/faunadb/hook/useFaunaQuery';
 import { Client, fql, QuerySuccess } from 'fauna';
 import { FaunaCadModel, resetState } from '../../cad_library';
 import { ThemeSelector } from '../../esymia/store/tabsAndMenuItemsSlice';
+import { useDynamoDBQuery } from '../../dynamoDB/hook/useDynamoDBQuery';
+import { getModelsByOwnerDynamoDB } from '../../dynamoDB/modelsApis';
+import { convertFromDynamoDBFormat } from '../../dynamoDB/utility/formatDynamoDBData';
 
 const getModelsByOwner = async (faunaClient: Client, faunaQuery: typeof fql, owner_id: string) => {
   try {
@@ -71,23 +74,27 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
       dispatch(removeModel(model.id));
     }
   };
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   useEffect(() => {
     if (user && user.sub) {
-      execQuery(getModelsByOwner, user.sub)
-        .then((mods) => {
+      execQuery2(getModelsByOwnerDynamoDB, user.sub, dispatch)
+        .then((res) => {
+          let mods:any[] = []
+          if(res.Item){
+            res.Item.forEach((i: any) => mods.push(convertFromDynamoDBFormat(i)))
+          }
           if (models.length === 0) {
             mods.forEach((m: FaunaCadModel) => dispatch(addModel(m)));
           }
         })
         .catch((err) => console.log(err));
-      if (selectedMenuItem === 'MSP') {
-        execQuery(getSharedModels, user.email, dispatch)
-          .then((mods) => {
-            dispatch(setSharedModel(mods));
-          })
-          .catch((err) => console.log(err));
-      }
+      // if (selectedMenuItem === 'MSP') {
+      //   execQuery(getSharedModels, user.email, dispatch)
+      //     .then((mods) => {
+      //       dispatch(setSharedModel(mods));
+      //     })
+      //     .catch((err) => console.log(err));
+      // }
     }
   }, [user, showCad, selectedMenuItem]);
 

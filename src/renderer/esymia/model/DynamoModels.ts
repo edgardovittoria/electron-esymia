@@ -45,7 +45,6 @@ export type DynamoFolderDetails = {
 }
 
 export type DynamoUserSessionInfo = {
-  id: string,
   userSessionInfo: UserSessionInfo
 }
 

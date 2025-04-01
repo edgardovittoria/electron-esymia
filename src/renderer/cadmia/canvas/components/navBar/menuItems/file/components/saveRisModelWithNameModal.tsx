@@ -10,6 +10,8 @@ import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../.
 import { useFaunaQuery } from '../../../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { Client, fql, QuerySuccess } from 'fauna';
 import { canvasStateSelector, ComponentEntity, CubeGeometryAttributes, FaunaCadModel, Material } from '../../../../../../../cad_library';
+import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateModelInDynamoDB } from '../../../../../../../dynamoDB/modelsApis';
 
 export const SaveRisModelWithNameModal: FC<{ showModalSave: Function }> = ({
   showModalSave,
@@ -18,35 +20,8 @@ export const SaveRisModelWithNameModal: FC<{ showModalSave: Function }> = ({
   const { user } = useAuth0();
   const canvas = useSelector(canvasStateSelector);
   const unit = useSelector(unitSelector);
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const dispatch = useDispatch();
-
-  const saveModelInFauna = async (
-    faunaClient: Client,
-    faunaQuery: typeof fql,
-    modelToSave: FaunaCadModel,
-  ) => {
-    const response = await faunaClient
-      .query(
-        faunaQuery`CadModels.create(${modelToSave})`
-      )
-      .catch(
-        (err: {
-          name: any;
-          message: any;
-          errors: () => { description: any }[];
-        }) => {
-          dispatch(setLoadingSpinner(false))
-          toast.error(
-            'ERROR! Model not saved.',
-          );
-          dispatch(setMessageInfoModal('Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.'));
-          dispatch(setIsAlertInfoModal(false));
-          dispatch(setShowInfoModal(true));
-        },
-      );
-    return (response as QuerySuccess<any>).data;
-  };
 
   const saveModel = async () => {
     const model = JSON.stringify({ components: canvas.components, unit });
@@ -65,14 +40,14 @@ export const SaveRisModelWithNameModal: FC<{ showModalSave: Function }> = ({
         uploadFileS3(modelFileRis).then((resRis) => {
           if (resRis) {
             const newModel = {
+              id: crypto.randomUUID(),
               name,
               components: res.key,
               bricks: resRis.key,
               owner_id: user?.sub,
               owner: user?.name,
             } as FaunaCadModel;
-            execQuery(saveModelInFauna, newModel).then((res) => {
-              newModel.id = res.id;
+            execQuery2(createOrUpdateModelInDynamoDB, newModel, dispatch).then((res) => {
               dispatch(addModel(newModel));
               toast.success('Model has been saved!');
               dispatch(setLoadingSpinner(false))

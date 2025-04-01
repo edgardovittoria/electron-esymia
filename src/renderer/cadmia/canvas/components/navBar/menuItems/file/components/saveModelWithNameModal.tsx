@@ -10,6 +10,8 @@ import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../.
 import { useFaunaQuery } from '../../../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { Client, fql, QuerySuccess } from 'fauna';
 import { canvasStateSelector, FaunaCadModel } from '../../../../../../../cad_library';
+import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateModelInDynamoDB } from '../../../../../../../dynamoDB/modelsApis';
 
 export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
   showModalSave,
@@ -18,7 +20,7 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
   const { user } = useAuth0();
   const canvas = useSelector(canvasStateSelector);
   const unit = useSelector(unitSelector);
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const dispatch = useDispatch();
 
   const saveModelInFauna = async (
@@ -58,13 +60,13 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
     uploadFileS3(modelFile).then((res) => {
       if (res) {
         const newModel = {
+          id: crypto.randomUUID(),
           name,
           components: res.key,
           owner_id: user?.sub,
           owner: user?.name,
         } as FaunaCadModel;
-        execQuery(saveModelInFauna, newModel).then((res) => {
-          newModel.id = res.id;
+        execQuery2(createOrUpdateModelInDynamoDB, newModel, dispatch).then(() => {
           dispatch(addModel(newModel));
           toast.success('Model has been saved!');
           dispatch(setLoadingSpinner(false))

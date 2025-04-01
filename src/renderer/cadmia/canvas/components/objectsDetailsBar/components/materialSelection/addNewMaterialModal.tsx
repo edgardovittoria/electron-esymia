@@ -5,12 +5,31 @@ import {ChromePicker} from "react-color"
 import ModalCustomAttributes, {CustomMaterialAttribute} from "./ModalCustomAttributes";
 import { useFaunaQuery } from "../../../../../../esymia/faunadb/hook/useFaunaQuery"
 import { Client, fql } from "fauna"
+import { useDynamoDBQuery } from "../../../../../../dynamoDB/hook/useDynamoDBQuery";
+import { createOrUpdateMaterialDynamoDB } from "../../../../../../dynamoDB/MaterialsApis";
+import { useDispatch } from "react-redux";
+
+export type MaterialDynamoDB = {
+    id: string,
+    name: string;
+    color: string;
+    permeability: number;
+    tangent_delta_permeability?: number;
+    custom_permeability?: CustomMaterialAttribute
+    permittivity: number;
+    tangent_delta_permittivity?: number;
+    custom_permittivity?: CustomMaterialAttribute
+    conductivity: number;
+    tangent_delta_conductivity?: number;
+    custom_conductivity?: CustomMaterialAttribute
+}
 
 export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Function }> = ({
                                                                                                 showModal,
                                                                                                 updateMaterials
                                                                                             }) => {
-    const {execQuery} = useFaunaQuery()
+    const {execQuery2} = useDynamoDBQuery()
+    const dispatch = useDispatch()
     const [name, setName] = useState("")
     const [color, setColor] = useState("#333")
     const [permeability, setPermeability] = useState<number | undefined>(undefined)
@@ -28,21 +47,7 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
     const [showModalCustomPermittivity, setShowModalCustomPermittivity] = useState(false)
     const [showModalCustomConductivity, setShowModalCustomConductivity] = useState(false)
 
-    type FaunaMaterial = {
-        name: string;
-        color: string;
-        permeability: number;
-        tangent_delta_permeability?: number;
-        custom_permeability?: CustomMaterialAttribute
-        permittivity: number;
-        tangent_delta_permittivity?: number;
-        custom_permittivity?: CustomMaterialAttribute
-        conductivity: number;
-        tangent_delta_conductivity?: number;
-        custom_conductivity?: CustomMaterialAttribute
-    }
-
-    async function saveNewMaterial(faunaClient: Client, faunaQuery: typeof fql, newMaterial: FaunaMaterial) {
+    async function saveNewMaterial(faunaClient: Client, faunaQuery: typeof fql, newMaterial: MaterialDynamoDB) {
         try {
             await faunaClient.query(
                 faunaQuery`Materials.create(${newMaterial})`
@@ -90,7 +95,8 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
         if (saveMaterialFlag) {
             setSaveMaterialFlag(false)
             showModal(false)
-            execQuery(saveNewMaterial, {
+            execQuery2(createOrUpdateMaterialDynamoDB, {
+                id: crypto.randomUUID(),
                 name: name,
                 color: color,
                 permeability: permeability,
@@ -102,7 +108,10 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
                 conductivity: conductivity,
                 tangent_delta_conductivity: tangentDeltaConductivity,
                 custom_conductivity: customConductivity.frequencies.length !== 0 ? customConductivity : undefined
-            } as FaunaMaterial).then(() => updateMaterials())
+            } as MaterialDynamoDB, dispatch).then(() => {
+                toast.success("Material successfully saved!")
+                updateMaterials()
+            })
         }
     }, [saveMaterialFlag])
 

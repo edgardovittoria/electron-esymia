@@ -1,39 +1,39 @@
-import {useEffect, useState} from "react";
-import { useAuth0 } from "@auth0/auth0-react";
-import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from "../../../../../../esymia/store/tabsAndMenuItemsSlice";
-import { useDispatch } from "react-redux";
-import { useFaunaQuery } from "../../../../../../esymia/faunadb/hook/useFaunaQuery";
-import { Client, fql, QuerySuccess } from "fauna";
-import { Material } from "../../../../../../cad_library";
+import { useEffect, useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useDispatch } from 'react-redux';
+import { Material } from '../../../../../../cad_library';
+import { useDynamoDBQuery } from '../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { getMaterialsDynamoDB } from '../../../../../../dynamoDB/MaterialsApis';
+import { convertFromDynamoDBFormat } from '../../../../../../dynamoDB/utility/formatDynamoDBData';
 
 export const useMaterials = () => {
-    const {user} = useAuth0()
-    const [availableMaterials, setAvailableMaterials] = useState<Material[]>([]);
-    const {execQuery} = useFaunaQuery()
-    const dispatch = useDispatch()
-    async function getMaterials(faunaClient: Client, faunaQuery: typeof fql) {
-        const response = await faunaClient.query(
-          faunaQuery`Materials.all()`
-        )
-            .catch((err) => {
-              dispatch(
-                setMessageInfoModal(
-                  'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
-                ),
-              );
-              dispatch(setIsAlertInfoModal(false));
-              dispatch(setShowInfoModal(true));
-            });
-        return (response as QuerySuccess<any>).data.data as Material[]
-    }
+  const { user } = useAuth0();
+  const [availableMaterials, setAvailableMaterials] = useState<Material[]>([]);
+  const { execQuery2 } = useDynamoDBQuery();
+  const dispatch = useDispatch();
 
-    const updateMaterials = () => {
-        execQuery(getMaterials)?.then(res => setAvailableMaterials(res as Material[]))
-    }
+  const updateMaterials = () => {
+    execQuery2(getMaterialsDynamoDB, dispatch)?.then((res) => {
+      let items: any[] = [];
+      if (res.Items) {
+        res.Items.forEach((i: any) => items.push(convertFromDynamoDBFormat(i)));
+      }
+      setAvailableMaterials(items as Material[]);
+    });
+  };
 
-    useEffect(() => {
-        (user) && execQuery(getMaterials)?.then(res => setAvailableMaterials(res as Material[]))
-    }, []);
+  useEffect(() => {
+    user &&
+      execQuery2(getMaterialsDynamoDB, dispatch)?.then((res) => {
+        let items: any[] = [];
+        if (res.Items) {
+          res.Items.forEach((i: any) =>
+            items.push(convertFromDynamoDBFormat(i)),
+          );
+        }
+        setAvailableMaterials(items as Material[]);
+      });
+  }, []);
 
-    return {availableMaterials, updateMaterials}
-}
+  return { availableMaterials, updateMaterials };
+};

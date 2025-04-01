@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from "../../../store/tabsAndMenuItemsSlice";
+import { setIsAlertInfoModal, setMessageInfoModal, setShowInfoModal } from "../../esymia/store/tabsAndMenuItemsSlice";
 
 export const useDynamoDBQuery = () => {
   const dispatch = useDispatch()

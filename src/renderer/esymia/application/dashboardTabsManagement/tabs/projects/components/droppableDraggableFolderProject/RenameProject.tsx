@@ -4,8 +4,8 @@ import {useDispatch} from "react-redux";
 import { renameProject } from '../../../../../../store/projectSlice';
 import { Project } from '../../../../../../model/esymiaModels';
 import { updateProjectTab } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
 
 
 interface RenameProjectProps {

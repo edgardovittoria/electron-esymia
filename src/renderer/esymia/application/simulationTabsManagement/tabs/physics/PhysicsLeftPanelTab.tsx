@@ -23,8 +23,8 @@ import { MdDeleteSweep } from 'react-icons/md';
 import { deleteFileS3 } from '../../../../aws/mesherAPIs';
 import { savePortsOnS3 } from './savePortsOnS3';
 import { isConfirmedInfoModalSelector, setIsAlertInfoModal, setMessageInfoModal, setShowInfoModal, ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
-import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 interface PhysicsLeftPanelTabProps {}
 

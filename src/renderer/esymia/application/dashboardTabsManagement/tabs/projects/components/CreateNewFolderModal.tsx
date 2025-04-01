@@ -6,8 +6,8 @@ import { Folder } from '../../../../../model/esymiaModels';
 import toast from 'react-hot-toast';
 import { usersStateSelector } from '../../../../../../cad_library';
 import { ThemeSelector } from '../../../../../store/tabsAndMenuItemsSlice';
-import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
-import { addIDInSubFoldersListInDynamoDB, createOrUpdateFolderInDynamoDB } from '../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateFolderInDynamoDB, addIDInSubFoldersListInDynamoDB } from '../../../../../../dynamoDB/projectsFolderApi';
 
 interface CreateNewFolderModalProps {
     setShowNewFolderModal: Function,

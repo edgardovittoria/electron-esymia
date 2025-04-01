@@ -26,8 +26,8 @@ import { publishMessage } from '../../../../../../../middleware/stompMiddleware'
 import { CanvasState } from '../../../../../../../cad_library';
 import { UsersState } from '../../../../../../../cad_library/components/store/users/usersSlice';
 import { GetObjectRequest } from 'aws-sdk/clients/s3';
-import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { addIDInProjectListInDynamoDB, createOrUpdateProjectInDynamoDB, deleteSimulationProjectFromDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { deleteSimulationProjectFromDynamoDB, createOrUpdateProjectInDynamoDB, addIDInProjectListInDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();

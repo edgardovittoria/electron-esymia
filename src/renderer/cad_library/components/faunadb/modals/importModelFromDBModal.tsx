@@ -4,12 +4,15 @@ import { FC, useEffect, useState, Fragment } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { ImportActionParamsObject } from '../../importFunctions/importFunctions';
-import { FaunaCadModel, getModelsByOwner } from '../api/modelsAPIs';
+import { DynamoDBCadModel, getModelsByOwner } from '../api/modelsAPIs';
 import { ComponentEntity } from '../../model/componentEntity/componentEntity';
 import AWS from 'aws-sdk';
 import { useFaunaQuery } from '../../../../esymia/faunadb/hook/useFaunaQuery';
 import { CheckIcon } from '@heroicons/react/20/solid';
 import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
+import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
+import { getModelsByOwnerDynamoDB } from '../../../../dynamoDB/modelsApis';
+import { convertFromDynamoDBFormat } from '../../../../dynamoDB/utility/formatDynamoDBData';
 
 export const ImportModelFromDBModal: FC<{
   showModalLoad: Function;
@@ -24,20 +27,24 @@ export const ImportModelFromDBModal: FC<{
   s3Config,
   bucket,
 }) => {
-  const [models, setModels] = useState<FaunaCadModel[]>([]);
-  const [selectedModel, setSelectedModel] = useState<FaunaCadModel | undefined>(
+  const [models, setModels] = useState<DynamoDBCadModel[]>([]);
+  const [selectedModel, setSelectedModel] = useState<DynamoDBCadModel | undefined>(
     undefined,
   );
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
   const { user } = useAuth0();
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const dispatch = useDispatch();
   const theme = useSelector(ThemeSelector)
 
   useEffect(() => {
     user !== undefined &&
       user.sub !== undefined &&
-      execQuery(getModelsByOwner, user.sub).then((mods) => {
+      execQuery2(getModelsByOwnerDynamoDB, user.sub, dispatch).then((res) => {
+        let mods: any[] = []
+        if(res.Items){
+          res.Items.forEach((i: any) => mods.push(convertFromDynamoDBFormat(i)))
+        }
         setModels(mods);
         models.length === 0 &&
           setLoadingMessage('No models to load form database.');

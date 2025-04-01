@@ -1,2 +1,2 @@
 export {getModelsByOwner, saveNewModel} from "./modelsAPIs"
-export type {FaunaCadModel} from "./modelsAPIs"
+export type {DynamoDBCadModel as FaunaCadModel} from "./modelsAPIs"

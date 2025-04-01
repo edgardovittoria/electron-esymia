@@ -36,8 +36,8 @@ import { GrClone } from 'react-icons/gr';
 import { ImSpinner } from 'react-icons/im';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../cad_library';
-import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { moveProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { moveProjectInDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
 
 interface DraggableProjectCardProps {
   project: Project;

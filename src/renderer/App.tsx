@@ -21,11 +21,7 @@ import {
 import { ImSpinner } from 'react-icons/im';
 import { brokerConnectedSelector, setTheme, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
 import { MesherStatusSelector, SolverStatusSelector } from './esymia/store/pluginsSlice';
-import { dynamoDB } from './esymia/aws/s3Config';
-import log from 'electron-log';
-import { useDynamoDBQuery } from './esymia/application/dynamoDB/hook/useDynamoDBQuery';
-import { getItemDynamoDB, putItemDynamoDB } from './esymia/application/dynamoDB/projectsFolderApi';
-import { convertFromDynamoDBFormat, convertToDynamoDBFormat } from './esymia/application/dynamoDB/utility/formatDynamoDBData';
+import { useAllowSingleSessionUser } from './useAllowSingleSessionUser';
 
 
 // export const client = new Client({
@@ -303,8 +299,8 @@ export default function App() {
                         className="flex items-center p-[5px] hover:bg-black hover:text-white hover:cursor-pointer"
                         onClick={() => {
                           if (process.env.APP_MODE !== 'test') {
-                            window.electron.ipcRenderer.sendMessage('checkLogout');
                             //closeUserSessionOnFauna()
+                            window.electron.ipcRenderer.sendMessage('checkLogout');
                           }
                         }}
                       >

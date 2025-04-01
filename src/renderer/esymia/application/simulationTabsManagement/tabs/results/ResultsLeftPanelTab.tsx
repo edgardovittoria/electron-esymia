@@ -12,8 +12,8 @@ import { ImSpinner } from 'react-icons/im';
 import { deleteFileS3 } from '../../../../aws/mesherAPIs';
 import { msToTime } from '../../../dashboardTabsManagement/tabs/Simulations';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
-import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 interface ResultsLeftPanelTabProps {
   selectedPort: string;

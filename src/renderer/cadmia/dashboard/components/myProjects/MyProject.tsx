@@ -20,6 +20,10 @@ import { getSimulationProjectsByOwner } from '../../../../esymia/faunadb/project
 import { useAuth0 } from '@auth0/auth0-react';
 import { DynamoProject } from '../../../../esymia/model/DynamoModels';
 import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
+import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
+import { getSimulationProjectsByUserEmailDynamoDB } from '../../../../dynamoDB/projectsFolderApi';
+import { convertFromDynamoDBFormat } from '../../../../dynamoDB/utility/formatDynamoDBData';
+import { deleteModelDynamoDB } from '../../../../dynamoDB/modelsApis';
 
 export interface ContextMenuProps {
   model: FaunaCadModel;
@@ -33,7 +37,7 @@ const MyProject: React.FC<ContextMenuProps> = ({
   deleteModel,
 }) => {
   const dispatch = useDispatch();
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const { user } = useAuth0();
   const [modalRenameShow, setModalRenameShow] = useState<boolean>(false);
   const [serchUserAndShare, setSerchUserAndShare] = useState<boolean>(false);
@@ -53,10 +57,14 @@ const MyProject: React.FC<ContextMenuProps> = ({
   }
 
   useEffect(() => {
-    execQuery(getSimulationProjectsByOwner, user?.email, dispatch).then(
-      (projects: DynamoProject[]) => {
+    execQuery2(getSimulationProjectsByUserEmailDynamoDB, user?.email, dispatch).then(
+      (res) => {
+        let projects: any[] = []
+        if(res.Items){
+          res.Items.forEach((i:any) => projects.push(convertFromDynamoDBFormat(i)))
+        }
         projects.forEach((p) => {
-          if (p.project.modelS3 === model.components) {
+          if (p.modelS3 === model.components) {
             setModelErasable(false);
           }
         });
@@ -127,7 +135,7 @@ const MyProject: React.FC<ContextMenuProps> = ({
               deleteFileS3(model.components)
                 .then(() => {
                   // cancellare documento fauna
-                  execQuery(deleteFaunadbModel, model.id as string, dispatch)
+                  execQuery2(deleteModelDynamoDB, model.id as string, dispatch)
                     .then(() => {
                       deleteModel(model);
                       return 'deleted';

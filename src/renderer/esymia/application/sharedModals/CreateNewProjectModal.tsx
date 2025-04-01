@@ -13,8 +13,8 @@ import {
 import { Project, sharingInfoUser } from '../../model/esymiaModels';
 import toast from 'react-hot-toast';
 import { CanvasState, UsersState, usersStateSelector } from '../../../cad_library';
-import { useDynamoDBQuery } from '../dynamoDB/hook/useDynamoDBQuery';
-import { addIDInProjectListInDynamoDB, createOrUpdateProjectInDynamoDB } from '../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB, addIDInProjectListInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
 
 interface CreateNewProjectModalProps {
 }

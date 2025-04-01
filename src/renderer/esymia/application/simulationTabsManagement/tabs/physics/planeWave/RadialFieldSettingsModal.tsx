@@ -8,8 +8,8 @@ import {
   unsetRadialFieldParametres,
 } from '../../../../../store/projectSlice';
 import { RadialFieldParameters } from '../../../../../model/esymiaModels';
-import { createOrUpdateProjectInDynamoDB } from '../../../../dynamoDB/projectsFolderApi';
-import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
+import { useDynamoDBQuery } from '../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../../dynamoDB/projectsFolderApi';
 
 interface RadialFieldSettingsModalProps {
   setModalOpen: (v: boolean) => void;

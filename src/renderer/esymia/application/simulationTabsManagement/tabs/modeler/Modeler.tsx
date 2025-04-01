@@ -24,8 +24,10 @@ import { s3 } from '../../../../aws/s3Config';
 import { ImportActionParamsObject, ImportModelFromDBModal, CanvasState } from "../../../../../cad_library";
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
-import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
+
+
 interface ModelerProps {
   selectedTabLeftPanel: string | undefined;
   setSelectedTabLeftPanel: Function;

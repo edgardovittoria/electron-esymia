@@ -56,8 +56,8 @@ import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { TbWavesElectricity } from 'react-icons/tb';
 import { PlaneWaveSettingsModal } from './planeWave/PlaneWaveSettingsModal';
 import { RadialFieldSettingsModal } from './planeWave/RadialFieldSettingsModal';
-import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string | undefined;

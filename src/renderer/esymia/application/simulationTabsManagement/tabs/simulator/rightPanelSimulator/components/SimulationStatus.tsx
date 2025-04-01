@@ -45,8 +45,8 @@ import { PiClockCountdownBold } from 'react-icons/pi';
 import { ImSpinner } from 'react-icons/im';
 import { TbTrashXFilled } from 'react-icons/tb';
 import { ComponentEntity } from '../../../../../../../cad_library';
-import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean;

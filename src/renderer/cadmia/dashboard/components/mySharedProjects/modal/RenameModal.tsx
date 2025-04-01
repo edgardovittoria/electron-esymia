@@ -6,13 +6,15 @@ import { updateModelInFauna } from '../../../../faunaDB/functions';
 import { updateModel } from '../../../../store/modelSlice';
 import { useFaunaQuery } from '../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { FaunaCadModel } from '../../../../../cad_library';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateModelInDynamoDB } from '../../../../../dynamoDB/modelsApis';
 
 const RenameModal: FC<{
   setRenameModalShow: Function;
   model: FaunaCadModel;
 }> = ({ setRenameModalShow, model }) => {
   const [name, setName] = useState('');
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const dispatch = useDispatch();
 
   return (
@@ -91,7 +93,7 @@ const RenameModal: FC<{
                               ...model,
                               name,
                             };
-                            execQuery(updateModelInFauna, newModel, dispatch)
+                            execQuery2(createOrUpdateModelInDynamoDB, newModel, dispatch)
                               .then(() => {
                                 dispatch(updateModel(newModel));
                                 toast.success('Model Name Updated!');

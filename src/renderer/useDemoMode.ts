@@ -1,13 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import {
-  setMessageInfoModal,
-  setIsAlertInfoModal,
-  setShowInfoModal,
-} from './esymia/store/tabsAndMenuItemsSlice';
 import { useDispatch } from 'react-redux';
-import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaQuery';
-import { Client, fql, QuerySuccess } from 'fauna';
+import { useDynamoDBQuery } from './dynamoDB/hook/useDynamoDBQuery';
+import { getItemByMacAddressDynamoBD, createItemInMacAddressesDynamoDB } from './dynamoDB/macAddressesApis';
+import { convertFromDynamoDBFormat } from './dynamoDB/utility/formatDynamoDBData';
 
 export const useDemoMode = () => {
   const MILLISECONDS_IN_A_DAY = 8.64e7;
@@ -15,47 +11,47 @@ export const useDemoMode = () => {
   const { user } = useAuth0();
   const [allowedUser, setallowedUser] = useState<boolean>(true);
   const [remainingDemoDays, setRemainingDemoDays] = useState<number>(DEMO_DAYS);
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const dispatch = useDispatch();
   //console.log(user)
 
-  const getItemByMacAddress = async (
-    faunaClient: Client,
-    faunaQuery: typeof fql,
-    macaddress: string,
-  ) => {
-    const query = fql`getItemByMacAddress(${macaddress})`
-    const response = await faunaClient.query(query)
-      .catch((err) => {
-        dispatch(
-          setMessageInfoModal(
-            'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
-          ),
-        );
-        dispatch(setIsAlertInfoModal(false));
-        dispatch(setShowInfoModal(true));
-      });
-    return (response as QuerySuccess<any>).data.data;
-  };
+  // const getItemByMacAddress = async (
+  //   faunaClient: Client,
+  //   faunaQuery: typeof fql,
+  //   macaddress: string,
+  // ) => {
+  //   const query = fql`getItemByMacAddress(${macaddress})`
+  //   const response = await faunaClient.query(query)
+  //     .catch((err) => {
+  //       dispatch(
+  //         setMessageInfoModal(
+  //           'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+  //         ),
+  //       );
+  //       dispatch(setIsAlertInfoModal(false));
+  //       dispatch(setShowInfoModal(true));
+  //     });
+  //   return (response as QuerySuccess<any>).data.data;
+  // };
 
-  const createItemInMacAddresses = async (
-    faunaClient: Client,
-    faunaQuery: typeof fql,
-    itemToSave: { macAddress: string; startTime: number },
-  ) => {
-    const query = faunaQuery`MacAddresses.create(${itemToSave})`
-    const response = faunaClient.query(query)
-      .catch((err) => {
-        dispatch(
-          setMessageInfoModal(
-            'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
-          ),
-        );
-        dispatch(setIsAlertInfoModal(false));
-        dispatch(setShowInfoModal(true));
-      });
-    return response;
-  };
+  // const createItemInMacAddresses = async (
+  //   faunaClient: Client,
+  //   faunaQuery: typeof fql,
+  //   itemToSave: { macAddress: string; startTime: number },
+  // ) => {
+  //   const query = faunaQuery`MacAddresses.create(${itemToSave})`
+  //   const response = faunaClient.query(query)
+  //     .catch((err) => {
+  //       dispatch(
+  //         setMessageInfoModal(
+  //           'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+  //         ),
+  //       );
+  //       dispatch(setIsAlertInfoModal(false));
+  //       dispatch(setShowInfoModal(true));
+  //     });
+  //   return response;
+  // };
 
   const demoElapsedDays = (demoStartTime: number) => {
     return Math.trunc(
@@ -66,8 +62,11 @@ export const useDemoMode = () => {
   const checkDemoPeriod = () => {
     if(process.env.APP_MODE !== 'test'){
       window.electron.ipcRenderer.invoke('getMac').then((res) => {
-        execQuery(getItemByMacAddress, res).then((item) => {
-          //console.log("mac -> ", item)
+        execQuery2(getItemByMacAddressDynamoBD, res, dispatch).then((resDynamo) => {
+          let item:any[] = []
+          if(resDynamo.Item){
+            item.push(convertFromDynamoDBFormat(resDynamo.Item))
+          }
           if (item.length !== 0) {
             let elapsedDays = demoElapsedDays(item[0].startTime);
             setRemainingDemoDays(DEMO_DAYS - elapsedDays);
@@ -77,10 +76,10 @@ export const useDemoMode = () => {
               window.close();
             }
           } else {
-            execQuery(createItemInMacAddresses, {
+            execQuery2(createItemInMacAddressesDynamoDB, {
               macAddress: res,
               startTime: new Date().getTime(),
-            });
+            }, dispatch);
           }
         });
       });

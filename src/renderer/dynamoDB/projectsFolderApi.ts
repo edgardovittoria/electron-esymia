@@ -3,26 +3,18 @@ import {
   PutItemInput,
   ScanInput,
 } from 'aws-sdk/clients/dynamodb';
-import { dynamoDB } from '../../aws/s3Config';
-import { Folder, Project } from '../../model/esymiaModels';
 import { convertToDynamoDBFormat } from './utility/formatDynamoDBData';
 import { Dispatch } from '@reduxjs/toolkit';
-import {
-  setMessageInfoModal,
-  setIsAlertInfoModal,
-  setShowInfoModal,
-} from '../../store/tabsAndMenuItemsSlice';
-import {
-  recursiveFindFolders,
-  takeAllProjectsIn,
-  takeAllProjectsInArrayOf,
-} from '../../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
 import {
   convertInDynamoFolderDetailsThis,
   convertInDynamoProjectThis,
 } from './utility/apiAuxiliaryFunctions';
+import { dynamoDB } from '../esymia/aws/s3Config';
+import { recursiveFindFolders, takeAllProjectsIn } from '../esymia/store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
+import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../esymia/store/tabsAndMenuItemsSlice';
+import { Folder, Project } from '../esymia/model/esymiaModels';
 
-export const getFolderByUserEmail = async (
+export const getFolderByUserEmailDynamoDB = async (
   email: string,
   dispatch: Dispatch,
 ) => {
@@ -50,7 +42,7 @@ export const getFolderByUserEmail = async (
     });
 };
 
-export const getSimulationProjectsByUserEmail = async (
+export const getSimulationProjectsByUserEmailDynamoDB = async (
   email: string,
   dispatch: Dispatch,
 ) => {

@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { Client, fql, QuerySuccess } from "fauna";
 
-export type FaunaCadModel = {
+export type DynamoDBCadModel = {
     id?: string,
     name: string,
     components: string,
@@ -11,19 +11,19 @@ export type FaunaCadModel = {
     userSharingWith?: string[]
 }
 
-type FaunaModelDetails = {
+type DynamoDBModelDetails = {
     id: string
-    details: FaunaCadModel
+    details: DynamoDBCadModel
 }
 
-function faunaModelDetailsToFaunaCadModel(modelDetails: FaunaModelDetails) {
+function DynamoDBModelDetailsToFaunaCadModel(modelDetails: DynamoDBModelDetails) {
     return {
         id: modelDetails.id,
         ...modelDetails.details
-    } as FaunaCadModel
+    } as DynamoDBCadModel
 }
 
-export async function saveNewModel(faunaClient: Client, faunaQuery: typeof fql, newModel: FaunaCadModel) {
+export async function saveNewModel(faunaClient: Client, faunaQuery: typeof fql, newModel: DynamoDBCadModel) {
     try {
         await faunaClient.query(
           faunaQuery`CadModels.create(${newModel})`
@@ -46,8 +46,8 @@ export const getModelsByOwner = async (faunaClient: Client, faunaQuery: typeof f
                 err.message,
                 err.errors()[0].description,
             ));
-        let res: FaunaModelDetails[] = ((response as QuerySuccess<any>).data.data as any[]).map((item: any) => {return {id: item.id, details: {...item} as FaunaCadModel}})
-        return res.map(el => faunaModelDetailsToFaunaCadModel(el))
+        let res: DynamoDBModelDetails[] = ((response as QuerySuccess<any>).data.data as any[]).map((item: any) => {return {id: item.id, details: {...item} as DynamoDBCadModel}})
+        return res.map(el => DynamoDBModelDetailsToFaunaCadModel(el))
     } catch (e) {
         console.log(e)
         return {} as [];

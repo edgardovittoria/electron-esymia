@@ -8,7 +8,7 @@ import {
   useContextMenu,
   Submenu,
 } from 'react-contexify';
-import { BiRename, BiShareAlt, BiTrash } from 'react-icons/bi';
+import { BiRename, BiTrash } from 'react-icons/bi';
 import { BsFillFolderSymlinkFill } from 'react-icons/bs';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -19,22 +19,13 @@ import {
   SelectedFolderSelector,
   selectFolder,
 } from '../../../../../../store/projectSlice';
-import {
-  deleteFolderFromFauna,
-  moveFolderInFauna,
-  moveProjectInFauna,
-} from '../../../../../../faunadb/projectsFolderAPIs';
 import { RenameFolder } from './RenameFolder';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
 import { Folder, MeshData, Port, Probe, Project, sharingInfoUser, TempLumped } from '../../../../../../model/esymiaModels';
-import { takeAllProjectsInArrayOf } from '../../../../../../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
-import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
-import { useStorageData } from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../cad_library';
 import { ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { deleteFolderFromDynamoDB, moveFolderInDynamoDB, moveProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { moveProjectInDynamoDB, moveFolderInDynamoDB, deleteFolderFromDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
 
 interface DroppableAndDraggableFolderProps {
   folder: Folder;

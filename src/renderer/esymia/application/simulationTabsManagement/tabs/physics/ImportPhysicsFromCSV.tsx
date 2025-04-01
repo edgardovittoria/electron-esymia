@@ -22,8 +22,8 @@ import { BsFiletypeCsv } from 'react-icons/bs';
 import { Port, Probe } from '../../../../model/esymiaModels';
 import { savePortsOnS3 } from './savePortsOnS3';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
-import { useDynamoDBQuery } from '../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
 const GREY = '#CCC';
 const GREY_LIGHT = 'rgba(255, 255, 255, 0.4)';

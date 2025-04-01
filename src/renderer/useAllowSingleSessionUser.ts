@@ -13,10 +13,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useFaunaQuery } from './esymia/faunadb/hook/useFaunaQuery';
 import { isConfirmedInfoModalSelector, setIsAlertInfoModal, setMessageInfoModal, setShowInfoModal } from './esymia/store/tabsAndMenuItemsSlice';
 import { useEffectNotOnMount } from './esymia/hook/useEffectNotOnMount';
+import { useDynamoDBQuery } from './dynamoDB/hook/useDynamoDBQuery';
+import { getUserSessionInfoDynamoDB, createOrUpdateUserSessionInfoDynamoDB } from './dynamoDB/usersSessionManagementApi';
+import { convertFromDynamoDBFormat } from './dynamoDB/utility/formatDynamoDBData';
 
 export const useAllowSingleSessionUser = () => {
   const { user } = useAuth0();
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const [loggedUser, setLoggedUser] = useState<
     DynamoUserSessionInfo | undefined
   >(undefined);
@@ -53,29 +56,29 @@ export const useAllowSingleSessionUser = () => {
 
   useEffect(() => {
     if (user) {
-      execQuery(getUserSessionInfo, user.email as string, dispatch).then((item) => {
-        if (item.length !== 0) {
-          let logged = item[0].userSessionInfo.logged;
+      execQuery2(getUserSessionInfoDynamoDB, user.email as string, dispatch).then((res) => {
+        let item:any = []
+        if(res.Item){
+          item.push(convertFromDynamoDBFormat(res.Item))
+        }
+        if (item) {
+          let logged = item[0].logged;
           if (!logged) {
             window.electron.ipcRenderer.invoke('getMac').then((mac) => {
               let newSessionInfo = {
-                email: item[0].userSessionInfo.email,
+                email: item[0].email,
                 mac: mac,
                 logged: true,
               } as UserSessionInfo;
-              execQuery(updateUserSessionInfo, {
-                id: item[0].id,
-                userSessionInfo: newSessionInfo,
-              } as DynamoUserSessionInfo, dispatch);
+              execQuery2(createOrUpdateUserSessionInfoDynamoDB, newSessionInfo, dispatch);
               setLoggedUser({
-                id: item[0].id,
                 userSessionInfo: newSessionInfo,
               } as DynamoUserSessionInfo);
             })
           } else {
             if(process.env.APP_MODE !== 'test'){
               window.electron.ipcRenderer.invoke('getMac').then((res) => {
-                if(res !== item[0].userSessionInfo.mac){
+                if(res !== item[0].mac){
                   dispatch(
                     setMessageInfoModal(
                       'You are already logged in to another device. Close that connection in order to start a new one. If not possible, you can manually terminate active session using confirm button. This may cause errors if within the active session there were pending operations, so use it carefully!',
@@ -96,10 +99,9 @@ export const useAllowSingleSessionUser = () => {
                 mac: res,
                 logged: true,
               } as UserSessionInfo;
-              execQuery(createUserSessionInfo, newUserSessionInfo, dispatch).then(
+              execQuery2(createOrUpdateUserSessionInfoDynamoDB, newUserSessionInfo, dispatch).then(
                 (ret: any) => {
                   setLoggedUser({
-                    id: ret.data.id,
                     userSessionInfo: newUserSessionInfo,
                   } as DynamoUserSessionInfo);
                 },
@@ -112,16 +114,12 @@ export const useAllowSingleSessionUser = () => {
   }, [user]);
 
   const closeUserSessionOnFauna = () => {
-    console.log(loggedUser)
     if (loggedUser) {
       let newSessionInfo = {
         ...loggedUser.userSessionInfo,
         logged: false,
       } as UserSessionInfo;
-      execQuery(updateUserSessionInfo, {
-        id: loggedUser.id,
-        userSessionInfo: newSessionInfo,
-      } as DynamoUserSessionInfo, dispatch)
+      execQuery2(createOrUpdateUserSessionInfoDynamoDB, newSessionInfo, dispatch)
     }
     setLoggedUser(undefined)
   };

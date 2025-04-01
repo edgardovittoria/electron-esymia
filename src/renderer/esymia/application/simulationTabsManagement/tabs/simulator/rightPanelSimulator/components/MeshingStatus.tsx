@@ -43,8 +43,8 @@ import { TbTrashXFilled } from 'react-icons/tb';
 import { ComponentEntity, Material } from '../../../../../../../cad_library';
 import { s3 } from '../../../../../../aws/s3Config';
 import { uploadFileS3 } from '../../../../../../aws/mesherAPIs';
-import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;

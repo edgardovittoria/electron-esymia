@@ -10,6 +10,8 @@ import { updateModel } from '../../../../store/modelSlice';
 import { FaUserCheck } from 'react-icons/fa';
 import { useFaunaQuery } from '../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { FaunaCadModel, usersStateSelector } from '../../../../../cad_library';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateModelInDynamoDB } from '../../../../../dynamoDB/modelsApis';
 
 interface SearchUserAndShareProps {
   setShowSearchUser: (v: boolean) => void;
@@ -21,7 +23,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
   modelToShare,
 }) => {
   const [users, setUsers] = useState<string[]>([]);
-  const { execQuery } = useFaunaQuery();
+  const { execQuery2 } = useDynamoDBQuery();
   const [selected, setSelected] = useState('');
   const [query, setQuery] = useState('');
   const [spinner, setSpinner] = useState(true);
@@ -188,7 +190,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                               ? [...modelToShare.userSharingWith, selected]
                               : [selected],
                           };
-                          execQuery(updateModelInFauna, newModel, dispatch)
+                          execQuery2(createOrUpdateModelInDynamoDB, newModel, dispatch)
                             .then(() => {
                               dispatch(updateModel(newModel));
                               toast.success('Sharing Successfully!');
