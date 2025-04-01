@@ -1,12 +1,8 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import { GetItemInput, PutItemInput } from 'aws-sdk/clients/dynamodb';
-import { dynamoDB } from '../../aws/s3Config';
-import {
-  setMessageInfoModal,
-  setIsAlertInfoModal,
-  setShowInfoModal,
-} from '../../store/tabsAndMenuItemsSlice';
 import { convertToDynamoDBFormat } from './utility/formatDynamoDBData';
+import { dynamoDB } from '../esymia/aws/s3Config';
+import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../esymia/store/tabsAndMenuItemsSlice';
 
 export const getItemByMacAddressDynamoBD = async (
   macaddress: string,
