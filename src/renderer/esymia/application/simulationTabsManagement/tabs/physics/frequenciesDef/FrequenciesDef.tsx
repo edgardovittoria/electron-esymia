@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectedProjectSelector, setFrequencies } from '../../../../../store/projectSlice';
-import { DebounceInput } from 'react-debounce-input';
 import { log10 } from 'chart.js/helpers';
 import { ThemeSelector } from '../../../../../store/tabsAndMenuItemsSlice';
 

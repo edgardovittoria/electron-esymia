@@ -113,7 +113,7 @@ export const ImportModelFromDBModal: FC<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className={`w-full max-w-lg transform overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2 text-textColorDark'} p-6 text-left align-middle shadow-xl transition-all`}>
+              <Dialog.Panel className={`w-full max-w-3xl transform overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2 text-textColorDark'} p-6 text-left align-middle shadow-xl transition-all`}>
                 <Dialog.Title
                   as="h3"
                   className={`text-lg font-medium leading-6 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}
@@ -123,8 +123,9 @@ export const ImportModelFromDBModal: FC<{
                 <div className="py-2 mt-3 px-2 border border-gray-300 z-20 rounded-xl flex flex-col gap-2 max-h-[400px] overflow-y-scroll relative">
                   <div className="grid grid-cols-12 gap-4 items-center">
                     <CheckIcon className="col-span-1 text-secondaryColor"/>
-                    <span className="font-semibold col-span-4">name</span>
-                    <span className="font-semibold col-span-7">owner</span>
+                    <span className="font-semibold col-span-3">name</span>
+                    <span className="font-semibold col-span-5">owner</span>
+                    <span className="font-semibold col-span-3">type</span>
                   </div>
 
                   <hr />
@@ -143,8 +144,9 @@ export const ImportModelFromDBModal: FC<{
                             onChange={() => setSelectedModel(model)}
                             className='col-span-1'
                           />
-                          <span className="font-semibold text-sm col-span-4">{model.name}</span>
-                          <span className="text-sm col-span-7">{model.owner}</span>
+                          <span className="font-semibold text-sm col-span-3">{model.name}</span>
+                          <span className="text-sm col-span-5">{model.owner}</span>
+                          <span className="text-sm col-span-3">{model.bricks ? 'Ris' : 'Standard'}</span>
                         </div>
                       );
                     })

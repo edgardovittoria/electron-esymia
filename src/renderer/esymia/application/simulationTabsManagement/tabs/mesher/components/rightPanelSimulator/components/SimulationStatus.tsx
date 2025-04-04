@@ -8,18 +8,18 @@ import {
   Project,
   Simulation,
   SolverOutput,
-} from '../../../../../../model/esymiaModels';
+} from '../../../../../../../model/esymiaModels';
 import {
   convergenceTresholdSelector,
   solverIterationsSelector,
   solverTypeSelector,
-} from '../../../../../../store/solverSlice';
+} from '../../../../../../../store/solverSlice';
 import {
   deleteSimulation,
   setMeshApproved,
   updateSimulation,
-} from '../../../../../../store/projectSlice';
-import { getMaterialListFrom } from '../../Simulator';
+} from '../../../../../../../store/projectSlice';
+import { getMaterialListFrom } from '../../../../solver/Solver';
 import {
   computingLpSelector,
   computingPSelector,
@@ -39,14 +39,14 @@ import {
   unsetComputingP,
   unsetIterations,
   unsetSolverResults,
-} from '../../../../../../store/tabsAndMenuItemsSlice';
-import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
+} from '../../../../../../../store/tabsAndMenuItemsSlice';
+import { publishMessage } from '../../../../../../../../middleware/stompMiddleware';
 import { PiClockCountdownBold } from 'react-icons/pi';
 import { ImSpinner } from 'react-icons/im';
 import { TbTrashXFilled } from 'react-icons/tb';
-import { ComponentEntity } from '../../../../../../../cad_library';
-import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
+import { ComponentEntity } from '../../../../../../../../cad_library';
+import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean;

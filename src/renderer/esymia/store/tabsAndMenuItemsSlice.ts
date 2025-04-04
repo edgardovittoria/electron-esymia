@@ -7,7 +7,7 @@ const getMenuItemsArrayBasedOnTabType = (tabType: string) => {
     case 'DASHBOARD':
       return ['Overview'];
     default:
-      return ['Modeler', 'Terminations', 'Simulator', 'Results'];
+      return ['Modeler', 'Mesher', 'Solver', 'Results'];
   }
 };
 

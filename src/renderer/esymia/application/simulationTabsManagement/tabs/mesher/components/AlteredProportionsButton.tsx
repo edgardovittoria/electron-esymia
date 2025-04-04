@@ -1,11 +1,11 @@
 import { FC, useMemo } from "react";
 import { TbAxisX } from "react-icons/tb";
-import { Project } from "../../../../model/esymiaModels";
-import { calculateModelBoundingBox } from "../../sharedElements/utilityFunctions";
+import { Project } from "../../../../../model/esymiaModels";
+import { calculateModelBoundingBox } from "../../../sharedElements/utilityFunctions";
 import * as THREE from 'three'
 import { useDispatch, useSelector } from "react-redux";
-import { selectedProjectSelector } from "../../../../store/projectSlice";
-import { setScalingViewParamsOfMesh, ThemeSelector } from "../../../../store/tabsAndMenuItemsSlice";
+import { selectedProjectSelector } from "../../../../../store/projectSlice";
+import { setScalingViewParamsOfMesh, ThemeSelector } from "../../../../../store/tabsAndMenuItemsSlice";
 
 export const AlteredProportionsButton: FC<{
   threshold: number,

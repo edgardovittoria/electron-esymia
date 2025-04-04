@@ -24,6 +24,8 @@ export function convertFromDynamoDBFormat(dynamoData:any) {
             formattedData[key] = value.L.map((v: any) => {
                 if (v.S !== undefined) {
                     return v.S;
+                } else if (v.N !== undefined) {
+                    return Number(v.N)// Convert number string to actual number
                 } else if (v.B !== undefined) {
                     return v.B; // Extract binary
                 } else if (v.SS !== undefined) {

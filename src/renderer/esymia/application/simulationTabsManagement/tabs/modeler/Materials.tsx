@@ -5,7 +5,7 @@ import { selectedProjectSelector } from '../../../../store/projectSlice';
 import noMaterialsIcon from '../../../../../../../assets/noMaterialsIcon.png';
 import noMaterialsIconDark from '../../../../../../../assets/noMaterialsIconDark.png';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
-import { getMaterialListFrom } from '../simulator/Simulator';
+import { getMaterialListFrom } from '../solver/Solver';
 import { Material } from '../../../../../cad_library';
 
 interface MaterialsProps {}

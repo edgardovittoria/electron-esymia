@@ -11,6 +11,7 @@ import {
   addModel,
   ModelsSelector,
   removeModel,
+  resetModel,
   setSharedModel,
   SharedModelsSelector
 } from '../store/modelSlice';
@@ -79,22 +80,12 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
     if (user && user.sub) {
       execQuery2(getModelsByOwnerDynamoDB, user.sub, dispatch)
         .then((res) => {
-          let mods:any[] = []
-          if(res.Item){
-            res.Item.forEach((i: any) => mods.push(convertFromDynamoDBFormat(i)))
-          }
-          if (models.length === 0) {
-            mods.forEach((m: FaunaCadModel) => dispatch(addModel(m)));
+          dispatch(resetModel())
+          if(res.Items){
+            res.Items.forEach((i: any) => dispatch(addModel(convertFromDynamoDBFormat(i))))
           }
         })
         .catch((err) => console.log(err));
-      // if (selectedMenuItem === 'MSP') {
-      //   execQuery(getSharedModels, user.email, dispatch)
-      //     .then((mods) => {
-      //       dispatch(setSharedModel(mods));
-      //     })
-      //     .catch((err) => console.log(err));
-      // }
     }
   }, [user, showCad, selectedMenuItem]);
 

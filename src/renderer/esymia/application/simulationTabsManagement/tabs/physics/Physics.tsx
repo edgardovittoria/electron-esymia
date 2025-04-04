@@ -43,7 +43,7 @@ import { GiAtom, GiRadialBalance } from 'react-icons/gi';
 import { GrClone, GrStatusInfo } from 'react-icons/gr';
 import { RiListIndefinite } from 'react-icons/ri';
 import { ImSpinner } from 'react-icons/im';
-import { useStorageData } from '../simulator/rightPanelSimulator/hook/useStorageData';
+import { useStorageData } from '../mesher/components/rightPanelSimulator/hook/useStorageData';
 import {
   FrequenciesImportFromCSV,
   LumpedImportFromCSV,
@@ -204,7 +204,7 @@ export const Physics: React.FC<PhysicsProps> = ({
         savedPhysicsParameters={savedPhysicsParameters}
         setSavedPhysicsParameters={setSavedPhysicsParameters}
       /> */}
-      <PhysicsRightSidebar
+      <PhysicsSettingsOld
         selectedTabRightPanel={selectedTabRightPanel}
         setSelectedTabRightPanel={setSelectedTabRightPanel}
         savedPhysicsParameters={savedPhysicsParameters}
@@ -332,7 +332,7 @@ const PhysicsLeftPanel: FC<{
 }> = ({ selectedTabLeftPanel, setSelectedTabLeftPanel }) => {
   return (
     <MyPanel
-      tabs={['Terminations']}
+      tabs={['Mesher']}
       selectedTab={selectedTabLeftPanel}
       setSelectedTab={setSelectedTabLeftPanel}
       className="absolute left-[2%] top-[180px] md:w-1/4 xl:w-1/6"
@@ -440,7 +440,7 @@ const PhysicsRightPanel: FC<{
   );
 };
 
-const PhysicsRightSidebar: FC<{
+export const PhysicsSettingsOld: FC<{
   selectedTabRightPanel: string | undefined;
   setSelectedTabRightPanel: Function;
   savedPhysicsParameters: boolean;
@@ -465,7 +465,7 @@ const PhysicsRightSidebar: FC<{
     <>
       {/* <PhysicsLeftPanelTab /> */}
       <div
-        className={`absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0`}
+        className={`absolute left-[2%] top-[210px] rounded max-h-[500px] flex flex-col items-center gap-0`}
       >
         <div
           className={`p-2 tooltip rounded-t tooltip-right ${

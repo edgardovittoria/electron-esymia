@@ -18,7 +18,7 @@ import {
   Simulation,
   TempLumped
 } from '../model/esymiaModels';
-import { getMaterialListFrom } from '../application/simulationTabsManagement/tabs/simulator/Simulator';
+import { getMaterialListFrom } from '../application/simulationTabsManagement/tabs/solver/Solver';
 import { ComponentEntity, ImportActionParamsObject, Material, UsersState } from '../../cad_library';
 
 
@@ -360,7 +360,13 @@ export const ProjectSlice = createSlice({
       if (selectedProject) {
         selectedProject.planeWaveParameters = undefined;
       }
-    }
+    },
+    setMaxFrequency(state: ProjectState, action: PayloadAction<number | undefined>) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if (selectedProject) {
+        selectedProject.maxFrequency = action.payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -437,7 +443,8 @@ export const {
   setRadialFieldParametres,
   unsetRadialFieldParametres,
   setPlaneWaveParametres,
-  unsetPlaneWaveParametres
+  unsetPlaneWaveParametres,
+  setMaxFrequency
 } = ProjectSlice.actions;
 
 const selectTabEffects = (state: ProjectState, tab: string) => {

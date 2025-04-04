@@ -101,6 +101,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   >([]);
 
   useEffect(() => {
+    console.log(resultsView)
     if (resultsView.length > 0) {
       setmatrixZ(
         resultsView.map((r) => ({

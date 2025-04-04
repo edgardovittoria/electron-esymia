@@ -1,5 +1,5 @@
-import { Folder, Project, SolverOutput } from "../../../model/esymiaModels";
-import { DynamoProject, DynamoProjectDetails, DynamoFolderDetails } from "../../../model/DynamoModels";
+import { DynamoProject, DynamoProjectDetails, DynamoFolderDetails } from "../../esymia/model/DynamoModels";
+import { Project, SolverOutput, Folder } from "../../esymia/model/esymiaModels";
 
 export const convertInDynamoProjectThis = (project: Project) => {
   const faunaProject: DynamoProject = {
@@ -14,6 +14,7 @@ export const convertInDynamoProjectThis = (project: Project) => {
       bricks: project.bricks,
       portsS3: project.portsS3,
       frequencies: project.frequencies,
+      maxFrequency: project.maxFrequency,
       simulation: project.simulation === undefined ? null : {
         ...project.simulation,
         results: {} as SolverOutput

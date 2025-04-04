@@ -29,6 +29,7 @@ export type Project = {
   portsS3?: string | null;
   scatteringValue?: number;
   frequencies?: number[];
+  maxFrequency?: number,
   simulation?: Simulation;
   meshData: MeshData;
   screenshot: string | undefined;

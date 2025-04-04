@@ -20,6 +20,9 @@ export const ModelSlice = createSlice({
     addModel(state: ModelState, action: PayloadAction<FaunaCadModel>) {
       state.models.push(action.payload);
     },
+    resetModel(state: ModelState) {
+      state.models = []
+    },
     removeModel(state: ModelState, action: PayloadAction<string>) {
       state.models = state.models.filter((m) => m.id !== action.payload);
     },
@@ -42,6 +45,7 @@ export const ModelSlice = createSlice({
 
 export const {
   addModel,
+  resetModel,
   removeModel,
   updateModel,
   selectModel,

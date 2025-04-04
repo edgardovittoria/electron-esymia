@@ -5,29 +5,29 @@ import {
   Folder,
   OriginPoint,
   Project,
-} from '../../../../../../model/esymiaModels';
-import { deleteFileS3 } from '../../../../../../aws/mesherAPIs';
+} from '../../../../../../../model/esymiaModels';
+import { deleteFileS3 } from '../../../../../../../aws/mesherAPIs';
 import {
   addProject,
   removeProject,
   selectedProjectSelector,
   setPathToExternalGridsNotFound,
-} from '../../../../../../store/projectSlice';
+} from '../../../../../../../store/projectSlice';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   deleteFile,
   readLocalFile,
-} from '../../../../../../../fileSystemAPIs/fileSystemAPIs';
-import { s3 } from '../../../../../../aws/s3Config';
-import { addProjectTab, closeProjectTab, setAWSExternalGridsData } from '../../../../../../store/tabsAndMenuItemsSlice';
+} from '../../../../../../../../fileSystemAPIs/fileSystemAPIs';
+import { s3 } from '../../../../../../../aws/s3Config';
+import { addProjectTab, closeProjectTab, setAWSExternalGridsData } from '../../../../../../../store/tabsAndMenuItemsSlice';
 import { Brick } from '../components/createGridsExternals';
-import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
-import { CanvasState } from '../../../../../../../cad_library';
-import { UsersState } from '../../../../../../../cad_library/components/store/users/usersSlice';
+import { publishMessage } from '../../../../../../../../middleware/stompMiddleware';
+import { CanvasState } from '../../../../../../../../cad_library';
+import { UsersState } from '../../../../../../../../cad_library/components/store/users/usersSlice';
 import { GetObjectRequest } from 'aws-sdk/clients/s3';
-import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { deleteSimulationProjectFromDynamoDB, createOrUpdateProjectInDynamoDB, addIDInProjectListInDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
+import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { deleteSimulationProjectFromDynamoDB, createOrUpdateProjectInDynamoDB, addIDInProjectListInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();

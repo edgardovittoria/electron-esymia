@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { LuAxis3D } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
-import { resetScalingViewParamsOfMesh, ThemeSelector } from "../../../../store/tabsAndMenuItemsSlice";
+import { resetScalingViewParamsOfMesh, ThemeSelector } from "../../../../../store/tabsAndMenuItemsSlice";
 
 export const OriginaProportionsButton: FC<{}> = () => {
   const dispatch = useDispatch()

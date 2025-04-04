@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PiCubeFocusDuotone } from 'react-icons/pi';
-import { FaReact } from 'react-icons/fa6';
 import { MdOutlineSettingsPower } from 'react-icons/md';
 import { TfiBarChart } from 'react-icons/tfi';
 import {
@@ -10,14 +9,7 @@ import {
   selectMenuItem,
   ThemeSelector,
 } from '../store/tabsAndMenuItemsSlice';
-import { GrClone } from 'react-icons/gr';
-import {
-  SelectedFolderSelector,
-  selectedProjectSelector,
-} from '../store/projectSlice';
-import { Folder } from '../model/esymiaModels';
-import { useStorageData } from './simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
-import { ImSpinner } from 'react-icons/im';
+import { GiMeshBall } from 'react-icons/gi';
 
 interface MenuBarProps {}
 
@@ -26,10 +18,6 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
   const menuItems = useSelector(menuItemsSelector);
   const menuItemSelected = useSelector(selectedMenuItemSelector);
   const theme = useSelector(ThemeSelector)
-  const selectedProject = useSelector(selectedProjectSelector);
-  const selectedFolder = useSelector(SelectedFolderSelector)
-  const { cloneProject } = useStorageData()
-  const [cloning, setcloning] = useState<boolean>(false)
   return (
     <div className="w-full px-10">
       <div className={`${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'}  px-4 py-2 flex flex-row justify-between items-center rounded-xl`}>
@@ -51,8 +39,8 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
                   }
                 />
               )}
-              {item === 'Terminations' && (
-                <FaReact
+              {item === 'Mesher' && (
+                <GiMeshBall
                   size={25}
                   className={
                     menuItemSelected === item
@@ -61,7 +49,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
                   }
                 />
               )}
-              {item === 'Simulator' && (
+              {item === 'Solver' && (
                 <MdOutlineSettingsPower
                   size={25}
                   className={
@@ -111,21 +99,6 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
             </li>
           ))}
         </ul>
-        {/* <div className='flex flex-row gap-4 items-center'>
-          {selectedProject && (
-            <button
-              className="flex flex-row items-center gap-3 btn btn-sm text-sm bg-white text-black border-gray-300 hover:bg-secondaryColor hover:text-white"
-              onClick={() => {
-                setcloning(true)
-                cloneProject(selectedProject, selectedFolder as Folder, setcloning)
-              }}
-            >
-              <GrClone size={20} />
-              <span className="uppercase">clone project</span>
-            </button>
-          )}
-          {cloning && <ImSpinner className="animate-spin w-5 h-5" />}
-        </div> */}
       </div>
     </div>
   );

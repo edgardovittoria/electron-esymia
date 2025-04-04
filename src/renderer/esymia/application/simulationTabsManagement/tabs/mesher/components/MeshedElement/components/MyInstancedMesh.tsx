@@ -1,16 +1,16 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { BackSide, FrontSide, InstancedMesh, Object3D } from 'three';
-import { CellSize, OriginPoint, Project } from '../../../../../../model/esymiaModels';
+import { CellSize, OriginPoint, Project } from '../../../../../../../model/esymiaModels';
 import { useSelector } from 'react-redux';
 import { Brick } from '../../rightPanelSimulator/components/createGridsExternals';
-import { meshVisualizationSelector, scalingViewParamsOfMeshSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
+import { meshVisualizationSelector, scalingViewParamsOfMeshSelector } from '../../../../../../../store/tabsAndMenuItemsSlice';
 import { EdgesMaterial } from './EdgesMaterial';
 import { Edges, Wireframe } from '@react-three/drei';
 import uniqid from 'uniqid';
-import { selectedProjectSelector } from '../../../../../../store/projectSlice';
+import { selectedProjectSelector } from '../../../../../../../store/projectSlice';
 import * as THREE from 'three'
-import { calculateModelBoundingBox } from '../../../../sharedElements/utilityFunctions';
-import { ComponentEntity, FactoryShapes, Material } from '../../../../../../../cad_library';
+import { calculateModelBoundingBox } from '../../../../../sharedElements/utilityFunctions';
+import { ComponentEntity, FactoryShapes, Material } from '../../../../../../../../cad_library';
 
 
 interface InstancedMeshProps {

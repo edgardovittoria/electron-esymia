@@ -1,13 +1,13 @@
 import React, {} from 'react';
 import {useSelector} from "react-redux";
-import {selectedProjectSelector} from "../../../../store/projectSlice";
+import {selectedProjectSelector} from "../../../../../store/projectSlice";
 import {FaCircle} from "react-icons/fa";
 import {Disclosure, Switch, Transition} from '@headlessui/react'
 import {MdOutlineKeyboardArrowDown} from "react-icons/md";
-import noMaterialsIcon from '../../../../../../../assets/noMaterialsIcon.png'
-import noMaterialsIconDark from '../../../../../../../assets/noMaterialsIconDark.png'
-import { Material } from '../../../../../cad_library';
-import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import noMaterialsIcon from '../../../../../../../../assets/noMaterialsIcon.png'
+import noMaterialsIconDark from '../../../../../../../../assets/noMaterialsIconDark.png'
+import { Material } from '../../../../../../cad_library';
+import { ThemeSelector } from '../../../../../store/tabsAndMenuItemsSlice';
 
 
 interface SimulatorLeftPanelTabProps {

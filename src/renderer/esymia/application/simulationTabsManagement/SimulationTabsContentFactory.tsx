@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Physics } from './tabs/physics/Physics';
 import { Results } from './tabs/results/Results';
-import { Simulator } from './tabs/simulator/Simulator';
+import { Solver } from './tabs/solver/Solver';
 import { Modeler } from './tabs/modeler/Modeler';
 import { selectedMenuItemSelector } from '../../store/tabsAndMenuItemsSlice';
 import { useWindowInnerWidth } from '../../hook/useWindowInnerWidth';
 import { resultsLeftPanelTitle } from '../config/panelTitles';
+import { Mesher } from './tabs/mesher/Mesher';
 
 interface SimulationTabsContentFactoryProps {}
 
@@ -36,18 +37,18 @@ export const SimulationTabsContentFactory: React.FC<
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
         />
       );
-    case 'Terminations':
+    case 'Mesher':
       return (
-        <Physics
+        <Mesher
           selectedTabLeftPanel={selectedTabLeftPanel}
           setSelectedTabLeftPanel={setSelectedTabLeftPanel}
         />
       );
-    case 'Simulator':
+    case 'Solver':
       return (
-        <Simulator
-          selectedTabLeftPanel={selectedTabLeftPanel}
-          setSelectedTabLeftPanel={setSelectedTabLeftPanel}
+        <Solver
+          selectedTab={selectedTabLeftPanel}
+          setSelectedTab={setSelectedTabLeftPanel}
         />
       );
     case 'Results':

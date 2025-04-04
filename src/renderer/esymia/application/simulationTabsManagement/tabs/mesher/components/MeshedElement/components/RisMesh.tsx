@@ -2,15 +2,15 @@ import { Edges } from '@react-three/drei';
 import { FC, useEffect, useRef } from 'react';
 import { DoubleSide } from 'three';
 import { useSelector } from 'react-redux';
-import { selectedProjectSelector } from '../../../../../../store/projectSlice';
-import { getMaterialListFrom } from '../../Simulator';
+import { selectedProjectSelector } from '../../../../../../../store/projectSlice';
+import { getMaterialListFrom } from '../../../../solver/Solver';
 import {
   ExternalGridsRisObject,
   Project,
-} from '../../../../../../model/esymiaModels';
+} from '../../../../../../../model/esymiaModels';
 import * as THREE from 'three';
 import { EdgesMaterial } from './EdgesMaterial';
-import { scalingViewParamsOfMeshSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
+import { scalingViewParamsOfMeshSelector } from '../../../../../../../store/tabsAndMenuItemsSlice';
 
 interface RisMeshProps {
   positions: number[];

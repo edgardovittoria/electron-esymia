@@ -22,6 +22,7 @@ const EdgesGenerator: React.FC<EdgesGeneratorProps> = ({meshRef, inputPortPositi
     const dispatch = useDispatch()
     let selectedPort = findSelectedPort(selectedProject)
     let size = useSelector(boundingBoxDimensionSelector)
+    console.log(size)
     const instancedMeshRef = useRef<InstancedMesh[]>([]);
     useEffect(() => {
             // console.log(doubleClicked)

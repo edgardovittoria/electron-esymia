@@ -21,7 +21,7 @@ import {
   setMessageInfoModal,
   setShowInfoModal,
   ThemeSelector,
-} from '../../../../../../store/tabsAndMenuItemsSlice';
+} from '../../../../../../../store/tabsAndMenuItemsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   setExternalGrids,
@@ -30,21 +30,21 @@ import {
   setMeshGenerated,
   setMeshValidTopology,
   setSurface,
-} from '../../../../../../store/projectSlice';
-import { Project } from '../../../../../../model/esymiaModels';
+} from '../../../../../../../store/projectSlice';
+import { Project } from '../../../../../../../model/esymiaModels';
 import { generateSTLListFromComponents } from './rightPanelFunctions';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
-import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
+import { publishMessage } from '../../../../../../../../middleware/stompMiddleware';
 import { Disclosure } from '@headlessui/react';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { PiClockCountdownBold } from 'react-icons/pi';
 import { TbTrashXFilled } from 'react-icons/tb';
-import { ComponentEntity, Material } from '../../../../../../../cad_library';
-import { s3 } from '../../../../../../aws/s3Config';
-import { uploadFileS3 } from '../../../../../../aws/mesherAPIs';
-import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
+import { ComponentEntity, Material } from '../../../../../../../../cad_library';
+import { s3 } from '../../../../../../../aws/s3Config';
+import { uploadFileS3 } from '../../../../../../../aws/mesherAPIs';
+import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;
@@ -238,10 +238,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                 fileName: selectedProject.id as string,
                 density: selectedProject.meshData.lambdaFactor,
                 freqMax:
-                  selectedProject.frequencies &&
-                  selectedProject.frequencies[
-                    selectedProject.frequencies.length - 1
-                  ],
+                  selectedProject.maxFrequency,
               },
             },
           }),
@@ -256,13 +253,10 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             console.log(err);
           }
           const res = JSON.parse(data.Body?.toString() as string);
-          console.log(res.bricks);
           window.electron.ipcRenderer.sendMessage('computeMeshRis', [
             selectedProject.meshData.lambdaFactor as number,
-            selectedProject.frequencies
-              ? selectedProject.frequencies[
-                  selectedProject.frequencies?.length - 1
-                ]
+            selectedProject.maxFrequency
+              ? selectedProject.maxFrequency
               : 10e9,
             res.bricks,
             selectedProject.id as string,

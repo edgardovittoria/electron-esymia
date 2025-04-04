@@ -31,7 +31,7 @@ import noResultsIconForProject from '../../../../../../../../../assets/noResults
 import noResultsIconForProjectDark from '../../../../../../../../../assets/noResultsIconForProjectDark.png';
 import {
   useStorageData
-} from '../../../../../simulationTabsManagement/tabs/simulator/rightPanelSimulator/hook/useStorageData';
+} from '../../../../../simulationTabsManagement/tabs/mesher/components/rightPanelSimulator/hook/useStorageData';
 import { GrClone } from 'react-icons/gr';
 import { ImSpinner } from 'react-icons/im';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';

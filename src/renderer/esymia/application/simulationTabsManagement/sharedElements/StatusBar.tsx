@@ -26,7 +26,7 @@ const StatusBar: React.FC<StatusBarProps> = ({
             theme === 'light' ? 'bg-gray-300' : 'bg-bgColorDark2'
           }  flex justify-end absolute bottom-0 p-1`}
         >
-          {menuItemSelected === 'Simulator' && (
+          {menuItemSelected === 'Mesher' && (
             <>
               {selectedProject.meshData.type === 'Standard' ? (
                 <div

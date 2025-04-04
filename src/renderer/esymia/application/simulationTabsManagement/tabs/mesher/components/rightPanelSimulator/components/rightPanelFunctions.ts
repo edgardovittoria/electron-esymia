@@ -1,4 +1,4 @@
-import { ComponentEntity, exportToSTL, Material } from '../../../../../../../cad_library';
+import { ComponentEntity, exportToSTL, Material } from '../../../../../../../../cad_library';
 
 export function generateSTLListFromComponents(
   materialList: Material[],

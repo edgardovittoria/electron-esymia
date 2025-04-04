@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { MyInstancedMesh } from './components/MyInstancedMesh';
-import { ExternalGridsObject, Project } from '../../../../../model/esymiaModels';
+import { ExternalGridsObject, Project } from '../../../../../../model/esymiaModels';
 import { useSelector } from 'react-redux';
-import { meshGeneratedSelector, selectedProjectSelector } from '../../../../../store/projectSlice';
+import { meshGeneratedSelector, selectedProjectSelector } from '../../../../../../store/projectSlice';
 import { Brick } from '../rightPanelSimulator/components/createGridsExternals';
-import { ComponentEntity, Material } from '../../../../../../cad_library';
+import { ComponentEntity, Material } from '../../../../../../../cad_library';
 
 interface MeshedElementProps {
   externalGrids: ExternalGridsObject;
