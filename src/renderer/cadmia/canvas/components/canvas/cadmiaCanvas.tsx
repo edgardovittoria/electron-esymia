@@ -214,16 +214,17 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
       {/* Griglia sul piano XZ */}
       <gridHelper
         args={[gridSize, gridDivisions, "yellow", "gray"]}
-        position={[center.x, center.y - halfGridSize, center.z]}
+        position={[center.x, center.y + halfGridSize, center.z]}
       />
       {xNumbers.map((value, index) => (
         <Text
           key={`xz-x-${index}`}
-          position={[value, center.y - halfGridSize, center.z - halfGridSize]}
+          position={[value, center.y + halfGridSize, center.z - halfGridSize]}
           fontSize={gridSize / gridDivisions / 3}
           color="black"
           anchorX="center"
           anchorY="middle"
+          rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
         >
           {value.toFixed(2)}
         </Text>
@@ -231,11 +232,12 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
       {zNumbers.map((value, index) => (
         <Text
           key={`xz-z-${index}`}
-          position={[center.x - halfGridSize, center.y - halfGridSize, value]}
+          position={[center.x - halfGridSize, center.y + halfGridSize, value]}
           fontSize={gridSize / gridDivisions / 3}
           color="black"
           anchorX="center"
           anchorY="middle"
+          rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
         >
           {value.toFixed(2)}
         </Text>
@@ -250,11 +252,12 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
       {xNumbers.map((value, index) => (
         <Text
           key={`xy-x-${index}`}
-          position={[value, center.y - halfGridSize, center.z - halfGridSize]}
+          position={[value, center.y + halfGridSize, center.z - halfGridSize]}
           fontSize={gridSize / gridDivisions / 3}
           color="black"
           anchorX="center"
           anchorY="middle"
+          rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
         >
           {value.toFixed(2)}
         </Text>
@@ -267,6 +270,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
           color="black"
           anchorX="center"
           anchorY="middle"
+          rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
         >
           {value.toFixed(2)}
         </Text>
@@ -286,6 +290,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
           color="black"
           anchorX="center"
           anchorY="middle"
+          rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
         >
           {value.toFixed(2)}
         </Text>
@@ -293,11 +298,12 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
       {zNumbers.map((value, index) => (
         <Text
           key={`yz-z-${index}`}
-          position={[center.x - halfGridSize, center.y - halfGridSize, value]}
+          position={[center.x - halfGridSize, center.y + halfGridSize, value]}
           fontSize={gridSize / gridDivisions / 3}
           color="black"
           anchorX="center"
           anchorY="middle"
+          rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
         >
           {value.toFixed(2)}
         </Text>
