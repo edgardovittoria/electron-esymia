@@ -326,8 +326,11 @@ export const Solver: React.FC<SolverProps> = ({
         setSelectedTabRightPanel={setSelectedTabRightPanel}
         simulationType={simulationType}
         setsimulationType={setsimulationType}
+        setSavedPhysicsParameters={setSavedPhysicsParameters}
+        savedPhysicsParameters={savedPhysicsParameters}
+        cameraPosition={cameraPosition}
       />
-      <FrequenciesSettings
+      {/* <FrequenciesSettings
         selectedTabRightPanel={selectedTabRightPanel}
         setSelectedTabRightPanel={setSelectedTabRightPanel}
         setSelectedTabLeftPanel={setSelectedTab}
@@ -344,9 +347,9 @@ export const Solver: React.FC<SolverProps> = ({
         setSelectedTabRightPanel={setSelectedTabRightPanel}
         setsidebarItemSelected={setsidebarItemSelected}
         simulationType={simulationType}
-      />
+      /> */}
       <div
-        className={`absolute left-[2%] top-[450px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
+        className={`absolute left-[2%] top-[230px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
           theme === 'light'
             ? 'bg-white text-textColor'
             : 'bg-bgColorDark2 text-textColorDark'
@@ -383,10 +386,7 @@ export const Solver: React.FC<SolverProps> = ({
         <div className="gap-2 flex flex-row">
           {selectedProject?.model.components && (
             <>
-              <CreatePorts
-                selectedProject={selectedProject}
-                cameraPosition={cameraPosition}
-              />
+
               <SurfaceAdvicesButton
                 surfaceAdvices={surfaceAdvices}
                 setSurfaceAdvices={setSurfaceAdvices}
@@ -405,16 +405,6 @@ export const Solver: React.FC<SolverProps> = ({
                   <GrStatusInfo size={18} />
                 </div>
               </div>
-            </>
-          )}
-        </div>
-        <div className="gap-2 flex flex-row">
-          {selectedProject?.model.components && (
-            <>
-              <ExportPhisicsToCSV />
-              <PortImportFromCSV />
-              <LumpedImportFromCSV />
-              <FrequenciesImportFromCSV />
             </>
           )}
         </div>

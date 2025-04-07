@@ -203,7 +203,7 @@ export const LumpedImportFromCSV: FC = () => {
         <>
           <div
             {...getRootProps()}
-            className={`hover:cursor-pointer ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
+            className={`hover:cursor-pointer h-8 border ${theme === 'light' ? 'bg-white text-textColor border-textColor' : 'bg-bgColorDark2 text-textColorDark border-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
             style={Object.assign(
               {},
               styles.zone,
@@ -212,7 +212,7 @@ export const LumpedImportFromCSV: FC = () => {
           >
             {acceptedFile ? (
               <>
-                <div style={styles.file}>
+                {/* <div style={styles.file}>
                   <div style={styles.info}>
                     <span style={styles.size}>
                       {formatFileSize(acceptedFile.size)}
@@ -236,7 +236,11 @@ export const LumpedImportFromCSV: FC = () => {
                   >
                     <Remove color={removeHoverColor} />
                   </div>
-                </div>
+                </div> */}
+                <div className='flex flex-row gap-2 items-center'>
+                <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
+                <span className='text-sm'>Import Lumped</span>
+              </div>
               </>
             ) : (
               <div className='flex flex-row gap-2 items-center'>
@@ -349,7 +353,7 @@ export const PortImportFromCSV:FC = () => {
         <>
           <div
             {...getRootProps()}
-            className={`hover:cursor-pointer ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
+            className={`hover:cursor-pointer h-8 border ${theme === 'light' ? 'bg-white text-textColor border-textColor' : 'bg-bgColorDark2 text-textColorDark border-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
             style={Object.assign(
               {},
               styles.zone,
@@ -358,7 +362,7 @@ export const PortImportFromCSV:FC = () => {
           >
             {acceptedFile ? (
               <>
-                <div style={styles.file}>
+                {/* <div style={styles.file}>
                   <div style={styles.info}>
                     <span style={styles.size}>
                       {formatFileSize(acceptedFile.size)}
@@ -382,7 +386,11 @@ export const PortImportFromCSV:FC = () => {
                   >
                     <Remove color={removeHoverColor} />
                   </div>
-                </div>
+                </div> */}
+                <div className='flex flex-row gap-2 items-center'>
+              <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
+              <span className='text-sm'>Import Ports</span>
+            </div>
               </>
             ) : (
               <div className='flex flex-row gap-2 items-center'>
@@ -469,7 +477,7 @@ export const FrequenciesImportFromCSV:FC = () => {
         <>
           <div
             {...getRootProps()}
-            className={`hover:cursor-pointer ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
+            className={`hover:cursor-pointer hover:opacity-85 border h-8 ${theme === 'light' ? 'bg-white text-textColor border-textColor' : 'bg-bgColorDark2 text-textColorDark border-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
             style={Object.assign(
               {},
               styles.zone,
@@ -478,7 +486,7 @@ export const FrequenciesImportFromCSV:FC = () => {
           >
             {acceptedFile ? (
               <>
-                <div style={styles.file}>
+                {/* <div style={styles.file}>
                   <div style={styles.info}>
                     <span style={styles.size}>
                       {formatFileSize(acceptedFile.size)}
@@ -502,7 +510,11 @@ export const FrequenciesImportFromCSV:FC = () => {
                   >
                     <Remove color={removeHoverColor} />
                   </div>
-                </div>
+                </div> */}
+                <div className='flex flex-row gap-2 items-center'>
+              <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
+              <span className='text-sm'>Import Frequencies</span>
+            </div>
               </>
             ) : (
               <div className='flex flex-row gap-2 items-center'>

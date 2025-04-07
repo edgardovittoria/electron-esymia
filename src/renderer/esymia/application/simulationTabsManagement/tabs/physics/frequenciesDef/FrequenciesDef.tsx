@@ -21,7 +21,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
   const theme = useSelector(ThemeSelector)
 
   return(
-    <div className={`p-[10px] mt-2 border-[1px] ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-secondaryColorDark bg-bgColorDark'} text-left overflow-y-scroll max-h-[800px]`}>
+    <div className={`p-[10px] mt-2 border-[1px] ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-white bg-bgColorDark'} text-left overflow-y-scroll max-h-[800px]`}>
       <h6 className="w-[100%] mb-3">Range Definition</h6>
       <div className='flex flex-row justify-between px-5'>
         <div className='flex flex-row items-center gap-2'>
@@ -96,7 +96,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
       </div>
       <button
         data-testid="generateFrequencies"
-        className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'} w-full mt-2 hover:opacity-80 disabled:opacity-60`}
+        className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-bgColorDark2 text-textColorDark border-textColorDark'} w-full mt-2 hover:opacity-80 disabled:opacity-60`}
         disabled={(fNum === 0 || fMax <= fMin)}
         onClick={() => {
           scaleType === 0 ? dispatch(setFrequencies(logSpace(log10(fMin), log10(fMax), fNum))) : dispatch(setFrequencies([].slice.call(linSpace(fMin, fMax, fNum))))

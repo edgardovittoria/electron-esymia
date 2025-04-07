@@ -16,7 +16,7 @@ const ScatteringParameter: React.FC<ScatteringParameterProps> = ({setSavedPortPa
 
     return(
       <div className={`mt-3 p-[10px] text-left border-[1px] ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-secondaryColorDark bg-bgColorDark'}`}>
-        <h6 className="lg:text-base text-[12px]">Scattering Parameters Reference Impedance</h6>
+        <h6 className="text-sm">Scattering Parameters Reference Impedance</h6>
         <div className="mt-2">
           <DebounceInput
             data-testid="scattering"

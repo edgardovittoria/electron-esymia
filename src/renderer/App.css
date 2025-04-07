@@ -44,6 +44,12 @@
   }
 }
 
+@layer utilities {
+  .collapse {
+    visibility: visible;
+  }
+}
+
 body{
   background-color: #ececec;
 }

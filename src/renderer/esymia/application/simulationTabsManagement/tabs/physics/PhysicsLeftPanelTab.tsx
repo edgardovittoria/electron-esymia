@@ -93,8 +93,8 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   return (
     <>
       {selectedProject && selectedProject.ports.length !== 0 ? (
-        <div className="lg:max-h-[150px] xl:max-h-[200px] xl:h-[200px] overflow-y-scroll">
-          <div className="flex flex-row items-center justify-between pt-3">
+        <div className={`lg:max-h-[150px] overflow-y-scroll bg-white border ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-white bg-bgColorDark'} mt-3 rounded px-5 py-5`}>
+          <div className="flex flex-row items-center justify-between">
             <span className="font-bold">Terminations</span>
             <div className="flex flex-row items-center gap-8">
               <div
@@ -302,17 +302,18 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
           </ul>
         </div>
       ) : (
-        <div className="text-center">
-          <img
-            src={theme === 'light' ? noPhysicsIcon : noPhysicsIconDark}
-            className="mx-auto xl:mt-[20px] w-1/4"
-            alt="No Physics"
-          />
-          <h5 className="lg:text-sm xl:text-xl">No Physics applied</h5>
-          <p className="mt-[20px] text-sm">
-            Add ports or lumpeds and apply them to geometry in the 3D View.
-          </p>
-        </div>
+        // <div className="text-center">
+        //   <img
+        //     src={theme === 'light' ? noPhysicsIcon : noPhysicsIconDark}
+        //     className="mx-auto xl:mt-[20px] w-1/4"
+        //     alt="No Physics"
+        //   />
+        //   <h5 className="lg:text-sm xl:text-xl">No Physics applied</h5>
+        //   <p className="mt-[20px] text-sm">
+        //     Add ports or lumpeds and apply them to geometry in the 3D View.
+        //   </p>
+        // </div>
+        <></>
       )}
     </>
   );

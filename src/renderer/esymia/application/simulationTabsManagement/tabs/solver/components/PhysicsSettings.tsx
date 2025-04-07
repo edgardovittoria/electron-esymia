@@ -138,12 +138,12 @@ export const PhysicsSettings: FC<{
           <GiRadialBalance style={{ width: '25px', height: '25px' }} />
         </button>
       </div>
-      {planeWaweModalOpen && (
+      {/* {planeWaweModalOpen && (
         <PlaneWaveSettingsModal setModalOpen={setplaneWaweModalOpen} />
       )}
       {radialFieldModalOpen && (
         <RadialFieldSettingsModal setModalOpen={setradialFieldModalOpen} />
-      )}
+      )} */}
       {(selectedTabRightPanel || selectedTabLeftPanel) && selectedTabRightPanel !== physicsRightPanelTitle.second && (
         <div
           className={`${

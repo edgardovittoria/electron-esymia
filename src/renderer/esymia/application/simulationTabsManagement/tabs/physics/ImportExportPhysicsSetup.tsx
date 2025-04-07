@@ -138,7 +138,7 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
       className={
         className
           ? className
-          : `rounded ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} capitalize px-3 flex flex-row gap-2 items-center max-h-8`
+          : `rounded ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} capitalize px-3 flex flex-row gap-2 items-center h-8 max-h-8`
       }
       onClick={() => {
         const zip = new JSZip();
