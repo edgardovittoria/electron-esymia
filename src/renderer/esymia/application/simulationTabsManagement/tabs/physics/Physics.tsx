@@ -574,8 +574,8 @@ export const PhysicsSettingsOld: FC<{
           <GiRadialBalance style={{ width: '25px', height: '25px' }} />
         </div>
       </div>
-      {planeWaweModalOpen && <PlaneWaveSettingsModal setModalOpen={setplaneWaweModalOpen}/>}
-      {radialFieldModalOpen && <RadialFieldSettingsModal setModalOpen={setradialFieldModalOpen}/>}
+      {/* {planeWaweModalOpen && <PlaneWaveSettingsModal setModalOpen={setplaneWaweModalOpen}/>}
+      {radialFieldModalOpen && <RadialFieldSettingsModal setModalOpen={setradialFieldModalOpen}/>} */}
       {(selectedTabRightPanel || selectedTabLeftPanel) && (
         <div
           className={`${

@@ -51,6 +51,12 @@ import { PhysicsSettings } from './components/PhysicsSettings';
 import { FrequenciesSettings } from './components/FrequenciesSettings';
 import { MdOutlineViewInAr } from 'react-icons/md';
 import { ViewMesh } from './components/ViewMesh';
+import { OriginaProportionsButton } from '../mesher/components/OriginalProportionsButton';
+import { AlteredProportionsButton } from '../mesher/components/AlteredProportionsButton';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
+import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
+import { savePortsOnS3 } from '../physics/savePortsOnS3';
+import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 
 interface SolverProps {
   selectedTab?: string;
@@ -66,7 +72,7 @@ export const Solver: React.FC<SolverProps> = ({
   >(undefined);
   const [voxelsPainted, setVoxelsPainted] = useState(0);
   const [totalVoxels, setTotalVoxels] = useState(0);
-
+  const {execQuery2} = useDynamoDBQuery()
   const [cloning, setcloning] = useState<boolean>(false);
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedFolder = useSelector(SelectedFolderSelector);
@@ -88,7 +94,7 @@ export const Solver: React.FC<SolverProps> = ({
   >(undefined);
   const [savedPhysicsParameters, setSavedPhysicsParameters] = useState(true);
   const [simulationType, setsimulationType] = useState<
-    'Matrix' | 'Electric Fields' | 'Both'
+    'Matrix' | 'Electric Fields'
   >('Matrix');
   const awsExternalGridsData = useSelector(AWSExternalGridsDataSelector);
 
@@ -230,6 +236,25 @@ export const Solver: React.FC<SolverProps> = ({
     setSelectedTab(undefined);
   }, []);
 
+  useEffectNotOnMount(() => {
+      if (selectedProject && savedPhysicsParameters) {
+        if (selectedProject.ports.length > 0) {
+          savePortsOnS3(
+            selectedProject.ports,
+            selectedProject,
+            dispatch,
+            execQuery2,
+          );
+        } else {
+          execQuery2(
+            createOrUpdateProjectInDynamoDB,
+            selectedProject,
+            dispatch,
+          ).then(() => {});
+        }
+      }
+    }, [savedPhysicsParameters]);
+
   return (
     <>
       {spinner && mesherStatus === 'ready' && (
@@ -257,62 +282,6 @@ export const Solver: React.FC<SolverProps> = ({
         viewMesh={viewMesh}
       />
       <StatusBar voxelsPainted={voxelsPainted} totalVoxels={totalVoxels} />
-      {/* <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
-        <div
-          className={`p-2 tooltip rounded-t tooltip-right ${
-            selectedTabLeftPanel === simulatorLeftPanelTitle.first
-              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
-              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
-          }`}
-          data-tip="Modeler"
-          onClick={() => {
-            if (selectedTabLeftPanel === simulatorLeftPanelTitle.first) {
-              setSelectedTabLeftPanel(undefined);
-            } else {
-              setSelectedTabLeftPanel(simulatorLeftPanelTitle.first);
-            }
-            setsidebarItemSelected(undefined)
-          }}
-        >
-          <GiCubeforce style={{ width: '25px', height: '25px' }} />
-        </div>
-        <div
-          className={`p-2 tooltip rounded-b tooltip-right ${
-            selectedTabLeftPanel === simulatorLeftPanelTitle.second
-              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
-              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
-          }`}
-          data-tip="Materials"
-          onClick={() => {
-            if (selectedTabLeftPanel === simulatorLeftPanelTitle.second) {
-              setSelectedTabLeftPanel(undefined);
-            } else {
-              setSelectedTabLeftPanel(simulatorLeftPanelTitle.second);
-            }
-            setsidebarItemSelected(undefined)
-          }}
-        >
-          <GiAtomicSlashes style={{ width: '25px', height: '25px' }} />
-        </div>
-      </div>
-      {selectedTabLeftPanel && (
-        <>
-          <div className={`${theme === 'light' ? 'text-textColor bg-white' : 'text-textColorDark bg-bgColorDark2'} p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[15%]`}>
-            {selectedTabLeftPanel === simulatorLeftPanelTitle.first && (
-              <Models>
-                <ModelOutliner />
-              </Models>
-            )}
-            {selectedTabLeftPanel === simulatorLeftPanelTitle.second && (
-              <SimulatorLeftPanelTab
-                allMaterials={allMaterials}
-                selectedMaterials={selectedMaterials}
-                setSelectedMaterials={setSelectedMaterials}
-              />
-            )}
-          </div>
-        </>
-      )} */}
       <ViewMesh
         viewMesh={viewMesh}
         setViewMesh={setViewMesh}
@@ -330,24 +299,6 @@ export const Solver: React.FC<SolverProps> = ({
         savedPhysicsParameters={savedPhysicsParameters}
         cameraPosition={cameraPosition}
       />
-      {/* <FrequenciesSettings
-        selectedTabRightPanel={selectedTabRightPanel}
-        setSelectedTabRightPanel={setSelectedTabRightPanel}
-        setSelectedTabLeftPanel={setSelectedTab}
-        setSavedPhysicsParameters={setSavedPhysicsParameters}
-        setsidebarItemSelected={setsidebarItemSelected}
-        savedPhysicsParameters={savedPhysicsParameters}
-      />
-      <PhysicsSettings
-        savedPhysicsParameters={savedPhysicsParameters}
-        selectedTabLeftPanel={selectedTab}
-        setSavedPhysicsParameters={setSavedPhysicsParameters}
-        selectedTabRightPanel={selectedTabRightPanel}
-        setSelectedTabLeftPanel={setSelectedTab}
-        setSelectedTabRightPanel={setSelectedTabRightPanel}
-        setsidebarItemSelected={setsidebarItemSelected}
-        simulationType={simulationType}
-      /> */}
       <div
         className={`absolute left-[2%] top-[230px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
           theme === 'light'
@@ -386,7 +337,6 @@ export const Solver: React.FC<SolverProps> = ({
         <div className="gap-2 flex flex-row">
           {selectedProject?.model.components && (
             <>
-
               <SurfaceAdvicesButton
                 surfaceAdvices={surfaceAdvices}
                 setSurfaceAdvices={setSurfaceAdvices}
@@ -409,14 +359,15 @@ export const Solver: React.FC<SolverProps> = ({
           )}
         </div>
       </div>
-
-      {/* <div className="absolute left-1/2 -translate-x-1/2 gap-2 top-[180px] flex flex-row">
-        <ResetFocusButton toggleResetFocus={toggleResetFocus} />
-        <OriginaProportionsButton />
-        <AlteredProportionsButton threshold={3} />
-        <NormalMeshVisualizationButton />
-        <LightMeshVisualizationButton />
-      </div> */}
+      {viewMesh && (
+        <div className="absolute left-1/2 -translate-x-1/2 gap-2 top-[180px] flex flex-row">
+          <ResetFocusButton toggleResetFocus={toggleResetFocus} />
+          <OriginaProportionsButton />
+          <AlteredProportionsButton threshold={3} />
+          <NormalMeshVisualizationButton />
+          <LightMeshVisualizationButton />
+        </div>
+      )}
     </>
   );
 };

@@ -337,6 +337,34 @@ export const ProjectSlice = createSlice({
         selectedProject.frequencies = action.payload;
       }
     },
+    setTimes(state: ProjectState, action: PayloadAction<number[]>) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if (selectedProject) {
+        selectedProject.times = action.payload;
+      }
+    },
+    addInterestFrequencyIndex(state: ProjectState, action: PayloadAction<number>) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if(selectedProject){
+        if (selectedProject.interestFrequenciesIndexes) {
+          selectedProject.interestFrequenciesIndexes?.push(action.payload)
+        }else{
+          selectedProject.interestFrequenciesIndexes = [action.payload]
+        }
+      }
+    },
+    removeInterestFrequencyIndex(state: ProjectState, action: PayloadAction<number>) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if(selectedProject){
+        selectedProject.interestFrequenciesIndexes = selectedProject.interestFrequenciesIndexes?.filter(i => i !== action.payload)
+      }
+    },
+    resetInterestFrequencyIndex(state: ProjectState) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if(selectedProject){
+        selectedProject.interestFrequenciesIndexes = undefined
+      }
+    },
     setRadialFieldParametres(state: ProjectState, action: PayloadAction<RadialFieldParameters>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       if (selectedProject) {
@@ -437,6 +465,10 @@ export const {
   setScatteringValue,
   unsetScatteringValue,
   setFrequencies,
+  setTimes,
+  addInterestFrequencyIndex,
+  removeInterestFrequencyIndex,
+  resetInterestFrequencyIndex,
   setPathToExternalGridsNotFound,
   deleteAllLumped,
   deleteAllPorts,

@@ -15,6 +15,8 @@ export type DynamoProjectDetails = {
     bricks?: string,
     portsS3?: string,
     frequencies?: number[],
+    times?: number[],
+    interestFrequenciesIndexes?: number[],
     maxFrequency?: number,
     simulation?: Simulation|null,
     meshData: MeshData,

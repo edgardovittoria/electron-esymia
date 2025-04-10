@@ -14,6 +14,8 @@ export const convertInDynamoProjectThis = (project: Project) => {
       bricks: project.bricks,
       portsS3: project.portsS3,
       frequencies: project.frequencies,
+      times: project.times,
+      interestFrequenciesIndexes: project.interestFrequenciesIndexes,
       maxFrequency: project.maxFrequency,
       simulation: project.simulation === undefined ? null : {
         ...project.simulation,
