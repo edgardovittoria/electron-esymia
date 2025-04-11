@@ -1,15 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  pathToExternalGridsNotFoundSelector,
   SelectedFolderSelector,
   selectedProjectSelector,
   setPathToExternalGridsNotFound,
 } from '../../../../store/projectSlice';
-import { SimulatorLeftPanelTab } from '../mesher/components/SimulatorLeftPanelTab';
 import { SolverSettings } from './components/SolverSettings';
-import { Models } from '../../sharedElements/Models';
-import { ModelOutliner } from '../../sharedElements/ModelOutliner';
 import {
   CellSize,
   CellsNumber,
@@ -22,7 +18,6 @@ import {
 import StatusBar from '../../sharedElements/StatusBar';
 import { CanvasSolver } from './components/CanvasSolver';
 import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
-import { simulatorLeftPanelTitle } from '../../../config/panelTitles';
 import { ImSpinner } from 'react-icons/im';
 import { useStorageData } from '../mesher/components/rightPanelSimulator/hook/useStorageData';
 import {
@@ -35,21 +30,10 @@ import {
 import { LiaFeatherSolid, LiaWeightHangingSolid } from 'react-icons/lia';
 import { BiHide, BiShow } from 'react-icons/bi';
 import { Brick } from '../mesher/components/rightPanelSimulator/components/createGridsExternals';
-import { GiAtomicSlashes, GiCubeforce } from 'react-icons/gi';
 import { GrClone, GrStatusInfo } from 'react-icons/gr';
 import { ComponentEntity, Material } from '../../../../../cad_library';
 import { MesherStatusSelector } from '../../../../store/pluginsSlice';
-import { ExportPhisicsToCSV } from '../physics/ImportExportPhysicsSetup';
-import {
-  PortImportFromCSV,
-  LumpedImportFromCSV,
-  FrequenciesImportFromCSV,
-} from '../physics/ImportPhysicsFromCSV';
-import { CreatePorts } from '../physics/portManagement/selectPorts/CreatePorts';
 import * as THREE from 'three';
-import { PhysicsSettings } from './components/PhysicsSettings';
-import { FrequenciesSettings } from './components/FrequenciesSettings';
-import { MdOutlineViewInAr } from 'react-icons/md';
 import { ViewMesh } from './components/ViewMesh';
 import { OriginaProportionsButton } from '../mesher/components/OriginalProportionsButton';
 import { AlteredProportionsButton } from '../mesher/components/AlteredProportionsButton';
@@ -57,6 +41,10 @@ import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/project
 import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
 import { savePortsOnS3 } from '../physics/savePortsOnS3';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import {
+  ShowInputGraphModal,
+  InputGraphData,
+} from './components/ShowInputGraphModal';
 
 interface SolverProps {
   selectedTab?: string;
@@ -72,7 +60,7 @@ export const Solver: React.FC<SolverProps> = ({
   >(undefined);
   const [voxelsPainted, setVoxelsPainted] = useState(0);
   const [totalVoxels, setTotalVoxels] = useState(0);
-  const {execQuery2} = useDynamoDBQuery()
+  const { execQuery2 } = useDynamoDBQuery();
   const [cloning, setcloning] = useState<boolean>(false);
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedFolder = useSelector(SelectedFolderSelector);
@@ -95,7 +83,7 @@ export const Solver: React.FC<SolverProps> = ({
   const [savedPhysicsParameters, setSavedPhysicsParameters] = useState(true);
   const [simulationType, setsimulationType] = useState<
     'Matrix' | 'Electric Fields'
-  >('Matrix');
+  >(selectedProject?.simulation ? selectedProject.simulation.simulationType : "Matrix");
   const awsExternalGridsData = useSelector(AWSExternalGridsDataSelector);
 
   const risExternalGridsFormat = (extGridsJson: any) => {
@@ -237,23 +225,23 @@ export const Solver: React.FC<SolverProps> = ({
   }, []);
 
   useEffectNotOnMount(() => {
-      if (selectedProject && savedPhysicsParameters) {
-        if (selectedProject.ports.length > 0) {
-          savePortsOnS3(
-            selectedProject.ports,
-            selectedProject,
-            dispatch,
-            execQuery2,
-          );
-        } else {
-          execQuery2(
-            createOrUpdateProjectInDynamoDB,
-            selectedProject,
-            dispatch,
-          ).then(() => {});
-        }
+    if (selectedProject && savedPhysicsParameters) {
+      if (selectedProject.ports.length > 0) {
+        savePortsOnS3(
+          selectedProject.ports,
+          selectedProject,
+          dispatch,
+          execQuery2,
+        );
+      } else {
+        execQuery2(
+          createOrUpdateProjectInDynamoDB,
+          selectedProject,
+          dispatch,
+        ).then(() => {});
       }
-    }, [savedPhysicsParameters]);
+    }
+  }, [savedPhysicsParameters]);
 
   return (
     <>

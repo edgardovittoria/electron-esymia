@@ -54,8 +54,8 @@ import { Dispatch } from '@reduxjs/toolkit';
 import { savePortsOnS3 } from './savePortsOnS3';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { TbWavesElectricity } from 'react-icons/tb';
-import { PlaneWaveSettingsModal } from './planeWave/PlaneWaveSettingsModal';
-import { RadialFieldSettingsModal } from './planeWave/RadialFieldSettingsModal';
+import { PlaneWaveSettings } from '../solver/components/planeWave/PlaneWaveSettings';
+import { RadialFieldSettingsModal } from '../solver/components/planeWave/RadialFieldSettingsModal';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 

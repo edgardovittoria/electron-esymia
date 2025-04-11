@@ -12,6 +12,7 @@ import {
   selectedProjectSelector,
   setFrequencies,
   setMeshApproved,
+  setPortSignal,
   setTimes,
   updateSimulation,
 } from '../../../../../store/projectSlice';
@@ -53,8 +54,10 @@ import { RLCParamsComponent } from '../../physics/portManagement/components/RLCP
 import ScatteringParameter from '../../physics/portManagement/components/ScatteringParameter';
 import { ModalSelectPortType } from '../../physics/portManagement/ModalSelectPortType';
 import { PortManagement } from '../../physics/portManagement/PortManagement';
-import { PlaneWaveSettingsModal } from '../../physics/planeWave/PlaneWaveSettingsModal';
-import { RadialFieldSettingsModal } from '../../physics/planeWave/RadialFieldSettingsModal';
+import { genera_segnale_esponenziale, genera_segnale_Gaussiano_modulato, genera_segnale_sinusoidale, PlaneWaveSettings } from './planeWave/PlaneWaveSettings';
+import { gamma } from 'mathjs';
+import { ShowInputGraphModal, InputGraphData } from './ShowInputGraphModal';
+import { BsGraphUp } from 'react-icons/bs';
 
 interface SolverSettingsProps {
   selectedProject: Project;
@@ -84,6 +87,9 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
   const theme = useSelector(ThemeSelector);
   const [electricField, setelectricField] = useState(true);
   const [ports, setports] = useState(false);
+  const [graphData, setgraphData] = useState<InputGraphData | undefined>(
+    undefined,
+  );
 
   return (
     <>
@@ -124,7 +130,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
               (selectedProject.simulation?.status === 'Queued' ||
                 selectedProject.simulation?.status === 'Running') &&
               'opacity-40'
-            } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[22%] w-[28%] rounded-tl rounded-tr ${
+            } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[40%] w-[28%] rounded-tl rounded-tr ${
               theme === 'light'
                 ? 'bg-white text-textColor'
                 : 'bg-bgColorDark2 text-textColorDark'
@@ -154,7 +160,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                         type="checkbox"
                         name="matrix"
                         id="matrix"
-                        checked={simulationType === 'Matrix'}
+                        checked={simulationType === "Matrix"}
                         onClick={() => setsimulationType('Matrix')}
                       />
                       <span>Matrix (S, Z, Y)</span>
@@ -162,9 +168,9 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                     <div className="flex flex-row gap-2 items-center">
                       <input
                         type="checkbox"
-                        name="matrix"
-                        id="matrix"
-                        checked={simulationType === 'Electric Fields'}
+                        name="electric_fields"
+                        id="electric_fields"
+                        checked={simulationType === "Electric Fields"}
                         onClick={() => setsimulationType('Electric Fields')}
                       />
                       <span>Electric Fields</span>
@@ -223,18 +229,32 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                   savedPhysicsParameters={savedPhysicsParameters}
                   setSavedPhysicsParameters={setSavedPhysicsParameters}
                 />
-                <CollapsePortsElecticField
-                  cameraPosition={cameraPosition}
-                  savedPhysicsParameters={savedPhysicsParameters}
-                  setSavedPhysicsParameters={setSavedPhysicsParameters}
-                />
-                <CollapsePlaneWave />
-                <CollapseRadiationDiagram />
+                {ports && (
+                  <CollapsePortsElecticField
+                    cameraPosition={cameraPosition}
+                    savedPhysicsParameters={savedPhysicsParameters}
+                    setSavedPhysicsParameters={setSavedPhysicsParameters}
+                    setGraphData={setgraphData}
+                  />
+                )}
+                {electricField && (
+                  <CollapsePlaneWave setGraphData={setgraphData} />
+                )}
               </>
             )}
             <SolverParameters simulationType={simulationType} />
             <SimulationSuggestions simulationType={simulationType} />
           </div>
+          {graphData && (
+            <ShowInputGraphModal
+              labelX={graphData.labelX}
+              labelY={graphData.labelY}
+              signalName={graphData.signalName}
+              dataX={graphData.dataX}
+              dataY={graphData.dataY}
+              setGraphData={setgraphData}
+            />
+          )}
         </>
       )}
     </>
@@ -452,17 +472,20 @@ interface CollapsePortsElecticFieldProps {
   setSavedPhysicsParameters: Function;
   savedPhysicsParameters: boolean;
   cameraPosition: THREE.Vector3;
+  setGraphData: Function;
 }
 
 const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
   setSavedPhysicsParameters,
   savedPhysicsParameters,
   cameraPosition,
+  setGraphData
 }) => {
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
+  const dispatch = useDispatch();
   return (
     <div
       className={`collapse collapse-arrow mt-3 xl:text-left text-center border-[1px] rounded ${
@@ -477,8 +500,6 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
         <div className="flex flex-row items-center gap-4">
           <PortImportFromCSV />
           <LumpedImportFromCSV />
-        </div>
-        <div className="flex flex-row items-center gap-4 mt-3">
           <CreatePorts
             selectedProject={selectedProject as Project}
             cameraPosition={cameraPosition}
@@ -517,6 +538,56 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
               <ScatteringParameter
                 setSavedPortParameters={setSavedPhysicsParameters}
               />
+              <div className="flex flex-row items-center justify-between mt-3 p-1">
+                <select
+                  defaultValue={selectedPort?.signal}
+                  onChange={(e) => {
+                    dispatch(setPortSignal(e.currentTarget.value));
+                    setSavedPhysicsParameters(false);
+                  }}
+                  className="select border-black mt-3"
+                >
+                  <option value={undefined}>No Signal</option>
+                  <option value="exponential">Exponential</option>
+                  <option value="gaussian_modulated">Gaussian Modulated</option>
+                  <option value="sinusoidal">Sinusoidal</option>
+                </select>
+                <div
+                  className="tooltip tooltip-left hover:cursor-pointer"
+                  data-tip="Show signal graph"
+                  onClick={() => {
+                    let vs: number[] = [];
+                    switch (selectedPort?.signal) {
+                      case 'exponential':
+                        vs = genera_segnale_esponenziale(
+                          selectedProject?.times as number[],
+                        );
+                        break;
+                      case 'sinusoidal':
+                        vs = genera_segnale_sinusoidale(
+                          selectedProject?.times as number[],
+                        );
+                        break;
+                      case 'gaussian_modulated':
+                        vs = genera_segnale_Gaussiano_modulato(
+                          selectedProject?.times as number[],
+                        );
+                        break;
+                    }
+                    setGraphData({
+                      labelX: 'Times',
+                      labelY: 'E',
+                      dataX: selectedProject?.times?.map((t) =>
+                        parseFloat(t.toExponential(2)),
+                      ),
+                      dataY: vs,
+                      signalName: 'E signal',
+                    } as InputGraphData);
+                  }}
+                >
+                  <BsGraphUp size={25} />
+                </div>
+              </div>
               <PortPosition
                 selectedPort={selectedPort as Port | TempLumped}
                 disabled={selectedProject?.simulation?.status === 'Completed'}
@@ -551,7 +622,9 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
   );
 };
 
-const CollapsePlaneWave: React.FC = () => {
+const CollapsePlaneWave: React.FC<{ setGraphData: Function }> = ({
+  setGraphData,
+}) => {
   const theme = useSelector(ThemeSelector);
   return (
     <div
@@ -564,26 +637,7 @@ const CollapsePlaneWave: React.FC = () => {
       <input type="checkbox" />
       <div className="collapse-title font-semibold">Plane Wave</div>
       <div className="collapse-content text-sm">
-        <PlaneWaveSettingsModal />
-      </div>
-    </div>
-  );
-};
-
-const CollapseRadiationDiagram: React.FC = () => {
-  const theme = useSelector(ThemeSelector);
-  return (
-    <div
-      className={`collapse collapse-arrow mt-3 xl:text-left text-center border-[1px] rounded ${
-        theme === 'light'
-          ? 'bg-[#f6f6f6] border-secondaryColor'
-          : 'bg-bgColorDark'
-      }`}
-    >
-      <input type="checkbox" />
-      <div className="collapse-title font-semibold">Radiation Diagram</div>
-      <div className="collapse-content text-sm">
-        <RadialFieldSettingsModal />
+        <PlaneWaveSettings setGraphData={setGraphData} />
       </div>
     </div>
   );
@@ -825,6 +879,7 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
                 outerIteration: solverIterations[1],
                 convergenceThreshold,
               },
+              simulationType: simulationType as "Matrix" | "Electric Fields",
             };
             dispatch(
               updateSimulation({
@@ -916,7 +971,6 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
     }
     return f;
   }
-
 
   return (
     <div
@@ -1053,7 +1107,7 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
                       name={f.toString()}
                       id={f.toString()}
                       onChange={(e) => {
-                        setSavedPhysicsParameters(false)
+                        setSavedPhysicsParameters(false);
                         if (e.currentTarget.checked) {
                           dispatch(addInterestFrequencyIndex(index));
                         } else {

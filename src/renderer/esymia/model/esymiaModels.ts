@@ -25,7 +25,7 @@ export type Project = {
   modelUnit?: string;
   modelS3?: string;
   bricks?: string;
-  ports: (Port | Probe | TempLumped)[];
+  ports: (Port | TempLumped)[];
   portsS3?: string | null;
   scatteringValue?: number;
   frequencies?: number[];
@@ -55,6 +55,7 @@ export type TempLumped = {
   isSelected: boolean;
   rlcParams: RLCParams;
   value: number;
+  signal?: string;
 };
 
 export type Port = {
@@ -63,6 +64,7 @@ export type Port = {
   inputElement: [number, number, number];
   outputElement: [number, number, number];
   isSelected: boolean;
+  signal?: string;
 };
 
 export type RLCParams = {
@@ -124,6 +126,7 @@ export type Simulation = {
     outerIteration: number;
     convergenceThreshold: number;
   };
+  simulationType: "Matrix" | "Electric Fields"
 };
 
 export type SolverOutput = {
@@ -175,6 +178,7 @@ export type PlaneWaveParameters = {
     phi: number;
     ETheta: number;
     EPhi: number;
+    ESignal: string;
   },
   output: {
     E: Vector3,

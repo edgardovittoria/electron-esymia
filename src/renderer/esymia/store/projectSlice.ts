@@ -169,7 +169,7 @@ export const ProjectSlice = createSlice({
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload);
       if (selectedProject && selectedProject.simulation) selectedProject.simulation = undefined;
     },
-    addPorts(state: ProjectState, action: PayloadAction<Port | Probe>) {
+    addPorts(state: ProjectState, action: PayloadAction<Port | TempLumped>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       selectedProject?.ports.push(action.payload);
     },
@@ -233,8 +233,6 @@ export const ProjectSlice = createSlice({
       if (selectedPort) {
         if (selectedPort.category === 'port' || selectedPort.category === 'lumped') {
           (action.payload.type === 'first') ? selectedPort.inputElement = action.payload.position : selectedPort.outputElement = action.payload.position;
-        } else if (action.payload.type === 'probe') {
-          (selectedPort as Probe).groupPosition = action.payload.position;
         }
       }
     },
@@ -243,16 +241,16 @@ export const ProjectSlice = createSlice({
       if (selectedPort) {
         if (selectedPort.category === 'lumped') {
           (selectedPort as TempLumped).rlcParams = action.payload;
-        }
-        if (selectedPort.category === 'lumped') {
           (selectedPort as TempLumped).value = action.payload.resistance as number;
         }
       }
     },
-    /* setAssociatedSignal(state: ProjectState, action: PayloadAction<Signal>) {
-      let project = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
-      if (project) project.signal = action.payload;
-    }, */
+    setPortSignal(state: ProjectState, action: PayloadAction<string>) {
+      let selectedPort = findSelectedPort(findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject));
+      if (selectedPort) {
+        selectedPort.signal = action.payload;
+      }
+    },
     setScreenshot(state: ProjectState, action: PayloadAction<string>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsIn(state.projects), state.selectedProject);
       if (selectedProject) {
@@ -476,7 +474,8 @@ export const {
   unsetRadialFieldParametres,
   setPlaneWaveParametres,
   unsetPlaneWaveParametres,
-  setMaxFrequency
+  setMaxFrequency,
+  setPortSignal
 } = ProjectSlice.actions;
 
 const selectTabEffects = (state: ProjectState, tab: string) => {

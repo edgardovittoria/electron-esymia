@@ -51,7 +51,7 @@ import {
 } from '../../mesher/components/MeshedElement/components/RisMesh';
 import { FactoryShapesEsymia } from '../../../../../../cad_library/components/baseShapes/factoryShapes';
 import EdgesGenerator from '../../physics/EdgesGenerator';
-import { GizmoArrowViewport } from '../../physics/planeWave/components/GizmoArrowViewport';
+import { GizmoArrowViewport } from '../../solver/components/planeWave/components/GizmoArrowViewport';
 import { PortControls } from '../../physics/portManagement/PortControls';
 import { ProbeControls } from '../../physics/portManagement/ProbeControls';
 import { calculateModelBoundingBox } from '../../../sharedElements/utilityFunctions';

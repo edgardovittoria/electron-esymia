@@ -29,10 +29,11 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                     <Menu.Button
                         data-testid="addPort"
                         disabled = {selectedProject.simulation?.status === 'Completed'}
-                        className={`inline-flex w-full justify-center rounded-md ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} px-2 py-2 text-sm font-medium text-black hover:bg-opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}>
+                        className={`inline-flex w-full justify-center rounded-md ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} px-2 py-1 text-sm font-medium text-black hover:bg-opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}>
                         <AiOutlineThunderbolt
-                            className="ml-0 mr-1 h-5 w-5"
+                            className="ml-0 mr-1"
                             aria-hidden="true"
+                            style={{ width: '21px', height: '21px' }}
                         />
                         Add Port/Lumped
                         <FiChevronDown
@@ -49,7 +50,7 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({selectedProject, camera
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                     >
-                        <Menu.Items className="fixed z-50 mt-2 w-56 origin-top-left divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Menu.Items className="absolute z-50 mt-2 w-56 origin-top-left divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             <Menu.Item>
                                 {({active}) => (
                                     <span

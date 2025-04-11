@@ -42,9 +42,9 @@ import {
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { FactoryShapesEsymia } from '../../../../../cad_library/components/baseShapes/factoryShapes';
 import { boundingBoxDimensionSelector } from '../../../../store/projectSlice';
-import { GizmoArrowViewport } from './planeWave/components/GizmoArrowViewport';
-import { FieldVectors } from './planeWave/components/FieldVectors';
-import { computeFieldsComponents } from './planeWave/utility/computeFieldsComponents';
+import { GizmoArrowViewport } from '../solver/components/planeWave/components/GizmoArrowViewport';
+import { FieldVectors } from '../solver/components/planeWave/components/FieldVectors';
+import { computeFieldsComponents } from '../solver/components/planeWave/utility/computeFieldsComponents';
 
 interface CanvasPhysicsProps {
   setCameraPosition: Function;
