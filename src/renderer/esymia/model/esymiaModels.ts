@@ -1,5 +1,5 @@
-import { Vector3 } from 'three';
 import { CanvasState, ComponentEntity, UsersState } from '../../cad_library';
+import * as THREE from 'three';
 
 export type Folder = {
   name: string;
@@ -117,7 +117,7 @@ export type Simulation = {
   started: string;
   ended: string;
   status: 'Queued' | 'Running' | 'Completed' | 'Failed';
-  results: SolverOutput;
+  results: SolverOutput | SolverOutputElectricFields;
   resultS3?: string;
   associatedProject: string;
   solverAlgoParams: {
@@ -134,6 +134,20 @@ export type SolverOutput = {
   matrix_S: string;
   matrix_Y: string;
   freqIndex?: number;
+};
+
+export type SolverOutputElectricFields = {
+  Ex: string,
+  Ey: string,
+  Ez: string,
+  Ex_3D: string,
+  Ey_3D: string,
+  Ez_3D: string,
+  Hx_3D: string,
+  Hy_3D: string,
+  Hz_3D: string,
+  Vp: string,
+  f: string
 };
 
 export type ExternalGridsRisObject = {
@@ -181,10 +195,10 @@ export type PlaneWaveParameters = {
     ESignal: string;
   },
   output: {
-    E: Vector3,
-    K: Vector3,
-    H: Vector3,
-    E_theta_v: Vector3,
-    E_phi_v: Vector3
+    E: THREE.Vector3,
+    K: THREE.Vector3,
+    H: THREE.Vector3,
+    E_theta_v: THREE.Vector3,
+    E_phi_v: THREE.Vector3
   }
 };

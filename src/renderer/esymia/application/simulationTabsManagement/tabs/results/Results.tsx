@@ -43,6 +43,7 @@ import {
   ThemeSelector,
   resetItemToResultsView,
   solverResultsViewSelector,
+  resultsViewItem,
 } from '../../../../store/tabsAndMenuItemsSlice';
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
 
@@ -99,26 +100,44 @@ export const Results: React.FC<ResultsProps> = ({
       selectedProject &&
       selectedProject.simulation &&
       selectedProject.simulation.resultS3 &&
-      selectedProject.simulation.status === 'Completed' &&
-      !selectedProject.simulation.results.matrix_S
+      selectedProject.simulation.status === 'Completed'
     ) {
       //setResultsFromS3(selectedProject, dispatch)
-      dispatch(
-        publishMessage({
-          queue: 'management_solver',
-          body: {
-            message: 'get results',
+      if (
+        !(selectedProject.simulation.results as SolverOutput).matrix_S &&
+        selectedProject.simulation.simulationType === 'Matrix'
+      ) {
+        dispatch(
+          publishMessage({
+            queue: 'management_solver',
             body: {
-              portIndex: 0,
-              fileId: selectedProject.simulation.resultS3,
+              message: 'get results',
+              body: {
+                portIndex: 0,
+                fileId: selectedProject.simulation.resultS3,
+              },
             },
-          },
-        }),
-      );
+          }),
+        );
+      } else if (
+        selectedProject.simulation.simulationType === 'Electric Fields'
+      ) {
+        dispatch(
+          publishMessage({
+            queue: 'management_solver',
+            body: {
+              message: 'get results electric fields',
+              body: {
+                fileId: selectedProject.simulation.resultS3,
+              },
+            },
+          }),
+        );
+      }
     }
   }, []);
   const selectedFolder = useSelector(SelectedFolderSelector);
-  const resultsView = useSelector(solverResultsViewSelector)
+  const resultsView = useSelector(solverResultsViewSelector);
   let selectedPort = findSelectedPort(selectedProject);
   const dispatch = useDispatch();
   const ports = selectedProject?.ports.filter(
@@ -160,12 +179,11 @@ export const Results: React.FC<ResultsProps> = ({
   //   setSelectedLabel([{ label: 'All Ports', id: 0 }]);
   // }, [selectedProject]);
 
-
   useEffect(() => {
     setSelectedTabLeftPanel(undefined);
     return () => {
-      dispatch(resetItemToResultsView())
-    }
+      dispatch(resetItemToResultsView());
+    };
   }, []);
 
   function randomColours(quan: number) {
@@ -265,7 +283,8 @@ export const Results: React.FC<ResultsProps> = ({
                 window.electron.ipcRenderer.sendMessage('exportTouchstone', [
                   selectedProject.frequencies,
                   JSON.parse(
-                    selectedProject?.simulation?.results.matrix_S as string,
+                    (selectedProject?.simulation?.results as SolverOutput)
+                      .matrix_S as string,
                   ),
                   selectedProject.scatteringValue,
                   selectedProject.ports.filter((p) => p.category === 'port')
@@ -405,32 +424,41 @@ export const Results: React.FC<ResultsProps> = ({
         selectedProject.simulation &&
         resultsView.length > 0 ? (
           <>
-            <ChartVisualizationMode
-              chartVisualizationMode={chartVisualizationMode}
-              setChartVisualizationMode={setChartVisualizationMode}
-              chartsScaleMode={chartsScaleMode}
-              setChartsScaleMode={setChartsScaleMode}
-              setGraphToVisualize={setGraphToVisualize}
-              selectedLabel={selectedLabel}
-              setSelectedLabel={setSelectedLabel}
-              graphDataToExport={graphDataToExport}
-            />
-            <div
-              className={
-                chartVisualizationMode === 'full'
-                  ? 'overflow-scroll grid grid-cols-1 gap-4 max-h-[77vh] pb-10'
-                  : 'grid grid-cols-2 gap-4 overflow-scroll max-h-[77vh] pb-10'
-              }
-            >
-              <ChartsList
-                graphToVisualize={graphToVisualize}
-                selectedLabel={selectedLabel}
-                setGraphsData={setGraphDataToExport}
-                currentFreIndexq={resultsView[0].freqIndex}
-                ChartVisualizationMode={chartVisualizationMode}
-                colorArray={colorArray}
-              />
-            </div>
+            {selectedProject.simulation.simulationType === 'Matrix' ? (
+              <>
+                <ChartVisualizationMode
+                  chartVisualizationMode={chartVisualizationMode}
+                  setChartVisualizationMode={setChartVisualizationMode}
+                  chartsScaleMode={chartsScaleMode}
+                  setChartsScaleMode={setChartsScaleMode}
+                  setGraphToVisualize={setGraphToVisualize}
+                  selectedLabel={selectedLabel}
+                  setSelectedLabel={setSelectedLabel}
+                  graphDataToExport={graphDataToExport}
+                />
+                <div
+                  className={
+                    chartVisualizationMode === 'full'
+                      ? 'overflow-scroll grid grid-cols-1 gap-4 max-h-[77vh] pb-10'
+                      : 'grid grid-cols-2 gap-4 overflow-scroll max-h-[77vh] pb-10'
+                  }
+                >
+                  <ChartsList
+                    graphToVisualize={graphToVisualize}
+                    selectedLabel={selectedLabel}
+                    setGraphsData={setGraphDataToExport}
+                    currentFreIndexq={
+                      (resultsView[0] as resultsViewItem).freqIndex
+                    }
+                    ChartVisualizationMode={chartVisualizationMode}
+                    colorArray={colorArray}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+              </>
+            )}
           </>
         ) : (
           <div className="absolute top-1/2 right-1/2 translate-x-1/2 flex justify-center w-[90%]">

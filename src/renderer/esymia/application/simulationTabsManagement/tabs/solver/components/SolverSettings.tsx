@@ -54,7 +54,7 @@ import { RLCParamsComponent } from '../../physics/portManagement/components/RLCP
 import ScatteringParameter from '../../physics/portManagement/components/ScatteringParameter';
 import { ModalSelectPortType } from '../../physics/portManagement/ModalSelectPortType';
 import { PortManagement } from '../../physics/portManagement/PortManagement';
-import { genera_segnale_esponenziale, genera_segnale_Gaussiano_modulato, genera_segnale_sinusoidale, PlaneWaveSettings } from './planeWave/PlaneWaveSettings';
+import { genera_segnale_esponenziale, genera_segnale_Gaussiano_modulato, genera_segnale_sinusoidale, genera_segnale_trapezoidal_pulse, PlaneWaveSettings } from './planeWave/PlaneWaveSettings';
 import { gamma } from 'mathjs';
 import { ShowInputGraphModal, InputGraphData } from './ShowInputGraphModal';
 import { BsGraphUp } from 'react-icons/bs';
@@ -551,6 +551,7 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
                   <option value="exponential">Exponential</option>
                   <option value="gaussian_modulated">Gaussian Modulated</option>
                   <option value="sinusoidal">Sinusoidal</option>
+                  <option value="trapezoidal_pulse">Trapezoidal Pulse</option>
                 </select>
                 <div
                   className="tooltip tooltip-left hover:cursor-pointer"
@@ -573,6 +574,11 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
                           selectedProject?.times as number[],
                         );
                         break;
+                      case 'trapezoidal_pulse':
+                        vs = genera_segnale_trapezoidal_pulse(
+                          selectedProject?.times as number[],
+                        );
+                        break;  
                     }
                     setGraphData({
                       labelX: 'Times',

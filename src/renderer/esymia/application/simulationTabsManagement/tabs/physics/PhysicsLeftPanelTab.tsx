@@ -34,12 +34,12 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   const [portRename, setPortRename] = useState('');
   const { execQuery2 } = useDynamoDBQuery();
   const isConfirmedInfoModal = useSelector(isConfirmedInfoModalSelector)
-  const [deleteAllType, setDeleteAllType] = useState("port")
+  const [deleteAllType, setDeleteAllType] = useState<string | undefined>(undefined)
 
-  useEffectNotOnMount(() => {
-    selectedProject?.ports.filter((p) => p.category === 'port').length === 0 &&
-      dispatch(unsetScatteringValue());
-  }, [selectedProject?.ports.length]);
+  // useEffectNotOnMount(() => {
+  //   selectedProject?.ports.filter((p) => p.category === 'port').length === 0 &&
+  //     dispatch(unsetScatteringValue());
+  // }, [selectedProject?.ports.length]);
 
   useEffect(() => {
     if(isConfirmedInfoModal && selectedProject && deleteAllType === "port"){

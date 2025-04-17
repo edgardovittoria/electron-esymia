@@ -51,15 +51,19 @@ export const VectorArrow: FC<VectorArrowProps> = ({
   label,
 }) => (
   <>
-    <arrowHelper args={[normalize(dir), start, 1, color]} />
-    <Text
-      position={start.clone().add(dir.clone().multiplyScalar(1.1))}
-      fontSize={0.1}
-      color={color}
-      rotation={[Math.PI / 2, 0, 0]}
-    >
-      {label}
-    </Text>
+    {dir && (
+      <>
+        <arrowHelper args={[normalize(dir), start, 1, color]} />
+        <Text
+          position={start.clone().add(dir.clone().multiplyScalar(1.1))}
+          fontSize={0.1}
+          color={color}
+          rotation={[Math.PI / 2, 0, 0]}
+        >
+          {label}
+        </Text>
+      </>
+    )}
   </>
 );
 
@@ -107,8 +111,8 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
         color="gray"
         label="K̂"
       />
-      <VectorArrow start={K} dir={E_theta_v} color="green" label="Êθ" />
-      <VectorArrow start={K} dir={E_phi_v} color="purple" label="Êφ" />
+      {/* <VectorArrow start={K} dir={E_theta_v} color="green" label="Êθ" />
+      <VectorArrow start={K} dir={E_phi_v} color="purple" label="Êφ" /> */}
       <VectorArrow start={K} dir={H} color="red" label="Ĥ" />
 
       <Line

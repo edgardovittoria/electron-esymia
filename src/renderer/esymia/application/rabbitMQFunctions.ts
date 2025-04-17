@@ -158,46 +158,57 @@ export const callback_solver_feedback = (message: any, dispatch: Function, getSt
 export const callback_solver_results = (message: any, dispatch: Function, getState: Function) => {
   let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
   let res = JSON.parse(message.body);
-  console.log(res)
-  if(res.portIndex !== undefined && res.partial){
-    dispatch(resetItemToResultsView())
-    dispatch(addItemToResultsView({
-      portIndex: parseInt(res.portIndex),
-      results: res.results,
-      freqIndex: res.freqIndex
-    }))
-  }else{
-    dispatch(addItemToResultsView({
-      portIndex: parseInt(res.portIndex),
-      results: res.results
-    }))
-  }
-  projects.forEach(p => {
-    if(p.id === res.id){
-      message.ack();
-      if(!res.error){
-        dispatch(
-          setSolverResults({
-            id: res.id,
-            matrices: !res.isStopped ? res.matrices : ({} as SolverOutput),
-            isStopped: res.isStopped,
-            partial: res.partial,
-            freqIndex: res.freqIndex,
-          }),
-        );
-        dispatch(setEstimatedTime(undefined))
-      }else{
-        dispatch(
-          setSolverResults({
-            id: res.id,
-            matrices: {} as SolverOutput,
-            isStopped: res.isStopped,
-            partial: res.partial,
-            error: res.error
-          }),
-        );
-        dispatch(setEstimatedTime(undefined))
-      }
+  if(res.simulationType === "matrix"){
+    if(res.portIndex !== undefined && res.partial){
+      dispatch(resetItemToResultsView())
+      dispatch(addItemToResultsView({
+        portIndex: parseInt(res.portIndex),
+        results: res.results,
+        freqIndex: res.freqIndex,
+      }))
+    }else{
+      dispatch(addItemToResultsView({
+        portIndex: parseInt(res.portIndex),
+        results: res.results,
+      }))
     }
-  })
+    projects.forEach(p => {
+      if(p.id === res.id){
+        message.ack();
+        if(!res.error){
+          dispatch(
+            setSolverResults({
+              id: res.id,
+              matrices: !res.isStopped ? res.matrices : ({} as SolverOutput),
+              isStopped: res.isStopped,
+              partial: res.partial,
+              freqIndex: res.freqIndex,
+            }),
+          );
+          dispatch(setEstimatedTime(undefined))
+        }else{
+          dispatch(
+            setSolverResults({
+              id: res.id,
+              matrices: {} as SolverOutput,
+              isStopped: res.isStopped,
+              partial: res.partial,
+              error: res.error
+            }),
+          );
+          dispatch(setEstimatedTime(undefined))
+        }
+      }
+    })
+  }else{
+    dispatch(
+      setSolverResults({
+        id: res.id,
+        results: res.results,
+        isStopped: false,
+        error: false
+      }),
+    );
+  }
+  
 };

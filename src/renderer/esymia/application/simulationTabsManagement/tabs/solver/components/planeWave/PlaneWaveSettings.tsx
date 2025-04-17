@@ -69,14 +69,14 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
   return (
     <>
       <div
-        className={`w-full max-w-md transform overflow-hidden rounded border p-3 ${
+        className={`w-full max-w-full transform overflow-hidden rounded border p-3 ${
           theme === 'light'
             ? 'bg-white text-textColor border-textColor'
             : 'bg-bgColorDark2 text-textColorDark border-textColorDark'
         }`}
       >
-        <div className="flex flex-row gap-2 items-center">
-          <div className="flex flex-col">
+        <div className="flex flex-row gap-2 items-center w-full">
+          <div className="flex flex-col w-1/2">
             <div className="p-1">
               <h6>Tetha (0 - π):</h6>
               <input
@@ -113,7 +113,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
               )}
             </div>
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col w-1/2">
             <div className="p-1">
               <h6>Phi (0 - π):</h6>
               <input
@@ -151,8 +151,8 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
             </div>
           </div>
         </div>
-        <div className="flex flex-row gap-2 items-center">
-          <div className="flex flex-col">
+        <div className="flex flex-row gap-2 items-center w-full">
+          <div className="flex flex-col w-1/2">
             <div className="p-1">
               <h6>E_tetha:</h6>
               <input
@@ -168,7 +168,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
               />
             </div>
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col w-1/2">
             <div className="p-1">
               <h6>E_phi:</h6>
               <input
@@ -191,7 +191,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
             onChange={(e) => {
               setsignal(e.currentTarget.value);
             }}
-            className="select border-black"
+            className="select border-black w-1/2"
           >
             <option value="exponential">Exponential</option>
             <option value="gaussian_modulated">Gaussian Modulated</option>
@@ -467,4 +467,113 @@ export function genera_segnale_sinusoidale(
     }
   }
   return vs;
+}
+
+export function genera_segnale_trapezoidal_pulse(
+  time_vect: number[],
+  initial_delay_time: number = 2e-9,
+  A: number = 1e-9,
+  high_level_time: number = 10e-9,
+  raise_time: number = 10e-9,
+  falling_time: number = 10e-9
+): number[] {
+  const findIndex = (arr: number[], value: number): number | undefined => {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i] >= value) {
+        return i;
+      }
+    }
+    return undefined;
+  };
+
+  const interp1 = (x: number[], y: number[], xi: number[]): number[] => {
+    if (x.length !== y.length || x.length < 2) {
+      return new Array(xi.length).fill(NaN); // Handle invalid input
+    }
+
+    const yi: number[] = [];
+    for (const x_i of xi) {
+      let lowerIndex = -1;
+      let upperIndex = -1;
+
+      for (let i = 0; i < x.length; i++) {
+        if (x[i] <= x_i) {
+          lowerIndex = i;
+        }
+        if (x[i] >= x_i && upperIndex === -1) {
+          upperIndex = i;
+          break;
+        }
+      }
+
+      if (lowerIndex === -1) {
+        yi.push(y[0]); // Extrapolate with first point
+      } else if (upperIndex === -1) {
+        yi.push(y[y.length - 1]); // Extrapolate with last point
+      } else if (lowerIndex === upperIndex) {
+        yi.push(y[lowerIndex]);
+      } else {
+        const x0 = x[lowerIndex];
+        const y0 = y[lowerIndex];
+        const x1 = x[upperIndex];
+        const y1 = y[upperIndex];
+
+        if (x1 === x0) {
+          yi.push(y0); // Avoid division by zero
+        } else {
+          yi.push(y0 + (y1 - y0) * (x_i - x0) / (x1 - x0));
+        }
+      }
+    }
+    return yi;
+  };
+
+  const index_start_rise_time = findIndex(time_vect, initial_delay_time);
+  const index_end_rise_time = findIndex(time_vect, initial_delay_time + raise_time);
+  const index_start_falling_time = findIndex(time_vect, initial_delay_time + raise_time + high_level_time);
+  const index_end_falling_time = findIndex(time_vect, initial_delay_time + raise_time + high_level_time + falling_time);
+
+  const num_samples = time_vect.length;
+  const signal_time_sampled: number[] = new Array(num_samples).fill(0);
+
+  if (index_end_rise_time !== undefined && index_start_falling_time !== undefined) {
+    for (let i = index_end_rise_time; i < index_start_falling_time; i++) {
+      signal_time_sampled[i] = A;
+    }
+  }
+
+  if (index_start_rise_time !== undefined && index_end_rise_time !== undefined && index_start_rise_time > 0 && index_end_rise_time < num_samples -1) {
+    const t_rise = time_vect.slice(index_start_rise_time, index_end_rise_time);
+    const x_rise = [time_vect[index_start_rise_time - 1], time_vect[index_end_rise_time < num_samples - 1 ? index_end_rise_time + 1 : index_end_rise_time]];
+    const y_rise = [0, A];
+    const interpolated_rise = interp1(x_rise, y_rise, t_rise);
+    for (let i = 0; i < t_rise.length; i++) {
+      signal_time_sampled[index_start_rise_time + i] = interpolated_rise[i];
+    }
+  } else if (index_start_rise_time !== undefined && index_end_rise_time !== undefined) {
+    // Handle edge cases where indices might be at the boundaries
+    for (let i = index_start_rise_time; i < index_end_rise_time; i++) {
+      const fraction = (time_vect[i] - time_vect[index_start_rise_time]) / (time_vect[index_end_rise_time] - time_vect[index_start_rise_time]);
+      signal_time_sampled[i] = Math.max(0, Math.min(A, fraction * A)); // Linear rise
+    }
+  }
+
+
+  if (index_start_falling_time !== undefined && index_end_falling_time !== undefined && index_start_falling_time > 0 && index_end_falling_time < num_samples - 1) {
+    const t_fall = time_vect.slice(index_start_falling_time, index_end_falling_time);
+    const x_fall = [time_vect[index_start_falling_time - 1], time_vect[index_end_falling_time < num_samples - 1 ? index_end_falling_time + 1 : index_end_falling_time]];
+    const y_fall = [A, 0];
+    const interpolated_fall = interp1(x_fall, y_fall, t_fall);
+    for (let i = 0; i < t_fall.length; i++) {
+      signal_time_sampled[index_start_falling_time + i] = interpolated_fall[i];
+    }
+  } else if (index_start_falling_time !== undefined && index_end_falling_time !== undefined) {
+    // Handle edge cases for falling time
+    for (let i = index_start_falling_time; i < index_end_falling_time; i++) {
+      const fraction = (time_vect[i] - time_vect[index_start_falling_time]) / (time_vect[index_end_falling_time] - time_vect[index_start_falling_time]);
+      signal_time_sampled[i] = Math.max(0, Math.min(A, A * (1 - fraction))); // Linear fall
+    }
+  }
+
+  return signal_time_sampled;
 }

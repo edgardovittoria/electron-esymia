@@ -287,8 +287,7 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
                     <group rotation={[-Math.PI / 2, 0, 0]} />
                   </GizmoHelper>
                   {selectedProject.planeWaveParameters && !viewMesh &&
-                    (simulationType === 'Both' ||
-                      simulationType === 'Electric Fields') && (
+                    (simulationType === 'Electric Fields') && (
                       <GizmoHelper
                         alignment="bottom-right"
                         margin={[400, 300]}
@@ -411,27 +410,27 @@ const PhysicsPortsDrawer: FC = () => {
             </group>
           );
         }
-        return (
-          <group
-            key={port.name}
-            name={port.name}
-            onClick={() => dispatch(selectPort(port.name))}
-            position={(port as Probe).groupPosition}
-          >
-            {(port as Probe).elements.map((element, index) => {
-              return (
-                <mesh
-                  key={index}
-                  position={element.transformationParams.position}
-                  scale={element.transformationParams.scale}
-                  rotation={element.transformationParams.rotation}
-                >
-                  <FactoryShapes entity={element} color="orange" />
-                </mesh>
-              );
-            })}
-          </group>
-        );
+        // return (
+        //   <group
+        //     key={port.name}
+        //     name={port.name}
+        //     onClick={() => dispatch(selectPort(port.name))}
+        //     position={(port as Probe).groupPosition}
+        //   >
+        //     {(port as Probe).elements.map((element, index) => {
+        //       return (
+        //         <mesh
+        //           key={index}
+        //           position={element.transformationParams.position}
+        //           scale={element.transformationParams.scale}
+        //           rotation={element.transformationParams.rotation}
+        //         >
+        //           <FactoryShapes entity={element} color="orange" />
+        //         </mesh>
+        //       );
+        //     })}
+        //   </group>
+        // );
       })}
     </>
   );
@@ -459,7 +458,7 @@ const PhysicsPortsControlsDrawer: FC<{ setSavedPortParameters: Function }> = ({
                 setSavedPortParameters={setSavedPortParameters}
               />
             )}
-          {selectedPort && selectedPort.category === 'probe' && (
+          {/* {selectedPort && selectedPort.category === 'probe' && (
             <ProbeControls
               selectedProbe={selectedPort as Probe}
               updateProbePosition={(obj: {
@@ -468,7 +467,7 @@ const PhysicsPortsControlsDrawer: FC<{ setSavedPortParameters: Function }> = ({
               }) => dispatch(updatePortPosition(obj))}
               setSavedPortParameters={setSavedPortParameters}
             />
-          )}
+          )} */}
         </>
       ) : (
         <>

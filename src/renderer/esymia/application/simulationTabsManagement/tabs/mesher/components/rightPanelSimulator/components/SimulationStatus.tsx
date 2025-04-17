@@ -281,12 +281,33 @@ const SimulationStatusItem: React.FC<{
         }),
       );
     }else{
-      dispatch(
-        publishMessage({
-          queue: 'management_solver',
-          body: { message: 'solving ris', body: objectToSendToSolver },
-        }),
-      );
+      if(associatedProject.simulation?.simulationType === "Matrix"){
+        dispatch(
+          publishMessage({
+            queue: 'management_solver',
+            body: { message: 'solving ris', body: objectToSendToSolver },
+          }),
+        );
+      }else{
+        dispatch(
+          publishMessage({
+            queue: 'management_solver',
+            body: { message: 'solving electric fields', body: {
+              ...objectToSendToSolver,
+              theta: associatedProject.planeWaveParameters?.input.theta,
+              phi: associatedProject.planeWaveParameters?.input.phi,
+              e_theta: associatedProject.planeWaveParameters?.input.ETheta,
+              e_phi: associatedProject.planeWaveParameters?.input.EPhi,
+              baricentro: [associatedProject.radialFieldParameters?.center.x, associatedProject.radialFieldParameters?.center.y, associatedProject.radialFieldParameters?.center.z],
+              r_circ: associatedProject.radialFieldParameters?.radius,
+              times: associatedProject.times,
+              signal_type_E: associatedProject.planeWaveParameters?.input.ESignal,
+              ind_freq_interest: associatedProject.interestFrequenciesIndexes
+            } },
+          }),
+        );
+      }
+      
     }
 
   }, []);
