@@ -18,6 +18,7 @@ import {
   setMeshingProgress,
   setSolverResults,
   setSolverResultsS3,
+  setSpinnerSolverResults,
   setcomputingLp,
   setcomputingP,
 } from '../store/tabsAndMenuItemsSlice';
@@ -201,6 +202,7 @@ export const callback_solver_results = (message: any, dispatch: Function, getSta
         }
       }
     })
+    dispatch(setSpinnerSolverResults(false))
   }else{
     dispatch(
       setSolverResults({
@@ -229,6 +231,7 @@ export const callback_solver_results = (message: any, dispatch: Function, getSta
         error: false
       }),
     );
+    dispatch(setSpinnerSolverResults(false))
   }
   
 };

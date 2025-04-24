@@ -49,9 +49,10 @@ export const VectorArrow: FC<VectorArrowProps> = ({
   dir,
   color,
   label,
-}) => (
+}) => {
+  return (
   <>
-    {dir && (
+    {dir && dir.isVector3 && (
       <>
         <arrowHelper args={[normalize(dir), start, 1, color]} />
         <Text
@@ -65,7 +66,7 @@ export const VectorArrow: FC<VectorArrowProps> = ({
       </>
     )}
   </>
-);
+)};
 
 export interface FieldVectorsProps {
   theta: number;
@@ -104,16 +105,16 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
   return (
     <>
       {/* Vettori */}
-      <VectorArrow start={K} dir={E} color="blue" label="Ê" />
       <VectorArrow
         start={new THREE.Vector3(K.x, K.y, K.z)}
         dir={K}
         color="gray"
         label="K̂"
       />
-      {/* <VectorArrow start={K} dir={E_theta_v} color="green" label="Êθ" />
-      <VectorArrow start={K} dir={E_phi_v} color="purple" label="Êφ" /> */}
+      <VectorArrow start={K} dir={E_theta_v} color="green" label="Êθ" />
+      <VectorArrow start={K} dir={new Vector3(E_phi_v.x, E_phi_v.y, E_phi_v.z)} color="purple" label="Êφ" />
       <VectorArrow start={K} dir={H} color="red" label="Ĥ" />
+      <VectorArrow start={K} dir={E} color="blue" label="Ê" />
 
       <Line
         points={[new THREE.Vector3(0, 0, 0), new THREE.Vector3(-0.5, 0, 0)]}
@@ -191,7 +192,7 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
         rotation={[Math.PI / 2, 0, 0]}
         fontSize={0.1}
         color="purple"
-        anchorX={-0.13}
+        anchorX={-0.05}
         anchorY="middle"
       >
         φ
@@ -199,26 +200,3 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
     </>
   );
 };
-
-// const Scene = () => {
-//   return (
-//     <Canvas camera={{ position: [2, 2, 2], fov: 50 }}>
-//       <ambientLight intensity={0.5} />
-//       <pointLight position={[5, 5, 5]} />
-//       <axesHelper args={[2]} />
-
-//       {/* Vettori di esempio */}
-//       <FieldVectors
-//         theta={Math.PI / 4}
-//         phi={Math.PI / 3}
-//         E={new THREE.Vector3(1, 0, 0)}
-//         K={new THREE.Vector3(0, 1, 0)}
-//         H={new THREE.Vector3(0, 0, 1)}
-//         E_theta_v={new THREE.Vector3(1, 1, 0)}
-//         E_phi_v={new THREE.Vector3(0, 1, 1)}
-//       />
-//     </Canvas>
-//   );
-// };
-
-// export default Scene;

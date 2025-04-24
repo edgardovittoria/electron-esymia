@@ -81,6 +81,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
               <h6>Tetha (0 - π):</h6>
               <input
                 type="number"
+                disabled={selectedProject?.simulation?.status === "Completed"}
                 className={`formControl ${
                   theme === 'light'
                     ? 'bg-gray-100 text-textColor'
@@ -118,6 +119,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
               <h6>Phi (0 - π):</h6>
               <input
                 type="number"
+                disabled={selectedProject?.simulation?.status === "Completed"}
                 className={`formControl ${
                   theme === 'light'
                     ? 'bg-gray-100 text-textColor'
@@ -157,6 +159,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
               <h6>E_tetha:</h6>
               <input
                 type="number"
+                disabled={selectedProject?.simulation?.status === "Completed"}
                 className={`formControl ${
                   theme === 'light'
                     ? 'bg-gray-100 text-textColor'
@@ -173,6 +176,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
               <h6>E_phi:</h6>
               <input
                 type="number"
+                disabled={selectedProject?.simulation?.status === "Completed"}
                 className={`formControl ${
                   theme === 'light'
                     ? 'bg-gray-100 text-textColor'
@@ -188,6 +192,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
         <div className="flex flex-row items-center justify-between mt-3 p-1">
           <select
             defaultValue={signal}
+            disabled={selectedProject?.simulation?.status === "Completed"}
             onChange={(e) => {
               setsignal(e.currentTarget.value);
             }}
@@ -236,6 +241,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
             <h6>Insert radius</h6>
             <input
               type="number"
+              disabled={selectedProject?.simulation?.status === "Completed"}
               className={`formControl ${
                 theme === 'light'
                   ? 'bg-gray-100 text-textColor'
@@ -253,6 +259,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
                 <span>X</span>
                 <input
                   type="number"
+                  disabled={selectedProject?.simulation?.status === "Completed"}
                   className={`formControl ${
                     theme === 'light'
                       ? 'bg-gray-100 text-textColor'
@@ -267,6 +274,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
                 <span>Y</span>
                 <input
                   type="number"
+                  disabled={selectedProject?.simulation?.status === "Completed"}
                   className={`formControl ${
                     theme === 'light'
                       ? 'bg-gray-100 text-textColor'
@@ -281,6 +289,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
                 <span>Z</span>
                 <input
                   type="number"
+                  disabled={selectedProject?.simulation?.status === "Completed"}
                   className={`formControl ${
                     theme === 'light'
                       ? 'bg-gray-100 text-textColor'
@@ -297,7 +306,8 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
         <div className="mt-4 flex justify-between">
           <button
             type="button"
-            className="button bg-red-500 text-white"
+            disabled={selectedProject?.simulation?.status === "Completed"}
+            className="button bg-red-500 text-white disabled:cursor-not-allowed disabled:opacity-30"
             onClick={() => {
               dispatch(unsetPlaneWaveParametres());
               seteTetha(0);
@@ -342,7 +352,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
             className={`button disabled:cursor-not-allowed disabled:opacity-30 buttonPrimary ${
               theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'
             }`}
-            disabled={errorPhi || errorTheta}
+            disabled={errorPhi || errorTheta || selectedProject?.simulation?.status === "Completed"}
             onClick={() => {
               const { E, K, H, E_theta_v, E_phi_v } = computeFieldsComponents(
                 tetha,

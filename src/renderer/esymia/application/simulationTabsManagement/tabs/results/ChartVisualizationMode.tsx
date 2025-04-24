@@ -7,7 +7,7 @@ import { Port, Project } from '../../../../model/esymiaModels';
 import { Dataset, pairs } from './sharedElements';
 import { ExportToCsvZippedButton } from './ExportToCsvZippedButton';
 import { ExportTouchstoneButton } from './ExportTouchstoneButton';
-import { removeItemToResultsView, ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import { removeItemToResultsView, setSpinnerSolverResults, ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
 
 interface ChartVisualizationModeProps {
@@ -133,6 +133,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
                     value={`${l[0]} - ${l[1]}`}
                     onChange={(e) => {
                       if (e.currentTarget.checked) {
+                        dispatch(setSpinnerSolverResults(true))
                         dispatch(
                           publishMessage({
                             queue: 'management_solver',

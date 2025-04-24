@@ -42,13 +42,13 @@ export const RadiationDiagram2D: React.FC<RadiationDiagram2DProps> = ({
   const calculateE = (start: number, end: number): number[] => {
     const Ex_slice = (
       solverResults[0] as SolverResultsElectricFields
-    ).results.Ex[indice_freq].slice(start, end);
+    ).results.Ex.slice(start, end);
     const Ey_slice = (
       solverResults[0] as SolverResultsElectricFields
-    ).results.Ey[indice_freq].slice(start, end);
+    ).results.Ey.slice(start, end);
     const Ez_slice = (
       solverResults[0] as SolverResultsElectricFields
-    ).results.Ez[indice_freq].slice(start, end);
+    ).results.Ez.slice(start, end);
     return Ex_slice.map((_, i) =>
       Math.sqrt(
         Math.sqrt(Ex_slice[i][0] ** 2 + Ex_slice[i][1] ** 2) ** 2 +
@@ -148,14 +148,14 @@ export const RadiationDiagram2D: React.FC<RadiationDiagram2DProps> = ({
   });
 
   return (
-    <div className="flex flex-row items-center justify-between">
-      <div className="w-[560px] h-[400px] bg-white rounded-xl p-3">
+    <div className="flex flex-row items-center justify-between bg-white h-[45vh] w-full">
+      <div className="w-1/3 h-full p-3 border-r border-gray-200">
         <PolarArea
           data={{
             ...polarChartData(
               E_xy,
               `xy-plane - ${
-                selectedFreq ? selectedFreq.toExponential(1) : 0
+                (solverResults[0] as SolverResultsElectricFields).results.f[indice_freq].toExponential(1)
               } Hz - [V/m]`,
             ),
           }}
@@ -174,20 +174,20 @@ export const RadiationDiagram2D: React.FC<RadiationDiagram2DProps> = ({
               title: {
                 ...polarChartOptions.plugins?.title,
                 text: `xy-plane - ${
-                  selectedFreq ? selectedFreq.toExponential(1) : 0
+                  (solverResults[0] as SolverResultsElectricFields).results.f[indice_freq].toExponential(1)
                 } Hz - [V/m]`,
               },
             },
           }}
         />
       </div>
-      <div className="w-[560px] h-[400px] bg-white rounded-xl p-3">
+      <div className="w-1/3 h-full p-3 border-r border-gray-200">
         <PolarArea
           data={{
             ...polarChartData(
               E_zx,
               `zx-plane - ${
-                selectedFreq ? selectedFreq.toExponential(1) : 0
+                (solverResults[0] as SolverResultsElectricFields).results.f[indice_freq].toExponential(1)
               } Hz - [V/m]`,
             ),
           }}
@@ -206,20 +206,20 @@ export const RadiationDiagram2D: React.FC<RadiationDiagram2DProps> = ({
               title: {
                 ...polarChartOptions.plugins?.title,
                 text: `zx-plane - ${
-                  selectedFreq ? selectedFreq.toExponential(1) : 0
+                  (solverResults[0] as SolverResultsElectricFields).results.f[indice_freq].toExponential(1)
                 } Hz - [V/m]`,
               },
             },
           }}
         />
       </div>
-      <div className="w-[560px] h-[400px] bg-white rounded-xl p-3">
+      <div className="w-1/3 h-full p-3">
         <PolarArea
           data={{
             ...polarChartData(
               E_yz,
               `yz-plane - ${
-                selectedFreq ? selectedFreq.toExponential(1) : 0
+                (solverResults[0] as SolverResultsElectricFields).results.f[indice_freq].toExponential(1)
               } Hz - [V/m]`,
             ),
           }}
@@ -238,7 +238,7 @@ export const RadiationDiagram2D: React.FC<RadiationDiagram2DProps> = ({
               title: {
                 ...polarChartOptions.plugins?.title,
                 text: `yz-plane - ${
-                  selectedFreq ? selectedFreq.toExponential(1) : 0
+                  (solverResults[0] as SolverResultsElectricFields).results.f[indice_freq].toExponential(1)
                 } Hz - [V/m]`,
               },
             },

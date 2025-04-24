@@ -21,6 +21,8 @@ import {
   ThemeSelector,
 } from '../../../../store/tabsAndMenuItemsSlice';
 import zoomPlugin, { pan } from 'chartjs-plugin-zoom';
+import { spinnerSolverResultsSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import { ImSpinner } from 'react-icons/im';
 
 
 ChartJS.register(
@@ -82,6 +84,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
 }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   const resultsView = useSelector(solverResultsViewSelector);
+  const spinnerSolverResults = useSelector(spinnerSolverResultsSelector)
   const theme = useSelector(ThemeSelector);
   const [showGraphsSettings, setShowGraphsSettings] = useState<boolean[]>(
     defaultShowGraphsSettings(11),
@@ -322,6 +325,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
 
   return (
     <>
+      {spinnerSolverResults && <ImSpinner className="animate-spin w-10 h-10 absolute top-1/2 left-1/2 z-50" />}
       {chartsDataToVisualize.map((chartData, index) => {
         return (
           <div
@@ -360,7 +364,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
             )}
             {selectedProject?.simulation &&
             selectedProject.simulation.status === 'Completed' ? (
-              <>
+              <div className={`${spinnerSolverResults ? 'opacity-40' : 'opacity-100'}`}>
                 {ChartVisualizationMode === 'full' ? (
                   <Line
                     options={optionsWithScaleMode(
@@ -387,7 +391,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
                     data={chartData.data}
                   />
                 )}
-              </>
+              </div>
             ) : (
               <></>
               //risultati parziali disabilitati

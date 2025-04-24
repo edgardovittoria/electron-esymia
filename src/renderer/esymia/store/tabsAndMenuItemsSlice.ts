@@ -69,6 +69,7 @@ type TabsAndMenuItemsState = {
     ASize?: number[];
   };
   solverResults: (SolverResultsMatrix | SolverResultsElectricFields)[];
+  spinnerSolverResults: boolean,
   resultsView: resultsViewItem[];
   SolverResultsS3?: string;
   externalGrids?: any;
@@ -114,6 +115,7 @@ export const TabsAndMenuItemsSlice = createSlice({
     iterations: [],
     meshAdvice: [],
     solverResults: [],
+    spinnerSolverResults: false,
     resultsView: [],
     brokerConnected: false,
     theme: 'light',
@@ -350,6 +352,12 @@ export const TabsAndMenuItemsSlice = createSlice({
       );
       state.solverResults.push(action.payload);
     },
+    setSpinnerSolverResults(
+      state: TabsAndMenuItemsState,
+      action: PayloadAction<boolean>,
+    ) {
+      state.spinnerSolverResults = action.payload
+    },
     setSolverResultsS3(
       state: TabsAndMenuItemsState,
       action: PayloadAction<string | undefined>,
@@ -459,6 +467,7 @@ export const {
   addItemToResultsView,
   removeItemToResultsView,
   resetItemToResultsView,
+  setSpinnerSolverResults
 } = TabsAndMenuItemsSlice.actions;
 
 const setTab = (state: TabsAndMenuItemsState, tab: string) => {
@@ -556,6 +565,10 @@ export const mesherResultsSelector = (state: {
 export const solverResultsSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState;
 }) => state.tabsAndMenuItems.solverResults;
+
+export const spinnerSolverResultsSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState;
+}) => state.tabsAndMenuItems.spinnerSolverResults;
 
 export const solverResultsViewSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState;

@@ -57,26 +57,26 @@ export const RadiationDiagram3D: React.FC<RadiationDiagram3DProps> = ({
       }
       const ex = (
         solverResults[0] as SolverResultsElectricFields
-      ).results.Ex_3D[indice_freq].map((row) => new Complex(row[0], row[1]));
+      ).results.Ex_3D.map((row) => new Complex(row[0], row[1]));
       const ey = (
         solverResults[0] as SolverResultsElectricFields
-      ).results.Ey_3D[indice_freq].map((row) => new Complex(row[0], row[1]));
+      ).results.Ey_3D.map((row) => new Complex(row[0], row[1]));
       const ez = (
         solverResults[0] as SolverResultsElectricFields
-      ).results.Ez_3D[indice_freq].map((row) => new Complex(row[0], row[1]));
+      ).results.Ez_3D.map((row) => new Complex(row[0], row[1]));
       const hx = (
         solverResults[0] as SolverResultsElectricFields
-      ).results.Hx_3D[indice_freq].map((row) =>
+      ).results.Hx_3D.map((row) =>
         new Complex(row[0], row[1]).conjugate(),
       );
       const hy = (
         solverResults[0] as SolverResultsElectricFields
-      ).results.Hy_3D[indice_freq].map((row) =>
+      ).results.Hy_3D.map((row) =>
         new Complex(row[0], row[1]).conjugate(),
       );
       const hz = (
         solverResults[0] as SolverResultsElectricFields
-      ).results.Hz_3D[indice_freq].map((row) =>
+      ).results.Hz_3D.map((row) =>
         new Complex(row[0], row[1]).conjugate(),
       );
 
@@ -230,7 +230,7 @@ export const RadiationDiagram3D: React.FC<RadiationDiagram3DProps> = ({
 
       const layout = {
         title: {
-          text: `Directivity Gain - ${selectedFreq.toExponential(1)} Hz`,
+          text: `Directivity Gain - ${(solverResults[0] as SolverResultsElectricFields).results.f[indice_freq].toExponential(1)} Hz`,
         },
 
         scene: {
@@ -267,7 +267,7 @@ export const RadiationDiagram3D: React.FC<RadiationDiagram3DProps> = ({
     (solverResults[0] as SolverResultsElectricFields).results.baricentro,
     indice_freq,
   ]);
-  return <Plot data={[surfaceData]} layout={layout} className="mt-4" />;
+  return <Plot data={[surfaceData]} layout={layout} className="mt-2" />;
 };
 
 // Helper function to perform linear griddata in JavaScript

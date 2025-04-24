@@ -97,8 +97,9 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
           <div className="flex flex-row items-center justify-between">
             <span className="font-bold">Terminations</span>
             <div className="flex flex-row items-center gap-8">
-              <div
-                className="w-[15%] tooltip tooltip-left hover:cursor-pointer"
+              <button
+                className="w-[15%] tooltip tooltip-left hover:cursor-pointer disabled:opacity-40 disabled:hover:cursor-not-allowed"
+                disabled={selectedProject.simulation?.status === "Completed"}
                 data-tip="Delete all ports"
                 onClick={() => {
                   setDeleteAllType("port")
@@ -116,9 +117,10 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                   style={{ width: '20px', height: '20px' }}
                   className="hover:opacity-50"
                 />
-              </div>
-              <div
-                className="w-[15%] tooltip tooltip-left hover:cursor-pointer"
+              </button>
+              <button
+                className="w-[15%] tooltip tooltip-left hover:cursor-pointer disabled:opacity-40 disabled:hover:cursor-not-allowed"
+                disabled={selectedProject.simulation?.status === "Completed"}
                 data-tip="Delete all lumped"
                 onClick={() => {
                   setDeleteAllType("lumped")
@@ -136,7 +138,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                   style={{ width: '20px', height: '20px' }}
                   className="hover:opacity-50"
                 />
-              </div>
+              </button>
             </div>
           </div>
           <hr className="border-[1px] border-gray-300 w-full mb-2 mt-1" />

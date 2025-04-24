@@ -46,6 +46,7 @@ import {
   resultsViewItem,
   solverResultsSelector,
   SolverResultsElectricFields,
+  setSpinnerSolverResults,
 } from '../../../../store/tabsAndMenuItemsSlice';
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
 import { ChartListElectricFields } from './chartListElectricFields/ChartListElectricFields';
@@ -110,6 +111,7 @@ export const Results: React.FC<ResultsProps> = ({
         !(selectedProject.simulation.results as SolverOutput).matrix_S &&
         selectedProject.simulation.simulationType === 'Matrix'
       ) {
+        dispatch(setSpinnerSolverResults(true))
         dispatch(
           publishMessage({
             queue: 'management_solver',
@@ -125,6 +127,7 @@ export const Results: React.FC<ResultsProps> = ({
       } else if (
         selectedProject.simulation.simulationType === 'Electric Fields'
       ) {
+        dispatch(setSpinnerSolverResults(true))
         dispatch(
           publishMessage({
             queue: 'management_solver',
@@ -132,6 +135,7 @@ export const Results: React.FC<ResultsProps> = ({
               message: 'get results electric fields',
               body: {
                 fileId: selectedProject.simulation.resultS3,
+                freq_index: 1
               },
             },
           }),
@@ -143,15 +147,6 @@ export const Results: React.FC<ResultsProps> = ({
   const resultsView = useSelector(solverResultsViewSelector);
   const solverResults = useSelector(solverResultsSelector);
 
-  const [Ex, setEx] = useState<number[][][]>([]);
-  const [Ey, setEy] = useState<number[][][]>([]);
-  const [Ez, setEz] = useState<number[][][]>([]);
-  const [Ex_3D, setEx_3D] = useState<number[][][]>([]);
-  const [Ey_3D, setEy_3D] = useState<number[][][]>([]);
-  const [Ez_3D, setEz_3D] = useState<number[][][]>([]);
-  const [Hx_3D, setHx_3D] = useState<number[][][]>([]);
-  const [Hy_3D, setHy_3D] = useState<number[][][]>([]);
-  const [Hz_3D, setHz_3D] = useState<number[][][]>([]);
   const [freq, setfreq] = useState<number[]>([]);
 
   useEffect(() => {
@@ -159,15 +154,6 @@ export const Results: React.FC<ResultsProps> = ({
       solverResults.length > 0 &&
       selectedProject?.simulation?.simulationType === 'Electric Fields'
     ) {
-      setEx((solverResults[0] as SolverResultsElectricFields).results.Ex);
-      setEy((solverResults[0] as SolverResultsElectricFields).results.Ey);
-      setEz((solverResults[0] as SolverResultsElectricFields).results.Ez);
-      setEx_3D((solverResults[0] as SolverResultsElectricFields).results.Ex_3D);
-      setEy_3D((solverResults[0] as SolverResultsElectricFields).results.Ey_3D);
-      setEz_3D((solverResults[0] as SolverResultsElectricFields).results.Ez_3D);
-      setHx_3D((solverResults[0] as SolverResultsElectricFields).results.Hx_3D);
-      setHy_3D((solverResults[0] as SolverResultsElectricFields).results.Hy_3D);
-      setHz_3D((solverResults[0] as SolverResultsElectricFields).results.Hz_3D);
       setfreq((solverResults[0] as SolverResultsElectricFields).results.f);
     }
   }, [solverResults]);

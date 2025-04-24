@@ -158,6 +158,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                     <div className="flex flex-row gap-2 items-center">
                       <input
                         type="checkbox"
+                        disabled={selectedProject.simulation?.status === "Completed"}
                         name="matrix"
                         id="matrix"
                         checked={simulationType === "Matrix"}
@@ -170,6 +171,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                         type="checkbox"
                         name="electric_fields"
                         id="electric_fields"
+                        disabled={selectedProject.simulation?.status === "Completed"}
                         checked={simulationType === "Electric Fields"}
                         onClick={() => setsimulationType('Electric Fields')}
                       />
@@ -182,6 +184,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                             type="checkbox"
                             name="electricField"
                             id="electricField"
+                            disabled={selectedProject.simulation?.status === "Completed"}
                             checked={electricField}
                             onClick={() => setelectricField(!electricField)}
                           />
@@ -192,6 +195,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                             type="checkbox"
                             name="ports"
                             id="ports"
+                            disabled={selectedProject.simulation?.status === "Completed"}
                             checked={ports}
                             onClick={() => setports(!ports)}
                           />
@@ -484,6 +488,7 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
+  console.log(selectedPort)
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
   const dispatch = useDispatch();
   return (
@@ -540,14 +545,15 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
               />
               <div className="flex flex-row items-center justify-between mt-3 p-1">
                 <select
-                  defaultValue={selectedPort?.signal}
+                  value={selectedPort?.signal}
+                  disabled={selectedProject?.simulation?.status === "Completed"}
                   onChange={(e) => {
                     dispatch(setPortSignal(e.currentTarget.value));
                     setSavedPhysicsParameters(false);
                   }}
                   className="select border-black mt-3"
                 >
-                  <option value={undefined}>No Signal</option>
+                  <option value="No Signal">No Signal</option>
                   <option value="exponential">Exponential</option>
                   <option value="gaussian_modulated">Gaussian Modulated</option>
                   <option value="sinusoidal">Sinusoidal</option>
@@ -684,6 +690,7 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
               <div className="flex justify-between mt-2">
                 <div className="w-full">
                   <select
+                    disabled={selectedProject?.simulation?.status === "Completed"}
                     className={`select select-bordered select-sm w-full max-w-xs ${
                       theme === 'light'
                         ? 'bg-[#f6f6f6]'
@@ -1030,7 +1037,7 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
             ? ''
             : 'bg-bgColorDark2 text-textColorDark border-textColorDark'
         } w-full mt-2 hover:opacity-80 disabled:opacity-60`}
-        disabled={tMax === 0 || tMax < tStep}
+        disabled={tMax === 0 || tMax < tStep || disabled}
         onClick={() => {
           dispatch(resetInterestFrequencyIndex());
           let times = createTimeVector(tStep, tMax);
@@ -1104,6 +1111,7 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
                     </span>
                     <input
                       type="checkbox"
+                      disabled={disabled}
                       defaultChecked={
                         selectedProject.interestFrequenciesIndexes &&
                         selectedProject.interestFrequenciesIndexes?.filter(
