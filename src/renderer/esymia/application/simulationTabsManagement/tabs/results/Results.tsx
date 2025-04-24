@@ -44,8 +44,11 @@ import {
   resetItemToResultsView,
   solverResultsViewSelector,
   resultsViewItem,
+  solverResultsSelector,
+  SolverResultsElectricFields,
 } from '../../../../store/tabsAndMenuItemsSlice';
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
+import { ChartListElectricFields } from './chartListElectricFields/ChartListElectricFields';
 
 interface ResultsProps {
   selectedTabLeftPanel: string | undefined;
@@ -138,6 +141,36 @@ export const Results: React.FC<ResultsProps> = ({
   }, []);
   const selectedFolder = useSelector(SelectedFolderSelector);
   const resultsView = useSelector(solverResultsViewSelector);
+  const solverResults = useSelector(solverResultsSelector);
+
+  const [Ex, setEx] = useState<number[][][]>([]);
+  const [Ey, setEy] = useState<number[][][]>([]);
+  const [Ez, setEz] = useState<number[][][]>([]);
+  const [Ex_3D, setEx_3D] = useState<number[][][]>([]);
+  const [Ey_3D, setEy_3D] = useState<number[][][]>([]);
+  const [Ez_3D, setEz_3D] = useState<number[][][]>([]);
+  const [Hx_3D, setHx_3D] = useState<number[][][]>([]);
+  const [Hy_3D, setHy_3D] = useState<number[][][]>([]);
+  const [Hz_3D, setHz_3D] = useState<number[][][]>([]);
+  const [freq, setfreq] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (
+      solverResults.length > 0 &&
+      selectedProject?.simulation?.simulationType === 'Electric Fields'
+    ) {
+      setEx((solverResults[0] as SolverResultsElectricFields).results.Ex);
+      setEy((solverResults[0] as SolverResultsElectricFields).results.Ey);
+      setEz((solverResults[0] as SolverResultsElectricFields).results.Ez);
+      setEx_3D((solverResults[0] as SolverResultsElectricFields).results.Ex_3D);
+      setEy_3D((solverResults[0] as SolverResultsElectricFields).results.Ey_3D);
+      setEz_3D((solverResults[0] as SolverResultsElectricFields).results.Ez_3D);
+      setHx_3D((solverResults[0] as SolverResultsElectricFields).results.Hx_3D);
+      setHy_3D((solverResults[0] as SolverResultsElectricFields).results.Hy_3D);
+      setHz_3D((solverResults[0] as SolverResultsElectricFields).results.Hz_3D);
+      setfreq((solverResults[0] as SolverResultsElectricFields).results.f);
+    }
+  }, [solverResults]);
   let selectedPort = findSelectedPort(selectedProject);
   const dispatch = useDispatch();
   const ports = selectedProject?.ports.filter(
@@ -422,7 +455,7 @@ export const Results: React.FC<ResultsProps> = ({
       <div className="w-[90%]">
         {selectedProject &&
         selectedProject.simulation &&
-        resultsView.length > 0 ? (
+        (resultsView.length > 0 || solverResults.length > 0) ? (
           <>
             {selectedProject.simulation.simulationType === 'Matrix' ? (
               <>
@@ -447,9 +480,7 @@ export const Results: React.FC<ResultsProps> = ({
                     graphToVisualize={graphToVisualize}
                     selectedLabel={selectedLabel}
                     setGraphsData={setGraphDataToExport}
-                    currentFreIndexq={
-                      (resultsView[0] as resultsViewItem).freqIndex
-                    }
+                    currentFreIndexq={0}
                     ChartVisualizationMode={chartVisualizationMode}
                     colorArray={colorArray}
                   />
@@ -457,6 +488,10 @@ export const Results: React.FC<ResultsProps> = ({
               </>
             ) : (
               <>
+                <ChartListElectricFields
+                  N_circ={100}
+                  freq={freq}
+                />
               </>
             )}
           </>

@@ -137,17 +137,24 @@ export type SolverOutput = {
 };
 
 export type SolverOutputElectricFields = {
-  Ex: string,
-  Ey: string,
-  Ez: string,
-  Ex_3D: string,
-  Ey_3D: string,
-  Ez_3D: string,
-  Hx_3D: string,
-  Hy_3D: string,
-  Hz_3D: string,
+  Ex: number[][][],
+  Ey: number[][][],
+  Ez: number[][][],
+  Ex_3D: number[][][],
+  Ey_3D: number[][][],
+  Ez_3D: number[][][],
+  Hx_3D: number[][][],
+  Hy_3D: number[][][],
+  Hz_3D: number[][][],
+  centri_oss_3D: number[][],
+  distanze_3D: number[],
+  theta_vals: number[],
+  x_grid: number[][],
+  y_grid: number[][],
+  z_grid: number[][],
+  baricentro: number[],
   Vp: string,
-  f: string
+  f: number[]
 };
 
 export type ExternalGridsRisObject = {

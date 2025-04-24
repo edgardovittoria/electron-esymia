@@ -1,5 +1,5 @@
 import { IMessage } from '@stomp/stompjs';
-import { Project, SolverOutput } from '../model/esymiaModels';
+import { Project, SolverOutput, SolverOutputElectricFields } from '../model/esymiaModels';
 import { takeAllProjectsIn } from '../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
 import { setMesherStatus, setSolverStatus } from '../store/pluginsSlice';
 import {
@@ -158,6 +158,7 @@ export const callback_solver_feedback = (message: any, dispatch: Function, getSt
 export const callback_solver_results = (message: any, dispatch: Function, getState: Function) => {
   let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
   let res = JSON.parse(message.body);
+  console.log(res)
   if(res.simulationType === "matrix"){
     if(res.portIndex !== undefined && res.partial){
       dispatch(resetItemToResultsView())
@@ -204,7 +205,26 @@ export const callback_solver_results = (message: any, dispatch: Function, getSta
     dispatch(
       setSolverResults({
         id: res.id,
-        results: res.results,
+        results: {
+          Ex: JSON.parse(res.results.Ex),
+          Ey: JSON.parse(res.results.Ey),
+          Ez: JSON.parse(res.results.Ez),
+          Ex_3D: JSON.parse(res.results.Ex_3D),
+          Ey_3D: JSON.parse(res.results.Ey_3D),
+          Ez_3D: JSON.parse(res.results.Ez_3D),
+          Hx_3D: JSON.parse(res.results.Hx_3D),
+          Hy_3D: JSON.parse(res.results.Hy_3D),
+          Hz_3D: JSON.parse(res.results.Hz_3D),
+          centri_oss_3D: JSON.parse(res.results.centri_oss_3D),
+          distanze_3D: JSON.parse(res.results.distanze_3D),
+          theta_vals: JSON.parse(res.results.theta_vals),
+          x_grid: JSON.parse(res.results.x_grid),
+          y_grid: JSON.parse(res.results.y_grid),
+          z_grid: JSON.parse(res.results.z_grid),
+          baricentro: JSON.parse(res.results.baricentro),
+          Vp: JSON.parse(res.results.Vp),
+          f: JSON.parse(res.results.f),
+        } as SolverOutputElectricFields,
         isStopped: false,
         error: false
       }),

@@ -85,7 +85,7 @@ interface SolverResultsMatrix {
   error?: any;
 }
 
-interface SolverResultsElectricFields {
+export interface SolverResultsElectricFields {
   id: string;
   results: SolverOutputElectricFields;
   isStopped: boolean;

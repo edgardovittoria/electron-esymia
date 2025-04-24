@@ -101,7 +101,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   >([]);
 
   useEffect(() => {
-    console.log(resultsView)
+    //console.log(resultsView)
     if (resultsView.length > 0) {
       setmatrixZ(
         resultsView.map((r) => ({
@@ -389,32 +389,34 @@ export const ChartsList: React.FC<ChartsListProps> = ({
                 )}
               </>
             ) : (
-              <Scatter
-                options={optionsWithScaleMode(
-                  chartData.options,
-                  scaleMode[index],
-                  'scatter',
-                  graphsTitle[index],
-                )}
-                data={{
-                  labels: chartData.data.labels.filter(
-                    (d, index) => currentFreIndexq && index < currentFreIndexq,
-                  ),
-                  // datasets: chartData.data.datasets[0].data.filter(
-                  //   (d, index) => currentFreIndexq && index < currentFreIndexq,
-                  // ),
-                  datasets: chartData.data.datasets.map((d) => {
-                    d.data = d.data.filter(
-                      (d1, index) =>
-                        currentFreIndexq && index < currentFreIndexq,
-                    );
-                    console.log("curr freq idx: ", currentFreIndexq)
-                    console.log("idx: ", index)
-                    return d;
-                  }),
-                }}
-                //data={chartData.data}
-              />
+              <></>
+              //risultati parziali disabilitati
+              // <Scatter
+              //   options={optionsWithScaleMode(
+              //     chartData.options,
+              //     scaleMode[index],
+              //     'scatter',
+              //     graphsTitle[index],
+              //   )}
+              //   data={{
+              //     labels: chartData.data.labels.filter(
+              //       (d, index) => currentFreIndexq && index < currentFreIndexq,
+              //     ),
+              //     // datasets: chartData.data.datasets[0].data.filter(
+              //     //   (d, index) => currentFreIndexq && index < currentFreIndexq,
+              //     // ),
+              //     datasets: chartData.data.datasets.map((d) => {
+              //       d.data = d.data.filter(
+              //         (d1, index) =>
+              //           currentFreIndexq && index < currentFreIndexq,
+              //       );
+              //       console.log("curr freq idx: ", currentFreIndexq)
+              //       console.log("idx: ", index)
+              //       return d;
+              //     }),
+              //   }}
+              //   //data={chartData.data}
+              // />
             )}
           </div>
         );

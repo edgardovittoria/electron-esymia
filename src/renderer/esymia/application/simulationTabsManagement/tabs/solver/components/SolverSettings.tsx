@@ -85,8 +85,8 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
   cameraPosition,
 }) => {
   const theme = useSelector(ThemeSelector);
-  const [electricField, setelectricField] = useState(true);
-  const [ports, setports] = useState(false);
+  const [electricField, setelectricField] = useState(selectedProject.planeWaveParameters ? true : false);
+  const [ports, setports] = useState(selectedProject.ports.length > 0 ? true : false);
   const [graphData, setgraphData] = useState<InputGraphData | undefined>(
     undefined,
   );

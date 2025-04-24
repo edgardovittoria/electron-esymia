@@ -64,7 +64,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
     selectedProject ? selectedProject.radialFieldParameters?.center.z : 0,
   );
 
-  const [signal, setsignal] = useState<string>('exponential');
+  const [signal, setsignal] = useState<string>(selectedProject?.planeWaveParameters ? selectedProject.planeWaveParameters.input.ESignal : 'exponential');
 
   return (
     <>
