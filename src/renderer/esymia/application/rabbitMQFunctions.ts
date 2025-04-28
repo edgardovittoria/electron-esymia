@@ -7,6 +7,7 @@ import {
   resetItemToResultsView,
   setAWSExternalGridsData,
   setCompress,
+  setElectricFieldsResultsStep,
   setEstimatedTime,
   setGridsCreationLength,
   setGridsCreationValue,
@@ -150,6 +151,8 @@ export const callback_solver_feedback = (message: any, dispatch: Function, getSt
           dispatch(setEstimatedTime({estimatedTime: body['estimatedTime'], portIndex: body['portIndex'], id: body['id']}))
         } else if(body['computation_completed']){
           dispatch(setSolverResultsS3(body['path']))
+        } else if(body['electric_fields_results_step']){
+          dispatch(setElectricFieldsResultsStep({step: body['electric_fields_results_step'], name: body['electric_fields_results_name'], id: body['id']}))
         }
       }
     })
@@ -232,6 +235,7 @@ export const callback_solver_results = (message: any, dispatch: Function, getSta
       }),
     );
     dispatch(setSpinnerSolverResults(false))
+    dispatch(setElectricFieldsResultsStep(undefined))
   }
   
 };

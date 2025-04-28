@@ -56,6 +56,7 @@ type TabsAndMenuItemsState = {
   computingLp: { done: boolean; id: string }[];
   iterations: { freqNumber: number; id: string }[];
   estimatedTime?: { estimatedTime: number; portIndex: number; id: string };
+  electricFieldsResultsStep?: { step: number; name: string; id: string };
   meshAdvice: { id: string; quantum: [number, number, number] }[];
   meshResults?: {
     id: string;
@@ -309,6 +310,14 @@ export const TabsAndMenuItemsSlice = createSlice({
     ) {
       state.estimatedTime = action.payload;
     },
+    setElectricFieldsResultsStep(
+      state: TabsAndMenuItemsState,
+      action: PayloadAction<
+        { step: number; name: string;  id: string } | undefined
+      >,
+    ) {
+      state.electricFieldsResultsStep = action.payload;
+    },
     setMeshAdvice(
       state: TabsAndMenuItemsState,
       action: PayloadAction<{ quantum: [number, number, number]; id: string }>,
@@ -467,7 +476,8 @@ export const {
   addItemToResultsView,
   removeItemToResultsView,
   resetItemToResultsView,
-  setSpinnerSolverResults
+  setSpinnerSolverResults,
+  setElectricFieldsResultsStep
 } = TabsAndMenuItemsSlice.actions;
 
 const setTab = (state: TabsAndMenuItemsState, tab: string) => {
@@ -553,6 +563,10 @@ export const iterationsSelector = (state: {
 export const estimatedTimeSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState;
 }) => state.tabsAndMenuItems.estimatedTime;
+
+export const electricFieldsResultsStepSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState;
+}) => state.tabsAndMenuItems.electricFieldsResultsStep;
 
 export const meshAdviceSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState;
