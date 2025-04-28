@@ -54,8 +54,6 @@ import { Dispatch } from '@reduxjs/toolkit';
 import { savePortsOnS3 } from './savePortsOnS3';
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { TbWavesElectricity } from 'react-icons/tb';
-import { PlaneWaveSettings } from '../solver/components/planeWave/PlaneWaveSettings';
-import { RadialFieldSettingsModal } from '../solver/components/planeWave/RadialFieldSettingsModal';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
@@ -73,7 +71,7 @@ export const setPortsFromS3 = (project: Project, dispatch: Dispatch) => {
     if (err) {
       console.log(err);
     }
-    const ports: (Port | Probe)[] = JSON.parse(data.Body?.toString() as string);
+    const ports: (Port | TempLumped)[] = JSON.parse(data.Body?.toString() as string);
     ports.forEach((p) => {
       dispatch(addPorts(p));
     });

@@ -12,7 +12,7 @@ import {
 } from 'chart.js';
 import { Line, Scatter } from 'react-chartjs-2';
 import { Port, Project, Simulation } from '../../../../model/esymiaModels';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectedProjectSelector } from '../../../../store/projectSlice';
 import { VscSettings } from 'react-icons/vsc';
 import { Dataset, pairs } from './sharedElements';
@@ -23,6 +23,7 @@ import {
 import zoomPlugin, { pan } from 'chartjs-plugin-zoom';
 import { spinnerSolverResultsSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { ImSpinner } from 'react-icons/im';
+import { setPortsFromS3 } from '../physics/Physics';
 
 
 ChartJS.register(
@@ -86,12 +87,13 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   const resultsView = useSelector(solverResultsViewSelector);
   const spinnerSolverResults = useSelector(spinnerSolverResultsSelector)
   const theme = useSelector(ThemeSelector);
+  const dispatch = useDispatch()
+  const [ports, setports] = useState(selectedProject?.ports.filter(
+    (p) => p.category === 'port',
+  ) as Port[])
   const [showGraphsSettings, setShowGraphsSettings] = useState<boolean[]>(
     defaultShowGraphsSettings(11),
   );
-  const ports = selectedProject?.ports.filter(
-    (p) => p.category === 'port',
-  ) as Port[];
 
   const [matrixZ, setmatrixZ] = useState<
     { portIndex: number; matrix: number[][][] }[]
@@ -104,7 +106,6 @@ export const ChartsList: React.FC<ChartsListProps> = ({
   >([]);
 
   useEffect(() => {
-    //console.log(resultsView)
     if (resultsView.length > 0) {
       setmatrixZ(
         resultsView.map((r) => ({
@@ -126,6 +127,17 @@ export const ChartsList: React.FC<ChartsListProps> = ({
       );
     }
   }, [resultsView]);
+
+  useEffect(() => {
+    if(selectedProject && selectedProject?.ports.length > 0){
+      setports(selectedProject?.ports.filter(
+        (p) => p.category === 'port',
+      ) as Port[])
+    }else{
+      setPortsFromS3(selectedProject as Project, dispatch)
+    }
+  }, [selectedProject?.ports])
+
   const [scaleMode, setScaleMode] = useState<ScaleMode[]>(
     defaultScaleModes(11),
   );
@@ -221,6 +233,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     matrixZ,
     matrixY,
     matrixS,
+    ports
   ]);
 
   const optionsWithScaleMode = (
@@ -634,27 +647,30 @@ const chartsDataOptionsFactory = (
     const labels = pairs(ports.map((p) => p.name));
     let innerLabels = project && project.frequencies ? project.frequencies : [];
     let matrices: { portIndex: number; value: number }[][] = [];
-    for (let i = 0; i < matrix.length; i++) {
-      matrices.push([]);
-      matrix[i].matrix[0].forEach((m, index) => {
-        (matrices[i] as Array<{ portIndex: number; value: number }>).push({
-          portIndex: matrix[i].portIndex,
-          value: getGraphFormulaResult(index, m, innerLabels),
+    if(matrix.length > 0){
+      for (let i = 0; i < matrix.length; i++) {
+        matrices.push([]);
+        matrix[i].matrix[0].forEach((m, index) => {
+          (matrices[i] as Array<{ portIndex: number; value: number }>).push({
+            portIndex: matrix[i].portIndex,
+            value: getGraphFormulaResult(index, m, innerLabels),
+          });
+        });
+      }
+    }
+    let datasets: Dataset[] = [];
+    if(ports.length > 0){
+      matrices.forEach((mat) => {
+        datasets.push({
+          label: `${labels[mat[0].portIndex][0]} - ${
+            labels[mat[0].portIndex][1]
+          }`,
+          data: mat.map((m1) => m1.value),
+          borderColor: colorArray[mat[0].portIndex],
+          backgroundColor: 'white',
         });
       });
     }
-    let datasets: Dataset[] = [];
-    matrices.forEach((mat) => {
-      datasets.push({
-        label: `${labels[mat[0].portIndex][0]} - ${
-          labels[mat[0].portIndex][1]
-        }`,
-        data: mat.map((m1) => m1.value),
-        borderColor: colorArray[mat[0].portIndex],
-        backgroundColor: 'white',
-      });
-    });
-
 
     let options = {
       responsive: true,
