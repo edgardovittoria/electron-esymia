@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Complex } from 'complex.js';
-import Plot, { PlotParams } from 'react-plotly.js';
+import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
 import {
   SolverResultsElectricFields,
