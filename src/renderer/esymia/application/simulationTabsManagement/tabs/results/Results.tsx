@@ -47,6 +47,7 @@ import {
   solverResultsSelector,
   SolverResultsElectricFields,
   setSpinnerSolverResults,
+  spinnerSolverResultsSelector,
 } from '../../../../store/tabsAndMenuItemsSlice';
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
 import { ChartListElectricFields } from './chartListElectricFields/ChartListElectricFields';
@@ -111,7 +112,7 @@ export const Results: React.FC<ResultsProps> = ({
         !(selectedProject.simulation.results as SolverOutput).matrix_S &&
         selectedProject.simulation.simulationType === 'Matrix'
       ) {
-        dispatch(setSpinnerSolverResults(true))
+        dispatch(setSpinnerSolverResults(true));
         dispatch(
           publishMessage({
             queue: 'management_solver',
@@ -125,9 +126,10 @@ export const Results: React.FC<ResultsProps> = ({
           }),
         );
       } else if (
-        selectedProject.simulation.simulationType === 'Electric Fields'
+        selectedProject.simulation.simulationType === 'Electric Fields' &&
+        solverResults.filter((s) => s.id === selectedProject.id).length === 0
       ) {
-        dispatch(setSpinnerSolverResults(true))
+        dispatch(setSpinnerSolverResults(true));
         dispatch(
           publishMessage({
             queue: 'management_solver',
@@ -135,7 +137,8 @@ export const Results: React.FC<ResultsProps> = ({
               message: 'get results electric fields',
               body: {
                 fileId: selectedProject.simulation.resultS3,
-                freq_index: 1
+                freq_index: 1,
+                id: selectedProject.id,
               },
             },
           }),
@@ -146,6 +149,7 @@ export const Results: React.FC<ResultsProps> = ({
   const selectedFolder = useSelector(SelectedFolderSelector);
   const resultsView = useSelector(solverResultsViewSelector);
   const solverResults = useSelector(solverResultsSelector);
+  const spinnerSolverResults = useSelector(spinnerSolverResultsSelector)
 
   const [freq, setfreq] = useState<number[]>([]);
 
@@ -156,7 +160,7 @@ export const Results: React.FC<ResultsProps> = ({
     ) {
       setfreq((solverResults[0] as SolverResultsElectricFields).results.f);
     }
-  }, [solverResults]);
+  }, [solverResults, selectedProject]);
   let selectedPort = findSelectedPort(selectedProject);
   const dispatch = useDispatch();
   const ports = selectedProject?.ports.filter(
@@ -220,6 +224,7 @@ export const Results: React.FC<ResultsProps> = ({
   return (
     <div className="flex">
       <div className="w-[6%]">
+      {spinnerSolverResults && <ImSpinner className="animate-spin w-10 h-10 absolute top-1/2 left-1/2 z-50" />}
         <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
           <div
             className={`p-2 tooltip rounded-t tooltip-right ${
@@ -474,10 +479,7 @@ export const Results: React.FC<ResultsProps> = ({
               </>
             ) : (
               <>
-                <ChartListElectricFields
-                  N_circ={100}
-                  freq={freq}
-                />
+                <ChartListElectricFields N_circ={100} freq={freq} />
               </>
             )}
           </>

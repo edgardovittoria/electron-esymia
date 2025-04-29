@@ -11,7 +11,7 @@ import { Project } from '../../../../model/esymiaModels';
 import { ImSpinner } from 'react-icons/im';
 import { deleteFileS3 } from '../../../../aws/mesherAPIs';
 import { msToTime } from '../../../dashboardTabsManagement/tabs/Simulations';
-import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
+import { setSolverResults, ThemeSelector, unsetSolverResults } from '../../../../store/tabsAndMenuItemsSlice';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
@@ -121,6 +121,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                           selectedProject.id as string,
                         ),
                       );
+                      dispatch(unsetSolverResults(selectedProject.id as string))
                       dispatch(
                         setMeshApproved({
                           approved: false,

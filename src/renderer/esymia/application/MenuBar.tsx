@@ -10,23 +10,26 @@ import {
   ThemeSelector,
 } from '../store/tabsAndMenuItemsSlice';
 import { GiMeshBall } from 'react-icons/gi';
+import { selectedProjectSelector } from '../store/projectSlice';
 
 interface MenuBarProps {}
 
 export const MenuBar: React.FC<MenuBarProps> = () => {
   const dispatch = useDispatch();
   const menuItems = useSelector(menuItemsSelector);
+  const selectedProject = useSelector(selectedProjectSelector)
   const menuItemSelected = useSelector(selectedMenuItemSelector);
   const theme = useSelector(ThemeSelector)
   return (
     <div className="w-full px-10">
       <div className={`${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'}  px-4 py-2 flex flex-row justify-between items-center rounded-xl`}>
-        <ul className="relative flex items-center">
+        <div className="relative flex items-center">
           {(menuItems as string[]).map((item) => (
-            <li
+            <button
               key={item}
               data-testid={item}
-              className="flex flex-col justify-center items-center hover:cursor-pointer"
+              disabled={item === "Results" && selectedProject?.simulation?.status !== "Completed"}
+              className="flex flex-col justify-center items-center hover:cursor-pointer disabled:hover:cursor-not-allowed disabled:opacity-50"
               onClick={() => dispatch(selectMenuItem(item))}
             >
               {item === 'Modeler' && (
@@ -96,9 +99,9 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
               {menuItemSelected === item && (
                 <hr className={`w-2/3 border ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'} border-secondaryColor`} />
               )}
-            </li>
+            </button>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );

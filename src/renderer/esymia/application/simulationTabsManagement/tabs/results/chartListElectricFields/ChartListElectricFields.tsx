@@ -56,6 +56,7 @@ export const ChartListElectricFields: React.FC<
                           freq.findIndex(
                             (val) => val === parseFloat(e.currentTarget.value),
                           ) + 1,
+                        id: selectedProject?.id
                       },
                     },
                   }),
