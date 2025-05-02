@@ -338,7 +338,6 @@ export const ChartsList: React.FC<ChartsListProps> = ({
 
   return (
     <>
-      {spinnerSolverResults && <ImSpinner className="animate-spin w-10 h-10 absolute top-1/2 left-1/2 z-50" />}
       {chartsDataToVisualize.map((chartData, index) => {
         return (
           <div

@@ -51,6 +51,7 @@ import {
 } from '../../../../store/tabsAndMenuItemsSlice';
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
 import { ChartListElectricFields } from './chartListElectricFields/ChartListElectricFields';
+import { SolverStatusSelector } from '../../../../store/pluginsSlice';
 
 interface ResultsProps {
   selectedTabLeftPanel: string | undefined;
@@ -99,6 +100,7 @@ export const Results: React.FC<ResultsProps> = ({
   const [cloning, setcloning] = useState<boolean>(false);
   const [emergencyCommand, setEmergencyCommand] = useState(false);
   const selectedProject = useSelector(selectedProjectSelector);
+  const solverStatus = useSelector(SolverStatusSelector)
   const theme = useSelector(ThemeSelector);
   useEffect(() => {
     if (
@@ -224,7 +226,18 @@ export const Results: React.FC<ResultsProps> = ({
   return (
     <div className="flex">
       <div className="w-[6%]">
-      {spinnerSolverResults && <ImSpinner className="animate-spin w-10 h-10 absolute top-1/2 left-1/2 z-50" />}
+      {spinnerSolverResults && 
+      <div className='absolute top-1/2 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4'>
+        {solverStatus === "ready" ? 
+        <>
+          <span className='text-xl'>Loading Results</span>
+          <ImSpinner className="animate-spin w-10 h-10" />
+        </>
+        :
+        <span className='text-xl'>Start Solver to load results.</span>
+      }
+      </div>
+      }
         <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
           <div
             className={`p-2 tooltip rounded-t tooltip-right ${
@@ -485,7 +498,7 @@ export const Results: React.FC<ResultsProps> = ({
           </>
         ) : (
           <div className="absolute top-1/2 right-1/2 translate-x-1/2 flex justify-center w-[90%]">
-            <span
+            {/* <span
               className={`${alertMessageStyle} ${
                 theme === 'light' ? '' : 'text-textColorDark'
               }`}
@@ -495,7 +508,7 @@ export const Results: React.FC<ResultsProps> = ({
               selectedProject.simulation.status == 'Queued'
                 ? runningSimulationMessageOnResults
                 : emptyResultsMessage}
-            </span>
+            </span> */}
           </div>
         )}
       </div>

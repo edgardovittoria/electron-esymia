@@ -28,7 +28,6 @@ export const ChartListElectricFields: React.FC<
 
   return (
     <>
-      {spinnerSolverResults && <ImSpinner className="animate-spin w-10 h-10 absolute top-1/2 left-1/2 z-50" />}
       <div className={` ${spinnerSolverResults ? 'opacity-40' : 'opacity-100'} flex flex-col gap-2 mt-5 overflow-scroll max-h-[80vh] px-1`}>
           <fieldset className="fieldset">
             <legend className="fieldset-legend text-xs mb-1">

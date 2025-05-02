@@ -8,6 +8,7 @@ import {
   selectedMenuItemSelector,
   selectMenuItem,
   ThemeSelector,
+  unsetSolverResults,
 } from '../store/tabsAndMenuItemsSlice';
 import { GiMeshBall } from 'react-icons/gi';
 import { selectedProjectSelector } from '../store/projectSlice';
@@ -30,7 +31,12 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
               data-testid={item}
               disabled={item === "Results" && selectedProject?.simulation?.status !== "Completed"}
               className="flex flex-col justify-center items-center hover:cursor-pointer disabled:hover:cursor-not-allowed disabled:opacity-50"
-              onClick={() => dispatch(selectMenuItem(item))}
+              onClick={() => {
+                dispatch(selectMenuItem(item))
+                if(item !== "Results"){
+                  dispatch(unsetSolverResults(selectedProject?.id as string))
+                }
+              }}
             >
               {item === 'Modeler' && (
                 <PiCubeFocusDuotone

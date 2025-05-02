@@ -18,6 +18,7 @@ import { SimulationTabsContentFactory } from './application/simulationTabsManage
 import Plugins from './plugin/Plugins';
 import { usersStateSelector } from '../cad_library';
 import { useStorage } from './hook/useStorage';
+import { publishMessage } from '../middleware/stompMiddleware';
 export interface EsymiaProps {
   selectedTab: string;
 }
@@ -61,6 +62,17 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   const showCreateNewProjectModal = useSelector(
     showCreateNewProjectModalSelector,
   );
+
+  useEffect(() => {
+    dispatch(publishMessage({
+      queue: 'management_solver',
+      body: { message: 'ping' },
+    }))
+    dispatch(publishMessage({
+      queue: 'management',
+      body: { message: 'ping' },
+    }))
+  }, [])
   // const mesherStatus = useSelector(MesherStatusSelector);
   // const solverStatus = useSelector(SolverStatusSelector);
 
