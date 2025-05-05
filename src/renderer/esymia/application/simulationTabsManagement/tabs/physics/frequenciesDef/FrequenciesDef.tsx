@@ -36,7 +36,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
       </div>
       <div className='flex flex-row justify-between gap-2 mt-5'>
         <div className='flex flex-col items-center gap-2'>
-          <span>{'f min'}</span>
+          <span>{'f min (Hz)'}</span>
           <input
             data-testid="fmin"
             //debounceTimeout={700}
@@ -55,7 +55,7 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
           />
         </div>
         <div className='flex flex-col items-center gap-2'>
-          <span>{'f max'}</span>
+          <span>{'f max (Hz)'}</span>
           <input
             data-testid="fmax"
             disabled={disabled}
@@ -110,8 +110,8 @@ const FrequenciesDef: React.FC<FrequenciesDefProps> = ({setSavedPhysicsParameter
           <h6 className="w-[100%] mb-2">Generated Frequencies</h6>
           <div className='flex flex-row'>
             <h6 className="w-[20%] mb-2">n.{selectedProject.frequencies.length}</h6>
-            <h6 className="w-[40%] mb-2"> min:{parseFloat(selectedProject.frequencies[0].toFixed(4)).toExponential()}</h6>
-            <h6 className="w-[40%] mb-2"> max: {parseFloat(selectedProject.frequencies[selectedProject.frequencies.length -1].toFixed(4)).toExponential()}</h6>
+            <h6 className="w-[40%] mb-2"> min: {parseFloat(selectedProject.frequencies[0].toFixed(4)).toExponential()} Hz</h6>
+            <h6 className="w-[40%] mb-2"> max: {parseFloat(selectedProject.frequencies[selectedProject.frequencies.length -1].toFixed(4)).toExponential()} Hz</h6>
           </div>
           <div className="p-3 bg-white border border-secondaryColor flex flex-col overflow-y-scroll max-h-[200px]">
             {selectedProject.frequencies.map((f,index) => {

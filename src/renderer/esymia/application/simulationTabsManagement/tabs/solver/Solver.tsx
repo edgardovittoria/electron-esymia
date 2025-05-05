@@ -41,10 +41,6 @@ import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/project
 import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
 import { savePortsOnS3 } from '../physics/savePortsOnS3';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
-import {
-  ShowInputGraphModal,
-  InputGraphData,
-} from './components/ShowInputGraphModal';
 
 interface SolverProps {
   selectedTab?: string;

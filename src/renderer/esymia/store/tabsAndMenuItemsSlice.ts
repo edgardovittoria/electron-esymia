@@ -44,6 +44,7 @@ type TabsAndMenuItemsState = {
     isConfirmed: boolean;
   };
   showCreateNewProjectModal: boolean;
+  showSaveProjectResultsModal: boolean;
   scalingViewParamsOfMesh: ScalingViewParams;
   meshVisualization: 'normal' | 'light';
   meshingProgress?: { meshingStep: number; id: string };
@@ -70,7 +71,7 @@ type TabsAndMenuItemsState = {
     ASize?: number[];
   };
   solverResults: (SolverResultsMatrix | SolverResultsElectricFields)[];
-  spinnerSolverResults: boolean,
+  spinnerSolverResults: boolean;
   resultsView: resultsViewItem[];
   SolverResultsS3?: string;
   externalGrids?: any;
@@ -109,6 +110,7 @@ export const TabsAndMenuItemsSlice = createSlice({
       isAlerted: false,
     },
     showCreateNewProjectModal: false,
+    showSaveProjectResultsModal: false,
     scalingViewParamsOfMesh: { x: 1, y: 1, z: 1 },
     meshVisualization: 'normal',
     computingP: [],
@@ -195,6 +197,12 @@ export const TabsAndMenuItemsSlice = createSlice({
       action: PayloadAction<boolean>,
     ) {
       state.showCreateNewProjectModal = action.payload;
+    },
+    setShowSaveProjectResultsModal(
+      state: TabsAndMenuItemsState,
+      action: PayloadAction<boolean>,
+    ) {
+      state.showSaveProjectResultsModal = action.payload;
     },
     setScalingViewParamsOfMesh(
       state: TabsAndMenuItemsState,
@@ -313,7 +321,7 @@ export const TabsAndMenuItemsSlice = createSlice({
     setElectricFieldsResultsStep(
       state: TabsAndMenuItemsState,
       action: PayloadAction<
-        { step: number; name: string;  id: string } | undefined
+        { step: number; name: string; id: string } | undefined
       >,
     ) {
       state.electricFieldsResultsStep = action.payload;
@@ -365,7 +373,7 @@ export const TabsAndMenuItemsSlice = createSlice({
       state: TabsAndMenuItemsState,
       action: PayloadAction<boolean>,
     ) {
-      state.spinnerSolverResults = action.payload
+      state.spinnerSolverResults = action.payload;
     },
     setSolverResultsS3(
       state: TabsAndMenuItemsState,
@@ -477,7 +485,8 @@ export const {
   removeItemToResultsView,
   resetItemToResultsView,
   setSpinnerSolverResults,
-  setElectricFieldsResultsStep
+  setElectricFieldsResultsStep,
+  setShowSaveProjectResultsModal
 } = TabsAndMenuItemsSlice.actions;
 
 const setTab = (state: TabsAndMenuItemsState, tab: string) => {
@@ -516,6 +525,10 @@ export const isAlertInfoModalSelector = (state: {
 export const showCreateNewProjectModalSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState;
 }) => state.tabsAndMenuItems.showCreateNewProjectModal;
+
+export const showSaveProjectResultsModalSelector = (state: {
+  tabsAndMenuItems: TabsAndMenuItemsState;
+}) => state.tabsAndMenuItems.showSaveProjectResultsModal;
 
 export const scalingViewParamsOfMeshSelector = (state: {
   tabsAndMenuItems: TabsAndMenuItemsState;

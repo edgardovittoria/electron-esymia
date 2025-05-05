@@ -116,7 +116,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
           </div>
           <div className="flex flex-col w-1/2">
             <div className="p-1">
-              <h6>Phi (0 - π):</h6>
+              <h6>Phi (0 - 2π):</h6>
               <input
                 type="number"
                 disabled={selectedProject?.simulation?.status === "Completed"}
@@ -127,7 +127,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
                 }  rounded p-2 w-full mt-1 ${
                   errorPhi ? 'border border-red-500' : ''
                 }`}
-                placeholder="Phi (0 - π)"
+                placeholder="Phi (0 - 2π)"
                 min={0}
                 max={Math.PI}
                 step={0.01}
@@ -147,7 +147,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
               />
               {errorPhi && (
                 <span className="text-red-500 mt-2">
-                  phi must be between 0 and π
+                  phi must be between 0 and 2π
                 </span>
               )}
             </div>
@@ -238,7 +238,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
         </div>
         <div className="flex flex-col mt-3">
           <div className="p-1">
-            <h6>Insert radius</h6>
+            <h6>{`Insert radius (${selectedProject?.modelUnit})`}</h6>
             <input
               type="number"
               disabled={selectedProject?.simulation?.status === "Completed"}
@@ -253,7 +253,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
             />
           </div>
           <div className="p-1">
-            <h6>Center of gravity</h6>
+            <h6>{`Center of gravity (${selectedProject?.modelUnit})`}</h6>
             <div className="flex flex-row gap-4">
               <div className="flex flex-col gap-2 items-center">
                 <span>X</span>

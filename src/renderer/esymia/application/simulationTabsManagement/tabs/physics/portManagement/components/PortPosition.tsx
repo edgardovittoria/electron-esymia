@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Port, Probe } from "../../../../../../model/esymiaModels";
-import { updatePortPosition } from "../../../../../../store/projectSlice";
+import { selectedProjectSelector, updatePortPosition } from "../../../../../../store/projectSlice";
 import { DebounceInput } from "react-debounce-input";
 import { ThemeSelector } from "../../../../../../store/tabsAndMenuItemsSlice";
 
@@ -18,6 +18,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 }) => {
 	const dispatch = useDispatch();
   const theme = useSelector(ThemeSelector)
+  const distanceUnit = useSelector(selectedProjectSelector)?.modelUnit;
 
 	return (
 		<>
@@ -28,7 +29,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 					<h6 className="xl:text-base text-[12px]">Port Position</h6>
           <span className="text-xs my-2">If the input field is blank and you want to enter a negative number, the minus key must be pressed two times.</span>
 					<div className="mt-2">
-						<span className="xl:text-base text-[12px]">Input (X,Y,Z)</span>
+						<span className="xl:text-base text-[12px]">{`Input [X,Y,Z coords (${distanceUnit})]`}</span>
 						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
               <TerminationPositionInput
                 dataTestId="inputPositionX"
@@ -90,7 +91,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 						</div>
 					</div>
 					<div className="mt-2">
-						<span className="xl:text-base text-[12px]">Output (X,Y,Z)</span>
+						<span className="xl:text-base text-[12px]">{`Output [X,Y,Z coords (${distanceUnit})]`}</span>
 						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
               <TerminationPositionInput
                   dataTestId="outputPositionX"

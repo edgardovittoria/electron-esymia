@@ -18,6 +18,8 @@ import {
 } from '../../../../../store/projectSlice';
 import {
   selectMenuItem,
+  setShowSaveProjectResultsModal,
+  showSaveProjectResultsModalSelector,
   ThemeSelector,
 } from '../../../../../store/tabsAndMenuItemsSlice';
 import {
@@ -54,10 +56,18 @@ import { RLCParamsComponent } from '../../physics/portManagement/components/RLCP
 import ScatteringParameter from '../../physics/portManagement/components/ScatteringParameter';
 import { ModalSelectPortType } from '../../physics/portManagement/ModalSelectPortType';
 import { PortManagement } from '../../physics/portManagement/PortManagement';
-import { genera_segnale_esponenziale, genera_segnale_Gaussiano_modulato, genera_segnale_sinusoidale, genera_segnale_trapezoidal_pulse, PlaneWaveSettings } from './planeWave/PlaneWaveSettings';
+import {
+  genera_segnale_esponenziale,
+  genera_segnale_Gaussiano_modulato,
+  genera_segnale_sinusoidale,
+  genera_segnale_trapezoidal_pulse,
+  PlaneWaveSettings,
+} from './planeWave/PlaneWaveSettings';
 import { gamma } from 'mathjs';
 import { ShowInputGraphModal, InputGraphData } from './ShowInputGraphModal';
 import { BsGraphUp } from 'react-icons/bs';
+import { FaLock, FaLockOpen } from 'react-icons/fa6';
+import { SaveProjectResultsModal } from './SaveProjectResultsModal';
 
 interface SolverSettingsProps {
   selectedProject: Project;
@@ -85,8 +95,12 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
   cameraPosition,
 }) => {
   const theme = useSelector(ThemeSelector);
-  const [electricField, setelectricField] = useState(selectedProject.planeWaveParameters ? true : false);
-  const [ports, setports] = useState(selectedProject.ports.length > 0 ? true : false);
+  const [electricField, setelectricField] = useState(
+    selectedProject.planeWaveParameters ? true : false,
+  );
+  const [ports, setports] = useState(
+    selectedProject.ports.length > 0 ? true : false,
+  );
   const [graphData, setgraphData] = useState<InputGraphData | undefined>(
     undefined,
   );
@@ -158,10 +172,12 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                     <div className="flex flex-row gap-2 items-center">
                       <input
                         type="checkbox"
-                        disabled={selectedProject.simulation?.status === "Completed"}
+                        disabled={
+                          selectedProject.simulation?.status === 'Completed'
+                        }
                         name="matrix"
                         id="matrix"
-                        checked={simulationType === "Matrix"}
+                        checked={simulationType === 'Matrix'}
                         onClick={() => setsimulationType('Matrix')}
                       />
                       <span>Matrix (S, Z, Y)</span>
@@ -171,8 +187,10 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                         type="checkbox"
                         name="electric_fields"
                         id="electric_fields"
-                        disabled={selectedProject.simulation?.status === "Completed"}
-                        checked={simulationType === "Electric Fields"}
+                        disabled={
+                          selectedProject.simulation?.status === 'Completed'
+                        }
+                        checked={simulationType === 'Electric Fields'}
                         onClick={() => setsimulationType('Electric Fields')}
                       />
                       <span>Electric Fields</span>
@@ -184,7 +202,9 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                             type="checkbox"
                             name="electricField"
                             id="electricField"
-                            disabled={selectedProject.simulation?.status === "Completed"}
+                            disabled={
+                              selectedProject.simulation?.status === 'Completed'
+                            }
                             checked={electricField}
                             onClick={() => setelectricField(!electricField)}
                           />
@@ -195,7 +215,9 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                             type="checkbox"
                             name="ports"
                             id="ports"
-                            disabled={selectedProject.simulation?.status === "Completed"}
+                            disabled={
+                              selectedProject.simulation?.status === 'Completed'
+                            }
                             checked={ports}
                             onClick={() => setports(!ports)}
                           />
@@ -483,12 +505,12 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
   setSavedPhysicsParameters,
   savedPhysicsParameters,
   cameraPosition,
-  setGraphData
+  setGraphData,
 }) => {
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
-  console.log(selectedPort)
+  console.log(selectedPort);
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
   const dispatch = useDispatch();
   return (
@@ -546,7 +568,7 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
               <div className="flex flex-row items-center justify-between mt-3 p-1">
                 <select
                   value={selectedPort?.signal}
-                  disabled={selectedProject?.simulation?.status === "Completed"}
+                  disabled={selectedProject?.simulation?.status === 'Completed'}
                   onChange={(e) => {
                     dispatch(setPortSignal(e.currentTarget.value));
                     setSavedPhysicsParameters(false);
@@ -584,7 +606,7 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
                         vs = genera_segnale_trapezoidal_pulse(
                           selectedProject?.times as number[],
                         );
-                        break;  
+                        break;
                     }
                     setGraphData({
                       labelX: 'Times',
@@ -666,6 +688,19 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
   const activeSimulations = useSelector(activeSimulationsSelector);
   const solverType = useSelector(solverTypeSelector);
   const dispatch = useDispatch();
+  const showSaveProjectResultsModal = useSelector(
+    showSaveProjectResultsModalSelector,
+  );
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
+  const toggleSlider = (): void => {
+    setIsUnlocked((prev: boolean) => {
+      const newState = !prev;
+      if (newState) {
+        dispatch(setShowSaveProjectResultsModal(true));
+      }
+      return newState;
+    });
+  };
   return (
     <>
       <div
@@ -690,7 +725,9 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
               <div className="flex justify-between mt-2">
                 <div className="w-full">
                   <select
-                    disabled={selectedProject?.simulation?.status === "Completed"}
+                    disabled={
+                      selectedProject?.simulation?.status === 'Completed'
+                    }
                     className={`select select-bordered select-sm w-full max-w-xs ${
                       theme === 'light'
                         ? 'bg-[#f6f6f6]'
@@ -848,17 +885,29 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
         </div>
       </div>
       {selectedProject?.simulation?.status === 'Completed' ? (
-        <button
-          className={`button buttonPrimary ${
-            theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'
-          } w-[100%] mt-3 text-[12px] xl:text-base`}
-          data-testid="resultsButton"
-          onClick={() => {
-            dispatch(selectMenuItem('Results'));
-          }}
-        >
-          Results
-        </button>
+        <div className="flex items-center mt-3 gap-2">
+          <button
+            className={`button buttonPrimary ${
+              theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'
+            } flex-1 text-[12px] xl:text-base`}
+            data-testid="resultsButton"
+            onClick={() => dispatch(selectMenuItem('Results'))}
+          >
+            Results
+          </button>
+          <div
+            className={`flex-shrink-0 ${
+              theme === 'light'
+                ? 'border border-gray-300 rounded px-2'
+                : 'border border-gray-700 rounded px-2'
+            }`}
+          >
+            <EditInputsSlider
+              isUnlocked={isUnlocked}
+              toggleSlider={toggleSlider}
+            />
+          </div>
+        </div>
       ) : (
         <button
           data-testid="startSimulationButton"
@@ -892,7 +941,7 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
                 outerIteration: solverIterations[1],
                 convergenceThreshold,
               },
-              simulationType: simulationType as "Matrix" | "Electric Fields",
+              simulationType: simulationType as 'Matrix' | 'Electric Fields',
             };
             dispatch(
               updateSimulation({
@@ -910,6 +959,9 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
         >
           Start Simulation
         </button>
+      )}
+      {showSaveProjectResultsModal && (
+        <SaveProjectResultsModal toggleEditInputsSlider={toggleSlider} />
       )}
     </>
   );
@@ -996,7 +1048,7 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
       <h6 className="w-[100%] mb-3">Time Range Definition</h6>
       <div className="flex flex-row justify-between gap-2 mt-5">
         <div className="flex flex-col items-center gap-2">
-          <span>{'final time'}</span>
+          <span>{'final time (s)'}</span>
           <input
             min={0}
             disabled={disabled}
@@ -1013,7 +1065,7 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
           />
         </div>
         <div className="flex flex-col items-center gap-2">
-          <span>time step</span>
+          <span>time step (s)</span>
           <input
             min={0}
             disabled={disabled}
@@ -1055,8 +1107,11 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
             <h6 className="w-[100%] mb-2">Generated Times</h6>
             <div className="flex flex-row">
               <h6 className="w-[20%] mb-2">n.{selectedProject.times.length}</h6>
-              <h6 className="w-[40%] mb-2"> step:{tStep.toExponential(2)}</h6>
-              <h6 className="w-[40%] mb-2"> final: {tMax.toExponential(2)}</h6>
+              <h6 className="w-[40%] mb-2"> step:{tStep.toExponential(2)} s</h6>
+              <h6 className="w-[40%] mb-2">
+                {' '}
+                final: {tMax.toExponential(2)} s
+              </h6>
             </div>
             <div className="p-3 bg-white border border-secondaryColor flex flex-col overflow-y-scroll max-h-[100px]">
               {selectedProject.times.map((t, index) => {
@@ -1080,10 +1135,11 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
               </h6>
               <h6 className="w-[40%] mb-2">
                 {' '}
-                min:
+                min:{' '}
                 {parseFloat(
                   selectedProject.frequencies[0].toFixed(4),
                 ).toExponential()}
+                {' Hz'}
               </h6>
               <h6 className="w-[40%] mb-2">
                 {' '}
@@ -1093,6 +1149,7 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
                     selectedProject.frequencies.length - 1
                   ].toFixed(4),
                 ).toExponential()}
+                {' Hz'}
               </h6>
             </div>
             <div className="flex flex-row justify-between items-center">
@@ -1135,6 +1192,42 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
             </div>
           </div>
         )}
+    </div>
+  );
+};
+
+const EditInputsSlider: React.FC<{
+  isUnlocked: boolean;
+  toggleSlider: Function;
+}> = ({ isUnlocked, toggleSlider }) => {
+  return (
+    <div className="inline-flex items-center h-10">
+      <span className="text-[12px] xl:text-base mr-2">Edit Inputs</span>
+      <div
+        className="relative cursor-pointer"
+        onClick={() => toggleSlider()}
+        role="switch"
+        aria-checked={isUnlocked}
+        aria-label="Toggle edit inputs"
+      >
+        <div className="w-14 h-6 bg-gray-300 rounded-full"></div>
+        <span
+          className={`absolute top-0 left-0 w-6 h-6 bg-white rounded-full transition-transform duration-200 transform ${
+            isUnlocked ? 'translate-x-8' : 'translate-x-0'
+          }`}
+        ></span>
+      </div>
+      <span className="ml-2">
+        {isUnlocked ? (
+          <FaLockOpen
+            size={20}
+            className="text-red-600"
+            aria-label="Unlocked"
+          />
+        ) : (
+          <FaLock size={20} className="text-green-600" aria-label="Locked" />
+        )}
+      </span>
     </div>
   );
 };

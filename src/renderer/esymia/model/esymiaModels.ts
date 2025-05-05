@@ -127,6 +127,7 @@ export type Simulation = {
     convergenceThreshold: number;
   };
   simulationType: "Matrix" | "Electric Fields"
+  //TODO: rivedere il simulationType, perché deve contenere anche il sottotipo di Electric Fields. Si può fare utilizzando due etichette distinte, anziché la sola Electric Fields
 };
 
 export type SolverOutput = {
