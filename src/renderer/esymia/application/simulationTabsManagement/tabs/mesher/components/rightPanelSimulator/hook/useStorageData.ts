@@ -116,7 +116,7 @@ export const useStorageData = () => {
         dispatch(setAWSExternalGridsData(res))
       });
     }
-    
+
   };
 
 
@@ -277,14 +277,90 @@ export const useStorageData = () => {
     })
   }
 
+  const cloneMeshAndGridsS3ToSaveResults = (res:any, project: Project, clonedProject: Project, selectedFolder: Folder, setCloning: Function, removePreviousResults: Function) => {
+    s3.copyObject({
+      Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+      CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
+      Key: `${project.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`
+    }).promise().then(mesh => {
+      s3.copyObject({
+        Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+        CopySource: project.meshData.type === 'Standard' ? `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.surface}`,
+        Key: project.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : `${clonedProject.id}_surface.json.json`
+      }).promise().then(grids => {
+        if(project.simulation?.resultS3){
+          s3.copyObject({
+            Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+            CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.simulation.resultS3}`,
+            Key: `${clonedProject.id}_results.json`
+          }).promise().then(results => {
+            clonedProject = {
+              ...clonedProject,
+              meshData: {
+                ...clonedProject.meshData,
+                mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`,
+                externalGrids: clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : undefined,
+                surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.json`
+              },
+              ports: [],
+              portsS3: `${clonedProject.id}_ports.json`,
+              simulation: {
+                ...clonedProject.simulation,
+                associatedProject: clonedProject.id,
+                name: `${clonedProject.name} - sim`,
+                resultS3: `${clonedProject.id}_results.json`
+              },
+            } as Project;
+            execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
+              selectedFolder?.id !== 'root' &&
+                execQuery2(
+                  addIDInProjectListInDynamoDB,
+                  clonedProject.id,
+                  selectedFolder,
+                  dispatch
+                );
+              dispatch(addProject(clonedProject));
+              setCloning(false)
+              removePreviousResults(project, dispatch)
+            })
+          })
+        } else {
+          clonedProject = {
+            ...clonedProject,
+            meshData: {
+              ...clonedProject.meshData,
+              mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`,
+              externalGrids: clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : undefined,
+              surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.json`
+            },
+            ports: [],
+            portsS3: `${clonedProject.id}_ports.json`,
+          } as Project;
+          execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
+            selectedFolder?.id !== 'root' &&
+              execQuery2(
+                addIDInProjectListInDynamoDB,
+                clonedProject.id,
+                selectedFolder,
+                dispatch
+              );
+            dispatch(addProject(clonedProject));
+            setCloning(false)
+            removePreviousResults(project, dispatch)
+          })
+        }
+      })
+    })
+  }
 
-  const cloneProject = (project: Project, selectedFolder: Folder, setCloning: (v:boolean) => void) => {
+
+  const cloneProject = (project: Project, selectedFolder: Folder, setCloning: (v:boolean) => void, newProjectName?: string) => {
     let clonedProject = {
       ...project,
       id: crypto.randomUUID(),
       model: {} as CanvasState,
       ports: [],
-      name: `${project?.name}_copy`,
+      name: newProjectName ? newProjectName : `${project?.name}_copy`,
     } as Project;
     execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(
       (res: any) => {
@@ -339,6 +415,67 @@ export const useStorageData = () => {
       },
     );
   };
+
+  const cloneProjectToSaveResults = (project: Project, selectedFolder: Folder, setCloning: (v:boolean) => void, removePreviousResults: Function, newProjectName: string) => {
+    let clonedProject = {
+      ...project,
+      id: crypto.randomUUID(),
+      model: {} as CanvasState,
+      ports: [],
+      name: newProjectName
+    } as Project;
+    execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(
+      (res: any) => {
+        if(project.portsS3){
+          s3.copyObject({
+            Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+            CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.portsS3}`,
+            Key: `${clonedProject.id}_ports.json`
+          }).promise().then(() => {
+            if(project.meshData.meshGenerated === "Generated"){
+              cloneMeshAndGridsS3ToSaveResults(res, project, clonedProject, selectedFolder, setCloning, removePreviousResults)
+            }else{
+              clonedProject = {
+                ...clonedProject,
+                ports: [],
+                portsS3: `${clonedProject.id}_ports.json`,
+              } as Project;
+              execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
+                selectedFolder?.id !== 'root' &&
+                  execQuery2(
+                    addIDInProjectListInDynamoDB,
+                    clonedProject.id,
+                    selectedFolder,
+                    dispatch
+                  );
+              dispatch(addProject(clonedProject));
+              setCloning(false)
+              removePreviousResults(project, dispatch)
+              })
+            }
+          })
+        }else{
+          if(project.meshData.meshGenerated === "Generated"){
+            cloneMeshAndGridsS3ToSaveResults(res, project, clonedProject, selectedFolder, setCloning, removePreviousResults)
+          }else{
+            selectedFolder?.id !== 'root' &&
+            execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
+              execQuery2(
+                addIDInProjectListInDynamoDB,
+                clonedProject.id,
+                selectedFolder,
+                dispatch
+              );
+            })
+            dispatch(addProject(clonedProject));
+            setCloning(false)
+            removePreviousResults(project, dispatch)
+        }
+        }
+      },
+    );
+  };
+
 
   const shareMeshAndGridsS3 = (res:any, project: Project, clonedProject: Project, setShowSearchUser: Function) => {
     s3.copyObject({
@@ -460,6 +597,7 @@ export const useStorageData = () => {
     deleteProject,
     deleteProjectStoredMeshData,
     cloneProject,
-    shareProject
+    shareProject,
+    cloneProjectToSaveResults
   };
 };

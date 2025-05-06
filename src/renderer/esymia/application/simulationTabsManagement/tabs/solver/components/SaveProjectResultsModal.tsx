@@ -5,15 +5,21 @@ import toast from 'react-hot-toast';
 import {
   setShowSaveProjectResultsModal,
   ThemeSelector,
+  unsetSolverResults,
 } from '../../../../../store/tabsAndMenuItemsSlice';
 import { useDynamoDBQuery } from '../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import {
+  deleteSimulation,
   SelectedFolderSelector,
   selectedProjectSelector,
+  setMeshApproved,
 } from '../../../../../store/projectSlice';
 import { useStorageData } from '../../mesher/components/rightPanelSimulator/hook/useStorageData';
 import { ImSpinner } from 'react-icons/im';
 import { Folder, Project } from '../../../../../model/esymiaModels';
+import { deleteFileS3 } from '../../../../../aws/mesherAPIs';
+import { createOrUpdateProjectInDynamoDB } from '../../../../../../dynamoDB/projectsFolderApi';
+import { Dispatch } from '@reduxjs/toolkit';
 
 interface SaveProjectResultsModalProps {
   toggleEditInputsSlider: Function
@@ -32,8 +38,37 @@ export const SaveProjectResultsModal: React.FC<
   const [projectName, setProjectName] = useState(
     selectedProject?.name + '_results',
   );
-  const { cloneProject } = useStorageData();
+  const { cloneProjectToSaveResults } = useStorageData();
   const [cloning, setcloning] = useState<boolean>(false);
+  const removePreviousResults = (selectedProject: Project, dispatch: Dispatch) => {
+                        dispatch(
+                          deleteSimulation(
+                            selectedProject.id as string,
+                          ),
+                        );
+                        dispatch(unsetSolverResults(selectedProject.id as string))
+                        dispatch(
+                          setMeshApproved({
+                            approved: false,
+                            projectToUpdate:
+                              selectedProject?.id as string,
+                          }),
+                        );
+                        deleteFileS3(selectedProject.simulation?.resultS3 as string).then(() => {
+                          execQuery2(
+                            createOrUpdateProjectInDynamoDB,
+                            {
+                              ...selectedProject,
+                              simulation: undefined,
+                              meshData: {
+                                ...selectedProject?.meshData,
+                                meshApproved: false,
+                              },
+                            } as Project,
+                            dispatch,
+                          ).then(() => {dispatch(setShowSaveProjectResultsModal(false))})
+                        })
+                      }
 
   return (
     <>
@@ -102,8 +137,8 @@ export const SaveProjectResultsModal: React.FC<
                       type="button"
                       className="button bg-gray-500 text-white"
                       onClick={() =>{
-                        dispatch(setShowSaveProjectResultsModal(false))
                         toggleEditInputsSlider()
+                        dispatch(setShowSaveProjectResultsModal(false))
                       }
                     }
                     >
@@ -112,7 +147,9 @@ export const SaveProjectResultsModal: React.FC<
                     <button
                       type="button"
                       className="button bg-red-500 text-black"
-                      onClick={() => {}}
+                      onClick={() => {
+                        removePreviousResults(selectedProject as Project, dispatch)
+                      }}
                     >
                       Discard results
                     </button>
@@ -124,13 +161,14 @@ export const SaveProjectResultsModal: React.FC<
                           : 'bg-secondaryColorDark text-textColor'
                       }`}
                       onClick={() => {
-                        setcloning(true);
-                        cloneProject(
+                        setcloning(true)
+                        cloneProjectToSaveResults(
                           selectedProject as Project,
                           selectedFolder as Folder,
                           setcloning,
+                          removePreviousResults,
+                          projectName
                         );
-                        //TODO: aggiungere istruzioni per l'eliminazione dei risultati dal progetto corrente, dopo che lo spinner è scomparso
                       }}
                     >
                       <span>Save results</span>
