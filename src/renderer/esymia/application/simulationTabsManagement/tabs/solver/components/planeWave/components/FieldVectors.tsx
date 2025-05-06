@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Line, Text } from '@react-three/drei';
+import { Cone, Line, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { Vector3 } from 'three';
 
@@ -55,14 +55,14 @@ export const VectorArrow: FC<VectorArrowProps> = ({
     {dir && dir.isVector3 && (
       <>
         <arrowHelper args={[normalize(dir), start, 1, color]} />
-        <Text
+        {/* <Text
           position={start.clone().add(dir.clone().multiplyScalar(1.1))}
           fontSize={0.1}
           color={color}
           rotation={[Math.PI / 2, 0, 0]}
         >
           {label}
-        </Text>
+        </Text> */}
       </>
     )}
   </>
@@ -160,8 +160,16 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
         dashSize={0.1}
         gapSize={0.05}
       />
-      {/* Curve Theta e Phi */}
       <Line
+        points={[new THREE.Vector3(0, 0, 0), new THREE.Vector3(x, y, z)]}
+        color="black"
+        lineWidth={1}
+        dashed
+        dashSize={0.1}
+        gapSize={0.05}
+      />
+      {/* Curve Theta e Phi */}
+      {/* <Line
         points={thetaCurve}
         color="green"
         lineWidth={2}
@@ -178,25 +186,94 @@ export const FieldVectors: FC<FieldVectorsProps> = ({
         anchorY="middle"
       >
         θ
-      </Text>
+      </Text> */}
+      <LineWithArrow thetaCurve={thetaCurve} rotation={new THREE.Euler(0,0,0)} color='green' lineWidth={2} text="θ"/>
+      <LineWithArrow thetaCurve={phiCurve} rotation={new THREE.Euler(0,0,0)} color='purple' lineWidth={2} text="φ"/>
+    </>
+  );
+};
+
+interface ArrowProps {
+  position: THREE.Vector3,
+  rotation: THREE.Euler,
+  color: string,
+  size: number
+}
+
+interface LineWithArrowProps {
+  thetaCurve: THREE.Vector3[],
+  rotation: THREE.Euler,
+  color: string,
+  lineWidth: number,
+  text: string,
+}
+
+const LineWithArrow:React.FC<LineWithArrowProps> = ({ thetaCurve, color, lineWidth, text }) => {
+  const [arrowPoints1, setArrowPoints1] = useState<THREE.Vector3[]>([]);
+  const [arrowPoints2, setArrowPoints2] = useState<THREE.Vector3[]>([]);
+  const middleIndex = Math.floor(thetaCurve.length / 2);
+  const middlePoint = thetaCurve[middleIndex];
+
+  useEffect(() => {
+    if (thetaCurve.length >= 2) {
+      const prevPoint = thetaCurve[Math.max(0, middleIndex - 1)];
+      const nextPoint = thetaCurve[Math.min(thetaCurve.length - 1, middleIndex + 1)];
+      const direction = new THREE.Vector3().subVectors(prevPoint, nextPoint).normalize();
+
+      const arrowBaseOffset = direction.clone().multiplyScalar(-0.08);
+      const arrowBasePoint = new THREE.Vector3().addVectors(middlePoint, arrowBaseOffset);
+
+      const arrowWingDirection1 = new THREE.Vector3();
+      arrowWingDirection1.crossVectors(direction, new THREE.Vector3(0, 1, 0)).normalize().multiplyScalar(0.05);
+
+      const arrowWingDirection2 = new THREE.Vector3();
+      arrowWingDirection2.crossVectors(new THREE.Vector3(0, 1, 0), direction).normalize().multiplyScalar(0.05);
+
+      const arrowTip1 = new THREE.Vector3().addVectors(arrowBasePoint, direction.clone().multiplyScalar(0.10)).add(arrowWingDirection1);
+      const arrowTip2 = new THREE.Vector3().addVectors(arrowBasePoint, direction.clone().multiplyScalar(0.10)).add(arrowWingDirection2);
+
+      setArrowPoints1([arrowBasePoint, arrowTip1]);
+      setArrowPoints2([arrowBasePoint, arrowTip2]);
+    } else {
+      setArrowPoints1([]);
+      setArrowPoints2([]);
+    }
+  }, [thetaCurve, middleIndex]);
+  return (
+    <>
       <Line
-        points={phiCurve}
-        color="purple"
-        lineWidth={2}
+        points={thetaCurve}
+        color={color}
+        lineWidth={lineWidth}
         dashed
         dashSize={0.1}
         gapSize={0.05}
       />
-      <Text
-        position={phiCurve[Math.floor(phiCurve.length / 2)]} // Posizione al centro
+      {/* <Text
+        position={thetaCurve[Math.floor(thetaCurve.length / 2)]} // Posizione al centro
         rotation={[Math.PI / 2, 0, 0]}
         fontSize={0.1}
-        color="purple"
-        anchorX={-0.05}
+        color={color}
+        anchorX={-0.13}
         anchorY="middle"
       >
-        φ
-      </Text>
+        {text}
+      </Text> */}
+      {thetaCurve.length >= 2 && arrowPoints1.length > 0 && arrowPoints2.length > 0 && (
+        <>
+          <Line
+            points={arrowPoints1}
+            color={color}
+            lineWidth={lineWidth}
+          />
+          <Line
+            points={arrowPoints2}
+            color={color}
+            lineWidth={lineWidth}
+          />
+        </>
+      )}
+
     </>
   );
-};
+}

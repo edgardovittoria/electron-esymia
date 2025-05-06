@@ -167,24 +167,30 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
                       selectedProject.radialFieldParameters && (
                         <>
                           <Circle
-                            radius={boundingBoxDimension}
-                            center={calculateCenter(mesh.current)}
+                            //radius={boundingBoxDimension}
+                            radius={selectedProject.radialFieldParameters.radius}
+                            //center={calculateCenter(mesh.current)}
+                            center={selectedProject.radialFieldParameters.center}
                             plane={'xy'}
                             boundingBox={boundingBoxDimension}
                             //color={getColourBasedOnPlane('xy')[0]}
                             color={'black'}
                           />
                           <Circle
-                            radius={boundingBoxDimension}
-                            center={calculateCenter(mesh.current)}
+                            //radius={boundingBoxDimension}
+                            radius={selectedProject.radialFieldParameters.radius}
+                            //center={calculateCenter(mesh.current)}
+                            center={selectedProject.radialFieldParameters.center}
                             plane={getOrthogonalPlane('xy')}
                             boundingBox={boundingBoxDimension}
                             //color={getColourBasedOnPlane('xy')[1]}
                             color={'black'}
                           />
                           <Circle
-                            radius={boundingBoxDimension}
-                            center={calculateCenter(mesh.current)}
+                            //radius={boundingBoxDimension}
+                            radius={selectedProject.radialFieldParameters.radius}
+                            //center={calculateCenter(mesh.current)}
+                            center={selectedProject.radialFieldParameters.center}
                             plane={getOrthogonalPlane('xz')}
                             boundingBox={boundingBoxDimension}
                             //color={getColourBasedOnPlane('xz')[0]}

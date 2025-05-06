@@ -318,8 +318,9 @@ const SimulationStatusItem: React.FC<{
                 r_circ: associatedProject.radialFieldParameters?.radius,
                 times: associatedProject.times,
                 signal_type_E:
-                  associatedProject.planeWaveParameters?.input.ESignal,
+                associatedProject.planeWaveParameters?.input.ESignal,
                 ind_freq_interest: associatedProject.interestFrequenciesIndexes,
+                unit: associatedProject.modelUnit
               },
             },
           }),

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { IoMdFolder } from 'react-icons/io';
-import { useDrag, useDragDropManager, useDrop } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 import {
   Menu,
   Item,
@@ -21,8 +21,8 @@ import {
 } from '../../../../../../store/projectSlice';
 import { RenameFolder } from './RenameFolder';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
-import { Folder, MeshData, Port, Probe, Project, sharingInfoUser, TempLumped } from '../../../../../../model/esymiaModels';
-import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../cad_library';
+import { Folder, Project } from '../../../../../../model/esymiaModels';
+import { usersStateSelector } from '../../../../../../../cad_library';
 import { ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { moveProjectInDynamoDB, moveFolderInDynamoDB, deleteFolderFromDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
@@ -76,11 +76,8 @@ export const DroppableAndDraggableFolder: React.FC<
     [selectedFolder.name, selectedFolder.subFolders.length],
   );
 
-  const dragAndDropManager = useDragDropManager();
-
   useEffect(() => {
     if (dragDone) {
-      //console.log(dragItem)
       const objectToMove: Project | Folder = dragItem
       if (objectToMove && objectToMove.id !== dropTargetFolder.id) {
         if ('model' in objectToMove) {
@@ -93,19 +90,7 @@ export const DroppableAndDraggableFolder: React.FC<
           execQuery2(
             moveProjectInDynamoDB,
             {
-              id: objectToMove?.id,
-              description: objectToMove?.description as string,
-              frequencies: objectToMove?.frequencies,
-              meshData: objectToMove?.meshData as MeshData,
-              model: objectToMove?.model as CanvasState,
-              modelS3: objectToMove?.modelS3,
-              name: objectToMove?.name as string,
-              owner: objectToMove?.owner as UsersState,
-              ports: objectToMove?.ports as (Port | Probe | TempLumped)[],
-              screenshot: undefined,
-              storage: objectToMove?.storage as "local" | "online",
-              simulation: undefined,
-              sharedWith: objectToMove?.sharedWith as sharingInfoUser[],
+              ...objectToMove,
               parentFolder: dropTargetFolder.id,
             } as Project,
             selectedFolder,
@@ -122,12 +107,7 @@ export const DroppableAndDraggableFolder: React.FC<
           execQuery2(
             moveFolderInDynamoDB,
             {
-              id: objectToMove.id,
-              name: objectToMove.name,
-              owner: objectToMove.owner,
-              projectList: objectToMove.projectList,
-              sharedWith: objectToMove.sharedWith,
-              subFolders: objectToMove.subFolders,
+              ...objectToMove,
               parent: dropTargetFolder.id,
             } as Folder,
             selectedFolder,

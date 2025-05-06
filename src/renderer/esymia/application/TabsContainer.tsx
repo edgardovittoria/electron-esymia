@@ -4,13 +4,14 @@ import { MdOutlineDashboard } from 'react-icons/md';
 import { useAuth0 } from '@auth0/auth0-react';
 import { HiOutlineLogout } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectedFolderSelector, selectProject } from '../store/projectSlice';
+import { SelectedFolderSelector, selectedProjectSelector, selectProject } from '../store/projectSlice';
 import {
   closeProjectTab,
   projectsTabsSelector,
   selectTab, setShowCreateNewProjectModal,
   tabSelectedSelector,
-  ThemeSelector
+  ThemeSelector,
+  unsetSolverResults
 } from '../store/tabsAndMenuItemsSlice';
 import { BsPlugin } from 'react-icons/bs';
 import { VscServerProcess } from 'react-icons/vsc';
@@ -29,6 +30,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
   const dispatch = useDispatch();
   const selectedFolder = useSelector(SelectedFolderSelector)
   const theme = useSelector(ThemeSelector)
+  const selectedProject = useSelector(selectedProjectSelector)
 
   const { loginWithPopup, isAuthenticated, loginWithRedirect } = useAuth0();
   const activePlugins = useSelector(ActivePluginsSelector)
@@ -51,6 +53,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
             onClick={() => {
               dispatch(selectTab('DASHBOARD'));
               dispatch(selectProject(undefined));
+              dispatch(unsetSolverResults(selectedProject?.id as string))
             }}
           >
             <MdOutlineDashboard size={20} />
@@ -81,6 +84,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                     onClick={() => {
                       dispatch(selectTab(projectTab.id as string));
                       dispatch(selectProject(projectTab.id));
+                      dispatch(unsetSolverResults(selectedProject?.id as string))
                     }}
                   >
                     {projectTab.name}
@@ -92,6 +96,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                         closeProjectTab(projectTab.id as string),
                       );
                       dispatch(selectProject(undefined));
+                      dispatch(unsetSolverResults(selectedProject?.id as string))
                     }}
                   >
                     <FaTimes className="w-[12px] h-[12px] text-gray-400" />

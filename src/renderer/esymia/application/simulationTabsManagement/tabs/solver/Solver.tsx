@@ -41,6 +41,9 @@ import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/project
 import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
 import { savePortsOnS3 } from '../physics/savePortsOnS3';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { PlaneWaveParameters } from '../../../../model/esymiaModels';
+import { TiArrowMinimise } from 'react-icons/ti';
+import { LuClipboardList } from 'react-icons/lu';
 
 interface SolverProps {
   selectedTab?: string;
@@ -70,6 +73,7 @@ export const Solver: React.FC<SolverProps> = ({
   const [resetFocus, setResetFocus] = useState(false);
   const [spinner, setSpinner] = useState<boolean>(false);
   const [viewMesh, setViewMesh] = useState(false);
+  const [showLegend, setShowLegend] = useState(false);
   const toggleResetFocus = () => setResetFocus(!resetFocus);
   const { loadMeshData, cloneProject } = useStorageData();
   const mesherStatus = useSelector(MesherStatusSelector);
@@ -79,7 +83,11 @@ export const Solver: React.FC<SolverProps> = ({
   const [savedPhysicsParameters, setSavedPhysicsParameters] = useState(true);
   const [simulationType, setsimulationType] = useState<
     'Matrix' | 'Electric Fields'
-  >(selectedProject?.simulation ? selectedProject.simulation.simulationType : "Matrix");
+  >(
+    selectedProject?.simulation
+      ? selectedProject.simulation.simulationType
+      : 'Matrix',
+  );
   const awsExternalGridsData = useSelector(AWSExternalGridsDataSelector);
 
   const risExternalGridsFormat = (extGridsJson: any) => {
@@ -351,6 +359,67 @@ export const Solver: React.FC<SolverProps> = ({
           <NormalMeshVisualizationButton />
           <LightMeshVisualizationButton />
         </div>
+      )}
+      {showLegend ? (
+        <>
+          {!viewMesh &&
+            selectedProject?.planeWaveParameters &&
+            simulationType === 'Electric Fields' && (
+              <div className="absolute right-[2%] gap-2 bottom-[50px] flex flex-col p-5 rounded bg-white">
+                <div className="flex flex-row justify-between items-center gap-10">
+                  <span>Electric Fields Legend</span>
+                  <TiArrowMinimise
+                    className="hover:cursor-pointer hover:opacity-50"
+                    onClick={() => setShowLegend(false)}
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <div className="flex flex-row items-center">
+                    <span className="w-1/5">K̂</span>
+                    <hr className="w-4/5 border-2  border-gray-400" />
+                  </div>
+                  <div className="flex flex-row items-center">
+                    <span className="w-1/5">Êθ</span>
+                    <hr className="w-4/5 border-2  border-green-600" />
+                  </div>
+                  <div className="flex flex-row items-center">
+                    <span className="w-1/5">Êφ</span>
+                    <hr className="w-4/5 border-2  border-fuchsia-700" />
+                  </div>
+                  <div className="flex flex-row items-center">
+                    <span className="w-1/5">Ĥ</span>
+                    <hr className="w-4/5 border-2  border-red-500" />
+                  </div>
+                  <div className="flex flex-row items-center">
+                    <span className="w-1/5">Ê</span>
+                    <hr className="w-4/5 border-2  border-blue-600" />
+                  </div>
+                  <div className="flex flex-row items-center">
+                    <span className="w-1/5">θ</span>
+                    <hr className="w-4/5 border-2 border-dashed border-green-600" />
+                  </div>
+                  <div className="flex flex-row items-center">
+                    <span className="w-1/5">φ</span>
+                    <hr className="w-4/5 border-2 border-dashed border-fuchsia-700" />
+                  </div>
+                </div>
+              </div>
+            )}
+        </>
+      ) : (
+        <>
+          {!viewMesh &&
+            selectedProject?.planeWaveParameters &&
+            simulationType === 'Electric Fields' && (
+            <div
+              className="absolute right-[2%] gap-2 bottom-[50px] p-3 rounded bg-white tooltip tooltip-left hover:cursor-pointer"
+              data-tip="Electric Fields Legend"
+              onClick={() => setShowLegend(true)}
+            >
+              <LuClipboardList size={20} />
+            </div>
+          )}
+        </>
       )}
     </>
   );

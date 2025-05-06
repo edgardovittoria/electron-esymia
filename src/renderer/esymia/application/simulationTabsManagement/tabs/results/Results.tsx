@@ -48,6 +48,7 @@ import {
   SolverResultsElectricFields,
   setSpinnerSolverResults,
   spinnerSolverResultsSelector,
+  unsetSolverResults,
 } from '../../../../store/tabsAndMenuItemsSlice';
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
 import { ChartListElectricFields } from './chartListElectricFields/ChartListElectricFields';
@@ -102,6 +103,7 @@ export const Results: React.FC<ResultsProps> = ({
   const selectedProject = useSelector(selectedProjectSelector);
   const solverStatus = useSelector(SolverStatusSelector)
   const theme = useSelector(ThemeSelector);
+  const solverResults = useSelector(solverResultsSelector);
   useEffect(() => {
     if (
       selectedProject &&
@@ -147,10 +149,9 @@ export const Results: React.FC<ResultsProps> = ({
         );
       }
     }
-  }, []);
+  }, [solverResults]);
   const selectedFolder = useSelector(SelectedFolderSelector);
   const resultsView = useSelector(solverResultsViewSelector);
-  const solverResults = useSelector(solverResultsSelector);
   const spinnerSolverResults = useSelector(spinnerSolverResultsSelector)
 
   const [freq, setfreq] = useState<number[]>([]);
@@ -208,6 +209,7 @@ export const Results: React.FC<ResultsProps> = ({
     setSelectedTabLeftPanel(undefined);
     return () => {
       dispatch(resetItemToResultsView());
+      dispatch(unsetSolverResults(selectedProject?.id as string))
     };
   }, []);
 
