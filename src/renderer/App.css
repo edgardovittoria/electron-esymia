@@ -79,3 +79,12 @@ body{
   background-size: cover;
   background-repeat: no-repeat;
 }
+
+/* In src/index.css o src/App.css */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+/* Altri stili CSS */
+
+body {
+  font-family: 'Open Sans', sans-serif;
+}

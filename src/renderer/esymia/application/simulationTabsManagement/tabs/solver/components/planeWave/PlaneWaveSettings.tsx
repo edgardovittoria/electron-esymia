@@ -78,7 +78,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
         <div className="flex flex-row gap-2 items-center w-full">
           <div className="flex flex-col w-1/2">
             <div className="p-1">
-              <h6>Tetha (0 - π):</h6>
+              <h6>θ [0 - π]:</h6>
               <input
                 type="number"
                 disabled={selectedProject?.simulation?.status === "Completed"}
@@ -109,14 +109,14 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
               />
               {errorTheta && (
                 <span className="text-red-500 mt-2">
-                  theta must be between 0 and π
+                  θ must be between 0 and π
                 </span>
               )}
             </div>
           </div>
           <div className="flex flex-col w-1/2">
             <div className="p-1">
-              <h6>Phi (0 - 2π):</h6>
+              <h6>φ [0 - 2π]:</h6>
               <input
                 type="number"
                 disabled={selectedProject?.simulation?.status === "Completed"}
@@ -147,7 +147,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
               />
               {errorPhi && (
                 <span className="text-red-500 mt-2">
-                  phi must be between 0 and 2π
+                  φ must be between 0 and 2π
                 </span>
               )}
             </div>
@@ -156,7 +156,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
         <div className="flex flex-row gap-2 items-center w-full">
           <div className="flex flex-col w-1/2">
             <div className="p-1">
-              <h6>E_tetha:</h6>
+              <h6>Eθ:</h6>
               <input
                 type="number"
                 disabled={selectedProject?.simulation?.status === "Completed"}
@@ -173,7 +173,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
           </div>
           <div className="flex flex-col w-1/2">
             <div className="p-1">
-              <h6>E_phi:</h6>
+              <h6>Eφ:</h6>
               <input
                 type="number"
                 disabled={selectedProject?.simulation?.status === "Completed"}
@@ -238,7 +238,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
         </div>
         <div className="flex flex-col mt-3">
           <div className="p-1">
-            <h6>{`Insert radius (${selectedProject?.modelUnit})`}</h6>
+            <h6>{`Insert radius [${selectedProject?.modelUnit}]`}</h6>
             <input
               type="number"
               disabled={selectedProject?.simulation?.status === "Completed"}
@@ -253,7 +253,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({setGraphDat
             />
           </div>
           <div className="p-1">
-            <h6>{`Center of gravity (${selectedProject?.modelUnit})`}</h6>
+            <h6>{`Center of gravity [${selectedProject?.modelUnit}]`}</h6>
             <div className="flex flex-row gap-4">
               <div className="flex flex-col gap-2 items-center">
                 <span>X</span>

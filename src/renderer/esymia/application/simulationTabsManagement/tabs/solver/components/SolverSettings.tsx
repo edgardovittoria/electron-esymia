@@ -1131,13 +1131,13 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
             <h6 className="w-[100%] mb-2">Generated Frequencies</h6>
             <div className="flex flex-row">
               <h6 className="w-[20%] mb-2">
-                n.{selectedProject.frequencies.length}
+                n.{selectedProject.frequencies.length-1}
               </h6>
               <h6 className="w-[40%] mb-2">
                 {' '}
                 min:{' '}
                 {parseFloat(
-                  selectedProject.frequencies[0].toFixed(4),
+                  selectedProject.frequencies[1].toFixed(4),
                 ).toExponential()}
                 {' Hz'}
               </h6>
@@ -1152,19 +1152,19 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
                 {' Hz'}
               </h6>
             </div>
-            <div className="flex flex-row justify-between items-center">
+            <div className="flex flex-row gap-12 items-center">
               <span className="text-black font-bold">Frequencies</span>
               <span className="text-black font-bold">Check interest</span>
             </div>
             <div className="p-3 bg-white border border-secondaryColor flex flex-col overflow-y-scroll max-h-[200px]">
-              {selectedProject.frequencies.map((f, index) => {
+              {selectedProject.frequencies.filter(f => f !== 0).map((f, index) => {
                 return (
                   <div
                     key={index}
-                    className="flex flex-row justify-between items-center"
+                    className="flex flex-row gap-20 items-center"
                   >
                     <span className="text-black">
-                      {f % 1 !== 0 ? f.toFixed(4) : f}
+                      {f % 1 !== 0 ? f.toExponential(2) : f}
                     </span>
                     <input
                       type="checkbox"
@@ -1180,9 +1180,9 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
                       onChange={(e) => {
                         setSavedPhysicsParameters(false);
                         if (e.currentTarget.checked) {
-                          dispatch(addInterestFrequencyIndex(index));
+                          dispatch(addInterestFrequencyIndex(index+1));
                         } else {
-                          dispatch(removeInterestFrequencyIndex(index));
+                          dispatch(removeInterestFrequencyIndex(index+1));
                         }
                       }}
                     />

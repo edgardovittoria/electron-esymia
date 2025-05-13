@@ -1,5 +1,9 @@
 import { IMessage } from '@stomp/stompjs';
-import { Project, SolverOutput, SolverOutputElectricFields } from '../model/esymiaModels';
+import {
+  Project,
+  SolverOutput,
+  SolverOutputElectricFields,
+} from '../model/esymiaModels';
 import { takeAllProjectsIn } from '../store/auxiliaryFunctions/managementProjectsAndFoldersFunction';
 import { setMesherStatus, setSolverStatus } from '../store/pluginsSlice';
 import {
@@ -11,12 +15,15 @@ import {
   setEstimatedTime,
   setGridsCreationLength,
   setGridsCreationValue,
+  setIsAlertInfoModal,
   setIterations,
   setMeshAdvice,
   setMeshProgress,
   setMeshProgressLength,
   setMesherResults,
   setMeshingProgress,
+  setMessageInfoModal,
+  setShowInfoModal,
   setSolverResults,
   setSolverResultsS3,
   setSpinnerSolverResults,
@@ -28,18 +35,18 @@ import { setMeshASize } from '../store/projectSlice';
 export const callback_mesh_advices = function (
   message: IMessage,
   dispatch: Function,
-  getState: Function
+  getState: Function,
 ) {
   // called when the client receives a STOMP message from the server
-  let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
+  let projects: Project[] = takeAllProjectsIn(getState().projects.projects);
 
   let res = JSON.parse(message.body);
-  projects.forEach(p => {
-    if(p.id === res.id){
+  projects.forEach((p) => {
+    if (p.id === res.id) {
       dispatch(setMeshAdvice({ quantum: JSON.parse(res.quantum), id: res.id }));
       message.ack();
     }
-  })
+  });
 };
 
 export const callback_server_init = function (
@@ -56,12 +63,16 @@ export const callback_server_init = function (
   }
 };
 
-export const callback_mesher_feedback = (message: any, dispatch: Function, getState: Function) => {
-  let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
+export const callback_mesher_feedback = (
+  message: any,
+  dispatch: Function,
+  getState: Function,
+) => {
+  let projects: Project[] = takeAllProjectsIn(getState().projects.projects);
   if (message.body) {
     let body = JSON.parse(message.body);
-    projects.forEach(p => {
-      if(p.id === body.id){
+    projects.forEach((p) => {
+      if (p.id === body.id) {
         message.ack();
         if (body['length']) {
           dispatch(
@@ -83,7 +94,7 @@ export const callback_mesher_feedback = (message: any, dispatch: Function, getSt
               id: body['id'],
             }),
           );
-        }else if (body['gridsCreationValue']) {
+        } else if (body['gridsCreationValue']) {
           dispatch(
             setGridsCreationValue({
               gridsCreationValue: body['gridsCreationValue'],
@@ -94,23 +105,28 @@ export const callback_mesher_feedback = (message: any, dispatch: Function, getSt
           dispatch(setCompress({ compress: body['compress'], id: body['id'] }));
         }
       }
-    })
+    });
   }
 };
 
-export const callback_mesher_results = (message: any, dispatch: Function, getState: Function) => {
-  let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
+export const callback_mesher_results = (
+  message: any,
+  dispatch: Function,
+  getState: Function,
+) => {
+  let projects: Project[] = takeAllProjectsIn(getState().projects.projects);
   let res = JSON.parse(message.body);
-  projects.forEach(p => {
-    if(p.id === res.id){
+  projects.forEach((p) => {
+    if (p.id === res.id) {
       message.ack();
-      if(res.ASize) dispatch(setMeshASize({ASize: res.ASize, projectToUpdate: res.id}))
+      if (res.ASize)
+        dispatch(setMeshASize({ ASize: res.ASize, projectToUpdate: res.id }));
       dispatch(
         setMesherResults({
           id: res.id,
-          gridsPath: res.grids ? res.grids : "",
+          gridsPath: res.grids ? res.grids : '',
           meshPath: res.mesh,
-          surfacePath: res.surface ? res.surface : "",
+          surfacePath: res.surface ? res.surface : '',
           isStopped: res.isStopped ? res.isStopped : false,
           isValid: res.isValid,
           validTopology: res.validTopology,
@@ -119,68 +135,108 @@ export const callback_mesher_results = (message: any, dispatch: Function, getSta
         }),
       );
     }
-  })
+  });
 };
 
-export const callback_mesher_grids = (message: any, dispatch: Function, getState: Function) => {
-  let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
+export const callback_mesher_grids = (
+  message: any,
+  dispatch: Function,
+  getState: Function,
+) => {
+  let projects: Project[] = takeAllProjectsIn(getState().projects.projects);
   let res = JSON.parse(message.body);
-  console.log(res)
-  projects.forEach(p => {
-    if(p.id === res.id){
+  console.log(res);
+  projects.forEach((p) => {
+    if (p.id === res.id) {
       message.ack();
       res.grids_exist && dispatch(setAWSExternalGridsData(res.grids));
     }
-  })
+  });
 };
 
-export const callback_solver_feedback = (message: any, dispatch: Function, getState: Function) => {
-  let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
+export const callback_solver_feedback = (
+  message: any,
+  dispatch: Function,
+  getState: Function,
+) => {
+  let projects: Project[] = takeAllProjectsIn(getState().projects.projects);
   if (message.body) {
     let body = JSON.parse(message.body);
-    projects.forEach(p => {
-      if(p.id === body.id){
+    projects.forEach((p) => {
+      if (p.id === body.id) {
         message.ack();
         if (body['computingP']) {
           dispatch(setcomputingP({ done: body['computingP'], id: body['id'] }));
         } else if (body['computingLp']) {
-          dispatch(setcomputingLp({ done: body['computingLp'], id: body['id'] }));
+          dispatch(
+            setcomputingLp({ done: body['computingLp'], id: body['id'] }),
+          );
         } else if (body['freqNumber']) {
-          dispatch(setIterations({ freqNumber: body['freqNumber'], id: body['id'] }));
-        } else if (body['estimatedTime']){
-          dispatch(setEstimatedTime({estimatedTime: body['estimatedTime'], portIndex: body['portIndex'], id: body['id']}))
-        } else if(body['computation_completed']){
-          dispatch(setSolverResultsS3(body['path']))
-        } else if(body['electric_fields_results_step']){
-          dispatch(setElectricFieldsResultsStep({step: body['electric_fields_results_step'], name: body['electric_fields_results_name'], id: body['id']}))
+          dispatch(
+            setIterations({ freqNumber: body['freqNumber'], id: body['id'] }),
+          );
+        } else if (body['estimatedTime']) {
+          dispatch(
+            setEstimatedTime({
+              estimatedTime: body['estimatedTime'],
+              portIndex: body['portIndex'],
+              id: body['id'],
+            }),
+          );
+        } else if (body['computation_completed']) {
+          dispatch(setSolverResultsS3(body['path']));
+        } else if (body['electric_fields_results_step']) {
+          dispatch(
+            setElectricFieldsResultsStep({
+              step: body['electric_fields_results_step'],
+              name: body['electric_fields_results_name'],
+              id: body['id'],
+            }),
+          );
+        } else if (body['error']) {
+          dispatch(
+            setMessageInfoModal(
+              `Error: ${body['error']}!!Please stop simulation and try again. The simulation will restart from the point where the error was generated. `,
+            ),
+          );
+          dispatch(setIsAlertInfoModal(false));
+          dispatch(setShowInfoModal(true));
         }
       }
-    })
+    });
   }
 };
 
-export const callback_solver_results = (message: any, dispatch: Function, getState: Function) => {
-  let projects:Project[] = takeAllProjectsIn(getState().projects.projects)
+export const callback_solver_results = (
+  message: any,
+  dispatch: Function,
+  getState: Function,
+) => {
+  let projects: Project[] = takeAllProjectsIn(getState().projects.projects);
   let res = JSON.parse(message.body);
-  console.log(res)
-  if(res.simulationType === "matrix"){
-    if(res.portIndex !== undefined && res.partial){
-      dispatch(resetItemToResultsView())
-      dispatch(addItemToResultsView({
-        portIndex: parseInt(res.portIndex),
-        results: res.results,
-        freqIndex: res.freqIndex,
-      }))
-    }else{
-      dispatch(addItemToResultsView({
-        portIndex: parseInt(res.portIndex),
-        results: res.results,
-      }))
+  console.log(res);
+  if (res.simulationType === 'matrix') {
+    if (res.portIndex !== undefined && res.partial) {
+      dispatch(resetItemToResultsView());
+      dispatch(
+        addItemToResultsView({
+          portIndex: parseInt(res.portIndex),
+          results: res.results,
+          freqIndex: res.freqIndex,
+        }),
+      );
+    } else {
+      dispatch(
+        addItemToResultsView({
+          portIndex: parseInt(res.portIndex),
+          results: res.results,
+        }),
+      );
     }
-    projects.forEach(p => {
-      if(p.id === res.id){
+    projects.forEach((p) => {
+      if (p.id === res.id) {
         message.ack();
-        if(!res.error){
+        if (!res.error) {
           dispatch(
             setSolverResults({
               id: res.id,
@@ -190,23 +246,23 @@ export const callback_solver_results = (message: any, dispatch: Function, getSta
               freqIndex: res.freqIndex,
             }),
           );
-          dispatch(setEstimatedTime(undefined))
-        }else{
+          dispatch(setEstimatedTime(undefined));
+        } else {
           dispatch(
             setSolverResults({
               id: res.id,
               matrices: {} as SolverOutput,
               isStopped: res.isStopped,
               partial: res.partial,
-              error: res.error
+              error: res.error,
             }),
           );
-          dispatch(setEstimatedTime(undefined))
+          dispatch(setEstimatedTime(undefined));
         }
       }
-    })
-    dispatch(setSpinnerSolverResults(false))
-  }else{
+    });
+    dispatch(setSpinnerSolverResults(false));
+  } else {
     dispatch(
       setSolverResults({
         id: res.id,
@@ -231,11 +287,10 @@ export const callback_solver_results = (message: any, dispatch: Function, getSta
           f: JSON.parse(res.results.f),
         } as SolverOutputElectricFields,
         isStopped: false,
-        error: false
+        error: false,
       }),
     );
-    dispatch(setSpinnerSolverResults(false))
-    dispatch(setElectricFieldsResultsStep(undefined))
+    dispatch(setSpinnerSolverResults(false));
+    dispatch(setElectricFieldsResultsStep(undefined));
   }
-  
 };

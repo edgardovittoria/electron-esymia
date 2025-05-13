@@ -44,6 +44,7 @@ import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery'
 import { PlaneWaveParameters } from '../../../../model/esymiaModels';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { LuClipboardList } from 'react-icons/lu';
+import { classNames } from '../../../../../cadmia/canvas/components/navBar/NavBar';
 
 interface SolverProps {
   selectedTab?: string;
@@ -375,7 +376,7 @@ export const Solver: React.FC<SolverProps> = ({
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex flex-row items-center">
-                    <span className="w-1/5">K̂</span>
+                    <span className="w-1/5 uppercase">K̂</span>
                     <hr className="w-4/5 border-2  border-gray-400" />
                   </div>
                   <div className="flex flex-row items-center">

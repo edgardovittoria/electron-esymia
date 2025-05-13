@@ -29,7 +29,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 					<h6 className="xl:text-base text-[12px]">Port Position</h6>
           <span className="text-xs my-2">If the input field is blank and you want to enter a negative number, the minus key must be pressed two times.</span>
 					<div className="mt-2">
-						<span className="xl:text-base text-[12px]">{`Input [X,Y,Z coords (${distanceUnit})]`}</span>
+						<span className="xl:text-base text-[12px]">{`Input [X,Y,Z coords [${distanceUnit}]]`}</span>
 						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
               <TerminationPositionInput
                 dataTestId="inputPositionX"
@@ -91,7 +91,7 @@ export const PortPosition: FC<PortPositionProps> = ({
 						</div>
 					</div>
 					<div className="mt-2">
-						<span className="xl:text-base text-[12px]">{`Output [X,Y,Z coords (${distanceUnit})]`}</span>
+						<span className="xl:text-base text-[12px]">{`Output [X,Y,Z coords [${distanceUnit}]]`}</span>
 						<div className="flex gap-2 lg:gap-0 lg:flex-row flex-col justify-around mt-2">
               <TerminationPositionInput
                   dataTestId="outputPositionX"
