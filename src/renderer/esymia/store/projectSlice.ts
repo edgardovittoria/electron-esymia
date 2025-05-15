@@ -37,6 +37,7 @@ export const ProjectSlice = createSlice({
     projects: {
       name: 'My Files',
       owner: {} as UsersState,
+      ownerEmail: "",
       sharedWith: [],
       subFolders: [],
       projectList: [],
@@ -45,6 +46,7 @@ export const ProjectSlice = createSlice({
     sharedElements: {
       name: 'My Shared Elements',
       owner: {} as UsersState,
+      ownerEmail: "",
       sharedWith: [],
       subFolders: [],
       projectList: [],

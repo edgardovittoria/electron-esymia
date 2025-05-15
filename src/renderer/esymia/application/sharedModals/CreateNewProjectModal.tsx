@@ -54,6 +54,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         },
         screenshot: undefined,
         owner: (selectedFolder?.owner.email === user.email) ? user : selectedFolder?.owner as UsersState,
+        ownerEmail: user.email as string,
         sharedWith: (selectedFolder?.id === 'root') ? [] as sharingInfoUser[] : selectedFolder?.sharedWith as sharingInfoUser[],
         parentFolder: selectedFolder?.id as string
       };

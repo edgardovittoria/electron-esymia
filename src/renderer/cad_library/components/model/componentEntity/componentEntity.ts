@@ -51,6 +51,7 @@ export type Material = {
     tangent_delta_conductivity?: number,
     custom_conductivity?: [number, number]
     associatedComponentKey: number[]
+    ownerEmail: string
 }
 
 export type GeometryAttributes = {}

@@ -1,7 +1,8 @@
 import {
   DeleteItemInput,
   PutItemInput,
-  ScanInput,
+  QueryInput,
+  QueryOutput,
 } from 'aws-sdk/clients/dynamodb';
 import { dynamoDB } from '../esymia/aws/s3Config';
 import {
@@ -10,38 +11,53 @@ import {
   setShowInfoModal,
 } from '../esymia/store/tabsAndMenuItemsSlice';
 import { Dispatch } from '@reduxjs/toolkit';
-import { QuerySuccess } from 'fauna';
-import toast from 'react-hot-toast';
 import { FaunaCadModel } from '../cad_library';
-import { setLoadingSpinner } from '../cadmia/store/modelSlice';
 import { convertToDynamoDBFormat } from './utility/formatDynamoDBData';
 
 export const getModelsByOwnerDynamoDB = async (
   owner_id: string,
   dispatch: Dispatch,
 ) => {
-  let params: ScanInput = {
+  let params: QueryInput = {
     TableName: 'CadModels',
-    FilterExpression: '#owner_id = :owner_id',
+    IndexName: 'ModelsByUserEmail',
+    KeyConditionExpression: '#owner_id = :owner_id',
     ExpressionAttributeValues: {
       ':owner_id': { S: owner_id },
     },
     ExpressionAttributeNames: {
       '#owner_id': 'owner_id',
     },
+    Limit: 3
   };
-  return await dynamoDB
-    .scan(params)
-    .promise()
-    .catch((err) => {
-      dispatch(
-        setMessageInfoModal(
-          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
-        ),
-      );
-      dispatch(setIsAlertInfoModal(false));
-      dispatch(setShowInfoModal(true));
-    });
+  let allItems: any[] = [];
+  let lastEvaluatedKey: Record<string, any> | undefined;
+
+  try {
+    do {
+      if (lastEvaluatedKey) {
+        params.ExclusiveStartKey = lastEvaluatedKey;
+      }
+
+      const result = await dynamoDB.query(params).promise();
+      if (result && result.Items) {
+        allItems.push(...result.Items);
+      }
+      lastEvaluatedKey = result?.LastEvaluatedKey;
+    } while (lastEvaluatedKey);
+
+    return { Items: allItems } as QueryOutput; // Restituisci un oggetto simile a QueryOutput
+
+  } catch (err: any) {
+    dispatch(
+      setMessageInfoModal(
+        'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+      ),
+    );
+    dispatch(setIsAlertInfoModal(false));
+    dispatch(setShowInfoModal(true));
+    return undefined; // Indica che c'è stato un errore
+  }
 };
 
 export const createOrUpdateModelInDynamoDB = async (

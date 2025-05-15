@@ -13,7 +13,7 @@ export const useMaterials = () => {
   const dispatch = useDispatch();
 
   const updateMaterials = () => {
-    execQuery2(getMaterialsDynamoDB, dispatch)?.then((res) => {
+    execQuery2(getMaterialsDynamoDB, dispatch, user?.email as string)?.then((res) => {
       let items: any[] = [];
       if (res.Items) {
         res.Items.forEach((i: any) => items.push(convertFromDynamoDBFormat(i)));
@@ -24,7 +24,7 @@ export const useMaterials = () => {
 
   useEffect(() => {
     user &&
-      execQuery2(getMaterialsDynamoDB, dispatch)?.then((res) => {
+      execQuery2(getMaterialsDynamoDB, dispatch, user?.email as string)?.then((res) => {
         let items: any[] = [];
         if (res.Items) {
           res.Items.forEach((i: any) =>

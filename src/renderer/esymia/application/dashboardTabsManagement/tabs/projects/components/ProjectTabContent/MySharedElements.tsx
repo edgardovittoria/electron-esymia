@@ -53,6 +53,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 						folder: {
 							name: 'My Shared Elements',
 							owner: user,
+              ownerEmail: user.email as string,
 							sharedWith: [],
 							subFolders: folders
 								.filter(

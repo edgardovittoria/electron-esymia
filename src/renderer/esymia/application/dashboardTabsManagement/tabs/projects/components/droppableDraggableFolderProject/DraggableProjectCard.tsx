@@ -128,7 +128,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                     <hr className="mb-3"/>
                     {(project.description.length > 20) ? project.description.substring(0, 20) + '...' : project.description}
                 </div> */}
-        {project.owner.email === user.email && (
+        {project.ownerEmail === user.email && (
           <Menu id={project.name} theme={theme}>
             <Submenu
               className='hover:text-white  text-primaryColor'

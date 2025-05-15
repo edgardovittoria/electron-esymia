@@ -8,6 +8,7 @@ import { Client, fql } from "fauna"
 import { useDynamoDBQuery } from "../../../../../../dynamoDB/hook/useDynamoDBQuery";
 import { createOrUpdateMaterialDynamoDB } from "../../../../../../dynamoDB/MaterialsApis";
 import { useDispatch } from "react-redux";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export type MaterialDynamoDB = {
     id: string,
@@ -15,13 +16,14 @@ export type MaterialDynamoDB = {
     color: string;
     permeability: number;
     tangent_delta_permeability?: number;
-    custom_permeability?: CustomMaterialAttribute
+    custom_permeability?: CustomMaterialAttribute;
     permittivity: number;
     tangent_delta_permittivity?: number;
-    custom_permittivity?: CustomMaterialAttribute
+    custom_permittivity?: CustomMaterialAttribute;
     conductivity: number;
     tangent_delta_conductivity?: number;
-    custom_conductivity?: CustomMaterialAttribute
+    custom_conductivity?: CustomMaterialAttribute;
+    ownerEmail: string;
 }
 
 export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Function }> = ({
@@ -29,6 +31,7 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
                                                                                                 updateMaterials
                                                                                             }) => {
     const {execQuery2} = useDynamoDBQuery()
+    const {user} = useAuth0()
     const dispatch = useDispatch()
     const [name, setName] = useState("")
     const [color, setColor] = useState("#333")
@@ -46,18 +49,6 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
     const [showModalCustomPermeability, setShowModalCustomPermeability] = useState(false)
     const [showModalCustomPermittivity, setShowModalCustomPermittivity] = useState(false)
     const [showModalCustomConductivity, setShowModalCustomConductivity] = useState(false)
-
-    async function saveNewMaterial(faunaClient: Client, faunaQuery: typeof fql, newMaterial: MaterialDynamoDB) {
-        try {
-            await faunaClient.query(
-                faunaQuery`Materials.create(${newMaterial})`
-            )
-            toast.success("Material successfully saved!")
-        } catch (e) {
-            toast.error("Material not saved! See console log for error details.")
-            console.log(e)
-        }
-    }
 
     const checkForValueErrors = () => {
         let error = undefined
@@ -98,6 +89,7 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
             execQuery2(createOrUpdateMaterialDynamoDB, {
                 id: crypto.randomUUID(),
                 name: name,
+                ownerEmail: user?.email as string,
                 color: color,
                 permeability: permeability,
                 tangent_delta_permeability: tangentDeltaPermeability,

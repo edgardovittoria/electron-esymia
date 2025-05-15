@@ -15,7 +15,8 @@ export const useStorage = () => {
     execQuery2(getFolderByUserEmailDynamoDB, user.email, dispatch).then(
       (resFolders) => {
         let folders = resFolders.Items.map((f: any) => ({id: f.id.S, folder: convertFromDynamoDBFormat(f)} as DynamoFolder))
-        execQuery2(getSimulationProjectsByUserEmailDynamoDB, user.email, dispatch).then(
+        try {
+          execQuery2(getSimulationProjectsByUserEmailDynamoDB, user.email, dispatch).then(
           (resProjects) => {
             let projects = resProjects.Items.map((p: any) => ({id: p.id.S, project: convertFromDynamoDBFormat(p)} as DynamoProject))
             const rootFaunaFolder = {
@@ -23,6 +24,7 @@ export const useStorage = () => {
               folder: {
                 name: 'My Files',
                 owner: user,
+                ownerEmail: user.email,
                 sharedWith: [],
                 subFolders: folders
                   .filter((f: any) => f.folder.parent === 'root')
@@ -43,6 +45,10 @@ export const useStorage = () => {
             setLoginSpinner(false);
           }
         );
+        } catch (error) {
+          console.log(error)
+        }
+        
       }
     );
   };

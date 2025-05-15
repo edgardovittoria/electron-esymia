@@ -22,6 +22,7 @@ export type DynamoProjectDetails = {
     meshData: MeshData,
     screenshot: string | undefined,
     owner: UsersState
+    ownerEmail: string,
     sharedWith?: sharingInfoUser[],
     shared?: boolean,
     parentFolder: string,
@@ -41,6 +42,7 @@ export type DynamoFolder = {
 export type DynamoFolderDetails = {
     name: string,
     owner: UsersState,
+    ownerEmail: string,
     sharedWith?: sharingInfoUser[],
     projectList: string[],
     subFolders: string[],

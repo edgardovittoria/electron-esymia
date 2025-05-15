@@ -66,7 +66,6 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
   const [selectedMenuItem, setSelectedMenuItem] = useState<string>('MP');
   // const [models, setModels] = useState<FaunaCadModel[]>([]);
   const models = useSelector(ModelsSelector);
-  const shardeModels = useSelector(SharedModelsSelector);
   const theme = useSelector(ThemeSelector)
   const dispatch = useDispatch();
   const deleteModel = (model: FaunaCadModel) => {
@@ -121,31 +120,6 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
                   New Blank Project
                 </span>
               </div>
-            </div>
-          )}
-          {selectedMenuItem === 'MSP' && (
-            <div
-              className={`w-full flex ${shardeModels.length > 0 ? 'items-start' : 'justify-center items-center'}  relative`}>
-              {shardeModels.length === 0 ? (
-                <div className='flex flex-col justify-center items-center gap-3'>
-                  <img src={boxIcon} alt='box icon' />
-                  <span className='text-xl font-semibold'>
-                    No Shared Projects
-                  </span>
-                </div>
-              ) : (
-                <div className='w-full px-10 items-start grid grid-cols-5 gap-4'>
-                  {shardeModels.map((m) => {
-                    return (
-                      <MySharedProject
-                        model={m}
-                        setShowCad={setShowCad}
-                        deleteModel={deleteModel}
-                      />
-                    );
-                  })}
-                </div>
-              )}
             </div>
           )}
         </div>

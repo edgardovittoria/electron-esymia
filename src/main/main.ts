@@ -19,6 +19,7 @@ import nodeChildProcess, { fork } from 'child_process';
 import { closeSync, mkdir, openSync, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync, writeSync } from 'fs';
 import getmac from 'getmac'
 import {Worker} from 'worker_threads'
+import { getHeapStatistics } from 'v8';
 
 class AppUpdater {
   constructor() {
@@ -56,6 +57,7 @@ const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+  
 
   return installer
     .default(
@@ -325,7 +327,7 @@ ipcMain.on('exportTouchstone', (e, args) => {
 })
 
 ipcMain.on('computeMeshRis', (e, args) => {
-  const worker = new Worker(path.join(__dirname, '../renderer/mesherTypescript/mainfile.js'), {workerData: args})
+  const worker = new Worker(getServerPath('mesherTypescript/mainfile.js'), {workerData: args})
   
   ipcMain.on('stopMeshing', (e, args) => {
     worker.terminate()

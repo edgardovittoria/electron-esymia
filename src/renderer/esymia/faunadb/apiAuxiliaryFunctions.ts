@@ -110,6 +110,7 @@ export const convertInFaunaProjectThis = (project: Project) => {
       meshData: project.meshData,
       screenshot: project.screenshot,
       owner: project.owner,
+      ownerEmail: project.ownerEmail,
       sharedWith: project.sharedWith,
       shared: project.shared,
       parentFolder: project.parentFolder,

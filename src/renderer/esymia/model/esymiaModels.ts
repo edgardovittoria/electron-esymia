@@ -4,6 +4,7 @@ import * as THREE from 'three';
 export type Folder = {
   name: string;
   owner: UsersState;
+  ownerEmail: string;
   sharedWith: sharingInfoUser[];
   projectList: Project[];
   subFolders: Folder[];
@@ -36,6 +37,7 @@ export type Project = {
   meshData: MeshData;
   screenshot: string | undefined;
   owner: UsersState;
+  ownerEmail: string;
   sharedWith: sharingInfoUser[];
   shared?: boolean;
   id?: string;

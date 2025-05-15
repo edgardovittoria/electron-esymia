@@ -1,7 +1,8 @@
 import {
   DeleteItemInput,
   PutItemInput,
-  ScanInput,
+  QueryInput,
+  QueryOutput
 } from 'aws-sdk/clients/dynamodb';
 import { convertToDynamoDBFormat } from './utility/formatDynamoDBData';
 import { Dispatch } from '@reduxjs/toolkit';
@@ -18,56 +19,95 @@ export const getFolderByUserEmailDynamoDB = async (
   email: string,
   dispatch: Dispatch,
 ) => {
-  let params: ScanInput = {
+  let params: QueryInput = {
     TableName: 'Folders',
-    FilterExpression: '#owner.email = :email',
+    IndexName: 'FoldersByUserEmail',
+    KeyConditionExpression: '#email = :email',
     ExpressionAttributeValues: {
       ':email': { S: email },
     },
     ExpressionAttributeNames: {
-      '#owner': 'owner',
+      '#email': 'ownerEmail',
     },
+    Limit: 3
   };
-  return await dynamoDB
-    .scan(params)
-    .promise()
-    .catch((err) => {
-      dispatch(
-        setMessageInfoModal(
-          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
-        ),
-      );
-      dispatch(setIsAlertInfoModal(false));
-      dispatch(setShowInfoModal(true));
-    });
+  let allItems: any[] = [];
+  let lastEvaluatedKey: Record<string, any> | undefined;
+
+  try {
+    do {
+      if (lastEvaluatedKey) {
+        params.ExclusiveStartKey = lastEvaluatedKey;
+      }
+
+      const result = await dynamoDB.query(params).promise();
+      if (result && result.Items) {
+        allItems.push(...result.Items);
+      }
+      lastEvaluatedKey = result?.LastEvaluatedKey;
+    } while (lastEvaluatedKey);
+
+    return { Items: allItems } as QueryOutput; // Restituisci un oggetto simile a QueryOutput
+
+  } catch (err: any) {
+    console.log('projectsFolderAPI:', err)
+    dispatch(
+      setMessageInfoModal(
+        'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+      ),
+    );
+    dispatch(setIsAlertInfoModal(false));
+    dispatch(setShowInfoModal(true));
+    return undefined; // Indica che c'è stato un errore
+  }
 };
+
 
 export const getSimulationProjectsByUserEmailDynamoDB = async (
   email: string,
   dispatch: Dispatch,
-) => {
-  let params: ScanInput = {
+): Promise<QueryOutput | undefined> => {
+  let params: QueryInput = {
     TableName: 'SimulationProjects',
-    FilterExpression: '#owner.email = :email',
+    IndexName: 'ProjectsByOwnerEmail', // Il nome del tuo GSI
+    KeyConditionExpression: '#email = :email',
     ExpressionAttributeValues: {
       ':email': { S: email },
     },
     ExpressionAttributeNames: {
-      '#owner': 'owner',
+      '#email': 'ownerEmail',
     },
+    Limit: 3,
   };
-  return await dynamoDB
-    .scan(params)
-    .promise()
-    .catch((err) => {
-      dispatch(
-        setMessageInfoModal(
-          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
-        ),
-      );
-      dispatch(setIsAlertInfoModal(false));
-      dispatch(setShowInfoModal(true));
-    });
+
+  let allItems: any[] = [];
+  let lastEvaluatedKey: Record<string, any> | undefined;
+
+  try {
+    do {
+      if (lastEvaluatedKey) {
+        params.ExclusiveStartKey = lastEvaluatedKey;
+      }
+
+      const result = await dynamoDB.query(params).promise();
+      if (result && result.Items) {
+        allItems.push(...result.Items);
+      }
+      lastEvaluatedKey = result?.LastEvaluatedKey;
+    } while (lastEvaluatedKey);
+
+    return { Items: allItems } as QueryOutput; // Restituisci un oggetto simile a QueryOutput
+
+  } catch (err: any) {
+    dispatch(
+      setMessageInfoModal(
+        'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+      ),
+    );
+    dispatch(setIsAlertInfoModal(false));
+    dispatch(setShowInfoModal(true));
+    return undefined; // Indica che c'è stato un errore
+  }
 };
 
 export const createOrUpdateProjectInDynamoDB = async (

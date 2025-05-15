@@ -50,62 +50,21 @@ export default function App() {
   //let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
 
   useEffect(() => {
-    // window.electron.ipcRenderer.invoke('getInstallationDir').then((res) => {
-    //   dispatch(setHomePat(res));
-    // });
-    //window.electron.ipcRenderer.sendMessage('runBroker', []);
-    
-    // let params = {
-    //   TableName: "Test",
-    //   Key: {
-    //     id: {N: "001"}
-    //   }
-    // };
-
-    // var params = {
-    //   TableName: "Test",
-    //   Item: convertToDynamoDBFormat( {
-    //     id: 11,
-    //     nome: "Giovanni",
-    //     bool: false,
-    //     stringArray: ["pippo", "gino"],
-    //     numberArray: [1,2],
-    //     obj: {
-    //       x:1,
-    //       s: "pippo"
-    //     }
-    //   }),
-    // };
-
-    
-
-    //dynamoDB.getItem(params).promise().then(res => console.log(res));
-    // var params = {
-    //   TableName: "Test",
-    //   Item: {
-    //     id: { N: "001" },
-    //     nome: { S: "Richard Roe" },
-    //   },
-    // };
-
-    // dynamoDB.putItem(params).promise().then(res => console.log(res));
-
-
-
+    window.electron.ipcRenderer.sendMessage('runBroker', []);
     dispatch(connectStomp());
     return () => {
       dispatch(disconnectStomp());
     };
   }, []);
 
-  // window.electron.ipcRenderer.on('runBroker', (arg) => {
-  //   (arg as string).split("\n").filter(s => {
-  //     if (s === 'docker not installed') {
-  //       setDockerInstallationBox(true);
-  //     }
-  //     console.log(s.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
-  //   })
-  // });
+  window.electron.ipcRenderer.on('runBroker', (arg) => {
+    (arg as string).split("\n").filter(s => {
+      if (s === 'docker not installed') {
+        setDockerInstallationBox(true);
+      }
+      console.log(s.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
+    })
+  });
 
   if (process.env.APP_MODE !== "test") {
     window.electron.ipcRenderer.on('checkLogout', (arg) => {

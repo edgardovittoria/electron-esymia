@@ -37,6 +37,7 @@ export const CreateNewFolderModal: React.FC<CreateNewFolderModalProps> = (
             let newFolder: Folder = {
                 name: folderName,
                 owner: user,
+                ownerEmail: user.email as string,
                 sharedWith: [],
                 projectList: [],
                 subFolders: [],

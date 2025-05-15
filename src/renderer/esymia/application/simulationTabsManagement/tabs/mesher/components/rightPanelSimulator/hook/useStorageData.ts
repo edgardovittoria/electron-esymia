@@ -543,6 +543,7 @@ export const useStorageData = () => {
       id: crypto.randomUUID(),
       model: {} as CanvasState,
       owner: userToShare,
+      ownerEmail: userToShare.email,
       parentFolder: 'root',
       ports: [],
       shared: true,

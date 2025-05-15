@@ -60,6 +60,7 @@ const MyProject: React.FC<ContextMenuProps> = ({
     execQuery2(getSimulationProjectsByUserEmailDynamoDB, user?.email, dispatch).then(
       (res) => {
         let projects: any[] = []
+        console.log(res)
         if(res.Items){
           res.Items.forEach((i:any) => projects.push(convertFromDynamoDBFormat(i)))
         }
