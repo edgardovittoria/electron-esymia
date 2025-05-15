@@ -99,6 +99,7 @@ export const getSimulationProjectsByUserEmailDynamoDB = async (
     return { Items: allItems } as QueryOutput; // Restituisci un oggetto simile a QueryOutput
 
   } catch (err: any) {
+    console.log(err)
     dispatch(
       setMessageInfoModal(
         'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',

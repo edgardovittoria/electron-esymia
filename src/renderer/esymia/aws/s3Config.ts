@@ -17,7 +17,8 @@ AWS.config.update({
     timeout: 900 * 1000,
     connectTimeout: 900 * 1000,
   },
-  region: "us-east-1"
+  region: "us-east-1",
+  dynamoDbCrc32: false,
 });
 
 export const s3 = new AWS.S3();
