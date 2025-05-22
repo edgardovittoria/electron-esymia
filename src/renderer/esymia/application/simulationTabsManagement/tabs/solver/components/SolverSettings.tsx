@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -6,7 +6,6 @@ import {
   activeSimulationsSelector,
   addInterestFrequencyIndex,
   findSelectedPort,
-  meshGeneratedSelector,
   removeInterestFrequencyIndex,
   resetInterestFrequencyIndex,
   selectedProjectSelector,
@@ -24,6 +23,7 @@ import {
 } from '../../../../../store/tabsAndMenuItemsSlice';
 import {
   Port,
+  PortOrPlaneWaveSignal,
   Project,
   Simulation,
   SolverOutput,
@@ -56,18 +56,11 @@ import { RLCParamsComponent } from '../../physics/portManagement/components/RLCP
 import ScatteringParameter from '../../physics/portManagement/components/ScatteringParameter';
 import { ModalSelectPortType } from '../../physics/portManagement/ModalSelectPortType';
 import { PortManagement } from '../../physics/portManagement/PortManagement';
-import {
-  genera_segnale_esponenziale,
-  genera_segnale_Gaussiano_modulato,
-  genera_segnale_sinusoidale,
-  genera_segnale_trapezoidal_pulse,
-  PlaneWaveSettings,
-} from './planeWave/PlaneWaveSettings';
-import { gamma } from 'mathjs';
+import { PlaneWaveSettings } from './planeWave/PlaneWaveSettings';
 import { ShowInputGraphModal, InputGraphData } from './ShowInputGraphModal';
-import { BsGraphUp } from 'react-icons/bs';
 import { FaLock, FaLockOpen } from 'react-icons/fa6';
 import { SaveProjectResultsModal } from './SaveProjectResultsModal';
+import { PortSignal } from './planeWave/SolverSignal';
 
 interface SolverSettingsProps {
   selectedProject: Project;
@@ -512,7 +505,11 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
   const selectedPort = findSelectedPort(selectedProject);
   console.log(selectedPort);
   const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
+  // const signalChange = (newSignal: PortOrPlaneWaveSignal) => {
+  //   // dispatch(setPortSignal(e.currentTarget.value));
+  //   // setSavedPhysicsParameters(false);
+  // };
   return (
     <div
       className={`collapse collapse-arrow mt-3 xl:text-left text-center border-[1px] rounded ${
@@ -565,63 +562,11 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
               <ScatteringParameter
                 setSavedPortParameters={setSavedPhysicsParameters}
               />
-              <div className="flex flex-row items-center justify-between mt-3 p-1">
-                <select
-                  value={selectedPort?.signal}
-                  disabled={selectedProject?.simulation?.status === 'Completed'}
-                  onChange={(e) => {
-                    dispatch(setPortSignal(e.currentTarget.value));
-                    setSavedPhysicsParameters(false);
-                  }}
-                  className="select border-black mt-3"
-                >
-                  <option value="No Signal">No Signal</option>
-                  <option value="exponential">Exponential</option>
-                  <option value="gaussian_modulated">Gaussian Modulated</option>
-                  <option value="sinusoidal">Sinusoidal</option>
-                  <option value="trapezoidal_pulse">Trapezoidal Pulse</option>
-                </select>
-                <div
-                  className="tooltip tooltip-left hover:cursor-pointer"
-                  data-tip="Show signal graph"
-                  onClick={() => {
-                    let vs: number[] = [];
-                    switch (selectedPort?.signal) {
-                      case 'exponential':
-                        vs = genera_segnale_esponenziale(
-                          selectedProject?.times as number[],
-                        );
-                        break;
-                      case 'sinusoidal':
-                        vs = genera_segnale_sinusoidale(
-                          selectedProject?.times as number[],
-                        );
-                        break;
-                      case 'gaussian_modulated':
-                        vs = genera_segnale_Gaussiano_modulato(
-                          selectedProject?.times as number[],
-                        );
-                        break;
-                      case 'trapezoidal_pulse':
-                        vs = genera_segnale_trapezoidal_pulse(
-                          selectedProject?.times as number[],
-                        );
-                        break;
-                    }
-                    setGraphData({
-                      labelX: 'Times',
-                      labelY: 'E',
-                      dataX: selectedProject?.times?.map((t) =>
-                        parseFloat(t.toExponential(2)),
-                      ),
-                      dataY: vs,
-                      signalName: 'E signal',
-                    } as InputGraphData);
-                  }}
-                >
-                  <BsGraphUp size={25} />
-                </div>
-              </div>
+              <PortSignal
+                setSavedPhysicsParameters={setSavedPhysicsParameters}
+                signal={(selectedPort?.signal && selectedPort?.signal.type) ?  selectedPort?.signal : {type: 'no_signal', params: {}} as PortOrPlaneWaveSignal}
+                setGraphData={setGraphData}
+              />
               <PortPosition
                 selectedPort={selectedPort as Port | TempLumped}
                 disabled={selectedProject?.simulation?.status === 'Completed'}
@@ -1131,7 +1076,7 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
             <h6 className="w-[100%] mb-2">Generated Frequencies</h6>
             <div className="flex flex-row">
               <h6 className="w-[20%] mb-2">
-                n.{selectedProject.frequencies.length-1}
+                n.{selectedProject.frequencies.length - 1}
               </h6>
               <h6 className="w-[40%] mb-2">
                 {' '}
@@ -1157,38 +1102,40 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
               <span className="text-black font-bold">Check interest</span>
             </div>
             <div className="p-3 bg-white border border-secondaryColor flex flex-col overflow-y-scroll max-h-[200px]">
-              {selectedProject.frequencies.filter(f => f !== 0).map((f, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-row gap-20 items-center"
-                  >
-                    <span className="text-black">
-                      {f % 1 !== 0 ? f.toExponential(2) : f}
-                    </span>
-                    <input
-                      type="checkbox"
-                      disabled={disabled}
-                      defaultChecked={
-                        selectedProject.interestFrequenciesIndexes &&
-                        selectedProject.interestFrequenciesIndexes?.filter(
-                          (i) => i === index,
-                        ).length > 0
-                      }
-                      name={f.toString()}
-                      id={f.toString()}
-                      onChange={(e) => {
-                        setSavedPhysicsParameters(false);
-                        if (e.currentTarget.checked) {
-                          dispatch(addInterestFrequencyIndex(index+1));
-                        } else {
-                          dispatch(removeInterestFrequencyIndex(index+1));
+              {selectedProject.frequencies
+                .filter((f) => f !== 0)
+                .map((f, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-row gap-20 items-center"
+                    >
+                      <span className="text-black">
+                        {f % 1 !== 0 ? f.toExponential(2) : f}
+                      </span>
+                      <input
+                        type="checkbox"
+                        disabled={disabled}
+                        defaultChecked={
+                          selectedProject.interestFrequenciesIndexes &&
+                          selectedProject.interestFrequenciesIndexes?.filter(
+                            (i) => i === index,
+                          ).length > 0
                         }
-                      }}
-                    />
-                  </div>
-                );
-              })}
+                        name={f.toString()}
+                        id={f.toString()}
+                        onChange={(e) => {
+                          setSavedPhysicsParameters(false);
+                          if (e.currentTarget.checked) {
+                            dispatch(addInterestFrequencyIndex(index + 1));
+                          } else {
+                            dispatch(removeInterestFrequencyIndex(index + 1));
+                          }
+                        }}
+                      />
+                    </div>
+                  );
+                })}
             </div>
           </div>
         )}

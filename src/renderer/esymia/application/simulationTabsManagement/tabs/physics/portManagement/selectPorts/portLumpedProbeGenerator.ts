@@ -131,7 +131,8 @@ export function getDefaultPort(name: string, position: Vector3){
       category: 'port',
       inputElement: [position.x-2.5, position.y, position.z-5],
       outputElement: [position.x+2.5, position.y, position.z-5],
-      isSelected: false
+      isSelected: false,
+      signal: {type: "no_signal", params: {}}
   }
   return port
 }
@@ -149,7 +150,8 @@ export function getDefaultLumped(name: string, position: Vector3){
           inductance: 0,
           capacitance: 0
         } as RLCParams,
-        value: 0
+        value: 0,
+        signal: {type: "no_signal", params: {}}
     }
     return lumped
 }

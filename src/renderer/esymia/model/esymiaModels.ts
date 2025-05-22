@@ -30,9 +30,9 @@ export type Project = {
   portsS3?: string | null;
   scatteringValue?: number;
   frequencies?: number[];
-  times?: number[],
-  interestFrequenciesIndexes?: number[],
-  maxFrequency?: number,
+  times?: number[];
+  interestFrequenciesIndexes?: number[];
+  maxFrequency?: number;
   simulation?: Simulation;
   meshData: MeshData;
   screenshot: string | undefined;
@@ -57,7 +57,7 @@ export type TempLumped = {
   isSelected: boolean;
   rlcParams: RLCParams;
   value: number;
-  signal?: string;
+  signal: PortOrPlaneWaveSignal;
 };
 
 export type Port = {
@@ -66,7 +66,7 @@ export type Port = {
   inputElement: [number, number, number];
   outputElement: [number, number, number];
   isSelected: boolean;
-  signal?: string;
+  signal: PortOrPlaneWaveSignal;
 };
 
 export type RLCParams = {
@@ -128,7 +128,7 @@ export type Simulation = {
     outerIteration: number;
     convergenceThreshold: number;
   };
-  simulationType: "Matrix" | "Electric Fields"
+  simulationType: 'Matrix' | 'Electric Fields';
 };
 
 export type SolverOutput = {
@@ -139,24 +139,24 @@ export type SolverOutput = {
 };
 
 export type SolverOutputElectricFields = {
-  Ex: number[][],
-  Ey: number[][],
-  Ez: number[][],
-  Ex_3D: number[][],
-  Ey_3D: number[][],
-  Ez_3D: number[][],
-  Hx_3D: number[][],
-  Hy_3D: number[][],
-  Hz_3D: number[][],
-  centri_oss_3D: number[][],
-  distanze_3D: number[],
-  theta_vals: number[],
-  x_grid: number[][],
-  y_grid: number[][],
-  z_grid: number[][],
-  baricentro: number[],
-  Vp: string,
-  f: number[]
+  Ex: number[][];
+  Ey: number[][];
+  Ez: number[][];
+  Ex_3D: number[][];
+  Ey_3D: number[][];
+  Ez_3D: number[][];
+  Hx_3D: number[][];
+  Hy_3D: number[][];
+  Hz_3D: number[][];
+  centri_oss_3D: number[][];
+  distanze_3D: number[];
+  theta_vals: number[];
+  x_grid: number[][];
+  y_grid: number[][];
+  z_grid: number[][];
+  baricentro: number[];
+  Vp: string;
+  f: number[];
 };
 
 export type ExternalGridsRisObject = {
@@ -201,13 +201,33 @@ export type PlaneWaveParameters = {
     phi: number;
     ETheta: number;
     EPhi: number;
-    ESignal: string;
-  },
+    ESignal: PortOrPlaneWaveSignal
+  };
   output: {
-    E: THREE.Vector3,
-    K: THREE.Vector3,
-    H: THREE.Vector3,
-    E_theta_v: THREE.Vector3,
-    E_phi_v: THREE.Vector3
-  }
+    E: THREE.Vector3;
+    K: THREE.Vector3;
+    H: THREE.Vector3;
+    E_theta_v: THREE.Vector3;
+    E_phi_v: THREE.Vector3;
+  };
+};
+
+
+export type PortOrPlaneWaveSignal = {
+  type: string;
+  params: SignalParams;
+}
+
+export type SignalParams = {
+  // I parametri sono memorizzati come stringhe per permettere entry incomplete (es. "3.5e-")
+  tw?: string;
+  power?: string;
+  time_delay_vs?: string;
+  f0?: string;
+  dev_stand?: string;
+  initial_delay_time?: string;
+  A?: string;
+  high_level_time?: string;
+  raise_time?: string;
+  falling_time?: string;
 };

@@ -10,6 +10,7 @@ import {
   Folder,
   PlaneWaveParameters,
   Port,
+  PortOrPlaneWaveSignal,
   Probe,
   Project,
   RadialFieldParameters,
@@ -247,7 +248,7 @@ export const ProjectSlice = createSlice({
         }
       }
     },
-    setPortSignal(state: ProjectState, action: PayloadAction<string>) {
+    setPortSignal(state: ProjectState, action: PayloadAction<PortOrPlaneWaveSignal>) {
       let selectedPort = findSelectedPort(findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject));
       if (selectedPort) {
         selectedPort.signal = action.payload;
