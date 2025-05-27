@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
-import { AiOutlineThunderbolt } from 'react-icons/ai';
+import React, { useState, Dispatch, SetStateAction, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { TbServerBolt } from 'react-icons/tb';
+import { IoMdInformationCircleOutline } from 'react-icons/io';
+import { FaLock, FaLockOpen } from 'react-icons/fa6';
+import { DebounceInput } from 'react-debounce-input';
+import * as THREE from 'three';
 
 import {
   activeSimulationsSelector,
@@ -11,7 +15,6 @@ import {
   selectedProjectSelector,
   setFrequencies,
   setMeshApproved,
-  setPortSignal,
   setTimes,
   updateSimulation,
 } from '../../../../../store/projectSlice';
@@ -22,14 +25,6 @@ import {
   ThemeSelector,
 } from '../../../../../store/tabsAndMenuItemsSlice';
 import {
-  Port,
-  PortOrPlaneWaveSignal,
-  Project,
-  Simulation,
-  SolverOutput,
-  TempLumped,
-} from '../../../../../model/esymiaModels';
-import {
   convergenceTresholdSelector,
   setConvergenceTreshold,
   setSolverIterations,
@@ -37,18 +32,9 @@ import {
   solverIterationsSelector,
   solverTypeSelector,
 } from '../../../../../store/solverSlice';
-import { DebounceInput } from 'react-debounce-input';
-import { SolverStatusSelector } from '../../../../../store/pluginsSlice';
-import { TbServerBolt } from 'react-icons/tb';
 import FrequenciesDef from '../../physics/frequenciesDef/FrequenciesDef';
-import { IoMdInformationCircleOutline } from 'react-icons/io';
-import {
-  FrequenciesImportFromCSV,
-  LumpedImportFromCSV,
-  PortImportFromCSV,
-} from '../../physics/ImportPhysicsFromCSV';
+import { FrequenciesImportFromCSV, LumpedImportFromCSV, PortImportFromCSV } from '../../physics/ImportPhysicsFromCSV';
 import { CreatePorts } from '../../physics/portManagement/selectPorts/CreatePorts';
-import * as THREE from 'three';
 import { PhysicsLeftPanelTab } from '../../physics/PhysicsLeftPanelTab';
 import { PortPosition } from '../../physics/portManagement/components/PortPosition';
 import { PortType } from '../../physics/portManagement/components/PortType';
@@ -58,9 +44,20 @@ import { ModalSelectPortType } from '../../physics/portManagement/ModalSelectPor
 import { PortManagement } from '../../physics/portManagement/PortManagement';
 import { PlaneWaveSettings } from './planeWave/PlaneWaveSettings';
 import { ShowInputGraphModal, InputGraphData } from './ShowInputGraphModal';
-import { FaLock, FaLockOpen } from 'react-icons/fa6';
-import { SaveProjectResultsModal } from './SaveProjectResultsModal';
 import { PortSignal } from './planeWave/SolverSignal';
+import { SaveProjectResultsModal } from './SaveProjectResultsModal';
+
+import {
+  Simulation,
+  Project,
+  SolverOutput,
+  TempLumped,
+  Port,
+} from '../../../../../model/esymiaModels';
+import { SolverStatusSelector } from '../../../../../store/pluginsSlice';
+
+// Tipizzazione dei callback per aggiornamenti
+type SetGraphData = Dispatch<SetStateAction<InputGraphData | undefined>>;
 
 interface SolverSettingsProps {
   selectedProject: Project;
@@ -69,7 +66,7 @@ interface SolverSettingsProps {
   setSelectedTabLeftPanel: Function;
   setSelectedTabRightPanel: Function;
   simulationType: 'Matrix' | 'Electric Fields';
-  setsimulationType: Function;
+  setsimulationType: Dispatch<SetStateAction<'Matrix' | 'Electric Fields'>>;
   setSavedPhysicsParameters: Function;
   savedPhysicsParameters: boolean;
   cameraPosition: THREE.Vector3;
@@ -88,32 +85,162 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
   cameraPosition,
 }) => {
   const theme = useSelector(ThemeSelector);
-  const [electricField, setelectricField] = useState(
-    selectedProject.planeWaveParameters ? true : false,
-  );
-  const [ports, setports] = useState(
-    selectedProject.ports.length > 0 ? true : false,
-  );
-  const [graphData, setgraphData] = useState<InputGraphData | undefined>(
-    undefined,
-  );
-
+  const dispatch = useDispatch();
+  const [electricField, setelectricField] = useState<boolean>(!!selectedProject.planeWaveParameters);
+  const [ports, setports] = useState<boolean>(selectedProject.ports.length > 0);
+  const [graphData, setgraphData] = useState<InputGraphData | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState<string>('simulationType');
+  // Definizione delle schede in un array flat
+  const tabs = useMemo(() => {
+    const _tabs: { id: string; label: string; content: JSX.Element }[] = [];
+    // Scheda Simulation Type: contiene la scelta del tipo e le relative opzioni
+    _tabs.push({
+      id: 'simulationType',
+      label: 'Simulation Type',
+      content: (
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-row gap-2 items-center">
+            <input
+              type="checkbox"
+              disabled={selectedProject.simulation?.status === 'Completed'}
+              name="matrix"
+              id="matrix"
+              checked={simulationType === 'Matrix'}
+              onClick={() => setsimulationType('Matrix')}
+              className="accent-primaryColor"
+            />
+            <span>Matrix (S, Z, Y)</span>
+          </div>
+          <div className="flex flex-row gap-2 items-center">
+            <input
+              type="checkbox"
+              name="electric_fields"
+              id="electric_fields"
+              disabled={selectedProject.simulation?.status === 'Completed'}
+              checked={simulationType === 'Electric Fields'}
+              onClick={() => setsimulationType('Electric Fields')}
+              className="accent-primaryColor"
+            />
+            <span>Electric Fields</span>
+          </div>
+          {simulationType === 'Electric Fields' && (
+            <div className="flex flex-col pl-5 gap-2">
+              <div className="flex flex-row gap-2 items-center">
+                <input
+                  type="checkbox"
+                  name="electricField"
+                  id="electricField"
+                  disabled={selectedProject.simulation?.status === 'Completed'}
+                  checked={electricField}
+                  onClick={() => setelectricField(!electricField)}
+                  className="accent-primaryColor"
+                />
+                <span>Electric Field</span>
+              </div>
+              <div className="flex flex-row gap-2 items-center">
+                <input
+                  type="checkbox"
+                  name="ports"
+                  id="ports"
+                  disabled={selectedProject.simulation?.status === 'Completed'}
+                  checked={ports}
+                  onClick={() => setports(!ports)}
+                  className="accent-primaryColor"
+                />
+                <span>Ports</span>
+              </div>
+              {!(electricField || ports) && (
+                <span className="text-red-600 text-sm">
+                  Alert: è necessario selezionare almeno un’opzione!
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      ),
+    });
+    // Scheda Frequencies: carica il componente in base al tipo di simulazione
+    _tabs.push({
+      id: 'frequencies',
+      label: 'Frequencies',
+      content:
+        simulationType === 'Matrix' ? (
+          <CollapseFrequenciesMatrix
+            savedPhysicsParameters={savedPhysicsParameters}
+            setSavedPhysicsParameters={setSavedPhysicsParameters}
+          />
+        ) : (
+          <CollapseFrequenciesElectricField
+            savedPhysicsParameters={savedPhysicsParameters}
+            setSavedPhysicsParameters={setSavedPhysicsParameters}
+          />
+        ),
+    });
+    // Scheda Ports (presente se applicabile)
+    if (simulationType === 'Matrix' || (simulationType === 'Electric Fields' && ports)) {
+      _tabs.push({
+        id: 'ports',
+        label: 'Ports',
+        content:
+          simulationType === 'Matrix' ? (
+            <CollapsePortsMatrix
+              cameraPosition={cameraPosition}
+              savedPhysicsParameters={savedPhysicsParameters}
+              setSavedPhysicsParameters={setSavedPhysicsParameters}
+            />
+          ) : (
+            <CollapsePortsElecticField
+              cameraPosition={cameraPosition}
+              savedPhysicsParameters={savedPhysicsParameters}
+              setSavedPhysicsParameters={setSavedPhysicsParameters}
+              setGraphData={setgraphData}
+            />
+          ),
+      });
+    }
+    // Scheda Plane Wave: solo per Electric Fields, se l'opzione è attiva
+    if (simulationType === 'Electric Fields' && electricField) {
+      _tabs.push({
+        id: 'planewave',
+        label: 'Plane Wave',
+        content: <CollapsePlaneWave setGraphData={setgraphData} />,
+      });
+    }
+    // Scheda Solver Setup
+    _tabs.push({
+      id: 'solverSetup',
+      label: 'Solver Setup',
+      content: (
+        <div className="flex flex-col gap-2">
+          <SolverParameters simulationType={simulationType} />
+          <SimulationSuggestions simulationType={simulationType} />
+        </div>
+      ),
+    });
+    return _tabs;
+  }, [
+    simulationType,
+    electricField,
+    ports,
+    selectedProject,
+    savedPhysicsParameters,
+    setSavedPhysicsParameters,
+    setsimulationType,
+    cameraPosition,
+  ]);
   return (
     <>
-      <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0 overflow-scroll">
+      {/* Bottone per mostrare/nascondere il pannello Solver */}
+      <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
         <div
           className={`p-2 tooltip rounded tooltip-right ${
             sidebarItemSelected === 'Solver'
-              ? `${
-                  theme === 'light'
-                    ? 'text-white bg-primaryColor'
-                    : 'text-textColor bg-secondaryColorDark'
-                }`
-              : `${
-                  theme === 'light'
-                    ? 'text-primaryColor bg-white'
-                    : 'text-textColorDark bg-bgColorDark2'
-                }`
+              ? theme === 'light'
+                ? 'text-white bg-primaryColor'
+                : 'text-textColor bg-secondaryColorDark'
+              : theme === 'light'
+              ? 'text-primaryColor bg-white'
+              : 'text-textColorDark bg-bgColorDark2'
           }`}
           data-tip="Solver"
           data-testid="solverSettings"
@@ -130,140 +257,41 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
           <TbServerBolt style={{ width: '25px', height: '25px' }} />
         </div>
       </div>
-      {sidebarItemSelected && sidebarItemSelected === 'Solver' && (
-        <>
-          <div
-            className={`${
-              (selectedProject.simulation?.status === 'Queued' ||
-                selectedProject.simulation?.status === 'Running') &&
-              'opacity-40'
-            } flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[40%] w-[28%] rounded-tl rounded-tr ${
-              theme === 'light'
-                ? 'bg-white text-textColor'
-                : 'bg-bgColorDark2 text-textColorDark'
-            } p-[10px] shadow-2xl overflow-y-scroll lg:max-h-[300px] xl:max-h-[700px]`}
-          >
-            <div className="flex">
-              <AiOutlineThunderbolt style={{ width: '25px', height: '25px' }} />
-              <h5 className="ml-2 text-[12px] xl:text-base">Solver Settings</h5>
-            </div>
-            <hr className="mt-1" />
-            <div
-              className={`collapse collapse-arrow mt-3 xl:text-left text-center border-[1px] rounded ${
-                theme === 'light'
-                  ? 'bg-[#f6f6f6] border-secondaryColor'
-                  : 'bg-bgColorDark'
-              }`}
-            >
-              <input type="checkbox" defaultChecked />
-              <div className="collapse-title font-semibold">
-                Simulation Type
-              </div>
-              <div className="collapse-content text-sm">
-                <div className="flex justify-between">
-                  <div className="w-full">
-                    <div className="flex flex-row gap-2 items-center">
-                      <input
-                        type="checkbox"
-                        disabled={
-                          selectedProject.simulation?.status === 'Completed'
-                        }
-                        name="matrix"
-                        id="matrix"
-                        checked={simulationType === 'Matrix'}
-                        onClick={() => setsimulationType('Matrix')}
-                      />
-                      <span>Matrix (S, Z, Y)</span>
-                    </div>
-                    <div className="flex flex-row gap-2 items-center">
-                      <input
-                        type="checkbox"
-                        name="electric_fields"
-                        id="electric_fields"
-                        disabled={
-                          selectedProject.simulation?.status === 'Completed'
-                        }
-                        checked={simulationType === 'Electric Fields'}
-                        onClick={() => setsimulationType('Electric Fields')}
-                      />
-                      <span>Electric Fields</span>
-                    </div>
-                    {simulationType === 'Electric Fields' && (
-                      <div className="flex flex-col pl-5">
-                        <div className="flex flex-row gap-2 items-center">
-                          <input
-                            type="checkbox"
-                            name="electricField"
-                            id="electricField"
-                            disabled={
-                              selectedProject.simulation?.status === 'Completed'
-                            }
-                            checked={electricField}
-                            onClick={() => setelectricField(!electricField)}
-                          />
-                          <span>Electric Field</span>
-                        </div>
-                        <div className="flex flex-row gap-2 items-center">
-                          <input
-                            type="checkbox"
-                            name="ports"
-                            id="ports"
-                            disabled={
-                              selectedProject.simulation?.status === 'Completed'
-                            }
-                            checked={ports}
-                            onClick={() => setports(!ports)}
-                          />
-                          <span>Ports</span>
-                        </div>
-                        {!electricField && !ports && (
-                          <span className="text-red-600 text-sm">
-                            alert: you have to select at least one option!
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {simulationType === 'Matrix' && (
-              <>
-                <CollapseFrequenciesMatrix
-                  savedPhysicsParameters={savedPhysicsParameters}
-                  setSavedPhysicsParameters={setSavedPhysicsParameters}
-                />
-                <CollapsePortsMatrix
-                  cameraPosition={cameraPosition}
-                  savedPhysicsParameters={savedPhysicsParameters}
-                  setSavedPhysicsParameters={setSavedPhysicsParameters}
-                />
-              </>
-            )}
-
-            {simulationType !== 'Matrix' && (
-              <>
-                <CollapseFrequenciesElectricField
-                  savedPhysicsParameters={savedPhysicsParameters}
-                  setSavedPhysicsParameters={setSavedPhysicsParameters}
-                />
-                {ports && (
-                  <CollapsePortsElecticField
-                    cameraPosition={cameraPosition}
-                    savedPhysicsParameters={savedPhysicsParameters}
-                    setSavedPhysicsParameters={setSavedPhysicsParameters}
-                    setGraphData={setgraphData}
-                  />
-                )}
-                {electricField && (
-                  <CollapsePlaneWave setGraphData={setgraphData} />
-                )}
-              </>
-            )}
-            <SolverParameters simulationType={simulationType} />
-            <SimulationSuggestions simulationType={simulationType} />
+      {/* Pannello principale */}
+      {sidebarItemSelected === 'Solver' && (
+        <div
+          className={`flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[40%] w-[28%] rounded-tl rounded-tr ${
+            theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'
+          } p-[10px] shadow-2xl lg:max-h-[300px] xl:max-h-[700px]`}
+        >
+          {/* Barra di navigazione delle tab fissa tramite 'sticky' */}
+          <nav className="border-b border-gray-200 sticky top-0 bg-inherit z-10">
+            <ul className="flex space-x-4 px-2">
+              {tabs.map((tab) => (
+                <li key={tab.id}>
+                  <button
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-4 py-2 text-sm font-medium rounded-t-md transition-all duration-200 ${
+                      activeTab === tab.id
+                        ? theme === 'light'
+                          ? 'bg-primaryColor text-white'
+                          : 'bg-secondaryColorDark text-textColor'
+                        : theme === 'light'
+                        ? 'bg-white text-gray-700 hover:bg-gray-200'
+                        : 'bg-bgColorDark2 text-gray-200 hover:bg-bgColorDark'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          {/* Solo il contenuto della tab è scrollabile */}
+          <div className="p-4 h-[650px] overflow-y-auto">
+            {tabs.find((tab) => tab.id === activeTab)?.content}
           </div>
+          {/* Modal per il grafico, se presente */}
           {graphData && (
             <ShowInputGraphModal
               labelX={graphData.labelX}
@@ -274,11 +302,15 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
               setGraphData={setgraphData}
             />
           )}
-        </>
+        </div>
       )}
     </>
   );
 };
+
+//
+// COMPONENTI COLLASSATI ORIGINALI (rimangono invariati)
+//
 
 interface CollapseFrequenciesMatrixProps {
   savedPhysicsParameters: boolean;
@@ -292,41 +324,24 @@ const CollapseFrequenciesMatrix: React.FC<CollapseFrequenciesMatrixProps> = ({
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   return (
-    <div
-      className={`collapse collapse-arrow mt-3 xl:text-left text-center border-[1px] rounded ${
-        theme === 'light'
-          ? 'bg-[#f6f6f6] border-secondaryColor'
-          : 'bg-bgColorDark'
-      }`}
-    >
-      <input type="checkbox" />
-      <div className="collapse-title font-semibold">Frequencies</div>
-      <div className="collapse-content text-sm">
-        <FrequenciesImportFromCSV />
-        <FrequenciesDef
-          disabled={selectedProject?.simulation?.status === 'Completed'}
-          setSavedPhysicsParameters={setSavedPhysicsParameters}
-        />
-        <div className={`flex px-[20px] mt-2 flex-row gap-2 items-center`}>
-          <button
-            data-testid="savePhysics"
-            type="button"
-            className={`button buttonPrimary ${
-              theme === 'light'
-                ? ''
-                : 'bg-bgColorDark2 text-textColorDark border-textColorDark'
-            } text-sm w-full hover:opacity-80 disabled:opacity-60`}
-            onClick={() => setSavedPhysicsParameters(true)}
-            disabled={savedPhysicsParameters}
-          >
-            SAVE ON DB
-          </button>
-          <div
-            className="tooltip tooltip-left"
-            data-tip="Saving parameters on server now is not necessary in order to launch a simulation. Use this button if you are not intended to launch a simulation now."
-          >
-            <IoMdInformationCircleOutline size={15} />
-          </div>
+    <div className={`p-4 border rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
+      <FrequenciesImportFromCSV />
+      <FrequenciesDef
+        disabled={selectedProject?.simulation?.status === 'Completed'}
+        setSavedPhysicsParameters={setSavedPhysicsParameters}
+      />
+      <div className="flex px-5 mt-2 flex-row gap-2 items-center">
+        <button
+          data-testid="savePhysics"
+          type="button"
+          className={`button buttonPrimary w-full text-sm hover:opacity-80 disabled:opacity-60 ${theme === 'light' ? '' : 'bg-bgColorDark2 text-textColorDark border-textColorDark'}`}
+          onClick={() => setSavedPhysicsParameters(true)}
+          disabled={savedPhysicsParameters}
+        >
+          SAVE ON DB
+        </button>
+        <div className="tooltip tooltip-left" data-tip="Salvare i parametri sul server non è obbligatorio per lanciare la simulazione ora.">
+          <IoMdInformationCircleOutline size={15} />
         </div>
       </div>
     </div>
@@ -347,91 +362,69 @@ const CollapsePortsMatrix: React.FC<CollapsePortsMatrixProps> = ({
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
-  const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
+  const [showModalSelectPortType, setShowModalSelectPortType] = useState<boolean>(false);
   return (
-    <div
-      className={`collapse collapse-arrow mt-3 xl:text-left text-center border-[1px] rounded ${
-        theme === 'light'
-          ? 'bg-[#f6f6f6] border-secondaryColor'
-          : 'bg-bgColorDark'
-      }`}
-    >
-      <input type="checkbox" />
-      <div className="collapse-title font-semibold">Ports</div>
-      <div className="collapse-content text-sm">
-        <div className="flex flex-row items-center gap-4">
-          <PortImportFromCSV />
-          <LumpedImportFromCSV />
-        </div>
-        <div className="flex flex-row items-center gap-4 mt-3">
-          <CreatePorts
-            selectedProject={selectedProject as Project}
-            cameraPosition={cameraPosition}
-          />
-        </div>
-        <PhysicsLeftPanelTab />
-        <>
-          {selectedPort?.category === 'lumped' ? (
-            <PortManagement selectedPort={selectedPort}>
-              <PortType
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setShow={setShowModalSelectPortType}
-                selectedPort={selectedPort as TempLumped}
-              />
-              <RLCParamsComponent
-                selectedPort={selectedPort as TempLumped}
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-              <PortPosition
-                selectedPort={selectedPort as Port | TempLumped}
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-              {selectedProject?.simulation?.status !== 'Completed' && (
-                <ModalSelectPortType
-                  show={showModalSelectPortType}
-                  setShow={setShowModalSelectPortType}
-                  selectedPort={selectedPort as TempLumped}
-                  setSavedPortParameters={setSavedPhysicsParameters}
-                />
-              )}
-            </PortManagement>
-          ) : (
-            <PortManagement selectedPort={selectedPort}>
-              <ScatteringParameter
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-              <PortPosition
-                selectedPort={selectedPort as Port | TempLumped}
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-            </PortManagement>
-          )}
-        </>
-        {selectedPort && (
-          <div className={`flex px-[20px] mt-3 flex-row gap-2 items-center`}>
-            <button
-              data-testid="savePhysics"
-              type="button"
-              className={`button buttonPrimary ${
-                theme === 'light' ? '' : 'bg-secondaryColorDark'
-              } text-sm w-full hover:opacity-80 disabled:opacity-60`}
-              onClick={() => setSavedPhysicsParameters(true)}
-              disabled={savedPhysicsParameters}
-            >
-              SAVE ON DB
-            </button>
-            <div
-              className="tooltip tooltip-left"
-              data-tip="Saving parameters on server now is not necessary in order to launch a simulation. Use this button if you are not intended to launch a simulation now."
-            >
-              <IoMdInformationCircleOutline size={15} />
-            </div>
-          </div>
-        )}
+    <div className={`p-4 border rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
+      <div className="flex flex-row items-center gap-4">
+        <PortImportFromCSV />
+        <LumpedImportFromCSV />
       </div>
+      <div className="flex flex-row items-center gap-4 mt-3">
+        <CreatePorts selectedProject={selectedProject as Project} cameraPosition={cameraPosition} />
+      </div>
+      <PhysicsLeftPanelTab />
+      {selectedPort?.category === 'lumped' ? (
+        <PortManagement selectedPort={selectedPort}>
+          <PortType
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setShow={setShowModalSelectPortType}
+            selectedPort={selectedPort as TempLumped}
+          />
+          <RLCParamsComponent
+            selectedPort={selectedPort as TempLumped}
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setSavedPortParameters={setSavedPhysicsParameters}
+          />
+          <PortPosition
+            selectedPort={selectedPort as TempLumped}
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setSavedPortParameters={setSavedPhysicsParameters}
+          />
+          {selectedProject?.simulation?.status !== 'Completed' && (
+            <ModalSelectPortType
+              show={showModalSelectPortType}
+              setShow={setShowModalSelectPortType}
+              selectedPort={selectedPort as TempLumped}
+              setSavedPortParameters={setSavedPhysicsParameters}
+            />
+          )}
+        </PortManagement>
+      ) : (
+        <PortManagement selectedPort={selectedPort}>
+          <ScatteringParameter setSavedPortParameters={setSavedPhysicsParameters} />
+          <PortPosition
+            selectedPort={selectedPort as Port | TempLumped}
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setSavedPortParameters={setSavedPhysicsParameters}
+          />
+        </PortManagement>
+      )}
+      {selectedPort && (
+        <div className="flex px-5 mt-3 flex-row gap-2 items-center">
+          <button
+            data-testid="savePhysics"
+            type="button"
+            className={`button buttonPrimary w-full text-sm hover:opacity-80 disabled:opacity-60 ${theme === 'light' ? '' : 'bg-secondaryColorDark'}`}
+            onClick={() => setSavedPhysicsParameters(true)}
+            disabled={savedPhysicsParameters}
+          >
+            SAVE ON DB
+          </button>
+          <div className="tooltip tooltip-left" data-tip="Salvare i parametri sul server non è obbligatorio per lanciare la simulazione ora.">
+            <IoMdInformationCircleOutline size={15} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -441,46 +434,30 @@ interface CollapseFrequenciesElectricFieldProps {
   setSavedPhysicsParameters: Function;
 }
 
-const CollapseFrequenciesElectricField: React.FC<
-  CollapseFrequenciesElectricFieldProps
-> = ({ savedPhysicsParameters, setSavedPhysicsParameters }) => {
+const CollapseFrequenciesElectricField: React.FC<CollapseFrequenciesElectricFieldProps> = ({
+  savedPhysicsParameters,
+  setSavedPhysicsParameters,
+}) => {
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   return (
-    <div
-      className={`collapse collapse-arrow mt-3 xl:text-left text-center border-[1px] rounded ${
-        theme === 'light'
-          ? 'bg-[#f6f6f6] border-secondaryColor'
-          : 'bg-bgColorDark'
-      }`}
-    >
-      <input type="checkbox" />
-      <div className="collapse-title font-semibold">Frequencies</div>
-      <div className="collapse-content text-sm">
-        <TimeRangeDef
-          disabled={selectedProject?.simulation?.status === 'Completed'}
-          setSavedPhysicsParameters={setSavedPhysicsParameters}
-        />
-        <div className={`flex px-[20px] mt-2 flex-row gap-2 items-center`}>
-          <button
-            data-testid="savePhysics"
-            type="button"
-            className={`button buttonPrimary ${
-              theme === 'light'
-                ? ''
-                : 'bg-bgColorDark2 text-textColorDark border-textColorDark'
-            } text-sm w-full hover:opacity-80 disabled:opacity-60`}
-            onClick={() => setSavedPhysicsParameters(true)}
-            disabled={savedPhysicsParameters}
-          >
-            SAVE ON DB
-          </button>
-          <div
-            className="tooltip tooltip-left"
-            data-tip="Saving parameters on server now is not necessary in order to launch a simulation. Use this button if you are not intended to launch a simulation now."
-          >
-            <IoMdInformationCircleOutline size={15} />
-          </div>
+    <div className={`p-4 border rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
+      <TimeRangeDef
+        disabled={selectedProject?.simulation?.status === 'Completed'}
+        setSavedPhysicsParameters={setSavedPhysicsParameters}
+      />
+      <div className="flex px-5 mt-2 flex-row gap-2 items-center">
+        <button
+          data-testid="savePhysics"
+          type="button"
+          className={`button buttonPrimary w-full text-sm hover:opacity-80 disabled:opacity-60 ${theme === 'light' ? '' : 'bg-bgColorDark2 text-textColorDark border-textColorDark'}`}
+          onClick={() => setSavedPhysicsParameters(true)}
+          disabled={savedPhysicsParameters}
+        >
+          SAVE ON DB
+        </button>
+        <div className="tooltip tooltip-left" data-tip="Salvare i parametri sul server non è obbligatorio per lanciare la simulazione ora.">
+          <IoMdInformationCircleOutline size={15} />
         </div>
       </div>
     </div>
@@ -491,7 +468,7 @@ interface CollapsePortsElecticFieldProps {
   setSavedPhysicsParameters: Function;
   savedPhysicsParameters: boolean;
   cameraPosition: THREE.Vector3;
-  setGraphData: Function;
+  setGraphData: SetGraphData;
 }
 
 const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
@@ -503,128 +480,98 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   const selectedPort = findSelectedPort(selectedProject);
-  console.log(selectedPort);
-  const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
-  // const dispatch = useDispatch();
-  // const signalChange = (newSignal: PortOrPlaneWaveSignal) => {
-  //   // dispatch(setPortSignal(e.currentTarget.value));
-  //   // setSavedPhysicsParameters(false);
-  // };
+  const [showModalSelectPortType, setShowModalSelectPortType] = useState<boolean>(false);
   return (
-    <div
-      className={`collapse collapse-arrow mt-3 xl:text-left text-center border-[1px] rounded ${
-        theme === 'light'
-          ? 'bg-[#f6f6f6] border-secondaryColor'
-          : 'bg-bgColorDark'
-      }`}
-    >
-      <input type="checkbox" />
-      <div className="collapse-title font-semibold">Ports</div>
-      <div className="collapse-content text-sm">
-        <div className="flex flex-row items-center gap-4">
-          <PortImportFromCSV />
-          <LumpedImportFromCSV />
-          <CreatePorts
-            selectedProject={selectedProject as Project}
-            cameraPosition={cameraPosition}
-          />
-        </div>
-        <PhysicsLeftPanelTab />
-        <>
-          {selectedPort?.category === 'lumped' ? (
-            <PortManagement selectedPort={selectedPort}>
-              <PortType
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setShow={setShowModalSelectPortType}
-                selectedPort={selectedPort as TempLumped}
-              />
-              <RLCParamsComponent
-                selectedPort={selectedPort as TempLumped}
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-              <PortPosition
-                selectedPort={selectedPort as Port | TempLumped}
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-              {selectedProject?.simulation?.status !== 'Completed' && (
-                <ModalSelectPortType
-                  show={showModalSelectPortType}
-                  setShow={setShowModalSelectPortType}
-                  selectedPort={selectedPort as TempLumped}
-                  setSavedPortParameters={setSavedPhysicsParameters}
-                />
-              )}
-            </PortManagement>
-          ) : (
-            <PortManagement selectedPort={selectedPort}>
-              <ScatteringParameter
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-              <PortSignal
-                setSavedPhysicsParameters={setSavedPhysicsParameters}
-                signal={(selectedPort?.signal && selectedPort?.signal.type) ?  selectedPort?.signal : {type: 'no_signal', params: {}} as PortOrPlaneWaveSignal}
-                setGraphData={setGraphData}
-              />
-              <PortPosition
-                selectedPort={selectedPort as Port | TempLumped}
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-            </PortManagement>
-          )}
-        </>
-        {selectedPort && (
-          <div className={`flex px-[20px] mt-3 flex-row gap-2 items-center`}>
-            <button
-              data-testid="savePhysics"
-              type="button"
-              className={`button buttonPrimary ${
-                theme === 'light' ? '' : 'bg-secondaryColorDark'
-              } text-sm w-full hover:opacity-80 disabled:opacity-60`}
-              onClick={() => setSavedPhysicsParameters(true)}
-              disabled={savedPhysicsParameters}
-            >
-              SAVE ON DB
-            </button>
-            <div
-              className="tooltip tooltip-left"
-              data-tip="Saving parameters on server now is not necessary in order to launch a simulation. Use this button if you are not intended to launch a simulation now."
-            >
-              <IoMdInformationCircleOutline size={15} />
-            </div>
-          </div>
-        )}
+    <div className={`p-4 border rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
+      <div className="flex flex-row items-center gap-4">
+        <PortImportFromCSV />
+        <LumpedImportFromCSV />
+        <CreatePorts selectedProject={selectedProject as Project} cameraPosition={cameraPosition} />
       </div>
+      <PhysicsLeftPanelTab />
+      {selectedPort?.category === 'lumped' ? (
+        <PortManagement selectedPort={selectedPort}>
+          <PortType
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setShow={setShowModalSelectPortType}
+            selectedPort={selectedPort as TempLumped}
+          />
+          <RLCParamsComponent
+            selectedPort={selectedPort as TempLumped}
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setSavedPortParameters={setSavedPhysicsParameters}
+          />
+          <PortPosition
+            selectedPort={selectedPort as TempLumped}
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setSavedPortParameters={setSavedPhysicsParameters}
+          />
+          {selectedProject?.simulation?.status !== 'Completed' && (
+            <ModalSelectPortType
+              show={showModalSelectPortType}
+              setShow={setShowModalSelectPortType}
+              selectedPort={selectedPort as TempLumped}
+              setSavedPortParameters={setSavedPhysicsParameters}
+            />
+          )}
+        </PortManagement>
+      ) : (
+        <PortManagement selectedPort={selectedPort}>
+          <ScatteringParameter setSavedPortParameters={setSavedPhysicsParameters} />
+          <PortSignal
+            setSavedPhysicsParameters={setSavedPhysicsParameters}
+            signal={
+              selectedPort?.signal && selectedPort?.signal.type
+                ? selectedPort?.signal
+                : ({ type: 'no_signal', params: {} } as any)
+            }
+            setGraphData={setGraphData}
+          />
+          <PortPosition
+            selectedPort={selectedPort as Port | TempLumped}
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            setSavedPortParameters={setSavedPhysicsParameters}
+          />
+        </PortManagement>
+      )}
+      {selectedPort && (
+        <div className="flex px-5 mt-3 flex-row gap-2 items-center">
+          <button
+            data-testid="savePhysics"
+            type="button"
+            className={`button buttonPrimary w-full text-sm hover:opacity-80 disabled:opacity-60 ${theme === 'light' ? '' : 'bg-secondaryColorDark'}`}
+            onClick={() => setSavedPhysicsParameters(true)}
+            disabled={savedPhysicsParameters}
+          >
+            SAVE ON DB
+          </button>
+          <div className="tooltip tooltip-left" data-tip="Salvare i parametri sul server non è obbligatorio per lanciare la simulazione ora.">
+            <IoMdInformationCircleOutline size={15} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-const CollapsePlaneWave: React.FC<{ setGraphData: Function }> = ({
-  setGraphData,
-}) => {
+interface CollapsePlaneWaveProps {
+  setGraphData: SetGraphData;
+}
+
+const CollapsePlaneWave: React.FC<CollapsePlaneWaveProps> = ({ setGraphData }) => {
   const theme = useSelector(ThemeSelector);
   return (
-    <div
-      className={`collapse collapse-arrow mt-3 xl:text-left text-center border-[1px] rounded ${
-        theme === 'light'
-          ? 'bg-[#f6f6f6] border-secondaryColor'
-          : 'bg-bgColorDark'
-      }`}
-    >
-      <input type="checkbox" />
-      <div className="collapse-title font-semibold">Plane Wave</div>
-      <div className="collapse-content text-sm">
-        <PlaneWaveSettings setGraphData={setGraphData} />
-      </div>
+    <div className={`p-4 border rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
+      <PlaneWaveSettings setGraphData={setGraphData} />
     </div>
   );
 };
 
-const SolverParameters: React.FC<{ simulationType: string }> = ({
-  simulationType,
-}) => {
+interface SolverParametersProps {
+  simulationType: 'Matrix' | 'Electric Fields';
+}
+
+const SolverParameters: React.FC<SolverParametersProps> = ({ simulationType }) => {
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   const solverIterations = useSelector(solverIterationsSelector);
@@ -633,12 +580,11 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
   const activeSimulations = useSelector(activeSimulationsSelector);
   const solverType = useSelector(solverTypeSelector);
   const dispatch = useDispatch();
-  const showSaveProjectResultsModal = useSelector(
-    showSaveProjectResultsModalSelector,
-  );
+  const showSaveProjectResultsModal = useSelector(showSaveProjectResultsModalSelector);
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
+
   const toggleSlider = (): void => {
-    setIsUnlocked((prev: boolean) => {
+    setIsUnlocked((prev) => {
       const newState = !prev;
       if (newState) {
         dispatch(setShowSaveProjectResultsModal(true));
@@ -646,226 +592,124 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
       return newState;
     });
   };
+
   return (
     <>
-      <div
-        className={`collapse collapse-arrow mt-3 xl:text-left text-center border-[1px] rounded ${
-          theme === 'light'
-            ? 'bg-[#f6f6f6] border-secondaryColor'
-            : 'bg-bgColorDark'
-        }`}
-      >
-        <input type="checkbox" />
-        <div className="collapse-title font-semibold">Solver Parameters</div>
-        <div className="collapse-content text-sm">
-          <div
-            className={`p-[10px] xl:text-left text-center border-[1px] rounded ${
-              theme === 'light'
-                ? 'bg-[#f6f6f6] border-secondaryColor'
-                : 'bg-bgColorDark'
-            }`}
+      <div className={`p-4 mt-3 border rounded ${theme === 'light' ? 'bg-[#f6f6f6] border-secondaryColor' : 'bg-bgColorDark'}`}>
+        <div className="p-2">
+          <h6 className="text-sm xl:text-base">Solver Type</h6>
+          <select
+            disabled={selectedProject?.simulation?.status === 'Completed'}
+            className={`select select-bordered select-sm w-full max-w-xs ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark border-textColorDark'}`}
+            onChange={(e) => {
+              dispatch(setSolverType(parseInt(e.target.value) as 1 | 2));
+            }}
+            defaultValue={2}
           >
-            <h6 className="text-[12px] xl:text-base">Solver Type</h6>
-            <div className="">
-              <div className="flex justify-between mt-2">
-                <div className="w-full">
-                  <select
-                    disabled={
-                      selectedProject?.simulation?.status === 'Completed'
-                    }
-                    className={`select select-bordered select-sm w-full max-w-xs ${
-                      theme === 'light'
-                        ? 'bg-[#f6f6f6]'
-                        : 'bg-bgColorDark border-textColorDark'
-                    }`}
-                    onChange={(e) => {
-                      dispatch(
-                        setSolverType(parseInt(e.target.value) as 1 | 2),
-                      );
-                    }}
-                  >
-                    <option value={2} selected>
-                      Rcc delayed coefficents computation
-                    </option>
-                    <option value={1}>
-                      Quasi static coefficents computation
-                    </option>
-                  </select>
-                </div>
-              </div>
+            <option value={2}>Rcc delayed coefficents computation</option>
+            <option value={1}>Quasi static coefficents computation</option>
+          </select>
+        </div>
+        <div className="mt-3 p-2">
+          <h6 className="text-sm xl:text-base">Solver Iterations</h6>
+          <div className="flex justify-between mt-2">
+            <div className="w-[45%]">
+              <span className="text-sm xl:text-base">Outer</span>
+              <input
+                disabled={
+                  selectedProject?.simulation?.status === 'Completed' ||
+                  selectedProject?.meshData.meshGenerated !== 'Generated'
+                }
+                min={1}
+                type="number"
+                step={1}
+                value={
+                  selectedProject?.simulation
+                    ? isNaN(selectedProject.simulation.solverAlgoParams.innerIteration)
+                      ? 0
+                      : selectedProject.simulation.solverAlgoParams.innerIteration
+                    : solverIterations[0]
+                }
+                className={`w-full p-1 border rounded formControl ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'}`}
+                onChange={(event) => {
+                  dispatch(setSolverIterations([parseInt(event.target.value), solverIterations[1]]));
+                }}
+              />
+            </div>
+            <div className="w-[45%]">
+              <span className="text-sm xl:text-base">Inner</span>
+              <input
+                disabled={
+                  selectedProject?.simulation?.status === 'Completed' ||
+                  selectedProject?.meshData.meshGenerated !== 'Generated'
+                }
+                min={1}
+                type="number"
+                step={1}
+                value={
+                  selectedProject?.simulation
+                    ? isNaN(selectedProject.simulation.solverAlgoParams.outerIteration)
+                      ? 0
+                      : selectedProject.simulation.solverAlgoParams.outerIteration
+                    : solverIterations[1]
+                }
+                className={`w-full p-1 border rounded formControl ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'}`}
+                onChange={(event) => {
+                  dispatch(setSolverIterations([solverIterations[0], parseInt(event.target.value)]));
+                }}
+              />
             </div>
           </div>
-          <div
-            className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${
-              theme === 'light'
-                ? 'bg-[#f6f6f6] border-secondaryColor'
-                : 'bg-bgColorDark'
-            }`}
-          >
-            <h6 className="text-[12px] xl:text-base">Solver Iterations</h6>
-            <div className="mt-2">
-              <div className="flex justify-between mt-2">
-                <div className="w-[45%]">
-                  <span className="text-[12px] xl:text-base">Outer</span>
-                  <input
-                    disabled={
-                      selectedProject?.simulation?.status === 'Completed' ||
-                      selectedProject?.meshData.meshGenerated !== 'Generated'
-                    }
-                    min={1}
-                    className={`w-full p-[4px] border-[1px] ${
-                      theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
-                    } text-[15px] font-bold rounded formControl`}
-                    type="number"
-                    step={1}
-                    value={
-                      selectedProject?.simulation
-                        ? isNaN(
-                            selectedProject.simulation.solverAlgoParams
-                              .innerIteration,
-                          )
-                          ? 0
-                          : selectedProject.simulation.solverAlgoParams
-                              .innerIteration
-                        : isNaN(solverIterations[0])
-                        ? 0
-                        : solverIterations[0]
-                    }
-                    onChange={(event) => {
-                      dispatch(
-                        setSolverIterations([
-                          parseInt(event.target.value),
-                          solverIterations[1],
-                        ]),
-                      );
-                    }}
-                  />
-                </div>
-                <div className="w-[45%]">
-                  <span className="text-[12px] xl:text-base">Inner</span>
-                  <input
-                    disabled={
-                      selectedProject?.simulation?.status === 'Completed' ||
-                      selectedProject?.meshData.meshGenerated !== 'Generated'
-                    }
-                    min={1}
-                    className={`w-full p-[4px] border-[1px] ${
-                      theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
-                    } text-[15px] font-bold rounded formControl`}
-                    type="number"
-                    step={1}
-                    value={
-                      selectedProject?.simulation
-                        ? isNaN(
-                            selectedProject.simulation.solverAlgoParams
-                              .outerIteration,
-                          )
-                          ? 0
-                          : selectedProject.simulation.solverAlgoParams
-                              .outerIteration
-                        : isNaN(solverIterations[1])
-                        ? 0
-                        : solverIterations[1]
-                    }
-                    onChange={(event) => {
-                      dispatch(
-                        setSolverIterations([
-                          solverIterations[0],
-                          parseInt(event.target.value),
-                        ]),
-                      );
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${
-              theme === 'light'
-                ? 'bg-[#f6f6f6] border-secondaryColor'
-                : 'bg-bgColorDark'
-            }`}
-          >
-            <h6 className="text-[12px] xl:text-base">Convergence Threshold</h6>
-            <div className="mt-2">
-              <div className="flex justify-between mt-2">
-                <div className="w-full">
-                  <DebounceInput
-                    debounceTimeout={500}
-                    disabled={
-                      selectedProject?.simulation?.status === 'Completed' ||
-                      selectedProject?.meshData.meshGenerated !== 'Generated'
-                    }
-                    min={0.0001}
-                    max={0.1}
-                    className={`w-full p-[4px] border-[1px] ${
-                      theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
-                    } text-[15px] font-bold rounded formControl`}
-                    type="number"
-                    step={0.0001}
-                    value={
-                      selectedProject?.simulation
-                        ? isNaN(
-                            selectedProject.simulation.solverAlgoParams
-                              .convergenceThreshold,
-                          )
-                          ? 0
-                          : selectedProject.simulation.solverAlgoParams
-                              .convergenceThreshold
-                        : isNaN(convergenceThreshold)
-                        ? 0
-                        : convergenceThreshold
-                    }
-                    onChange={(event) => {
-                      dispatch(
-                        setConvergenceTreshold(parseFloat(event.target.value)),
-                      );
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+        </div>
+        <div className="mt-3 p-2">
+          <h6 className="text-sm xl:text-base">Convergence Threshold</h6>
+          <DebounceInput
+            debounceTimeout={500}
+            disabled={
+              selectedProject?.simulation?.status === 'Completed' ||
+              selectedProject?.meshData.meshGenerated !== 'Generated'
+            }
+            min={0.0001}
+            max={0.1}
+            type="number"
+            step={0.0001}
+            value={
+              selectedProject?.simulation
+                ? isNaN(selectedProject.simulation.solverAlgoParams.convergenceThreshold)
+                  ? 0
+                  : selectedProject.simulation.solverAlgoParams.convergenceThreshold
+                : convergenceThreshold
+            }
+            className={`w-full p-1 border rounded formControl ${theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'}`}
+            onChange={(event) => {
+              dispatch(setConvergenceTreshold(parseFloat(event.target.value)));
+            }}
+          />
         </div>
       </div>
       {selectedProject?.simulation?.status === 'Completed' ? (
         <div className="flex items-center mt-3 gap-2">
           <button
-            className={`button buttonPrimary ${
-              theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'
-            } flex-1 text-[12px] xl:text-base`}
+            className={`button buttonPrimary flex-1 text-sm xl:text-base ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'}`}
             data-testid="resultsButton"
             onClick={() => dispatch(selectMenuItem('Results'))}
           >
             Results
           </button>
-          <div
-            className={`flex-shrink-0 ${
-              theme === 'light'
-                ? 'border border-gray-300 rounded px-2'
-                : 'border border-gray-700 rounded px-2'
-            }`}
-          >
-            <EditInputsSlider
-              isUnlocked={isUnlocked}
-              toggleSlider={toggleSlider}
-            />
+          <div className={`flex-shrink-0 ${theme === 'light' ? 'border rounded px-2' : 'border border-gray-700 rounded px-2'}`}>
+            <EditInputsSlider isUnlocked={isUnlocked} toggleSlider={toggleSlider} />
           </div>
         </div>
       ) : (
         <button
           data-testid="startSimulationButton"
-          className={`w-full mt-3 button text-[12px] xl:text-base disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:opacity-100
-              ${
-                selectedProject?.meshData.meshGenerated !== 'Generated'
-                  ? 'bg-gray-300 text-gray-600 opacity-70'
-                  : `buttonPrimary ${
-                      theme === 'light'
-                        ? ''
-                        : 'bg-secondaryColorDark text-textColor'
-                    }`
-              }`}
+          className={`w-full mt-3 button text-sm xl:text-base disabled:bg-gray-400 disabled:cursor-not-allowed ${
+            selectedProject?.meshData.meshGenerated !== 'Generated'
+              ? 'bg-gray-300 text-gray-600 opacity-70'
+              : theme === 'light'
+              ? 'buttonPrimary'
+              : 'buttonPrimary bg-secondaryColorDark text-textColor'
+          }`}
           disabled={
             selectedProject?.meshData.meshGenerated !== 'Generated' ||
             solverStatus !== 'ready' ||
@@ -881,25 +725,15 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
               status: activeSimulations.length === 0 ? 'Running' : 'Queued',
               associatedProject: selectedProject?.id as string,
               solverAlgoParams: {
-                solverType: solverType,
+                solverType,
                 innerIteration: solverIterations[0],
                 outerIteration: solverIterations[1],
                 convergenceThreshold,
               },
-              simulationType: simulationType as 'Matrix' | 'Electric Fields',
+              simulationType: simulationType,
             };
-            dispatch(
-              updateSimulation({
-                associatedProject: simulation.associatedProject,
-                value: simulation,
-              }),
-            );
-            dispatch(
-              setMeshApproved({
-                approved: true,
-                projectToUpdate: selectedProject?.id as string,
-              }),
-            );
+            dispatch(updateSimulation({ associatedProject: simulation.associatedProject, value: simulation }));
+            dispatch(setMeshApproved({ approved: true, projectToUpdate: selectedProject?.id as string }));
           }}
         >
           Start Simulation
@@ -912,34 +746,67 @@ const SolverParameters: React.FC<{ simulationType: string }> = ({
   );
 };
 
-const SimulationSuggestions: React.FC<{ simulationType: string }> = ({
-  simulationType,
-}) => {
+interface EditInputsSliderProps {
+  isUnlocked: boolean;
+  toggleSlider: () => void;
+}
+
+const EditInputsSlider: React.FC<EditInputsSliderProps> = ({ isUnlocked, toggleSlider }) => {
+  return (
+    <div className="inline-flex items-center h-10">
+      <span className="text-sm xl:text-base mr-2">Edit Inputs</span>
+      <div
+        className="relative cursor-pointer"
+        onClick={toggleSlider}
+        role="switch"
+        aria-checked={isUnlocked}
+        aria-label="Toggle edit inputs"
+      >
+        <div className="w-14 h-6 bg-gray-300 rounded-full"></div>
+        <span
+          className={`absolute top-0 left-0 w-6 h-6 bg-white rounded-full transition-transform duration-200 transform ${isUnlocked ? 'translate-x-8' : 'translate-x-0'}`}
+        ></span>
+      </div>
+      <span className="ml-2">
+        {isUnlocked ? (
+          <FaLockOpen size={20} className="text-red-600" aria-label="Unlocked" />
+        ) : (
+          <FaLock size={20} className="text-green-600" aria-label="Locked" />
+        )}
+      </span>
+    </div>
+  );
+};
+
+interface SimulationSuggestionsProps {
+  simulationType: 'Matrix' | 'Electric Fields';
+}
+
+const SimulationSuggestions: React.FC<SimulationSuggestionsProps> = ({ simulationType }) => {
   const selectedProject = useSelector(selectedProjectSelector);
   const solverStatus = useSelector(SolverStatusSelector);
   return (
     <>
       {solverStatus !== 'ready' && (
-        <div className="text-[12px] xl:text-base font-semibold mt-2">
+        <div className="text-sm xl:text-base font-semibold mt-2">
           Solver Down: start solver or wait until started!
         </div>
       )}
       {selectedProject?.frequencies?.length === 0 && (
-        <div className="text-[12px] xl:text-base font-semibold mt-2">
-          To start the simulation set frequencies
+        <div className="text-sm xl:text-base font-semibold mt-2">
+          To start the simulation, set frequencies.
         </div>
       )}
       {simulationType === 'Matrix' && !selectedProject?.portsS3 && (
-        <div className="text-[12px] xl:text-base font-semibold mt-2">
-          To start the simulation set ports
+        <div className="text-sm xl:text-base font-semibold mt-2">
+          To start the simulation, set ports.
         </div>
       )}
-      {simulationType === 'Electric Fields' &&
-        !selectedProject?.planeWaveParameters && (
-          <div className="text-[12px] xl:text-base font-semibold mt-2">
-            To start the simulation set plane wave parameters
-          </div>
-        )}
+      {simulationType === 'Electric Fields' && !selectedProject?.planeWaveParameters && (
+        <div className="text-sm xl:text-base font-semibold mt-2">
+          To start the simulation, set plane wave parameters.
+        </div>
+      )}
     </>
   );
 };
@@ -1139,42 +1006,6 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
             </div>
           </div>
         )}
-    </div>
-  );
-};
-
-const EditInputsSlider: React.FC<{
-  isUnlocked: boolean;
-  toggleSlider: Function;
-}> = ({ isUnlocked, toggleSlider }) => {
-  return (
-    <div className="inline-flex items-center h-10">
-      <span className="text-[12px] xl:text-base mr-2">Edit Inputs</span>
-      <div
-        className="relative cursor-pointer"
-        onClick={() => toggleSlider()}
-        role="switch"
-        aria-checked={isUnlocked}
-        aria-label="Toggle edit inputs"
-      >
-        <div className="w-14 h-6 bg-gray-300 rounded-full"></div>
-        <span
-          className={`absolute top-0 left-0 w-6 h-6 bg-white rounded-full transition-transform duration-200 transform ${
-            isUnlocked ? 'translate-x-8' : 'translate-x-0'
-          }`}
-        ></span>
-      </div>
-      <span className="ml-2">
-        {isUnlocked ? (
-          <FaLockOpen
-            size={20}
-            className="text-red-600"
-            aria-label="Unlocked"
-          />
-        ) : (
-          <FaLock size={20} className="text-green-600" aria-label="Locked" />
-        )}
-      </span>
     </div>
   );
 };

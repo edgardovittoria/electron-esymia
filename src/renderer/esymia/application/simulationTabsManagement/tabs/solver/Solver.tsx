@@ -5,7 +5,6 @@ import {
   selectedProjectSelector,
   setPathToExternalGridsNotFound,
 } from '../../../../store/projectSlice';
-import { SolverSettings } from './components/SolverSettings';
 import {
   CellSize,
   CellsNumber,
@@ -41,10 +40,9 @@ import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/project
 import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
 import { savePortsOnS3 } from '../physics/savePortsOnS3';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { PlaneWaveParameters } from '../../../../model/esymiaModels';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { LuClipboardList } from 'react-icons/lu';
-import { classNames } from '../../../../../cadmia/canvas/components/navBar/NavBar';
+import { SolverSettings } from './components/SolverSettings';
 
 interface SolverProps {
   selectedTab?: string;
