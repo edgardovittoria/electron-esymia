@@ -53,6 +53,7 @@ import {
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
 import { ChartListElectricFields } from './chartListElectricFields/ChartListElectricFields';
 import { SolverStatusSelector } from '../../../../store/pluginsSlice';
+import axios from 'axios';
 
 interface ResultsProps {
   selectedTabLeftPanel: string | undefined;
@@ -101,7 +102,7 @@ export const Results: React.FC<ResultsProps> = ({
   const [cloning, setcloning] = useState<boolean>(false);
   const [emergencyCommand, setEmergencyCommand] = useState(false);
   const selectedProject = useSelector(selectedProjectSelector);
-  const solverStatus = useSelector(SolverStatusSelector)
+  const solverStatus = useSelector(SolverStatusSelector);
   const theme = useSelector(ThemeSelector);
   const solverResults = useSelector(solverResultsSelector);
   useEffect(() => {
@@ -134,25 +135,30 @@ export const Results: React.FC<ResultsProps> = ({
         solverResults.filter((s) => s.id === selectedProject.id).length === 0
       ) {
         dispatch(setSpinnerSolverResults(true));
-        dispatch(
-          publishMessage({
-            queue: 'management_solver',
-            body: {
-              message: 'get results electric fields',
-              body: {
-                fileId: selectedProject.simulation.resultS3,
-                freq_index: 1,
-                id: selectedProject.id,
-              },
-            },
-          }),
-        );
+        axios.post('http://127.0.0.1:8001/get_results_electric_fields?file_id='+selectedProject.simulation.resultS3, {
+          fileId: selectedProject.simulation.resultS3,
+          freq_index: 1,
+          id: selectedProject.id,
+        }).then(res => console.log(res)).catch(err => console.log(err));
+        // dispatch(
+        //   publishMessage({
+        //     queue: 'management_solver',
+        //     body: {
+        //       message: 'get results electric fields',
+        //       body: {
+        //         fileId: selectedProject.simulation.resultS3,
+        //         freq_index: 1,
+        //         id: selectedProject.id,
+        //       },
+        //     },
+        //   }),
+        // );
       }
     }
   }, [solverResults]);
   const selectedFolder = useSelector(SelectedFolderSelector);
   const resultsView = useSelector(solverResultsViewSelector);
-  const spinnerSolverResults = useSelector(spinnerSolverResultsSelector)
+  const spinnerSolverResults = useSelector(spinnerSolverResultsSelector);
 
   const [freq, setfreq] = useState<number[]>([]);
 
@@ -209,7 +215,7 @@ export const Results: React.FC<ResultsProps> = ({
     setSelectedTabLeftPanel(undefined);
     return () => {
       dispatch(resetItemToResultsView());
-      dispatch(unsetSolverResults(selectedProject?.id as string))
+      dispatch(unsetSolverResults(selectedProject?.id as string));
     };
   }, []);
 
@@ -228,18 +234,18 @@ export const Results: React.FC<ResultsProps> = ({
   return (
     <div className="flex">
       <div className="w-[6%]">
-      {spinnerSolverResults && 
-      <div className='absolute top-1/2 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4'>
-        {solverStatus === "ready" ? 
-        <>
-          <span className='text-xl'>Loading Results</span>
-          <ImSpinner className="animate-spin w-10 h-10" />
-        </>
-        :
-        <span className='text-xl'>Start Solver to load results.</span>
-      }
-      </div>
-      }
+        {spinnerSolverResults && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4">
+            {solverStatus === 'ready' ? (
+              <>
+                <span className="text-xl">Loading Results</span>
+                <ImSpinner className="animate-spin w-10 h-10" />
+              </>
+            ) : (
+              <span className="text-xl">Start Solver to load results.</span>
+            )}
+          </div>
+        )}
         <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
           <div
             className={`p-2 tooltip rounded-t tooltip-right ${

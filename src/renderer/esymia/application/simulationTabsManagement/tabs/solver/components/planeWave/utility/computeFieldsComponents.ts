@@ -19,7 +19,7 @@ export function computeFieldsComponents(phi: number, theta: number, E_theta: num
     let Hm = E_norm / (120 * Math.PI);
 
     // Normalizzazione di E
-    let E_hat = vectorScale([E.x, E.y, E.z], 1 / E_norm);
+    let E_hat = E_norm !== 0 ? vectorScale([E.x, E.y, E.z], 1 / E_norm) : vectorScale([E.x, E.y, E.z], 0)
 
     // Prodotto vettoriale tra E_hat e K
     let H_hat = crossProduct([E_hat.x, E_hat.y, E_hat.z], [K.x, K.y, K.z]);

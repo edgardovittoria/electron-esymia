@@ -50,6 +50,7 @@ import { ComponentEntity } from '../../../../../../../../cad_library';
 import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
 import { electricFieldsResultsStepSelector } from '../../../../../../../store/tabsAndMenuItemsSlice';
+import axios from 'axios';
 
 export interface SimulationStatusProps {
   feedbackSimulationVisible: boolean;
@@ -299,32 +300,50 @@ const SimulationStatusItem: React.FC<{
           }),
         );
       } else {
-        dispatch(
-          publishMessage({
-            queue: 'management_solver',
-            body: {
-              message: 'solving electric fields',
-              body: {
-                ...objectToSendToSolver,
-                theta: associatedProject.planeWaveParameters?.input.theta,
-                phi: associatedProject.planeWaveParameters?.input.phi,
-                e_theta: associatedProject.planeWaveParameters?.input.ETheta,
-                e_phi: associatedProject.planeWaveParameters?.input.EPhi,
-                baricentro: [
-                  associatedProject.radialFieldParameters?.center.x,
-                  associatedProject.radialFieldParameters?.center.y,
-                  associatedProject.radialFieldParameters?.center.z,
-                ],
-                r_circ: associatedProject.radialFieldParameters?.radius,
-                times: associatedProject.times,
-                signal_type_E:
-                associatedProject.planeWaveParameters?.input.ESignal,
-                ind_freq_interest: associatedProject.interestFrequenciesIndexes,
-                unit: associatedProject.modelUnit
-              },
-            },
-          }),
-        );
+        axios.post('http://127.0.0.1:8001/solve', {
+          ...objectToSendToSolver,
+          simulationType: associatedProject.simulation?.simulationType,
+          theta: associatedProject.planeWaveParameters?.input.theta,
+          phi: associatedProject.planeWaveParameters?.input.phi,
+          e_theta: associatedProject.planeWaveParameters?.input.ETheta,
+          e_phi: associatedProject.planeWaveParameters?.input.EPhi,
+          baricentro: [
+            associatedProject.radialFieldParameters?.center.x,
+            associatedProject.radialFieldParameters?.center.y,
+            associatedProject.radialFieldParameters?.center.z,
+          ],
+          r_circ: associatedProject.radialFieldParameters?.radius,
+          times: associatedProject.times,
+          signal_type_E: associatedProject.planeWaveParameters?.input.ESignal,
+          ind_freq_interest: associatedProject.interestFrequenciesIndexes,
+          unit: associatedProject.modelUnit,
+        });
+        // dispatch(
+        //   publishMessage({
+        //     queue: 'management_solver',
+        //     body: {
+        //       message: 'solving electric fields',
+        //       body: {
+        //         ...objectToSendToSolver,
+        //         theta: associatedProject.planeWaveParameters?.input.theta,
+        //         phi: associatedProject.planeWaveParameters?.input.phi,
+        //         e_theta: associatedProject.planeWaveParameters?.input.ETheta,
+        //         e_phi: associatedProject.planeWaveParameters?.input.EPhi,
+        //         baricentro: [
+        //           associatedProject.radialFieldParameters?.center.x,
+        //           associatedProject.radialFieldParameters?.center.y,
+        //           associatedProject.radialFieldParameters?.center.z,
+        //         ],
+        //         r_circ: associatedProject.radialFieldParameters?.radius,
+        //         times: associatedProject.times,
+        //         signal_type_E:
+        //         associatedProject.planeWaveParameters?.input.ESignal,
+        //         ind_freq_interest: associatedProject.interestFrequenciesIndexes,
+        //         unit: associatedProject.modelUnit
+        //       },
+        //     },
+        //   }),
+        // );
       }
     }
   }, []);
@@ -492,7 +511,11 @@ const SimulationStatusItem: React.FC<{
                           />
                         </div>
                       ) : (
-                        <progress className="progress w-full" value={0} max={1}/>
+                        <progress
+                          className="progress w-full"
+                          value={0}
+                          max={1}
+                        />
                       )}
                     </div>
                   </div>
@@ -518,29 +541,36 @@ const SimulationStatusItem: React.FC<{
                           />
                         </div>
                       ) : (
-                        <progress className="progress w-full" value={0} max={1}/>
+                        <progress
+                          className="progress w-full"
+                          value={0}
+                          max={1}
+                        />
                       )}
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2 mt-2">
                     <div className="flex flex-row items-center gap-2">
-                      <span className='flex flex-row items-center gap-2'>
+                      <span className="flex flex-row items-center gap-2">
                         Doing Iterations:{' '}
                         {selectedProject?.simulation?.simulationType ===
                         'Matrix' ? (
-                          <div className='flex flex-row gap-2 items-center'>
+                          <div className="flex flex-row gap-2 items-center">
                             <span className="font-semibold">
                               freq {iterations ? iterations.freqNumber : 0}/
                               {frequenciesNumber}
                             </span>
-                            {computingLpx && computingLpx.done && ((iterations &&
-                              iterations.freqNumber < frequenciesNumber || (!iterations))) && (
+                            {computingLpx &&
+                              computingLpx.done &&
+                              ((iterations &&
+                                iterations.freqNumber < frequenciesNumber) ||
+                                !iterations) && (
                                 <ImSpinner className="w-3 h-3 animate-spin" />
                               )}
                           </div>
                         ) : (
-                          <div className='flex flex-row gap-2 items-center'>
+                          <div className="flex flex-row gap-2 items-center">
                             <span className="font-semibold">
                               freq {iterations ? iterations.freqNumber : 0}/
                               {
@@ -548,11 +578,14 @@ const SimulationStatusItem: React.FC<{
                                   ?.length
                               }
                             </span>
-                            {computingLpx && computingLpx.done &&
-                              ((selectedProject?.interestFrequenciesIndexes && iterations &&
-                              iterations.freqNumber <
-                                selectedProject?.interestFrequenciesIndexes
-                                  ?.length) || (!iterations)) && (
+                            {computingLpx &&
+                              computingLpx.done &&
+                              ((selectedProject?.interestFrequenciesIndexes &&
+                                iterations &&
+                                iterations.freqNumber <
+                                  selectedProject?.interestFrequenciesIndexes
+                                    ?.length) ||
+                                !iterations) && (
                                 <ImSpinner className="w-3 h-3 animate-spin" />
                               )}
                           </div>
@@ -578,11 +611,13 @@ const SimulationStatusItem: React.FC<{
                               ? electricFieldsResultsStep.name
                               : 'hc'}
                           </span>
-                          {iterations && selectedProject?.interestFrequenciesIndexes && iterations.freqNumber <=
-                            selectedProject?.interestFrequenciesIndexes
-                              ?.length && (
-                            <ImSpinner className="w-3 h-3 animate-spin" />
-                          )}
+                          {iterations &&
+                            selectedProject?.interestFrequenciesIndexes &&
+                            iterations.freqNumber <=
+                              selectedProject?.interestFrequenciesIndexes
+                                ?.length && (
+                              <ImSpinner className="w-3 h-3 animate-spin" />
+                            )}
                         </div>
 
                         <div className="flex flex-row justify-between items-center w-full">
@@ -595,7 +630,11 @@ const SimulationStatusItem: React.FC<{
                               />
                             </div>
                           ) : (
-                            <progress className="progress w-full" value={0} max={1}/>
+                            <progress
+                              className="progress w-full"
+                              value={0}
+                              max={1}
+                            />
                           )}
                         </div>
                       </div>
