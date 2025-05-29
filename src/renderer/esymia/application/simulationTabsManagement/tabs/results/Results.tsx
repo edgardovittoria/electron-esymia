@@ -118,28 +118,46 @@ export const Results: React.FC<ResultsProps> = ({
         selectedProject.simulation.simulationType === 'Matrix'
       ) {
         dispatch(setSpinnerSolverResults(true));
-        dispatch(
-          publishMessage({
-            queue: 'management_solver',
-            body: {
-              message: 'get results',
-              body: {
-                portIndex: 0,
-                fileId: selectedProject.simulation.resultS3,
-              },
+        axios
+          .post(
+            'http://127.0.0.1:8001/get_results_matrix?file_id=' +
+              selectedProject?.simulation?.resultS3,
+            {
+              fileId: selectedProject?.simulation?.resultS3,
+              port_index: 0,
             },
-          }),
-        );
+          )
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err));
+        // dispatch(
+        //   publishMessage({
+        //     queue: 'management_solver',
+        //     body: {
+        //       message: 'get results',
+        //       body: {
+        //         portIndex: 0,
+        //         fileId: selectedProject.simulation.resultS3,
+        //       },
+        //     },
+        //   }),
+        // );
       } else if (
         selectedProject.simulation.simulationType === 'Electric Fields' &&
         solverResults.filter((s) => s.id === selectedProject.id).length === 0
       ) {
         dispatch(setSpinnerSolverResults(true));
-        axios.post('http://127.0.0.1:8001/get_results_electric_fields?file_id='+selectedProject.simulation.resultS3, {
-          fileId: selectedProject.simulation.resultS3,
-          freq_index: 1,
-          id: selectedProject.id,
-        }).then(res => console.log(res)).catch(err => console.log(err));
+        axios
+          .post(
+            'http://127.0.0.1:8001/get_results_electric_fields?file_id=' +
+              selectedProject.simulation.resultS3,
+            {
+              fileId: selectedProject.simulation.resultS3,
+              freq_index: 1,
+              id: selectedProject.id,
+            },
+          )
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err));
         // dispatch(
         //   publishMessage({
         //     queue: 'management_solver',
@@ -500,7 +518,7 @@ export const Results: React.FC<ResultsProps> = ({
               </>
             ) : (
               <>
-                <ChartListElectricFields N_circ={100} freq={freq} />
+                <ChartListElectricFields N_circ={360} freq={freq} />
               </>
             )}
           </>

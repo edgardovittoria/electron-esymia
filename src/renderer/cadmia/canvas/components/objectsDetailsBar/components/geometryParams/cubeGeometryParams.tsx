@@ -23,12 +23,12 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
     depth: number,
   ) => {
     return [
-      (position[0] - width / 2).toFixed(6),
-      (position[0] + width / 2).toFixed(6),
-      (position[1] - height / 2).toFixed(6),
-      (position[1] + height / 2).toFixed(6),
-      (position[2] - depth / 2).toFixed(6),
-      (position[2] + depth / 2).toFixed(6),
+      (position[0] - width / 2).toString(),
+      (position[0] + width / 2).toString(),
+      (position[1] - height / 2).toString(),
+      (position[1] + height / 2).toString(),
+      (position[2] - depth / 2).toString(),
+      (position[2] + depth / 2).toString(),
     ];
   };
   const [coords, setCoords] = useState<string[]>(
@@ -318,7 +318,7 @@ export const SetCoordsModal: FC<{
   const [newCoords, setNewCoords] = useState<string[]>(coords);
 
   const updateNewCoords = (index: number, value: string) => {
-    if (/^-?\d*\.?\d{0,6}$/.test(value)) {
+    if (/^-?\d*\.?\d{0,20}$/.test(value)) {
       const newValues = [...newCoords];
       newValues[index] = value;
       setNewCoords(newValues);

@@ -237,6 +237,7 @@ const SimulationStatusItem: React.FC<{
             },
           }),
         );
+        axios.post("http://127.0.0.1:8001/stop_computation?sim_id="+associatedProject.id)
       }
     }
   }, [isAlertConfirmed]);
@@ -285,24 +286,35 @@ const SimulationStatusItem: React.FC<{
       convergenceThreshold,
     );
     if (associatedProject.meshData.type === 'Standard') {
-      dispatch(
-        publishMessage({
-          queue: 'management_solver',
-          body: { message: 'solving', body: objectToSendToSolver },
-        }),
-      );
+      axios.post('http://127.0.0.1:8001/solve', {
+          ...objectToSendToSolver,
+          simulationType: associatedProject.simulation?.simulationType,
+          mesher: 'standard'
+        });
+      // dispatch(
+      //   publishMessage({
+      //     queue: 'management_solver',
+      //     body: { message: 'solving', body: objectToSendToSolver },
+      //   }),
+      // );
     } else {
       if (associatedProject.simulation?.simulationType === 'Matrix') {
-        dispatch(
-          publishMessage({
-            queue: 'management_solver',
-            body: { message: 'solving ris', body: objectToSendToSolver },
-          }),
-        );
+        axios.post('http://127.0.0.1:8001/solve', {
+          ...objectToSendToSolver,
+          simulationType: associatedProject.simulation?.simulationType,
+          mesher: 'ris'
+        });
+        // dispatch(
+        //   publishMessage({
+        //     queue: 'management_solver',
+        //     body: { message: 'solving ris', body: objectToSendToSolver },
+        //   }),
+        // );
       } else {
         axios.post('http://127.0.0.1:8001/solve', {
           ...objectToSendToSolver,
           simulationType: associatedProject.simulation?.simulationType,
+          mesher: 'ris',
           theta: associatedProject.planeWaveParameters?.input.theta,
           phi: associatedProject.planeWaveParameters?.input.phi,
           e_theta: associatedProject.planeWaveParameters?.input.ETheta,

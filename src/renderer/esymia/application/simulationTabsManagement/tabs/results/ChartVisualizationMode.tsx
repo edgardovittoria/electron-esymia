@@ -9,6 +9,7 @@ import { ExportToCsvZippedButton } from './ExportToCsvZippedButton';
 import { ExportTouchstoneButton } from './ExportTouchstoneButton';
 import { removeItemToResultsView, setSpinnerSolverResults, ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { publishMessage } from '../../../../../middleware/stompMiddleware';
+import axios from 'axios';
 
 interface ChartVisualizationModeProps {
   chartVisualizationMode: 'grid' | 'full';
@@ -134,18 +135,22 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
                     onChange={(e) => {
                       if (e.currentTarget.checked) {
                         dispatch(setSpinnerSolverResults(true))
-                        dispatch(
-                          publishMessage({
-                            queue: 'management_solver',
-                            body: {
-                              message: 'get results',
-                              body: {
-                                portIndex: index,
-                                fileId: selectedProject?.simulation?.resultS3,
-                              },
-                            },
-                          }),
-                        );
+                        axios.post('http://127.0.0.1:8001/get_results_matrix?file_id='+selectedProject?.simulation?.resultS3, {
+                          fileId: selectedProject?.simulation?.resultS3,
+                          port_index: index
+                        }).then(res => console.log(res)).catch(err => console.log(err));
+                        // dispatch(
+                        //   publishMessage({
+                        //     queue: 'management_solver',
+                        //     body: {
+                        //       message: 'get results',
+                        //       body: {
+                        //         portIndex: index,
+                        //         fileId: selectedProject?.simulation?.resultS3,
+                        //       },
+                        //     },
+                        //   }),
+                        // );
                         setSelectedLabel([
                           ...selectedLabel.filter(
                             (sl) => sl.label !== 'All Ports',

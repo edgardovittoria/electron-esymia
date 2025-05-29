@@ -205,6 +205,19 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   const mesherResults = useSelector(mesherResultsSelector);
   const theme = useSelector(ThemeSelector);
 
+  const getEscalFrom = (unit?: string) => {
+    let escal = 1.0;
+    if (unit !== undefined) {
+      if (unit === 'm') escal = 1.0;
+      if (unit === 'dm') escal = 1e-1;
+      if (unit === 'cm') escal = 1e-2;
+      if (unit === 'mm') escal = 1e-3;
+      if (unit === 'microm') escal = 1e-6;
+      if (unit === 'nanom') escal = 1e-9;
+    }
+    return escal;
+  };
+
   useEffect(() => {
     if (selectedProject.meshData.type === 'Standard') {
       const components = selectedProject?.model
@@ -260,6 +273,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
               : 10e9,
             res.bricks,
             selectedProject.id as string,
+            getEscalFrom(selectedProject.modelUnit)
           ]);
         });
         window.electron.ipcRenderer.on('computeMeshRis', (arg: any) => {
