@@ -34,7 +34,9 @@ export const RadiationDiagram2D: React.FC<RadiationDiagram2DProps> = ({
   const endIndexZX = 2 * N_circ;
   const startIndexYZ = 2 * N_circ;
   const endIndexYZ = 3 * N_circ;
-  const angolo = [0, 330, 300, 270, 240, 210, 180, 150, 120, 90, 60, 30];
+  const angolo1 = [0, 330, 300, 270, 240, 210, 180, 150, 120, 90, 60, 30];
+  const angolo2 = [90, 60, 30, 0, 330, 300, 270, 240, 210, 180, 150, 120];
+  const angolo3 = [180, 150, 120, 90, 60, 30, 0, 330, 300, 270, 240, 210];
 
   const [E_xy, setE_xy] = useState<number[]>([]);
   const [E_zx, setE_zx] = useState<number[]>([]);
@@ -123,36 +125,11 @@ export const RadiationDiagram2D: React.FC<RadiationDiagram2DProps> = ({
     },
   };
 
-  const polarChartData = (dataValues: number[], title: string) => ({
-    labels: angolo.map((a) => a),
-    datasets: [
-      {
-        label: 'Magnitude [V/m]',
-        data: dataValues,
-        backgroundColor: 'rgba(54, 162, 235, 0.3)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1,
-      },
-    ],
-    options: {
-      scales: {
-        r: {
-          max: 1.1 * Math.max(...dataValues),
-        },
-      },
-      plugins: {
-        title: {
-          text: title,
-        },
-      },
-    },
-  });
-
   return (
     <div className="flex flex-row items-center justify-between bg-white h-[45vh] w-full">
       <div className="w-1/3 h-full p-3 border-r border-gray-200">
         <PolarAreaContinuousBorder
-          labels={angolo.map((a) => a.toString())}
+          labels={angolo1.map((a) => a.toString())}
           data={E_xy}
           title={`xy-plane - ${(
             solverResults[0] as SolverResultsElectricFields
@@ -181,7 +158,7 @@ export const RadiationDiagram2D: React.FC<RadiationDiagram2DProps> = ({
       </div>
       <div className="w-1/3 h-full p-3 border-r border-gray-200">
         <PolarAreaContinuousBorder
-          labels={angolo.map((a) => a.toString())}
+          labels={angolo2.map((a) => a.toString())}
           data={E_zx}
           title={`zx-plane - ${(
             solverResults[0] as SolverResultsElectricFields
@@ -210,7 +187,7 @@ export const RadiationDiagram2D: React.FC<RadiationDiagram2DProps> = ({
       </div>
       <div className="w-1/3 h-full p-3">
         <PolarAreaContinuousBorder
-          labels={angolo.map((a) => a.toString())}
+          labels={angolo3.map((a) => a.toString())}
           data={E_yz}
           title={`yz-plane - ${(
             solverResults[0] as SolverResultsElectricFields

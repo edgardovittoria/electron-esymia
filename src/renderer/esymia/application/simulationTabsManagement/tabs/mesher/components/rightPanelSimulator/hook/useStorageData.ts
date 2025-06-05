@@ -28,6 +28,7 @@ import { UsersState } from '../../../../../../../../cad_library/components/store
 import { GetObjectRequest } from 'aws-sdk/clients/s3';
 import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { deleteSimulationProjectFromDynamoDB, createOrUpdateProjectInDynamoDB, addIDInProjectListInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
+import axios from 'axios';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();
@@ -99,9 +100,13 @@ export const useStorageData = () => {
 
   const loadGridsFromS3 = (mesherBackend: boolean) => {
     if(mesherBackend){
-      dispatch(publishMessage({
-        queue: 'management',
-        body: { message: "get grids", grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, id: selectedProject.id }}))
+      axios.post("http://127.0.0.1:8002/getGrids", {
+        grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, 
+        id: selectedProject.id
+      })
+      // dispatch(publishMessage({
+      //   queue: 'management',
+      //   body: { message: "get grids", grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, id: selectedProject.id }}))
     }else{
       const params:GetObjectRequest = {
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
@@ -203,12 +208,12 @@ export const useStorageData = () => {
     s3.copyObject({
       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
       CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-      Key: `${project.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`
+      Key: `${project.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`
     }).promise().then(mesh => {
       s3.copyObject({
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
         CopySource: project.meshData.type === 'Standard' ? `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.surface}`,
-        Key: project.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : `${clonedProject.id}_surface.json.json`
+        Key: project.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : `${clonedProject.id}_surface.json.gz`
       }).promise().then(grids => {
         if(project.simulation?.resultS3){
           s3.copyObject({
@@ -220,12 +225,12 @@ export const useStorageData = () => {
               ...clonedProject,
               meshData: {
                 ...clonedProject.meshData,
-                mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`,
+                mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`,
                 externalGrids: clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : undefined,
-                surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.json`
+                surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.gz`
               },
               ports: [],
-              portsS3: `${clonedProject.id}_ports.json`,
+              portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
               simulation: {
                 ...clonedProject.simulation,
                 associatedProject: clonedProject.id,
@@ -252,12 +257,12 @@ export const useStorageData = () => {
             ...clonedProject,
             meshData: {
               ...clonedProject.meshData,
-              mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`,
+              mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`,
               externalGrids: clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : undefined,
-              surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.json`
+              surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.gz`
             },
             ports: [],
-            portsS3: `${clonedProject.id}_ports.json`,
+            portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
           } as Project;
           execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
             selectedFolder?.id !== 'root' &&
@@ -281,12 +286,12 @@ export const useStorageData = () => {
     s3.copyObject({
       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
       CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-      Key: `${project.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`
+      Key: `${project.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`
     }).promise().then(mesh => {
       s3.copyObject({
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
         CopySource: project.meshData.type === 'Standard' ? `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.surface}`,
-        Key: project.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : `${clonedProject.id}_surface.json.json`
+        Key: project.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : `${clonedProject.id}_surface.json.gz`
       }).promise().then(grids => {
         if(project.simulation?.resultS3){
           s3.copyObject({
@@ -298,12 +303,12 @@ export const useStorageData = () => {
               ...clonedProject,
               meshData: {
                 ...clonedProject.meshData,
-                mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`,
+                mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`,
                 externalGrids: clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : undefined,
-                surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.json`
+                surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.gz`
               },
               ports: [],
-              portsS3: `${clonedProject.id}_ports.json`,
+              portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
               simulation: {
                 ...clonedProject.simulation,
                 associatedProject: clonedProject.id,
@@ -329,12 +334,12 @@ export const useStorageData = () => {
             ...clonedProject,
             meshData: {
               ...clonedProject.meshData,
-              mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`,
+              mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`,
               externalGrids: clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : undefined,
-              surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.json`
+              surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.gz`
             },
             ports: [],
-            portsS3: `${clonedProject.id}_ports.json`,
+            portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
           } as Project;
           execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
             selectedFolder?.id !== 'root' &&
@@ -376,7 +381,7 @@ export const useStorageData = () => {
               clonedProject = {
                 ...clonedProject,
                 ports: [],
-                portsS3: `${clonedProject.id}_ports.json`,
+                portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
               } as Project;
               execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
                 selectedFolder?.id !== 'root' &&
@@ -438,7 +443,7 @@ export const useStorageData = () => {
               clonedProject = {
                 ...clonedProject,
                 ports: [],
-                portsS3: `${clonedProject.id}_ports.json`,
+                portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
               } as Project;
               execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
                 selectedFolder?.id !== 'root' &&
@@ -481,12 +486,12 @@ export const useStorageData = () => {
     s3.copyObject({
       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
       CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-      Key: `${project.meshData.type === "Standard" ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`}`
+      Key: `${project.meshData.type === "Standard" ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`
     }).promise().then(mesh => {
       s3.copyObject({
         Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
         CopySource: project.meshData.type === 'Standard' ? `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.surface}`,
-        Key: `${project.meshData.type === "Standard" ? `${clonedProject.id}_grids.json.gz` : `${clonedProject.id}_surface.json.json`}`
+        Key: `${project.meshData.type === "Standard" ? `${clonedProject.id}_grids.json.gz` : `${clonedProject.id}_surface.json.gz`}`
       }).promise().then(grids => {
         if(project.simulation?.resultS3){
           s3.copyObject({
@@ -498,12 +503,12 @@ export const useStorageData = () => {
               ...clonedProject,
               meshData: {
                 ...project.meshData,
-                mesh: project.meshData.type === "Standard" ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`,
+                mesh: project.meshData.type === "Standard" ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`,
                 externalGrids: project.meshData.type === "Standard" ? `${clonedProject.id}_grids.json.gz` : undefined,
-                surface: project.meshData.type === "Standard" ? undefined : `${clonedProject.id}_surface.json.json`
+                surface: project.meshData.type === "Standard" ? undefined : `${clonedProject.id}_surface.json.gz`
               },
               ports: [],
-              portsS3: `${clonedProject.id}_ports.json`,
+              portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
               simulation: {
                 ...clonedProject.simulation,
                 associatedProject: clonedProject.id,
@@ -521,12 +526,12 @@ export const useStorageData = () => {
             ...clonedProject,
             meshData: {
               ...project.meshData,
-              mesh: project.meshData.type === "Standard" ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.json`,
+              mesh: project.meshData.type === "Standard" ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`,
               externalGrids: project.meshData.type === "Standard" ? `${clonedProject.id}_grids.json.gz` : undefined,
-              surface: project.meshData.type === "Standard" ? undefined : `${clonedProject.id}_surface.json.json`
+              surface: project.meshData.type === "Standard" ? undefined : `${clonedProject.id}_surface.json.gz`
             },
             ports: [],
-            portsS3: `${clonedProject.id}_ports.json`,
+            portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
           } as Project;
           execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
             setShowSearchUser(false)
@@ -571,7 +576,7 @@ export const useStorageData = () => {
               clonedProject = {
                 ...clonedProject,
                 ports: [],
-                portsS3: `${clonedProject.id}_ports.json`,
+                portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
               } as Project;
               execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
                 setShowSearchUser(false)

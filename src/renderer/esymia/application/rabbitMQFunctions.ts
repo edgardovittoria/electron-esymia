@@ -41,6 +41,7 @@ export const callback_mesh_advices = function (
   let projects: Project[] = takeAllProjectsIn(getState().projects.projects);
 
   let res = JSON.parse(message.body);
+  console.log(res)
   projects.forEach((p) => {
     if (p.id === res.id) {
       dispatch(setMeshAdvice({ quantum: JSON.parse(res.quantum), id: res.id }));

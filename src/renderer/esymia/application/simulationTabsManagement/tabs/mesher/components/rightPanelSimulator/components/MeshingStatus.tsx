@@ -45,6 +45,7 @@ import { s3 } from '../../../../../../../aws/s3Config';
 import { uploadFileS3 } from '../../../../../../../aws/mesherAPIs';
 import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
+import axios from 'axios';
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;
@@ -228,34 +229,44 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           allMaterials &&
           generateSTLListFromComponents(allMaterials, components),
         quantum: quantumDimsInput,
-        fileName: selectedProject.id as string,
+        id: selectedProject.id as string,
+        meshingType: selectedProject.meshData.type,
       };
-      dispatch(
-        publishMessage({
-          queue: 'management',
-          body: {
-            message: 'compute mesh',
-            body: objToSendToMesher,
-          },
-        }),
-      );
+      axios.post("http://127.0.0.1:8002/meshing", objToSendToMesher).then(() => {}).catch(e => console.log(e))
+      // dispatch(
+      //   publishMessage({
+      //     queue: 'management',
+      //     body: {
+      //       message: 'compute mesh',
+      //       body: objToSendToMesher,
+      //     },
+      //   }),
+      // );
     } else {
       if (process.env.MESHER_RIS_MODE === 'backend') {
-        dispatch(
-          publishMessage({
-            queue: 'management',
-            body: {
-              message: 'compute mesh ris',
-              body: {
-                fileNameRisGeometry: selectedProject.bricks as string,
-                fileName: selectedProject.id as string,
-                density: selectedProject.meshData.lambdaFactor,
-                freqMax:
-                  selectedProject.maxFrequency,
-              },
-            },
-          }),
-        );
+        axios.post("http://127.0.0.1:8002/meshing", {
+          fileNameRisGeometry: selectedProject.bricks as string,
+          id: selectedProject.id as string,
+          density: selectedProject.meshData.lambdaFactor,
+          freqMax: selectedProject.maxFrequency,
+          meshingType: selectedProject.meshData.type,
+          escal: getEscalFrom(selectedProject.modelUnit)
+        }).then(() => {}).catch(e => console.log(e))
+        // dispatch(
+        //   publishMessage({
+        //     queue: 'management',
+        //     body: {
+        //       message: 'compute mesh ris',
+        //       body: {
+        //         fileNameRisGeometry: selectedProject.bricks as string,
+        //         id: selectedProject.id as string,
+        //         density: selectedProject.meshData.lambdaFactor,
+        //         freqMax: selectedProject.maxFrequency,
+        //         meshingType: selectedProject.meshData.type
+        //       },
+        //     },
+        //   }),
+        // );
       } else {
         const params = {
           Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
@@ -476,15 +487,16 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
     if (isAlertConfirmed) {
       if (!isAlert) {
         if(process.env.MESHER_RIS_MODE === 'backend' || selectedProject.meshData.type === "Standard") {
-          dispatch(
-            publishMessage({
-              queue: 'management',
-              body: {
-                message: 'stop computation',
-                id: selectedProject.id as string,
-              },
-            }),
-          );
+          axios.post("http://127.0.0.1:8002/stop_computation?meshing_id="+selectedProject.id).then(() => {}).catch(e => console.log(e))
+          // dispatch(
+          //   publishMessage({
+          //     queue: 'management',
+          //     body: {
+          //       message: 'stop computation',
+          //       id: selectedProject.id as string,
+          //     },
+          //   }),
+          // );
         }else{
           window.electron.ipcRenderer.sendMessage('stopMeshing', []);
         }

@@ -31,6 +31,7 @@ import {
 } from '../../../../../../model/esymiaModels';
 import { ModalRefineCoarse } from './components/ModalRefineCoarse';
 import { GiMeshBall } from 'react-icons/gi';
+import axios from 'axios';
 
 interface MesherSettingsProps {
   selectedProject: Project;
@@ -101,15 +102,16 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
             generateSTLListFromComponents(allMaterials, components),
           id: selectedProject.id as string,
         };
-        dispatch(
-          publishMessage({
-            queue: 'management',
-            body: {
-              message: 'compute suggested quantum',
-              body: objToSendToMesher,
-            },
-          }),
-        );
+        axios.post("http://127.0.0.1:8002/quantumAdvice", objToSendToMesher).then(() => {}).catch(e => console.log(e))
+        // dispatch(
+        //   publishMessage({
+        //     queue: 'management',
+        //     body: {
+        //       message: 'compute suggested quantum',
+        //       body: objToSendToMesher,
+        //     },
+        //   }),
+        // );
       }
     } else if (mesherStatus === 'idle' || mesherStatus === 'starting') {
       if (selectedProject.meshData.previousMeshStatus === 'Generated') {
@@ -143,17 +145,17 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
           Math.min(
             (3e8 / selectedProject.maxFrequency / 40) *
               getEscalFrom(selectedProject.modelUnit),
-            parseFloat(meshAdvice.quantum[0].toFixed(5)),
+            parseFloat(meshAdvice.quantum[0].toExponential(2)),
           ),
           Math.min(
             (3e8 / selectedProject.maxFrequency / 40) *
               getEscalFrom(selectedProject.modelUnit),
-            parseFloat(meshAdvice.quantum[1].toFixed(5)),
+            parseFloat(meshAdvice.quantum[1].toExponential(2)),
           ),
           Math.min(
             (3e8 / selectedProject.maxFrequency / 40) *
               getEscalFrom(selectedProject.modelUnit),
-            parseFloat(meshAdvice.quantum[2].toFixed(5)),
+            parseFloat(meshAdvice.quantum[2].toExponential(2)),
           ),
         ]),
       );
@@ -163,9 +165,9 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
   useEffect(() => {
     if (externalGrids) {
       setQuantumDimsInput([
-        parseFloat((externalGrids.cell_size.cell_size_x * 1000).toFixed(5)),
-        parseFloat((externalGrids.cell_size.cell_size_y * 1000).toFixed(5)),
-        parseFloat((externalGrids.cell_size.cell_size_z * 1000).toFixed(5)),
+        parseFloat((externalGrids.cell_size.cell_size_x * 1000).toExponential(2)),
+        parseFloat((externalGrids.cell_size.cell_size_y * 1000).toExponential(2)),
+        parseFloat((externalGrids.cell_size.cell_size_z * 1000).toExponential(2)),
       ]);
     }
   }, [externalGrids]);
@@ -360,7 +362,7 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
                         //disabled={selectedProject?.simulation?.status === 'Completed' || selectedProject?.model?.components === undefined}
                         key={indexQuantumComponent}
                         label={quantumDimensionsLabels[indexQuantumComponent]}
-                        value={parseFloat(quantumComponent.toFixed(5))}
+                        value={parseFloat(quantumComponent.toExponential(2))}
                         onChange={(event: { target: { value: string } }) =>
                           setQuantumDimsInput(
                             quantumDimsInput.map((q, ind) =>
@@ -545,6 +547,7 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({
   label,
 }) => {
   const theme = useSelector(ThemeSelector);
+  console.log(value)
   return (
     <div className="xl:w-[30%] w-full flex flex-col items-center relative">
       <span

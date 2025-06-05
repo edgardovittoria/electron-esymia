@@ -150,9 +150,13 @@ export const Mesher: React.FC<MesherProps> = ({
       setExternalGrids(undefined);
       setSpinner(true);
       if (selectedProject?.meshData.type === 'Ris') {
-        loadMeshData(process.env.MESHER_RIS_MODE === 'backend');
+        if(mesherStatus === "ready"){
+          loadMeshData(process.env.MESHER_RIS_MODE === 'backend');
+        }
       } else {
-        loadMeshData(true);
+        if(mesherStatus === "ready"){
+          loadMeshData(true);
+        }
       }
     }
   }, [selectedProject?.meshData.meshGenerated, mesherStatus]);
