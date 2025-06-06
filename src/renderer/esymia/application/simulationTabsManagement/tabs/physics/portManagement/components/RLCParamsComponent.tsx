@@ -115,7 +115,7 @@ const RLCParamsInput: FC<RLCParamsInputProps> = ({disabled, debounceTimeoutMilli
           //debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500}
           onKeyDown={(evt) => ["+", "-"].includes(evt.key) && evt.preventDefault()}
           step={inputStep ? inputStep : 0.000001}
-          defaultValue={isNaN(value) ? 0 : value}
+          value={isNaN(value) ? 0 : value}
           onChange={onChange}
           //onWheel={(e: { currentTarget: { blur: () => any; }; }) => e.currentTarget.blur()}
         />
