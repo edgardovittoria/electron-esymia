@@ -90,7 +90,6 @@ export const Solver: React.FC<SolverProps> = ({
   const awsExternalGridsData = useSelector(AWSExternalGridsDataSelector);
 
   const risExternalGridsFormat = (extGridsJson: any) => {
-    console.log(extGridsJson);
     let vertices: number[][] = [];
     for (let index = 0; index < extGridsJson.estremi_celle[0].length; index++) {
       vertices.push([]);
@@ -159,13 +158,14 @@ export const Solver: React.FC<SolverProps> = ({
       if (selectedProject?.meshData.type === 'Ris') {
         loadMeshData(process.env.MESHER_RIS_MODE === 'backend');
       } else {
-        loadMeshData(true);
+        if(mesherStatus === "ready"){
+          loadMeshData(true);
+        }
       }
     }
   }, [selectedProject?.meshData.meshGenerated, mesherStatus]);
 
   useEffect(() => {
-    console.log(awsExternalGridsData);
     if (awsExternalGridsData) {
       if (selectedProject?.meshData.type === 'Standard') {
         setExternalGrids(externalGridsDecode(awsExternalGridsData));
@@ -248,13 +248,13 @@ export const Solver: React.FC<SolverProps> = ({
 
   return (
     <>
-      {spinner && mesherStatus === 'ready' && (
+      {spinner && mesherStatus === 'ready' && viewMesh && (
         <div className="absolute top-1/2 left-1/2">
           <ImSpinner className="animate-spin w-8 h-8" />
         </div>
       )}
-      {process.env.MESHER_RIS_MODE === 'backend' &&
-        (mesherStatus === 'idle' || mesherStatus === 'starting') && (
+      {(process.env.MESHER_RIS_MODE === 'backend' || selectedProject?.meshData.type === "Standard") &&
+        (mesherStatus === 'idle' || mesherStatus === 'starting') && viewMesh && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2">
             Mesher Down: start mesher or wait until started to visualize the
             mesh!

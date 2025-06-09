@@ -237,6 +237,7 @@ const SimulationStatusItem: React.FC<{
             },
           }),
         );
+        setRunningSimulation(undefined)
         axios.post("http://127.0.0.1:8001/stop_computation?sim_id="+associatedProject.id)
       }
     }
@@ -566,7 +567,7 @@ const SimulationStatusItem: React.FC<{
                     <div className="flex flex-row items-center gap-2">
                       <span className="flex flex-row items-center gap-2">
                         Doing Iterations:{' '}
-                        {selectedProject?.simulation?.simulationType ===
+                        {simulation?.simulationType ===
                         'Matrix' ? (
                           <div className="flex flex-row gap-2 items-center">
                             <span className="font-semibold">
@@ -586,16 +587,16 @@ const SimulationStatusItem: React.FC<{
                             <span className="font-semibold">
                               freq {iterations ? iterations.freqNumber : 0}/
                               {
-                                selectedProject?.interestFrequenciesIndexes
+                                associatedProject?.interestFrequenciesIndexes
                                   ?.length
                               }
                             </span>
                             {computingLpx &&
                               computingLpx.done &&
-                              ((selectedProject?.interestFrequenciesIndexes &&
+                              ((associatedProject?.interestFrequenciesIndexes &&
                                 iterations &&
                                 iterations.freqNumber <
-                                  selectedProject?.interestFrequenciesIndexes
+                                  associatedProject?.interestFrequenciesIndexes
                                     ?.length) ||
                                 !iterations) && (
                                 <ImSpinner className="w-3 h-3 animate-spin" />
@@ -608,12 +609,12 @@ const SimulationStatusItem: React.FC<{
                       className="progress w-full"
                       value={iterations ? iterations.freqNumber : 0}
                       max={
-                        selectedProject?.simulation?.simulationType === 'Matrix'
+                        simulation?.simulationType === 'Matrix'
                           ? frequenciesNumber
-                          : selectedProject?.interestFrequenciesIndexes?.length
+                          : associatedProject?.interestFrequenciesIndexes?.length
                       }
                     />
-                    {selectedProject?.simulation?.simulationType ===
+                    {simulation?.simulationType ===
                       'Electric Fields' && (
                       <div className="flex flex-col gap-2 mt-2">
                         <div className="flex flex-row items-center gap-2">
@@ -624,9 +625,9 @@ const SimulationStatusItem: React.FC<{
                               : 'hc'}
                           </span>
                           {iterations &&
-                            selectedProject?.interestFrequenciesIndexes &&
+                            associatedProject?.interestFrequenciesIndexes &&
                             iterations.freqNumber <=
-                              selectedProject?.interestFrequenciesIndexes
+                              associatedProject?.interestFrequenciesIndexes
                                 ?.length && (
                               <ImSpinner className="w-3 h-3 animate-spin" />
                             )}
@@ -651,7 +652,7 @@ const SimulationStatusItem: React.FC<{
                         </div>
                       </div>
                     )}
-                    {selectedProject?.simulation?.simulationType ===
+                    {simulation?.simulationType ===
                       'Matrix' && (
                       <div className="max-h-[200px] overflow-y-scroll flex flex-col gap-2">
                         {associatedProject.ports

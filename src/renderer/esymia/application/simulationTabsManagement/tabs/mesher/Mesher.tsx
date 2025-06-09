@@ -160,7 +160,6 @@ export const Mesher: React.FC<MesherProps> = ({
   }, [selectedProject?.meshData.meshGenerated, mesherStatus]);
 
   useEffect(() => {
-    console.log(awsExternalGridsData);
     if (awsExternalGridsData) {
       if (selectedProject?.meshData.type === 'Standard') {
         setExternalGrids(externalGridsDecode(awsExternalGridsData));

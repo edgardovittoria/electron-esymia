@@ -147,7 +147,7 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
             <div className="flex flex-col">
               <Canvas
                 className="w-[100vw] lg:h-[70vh] xl:h-[82vh]"
-                camera={{ position: [0, -3, 0], up: [0, 0, 1], fov: 50 }}
+                camera={{ position: [0, -3, 0], up: [0, 0, 1], fov: 50, near: 0.1 }}
               >
                 {/* <Perf/> */}
                 <Provider store={store}>
@@ -276,7 +276,7 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
                   )}
 
                   {/*<Screenshot selectedProject={selectedProject}/>*/}
-                  <OrbitControls makeDefault zoomToCursor zoomSpeed={0.5}/>
+                  <OrbitControls makeDefault zoomToCursor zoomSpeed={0.2}/>
                   <GizmoHelper
                     alignment="bottom-left"
                     margin={[150, 80]}
