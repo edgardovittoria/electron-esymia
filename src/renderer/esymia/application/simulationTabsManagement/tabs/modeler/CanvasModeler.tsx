@@ -98,7 +98,7 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({
                       )}
                     </FocusView>
                     {/*<Screenshot selectedProject={selectedProject}/>*/}
-                    <OrbitControls makeDefault />
+                    <OrbitControls makeDefault zoomToCursor zoomSpeed={0.5}/>
                     <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
                       <GizmoViewport
                         axisColors={['red', '#40ff00', 'blue']}

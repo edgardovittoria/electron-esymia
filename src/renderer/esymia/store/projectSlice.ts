@@ -347,7 +347,7 @@ export const ProjectSlice = createSlice({
     addInterestFrequencyIndex(state: ProjectState, action: PayloadAction<number>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       if(selectedProject){
-        if (selectedProject.interestFrequenciesIndexes) {
+        if (selectedProject.interestFrequenciesIndexes && selectedProject.interestFrequenciesIndexes.filter(i => i == action.payload).length === 0) {
           selectedProject.interestFrequenciesIndexes?.push(action.payload)
         }else{
           selectedProject.interestFrequenciesIndexes = [action.payload]

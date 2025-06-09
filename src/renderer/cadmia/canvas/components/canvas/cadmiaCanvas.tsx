@@ -53,7 +53,7 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
         {({ store }) => (
           <Canvas
             className="w-full h-full bg-gradient-to-b from-gray-700 to-gray-100"
-            camera={{ position: [0, -50, 0], up: [0, 0, 1], fov: 50, far: 1000, near: 0.1 }}
+            camera={{ position: [0, -50, 0], up: [0, 0, 1], fov: 50, far: 5000, near: 0.1 }}
           >
             <Provider store={store}>
               <pointLight position={[100, 100, 100]} intensity={1.8} />
@@ -64,7 +64,7 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
                 position={[-7, 25, 13]}
                 intensity={1.85}
               />
-              <Bounds fit clip observe margin={1.2}>
+              <Bounds fit clip observe>
                 <CommonObjectsActions>
                   {components
                     .filter(
@@ -122,7 +122,11 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
                 hasEventListener={undefined}
                 removeEventListener={undefined}
                 dispatchEvent={undefined}
+                zoomToCursor
                 makeDefault
+                minDistance={10}
+                maxDistance={1000}
+                zoomSpeed={0.5}
                 // target={(orbitTarget) ? new THREE.Vector3(orbitTarget?.position[0], orbitTarget?.position[1], orbitTarget?.position[2]): new THREE.Vector3(0,0,0)}
               />
               <GizmoHelper alignment="bottom-right">

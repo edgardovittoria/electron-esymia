@@ -276,7 +276,7 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
                   )}
 
                   {/*<Screenshot selectedProject={selectedProject}/>*/}
-                  <OrbitControls makeDefault />
+                  <OrbitControls makeDefault zoomToCursor zoomSpeed={0.5}/>
                   <GizmoHelper
                     alignment="bottom-left"
                     margin={[150, 80]}

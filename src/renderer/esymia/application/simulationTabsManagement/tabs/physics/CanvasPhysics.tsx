@@ -209,7 +209,7 @@ export const CanvasPhysics: React.FC<CanvasPhysicsProps> = ({
                       setSavedPortParameters={setSavedPortParameters}
                     />
                     {/*<Screenshot selectedProject={selectedProject}/>*/}
-                    <OrbitControls makeDefault />
+                    <OrbitControls makeDefault zoomToCursor zoomSpeed={0.5}/>
                     <GizmoHelper
                       alignment="bottom-left"
                       margin={[150, 80]}

@@ -32,6 +32,7 @@ import {
 import { ModalRefineCoarse } from './components/ModalRefineCoarse';
 import { GiMeshBall } from 'react-icons/gi';
 import axios from 'axios';
+import { ImSpinner } from 'react-icons/im';
 
 interface MesherSettingsProps {
   selectedProject: Project;
@@ -56,6 +57,8 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
   const theme = useSelector(ThemeSelector);
   const quantumDimensionsLabels = ['X', 'Y', 'Z'];
   const [mesherSettingsSelected, setmesherSettingsSelected] = useState(true);
+  const [computingSuggestedQuantum, setcomputingSuggestedQuantum] =
+    useState(false);
   const [suggestedQuantumError, setSuggestedQuantumError] = useState<{
     active: boolean;
     type?: 'Mesher Not Active' | 'Frequencies not set';
@@ -71,6 +74,7 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
 
   useEffect(() => {
     suggestedQuantum && setQuantumDimsInput(suggestedQuantum);
+    setcomputingSuggestedQuantum(false);
   }, [suggestedQuantum]);
 
   useEffect(() => {
@@ -102,7 +106,12 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
             generateSTLListFromComponents(allMaterials, components),
           id: selectedProject.id as string,
         };
-        axios.post("http://127.0.0.1:8002/quantumAdvice", objToSendToMesher).then(() => {}).catch(e => console.log(e))
+        setcomputingSuggestedQuantum(true);
+        axios
+          .post('http://127.0.0.1:8002/quantumAdvice', objToSendToMesher)
+          .then(() => {
+          })
+          .catch((e) => console.log(e));
         // dispatch(
         //   publishMessage({
         //     queue: 'management',
@@ -165,9 +174,15 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
   useEffect(() => {
     if (externalGrids) {
       setQuantumDimsInput([
-        parseFloat((externalGrids.cell_size.cell_size_x * 1000).toExponential(2)),
-        parseFloat((externalGrids.cell_size.cell_size_y * 1000).toExponential(2)),
-        parseFloat((externalGrids.cell_size.cell_size_z * 1000).toExponential(2)),
+        parseFloat(
+          (externalGrids.cell_size.cell_size_x * 1000).toExponential(2),
+        ),
+        parseFloat(
+          (externalGrids.cell_size.cell_size_y * 1000).toExponential(2),
+        ),
+        parseFloat(
+          (externalGrids.cell_size.cell_size_z * 1000).toExponential(2),
+        ),
       ]);
     }
   }, [externalGrids]);
@@ -280,9 +295,12 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
               <input
                 type="number"
                 min={10}
-                disabled={selectedProject?.simulation?.resultS3 ? true : false}
-                defaultValue={maxFreq ? maxFreq.toExponential(0) : 0}
-                className={`w-1/3 p-[4px] border-[1px] disabled:border-none ${
+                disabled={
+                  (selectedProject?.simulation?.resultS3 ? true : false) ||
+                  !selectedProject.modelS3
+                }
+                defaultValue={maxFreq ? maxFreq.toExponential(2) : 0}
+                className={`w-1/3 p-[4px] border-[1px] disabled:cursor-not-allowed ${
                   theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
                 } text-[15px] font-bold rounded formControl`}
                 onChange={(e) => {
@@ -301,7 +319,7 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
                     } w-[100%]`
                   : 'button bg-gray-300 text-gray-600 opacity-70 w-[100%] cursor-not-allowed mt-3'
               }
-              disabled={!maxFreq}
+              disabled={!maxFreq || !selectedProject.modelS3}
               onClick={() => {
                 dispatch(setMaxFrequency(maxFreq));
               }}
@@ -310,12 +328,18 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
             </button>
           </div>
           <div
-            className={`mt-3 p-[10px] xl:text-left text-center border-[1px] rounded ${
+            className={`mt-3 p-[10px] xl:text-left text-center relative border-[1px] rounded ${
               theme === 'light'
                 ? 'bg-[#f6f6f6] border-secondaryColor'
                 : 'bg-bgColorDark border-textColorDark'
             }`}
           >
+            {computingSuggestedQuantum && (
+                  <div className="w-full absolute top-1/2 flex flex-col items-center rounded-xl -translate-y-1/2 right-1/2 translate-x-1/2 z-50 bg-white p-5">
+                    <ImSpinner className="w-8 h-8 animate-spin" />
+                    <span>Computing suggested quantum</span>
+                  </div>
+                )}
             {!selectedProject?.bricks ? (
               <h6 className="xl:text-base text-center text-[12px]">
                 Set quantum&apos;s dimensions
@@ -464,7 +488,7 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
                       className={
                         process.env.APP_MODE !== 'test' &&
                         selectedProject.maxFrequency
-                          ? `button buttonPrimary ${
+                          ? `button buttonPrimary disabled:cursor-not-allowed disabled:bg-gray-300  disabled:text-gray-600 disabled:opacity-70 ${
                               theme === 'light'
                                 ? ''
                                 : 'bg-secondaryColorDark text-textColor'
@@ -473,9 +497,9 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
                       }
                       disabled={
                         process.env.APP_MODE !== 'test' &&
-                        selectedProject.maxFrequency
-                          ? false
-                          : true
+                        ((selectedProject.maxFrequency ? false : true) ||
+                          (selectedProject.meshData.type === 'Standard' &&
+                            (!suggestedQuantum || mesherStatus !== 'ready')))
                       }
                       onClick={() => {
                         dispatch(
@@ -547,7 +571,7 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({
   label,
 }) => {
   const theme = useSelector(ThemeSelector);
-  console.log(value)
+  console.log(value);
   return (
     <div className="xl:w-[30%] w-full flex flex-col items-center relative">
       <span

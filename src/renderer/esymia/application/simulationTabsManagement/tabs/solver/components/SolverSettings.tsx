@@ -271,7 +271,8 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                 <li key={tab.id}>
                   <button
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-2 text-sm font-medium rounded-t-md transition-all duration-200 ${
+                    disabled={!selectedProject.modelS3 || selectedProject.meshData.meshGenerated !== "Generated"}
+                    className={`px-4 py-2 disabled:opacity-25 text-sm font-medium rounded-t-md transition-all duration-200 ${
                       activeTab === tab.id
                         ? theme === 'light'
                           ? 'bg-primaryColor text-white'
@@ -289,7 +290,10 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
           </nav>
           {/* Solo il contenuto della tab è scrollabile */}
           <div className="p-4 h-[650px] overflow-y-auto">
-            {tabs.find((tab) => tab.id === activeTab)?.content}
+            {!selectedProject.modelS3 || selectedProject.meshData.meshGenerated !== "Generated" ? 
+            <span>Load Model and generate mesh to set simulation parameters</span>  :
+              <>{tabs.find((tab) => tab.id === activeTab)?.content}</>
+          }
           </div>
           {/* Modal per il grafico, se presente */}
           {graphData && (
@@ -986,7 +990,7 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
                         defaultChecked={
                           selectedProject.interestFrequenciesIndexes &&
                           selectedProject.interestFrequenciesIndexes?.filter(
-                            (i) => i === index,
+                            (i) => i-1 === index,
                           ).length > 0
                         }
                         name={f.toString()}
