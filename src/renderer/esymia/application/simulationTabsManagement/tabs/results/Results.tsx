@@ -112,10 +112,9 @@ export const Results: React.FC<ResultsProps> = ({
       selectedProject.simulation.resultS3 &&
       selectedProject.simulation.status === 'Completed'
     ) {
-      //setResultsFromS3(selectedProject, dispatch)
       if (
         !(selectedProject.simulation.results as SolverOutput).matrix_S &&
-        selectedProject.simulation.simulationType === 'Matrix'
+        selectedProject.simulation.simulationType === 'Matrix' && solverStatus === "ready"
       ) {
         dispatch(setSpinnerSolverResults(true));
         axios
@@ -131,7 +130,7 @@ export const Results: React.FC<ResultsProps> = ({
           .catch((err) => console.log(err));
       } else if (
         selectedProject.simulation.simulationType === 'Electric Fields' &&
-        solverResults.filter((s) => s.id === selectedProject.id).length === 0
+        solverResults.filter((s) => s.id === selectedProject.id).length === 0 && solverStatus === "ready"
       ) {
         dispatch(setSpinnerSolverResults(true));
         axios
@@ -148,7 +147,7 @@ export const Results: React.FC<ResultsProps> = ({
           .catch((err) => console.log(err));
       }
     }
-  }, [solverResults]);
+  }, [solverResults, solverStatus]);
   const selectedFolder = useSelector(SelectedFolderSelector);
   const resultsView = useSelector(solverResultsViewSelector);
   const spinnerSolverResults = useSelector(spinnerSolverResultsSelector);
@@ -203,6 +202,7 @@ export const Results: React.FC<ResultsProps> = ({
   useEffect(() => {
     setSelectedTabLeftPanel(undefined);
     dispatch(unsetSolverResults());
+    dispatch(setSpinnerSolverResults(true))
     return () => {
       dispatch(resetItemToResultsView());
       dispatch(unsetSolverResults());
@@ -359,7 +359,7 @@ export const Results: React.FC<ResultsProps> = ({
             </div>
           </>
         )}
-        {emergencyCommand && (
+        {/* {emergencyCommand && (
           <>
             <div
               className={`${
@@ -388,7 +388,7 @@ export const Results: React.FC<ResultsProps> = ({
               </div>
             </div>
           </>
-        )}
+        )} */}
         <div
           className={`absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
             theme === 'light'
@@ -422,7 +422,7 @@ export const Results: React.FC<ResultsProps> = ({
             )}
           </button>
         </div>
-        <div
+        {/* <div
           className={`absolute left-[2%] top-[370px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
             emergencyCommand
               ? theme === 'light'
@@ -452,7 +452,7 @@ export const Results: React.FC<ResultsProps> = ({
               className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
             />
           </button>
-        </div>
+        </div> */}
       </div>
       <div className="w-[90%]">
         {selectedProject &&

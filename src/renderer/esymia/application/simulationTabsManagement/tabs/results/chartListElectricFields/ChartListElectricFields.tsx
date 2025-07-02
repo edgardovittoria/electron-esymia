@@ -64,22 +64,6 @@ export const ChartListElectricFields: React.FC<
                 )
                 .then((res) => console.log(res))
                 .catch((err) => console.log(err));
-              // dispatch(
-              //   publishMessage({
-              //     queue: 'management_solver',
-              //     body: {
-              //       message: 'get results electric fields',
-              //       body: {
-              //         fileId: selectedProject?.simulation?.resultS3,
-              //         freq_index:
-              //           freq.findIndex(
-              //             (val) => val === parseFloat(e.currentTarget.value),
-              //           ) + 1,
-              //         id: selectedProject?.id,
-              //       },
-              //     },
-              //   }),
-              // );
             }}
           >
             {freq.map((f) => {

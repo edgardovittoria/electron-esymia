@@ -19,7 +19,7 @@ export const Overview: React.FC<OverviewProps> = ({ setLoadingSpinner }) => {
   // const [cardMenuHovered, setCardMenuHovered] = useState(false);
 
   return (
-    <div className="w-full">
+    <div className="w-full pb-20">
       {/* <div className="box">
         <div className="flex flex-row justify-between items-start p-2">
           <h5 className="lg:text-base text-sm">My Recent Projects</h5>
@@ -129,7 +129,7 @@ export const Overview: React.FC<OverviewProps> = ({ setLoadingSpinner }) => {
       </div> */}
       <Projects setLoadingSpinner={setLoadingSpinner}/>
       <div className="lg:col-span-2 justify-between w-full">
-        <Simulations maxH="max-h-[270px]"/>
+        <Simulations maxH="max-h-[250px]"/>
       </div>
     </div>
   );

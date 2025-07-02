@@ -8,10 +8,10 @@ import { publishMessage } from '../../../middleware/stompMiddleware';
 import { ThemeSelector } from '../../store/tabsAndMenuItemsSlice';
 
 export interface ServerGUIProps{
-
+  index: number
 }
 
-const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
+const ServerGUI: React.FC<ServerGUIProps> = ({index}) => {
 
   const [spinnerMesher, setSpinnerMesher] = useState<boolean>(false);
   const [spinnerSolver, setSpinnerSolver] = useState<boolean>(false);
@@ -53,7 +53,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({}) => {
 
   return (
     <>
-      <div className={`flex relative flex-col py-5 px-5 border-2 ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'}`}>
+      <div className={`flex relative flex-col py-5 px-5 border-2 ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'}`} key={index}>
         <h5 className={`absolute top-[-16px] ${theme === 'light' ? 'text-secondaryColor bg-white' : 'text-secondaryColorDark bg-bgColorDark2'} left-10 font-bold px-2`}>serverGUI</h5>
         <div className={`flex flex-col border ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'} py-3 px-5`}>
           <div className="flex flex-row gap-2 items-center justify-between">

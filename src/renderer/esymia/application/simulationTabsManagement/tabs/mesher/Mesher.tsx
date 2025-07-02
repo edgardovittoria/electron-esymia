@@ -73,7 +73,6 @@ export const Mesher: React.FC<MesherProps> = ({
   const awsExternalGridsData = useSelector(AWSExternalGridsDataSelector);
 
   const risExternalGridsFormat = (extGridsJson: any) => {
-    console.log(extGridsJson);
     let vertices: number[][] = [];
     for (let index = 0; index < extGridsJson.estremi_celle[0].length; index++) {
       vertices.push([]);

@@ -61,7 +61,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
           theme === 'light'
             ? 'bg-white text-textColor'
             : 'bg-bgColorDark2 text-textColorDark'
-        } w-full`}
+        } w-full h-full`}
       >
         {/* <div className="flex p-2 gap-4 items-center">
           <div className="sm:w-3/5 w-1/5">
@@ -190,7 +190,7 @@ const MyFiles: React.FC<MyFilesProps> = ({
 
               <div
                 data-testid="projectsBox"
-                className="grid xl:grid-cols-9 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 overflow-scroll max-h-[150px] pb-3"
+                className="grid xl:grid-cols-9 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 overflow-scroll max-h-[250px] pb-3"
               >
                 {projects.map((project) => {
                   return (

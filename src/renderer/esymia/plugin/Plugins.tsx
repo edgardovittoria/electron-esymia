@@ -10,9 +10,9 @@ export interface PluginsProps{
   activePlugins: string[]
 }
 
-const pluginsFactory = (name:string) => {
+const pluginsFactory = (name:string, index: number) => {
   switch (name) {
-    case 'serverGUI': return <ServerGUI/>
+    case 'serverGUI': return <ServerGUI index={index}/>
   }
 }
 const Plugins: React.FC<PluginsProps> = ({pluginsVisible, setPluginsVisible, activePlugins}) => {
@@ -33,9 +33,9 @@ const Plugins: React.FC<PluginsProps> = ({pluginsVisible, setPluginsVisible, act
         </div>
         <hr className={`${theme === 'light' ? 'text-secondaryColor' : 'text-secondaryColorDark'} w-full mb-5 mt-3`} />
         <div className="w-full">
-          {activePlugins.map((p) => (
+          {activePlugins.map((p, index) => (
             <>
-              {pluginsFactory(p)}
+              {pluginsFactory(p, index)}
             </>
           ))}
         </div>

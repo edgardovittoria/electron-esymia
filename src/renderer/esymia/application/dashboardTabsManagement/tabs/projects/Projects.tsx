@@ -10,7 +10,7 @@ export const Projects: React.FC<ProjectsProps> = ({setLoadingSpinner}) => {
   const [showCreateNewFolderModal, setShowCreateNewFolderModal] =
     useState(false);
   return (
-    <div className="w-full py-2 h-[490px]">
+    <div className="w-full py-2 h-[68%]">
       <MyFiles
         showCreateNewFolderModal={showCreateNewFolderModal}
         setShowCreateNewFolderModal={setShowCreateNewFolderModal}
