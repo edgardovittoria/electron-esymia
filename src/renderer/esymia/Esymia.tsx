@@ -63,16 +63,6 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
     showCreateNewProjectModalSelector,
   );
 
-  useEffect(() => {
-    dispatch(publishMessage({
-      queue: 'management_solver',
-      body: { message: 'ping' },
-    }))
-    dispatch(publishMessage({
-      queue: 'management',
-      body: { message: 'ping' },
-    }))
-  }, [])
   // const mesherStatus = useSelector(MesherStatusSelector);
   // const solverStatus = useSelector(SolverStatusSelector);
 

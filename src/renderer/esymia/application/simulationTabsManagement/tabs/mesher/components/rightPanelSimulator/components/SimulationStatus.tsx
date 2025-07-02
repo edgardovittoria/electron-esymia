@@ -227,7 +227,7 @@ const SimulationStatusItem: React.FC<{
         dispatch(unsetComputingLp(associatedProject.id as string));
         dispatch(unsetComputingP(associatedProject.id as string));
         dispatch(unsetIterations(associatedProject.id as string));
-        dispatch(unsetSolverResults(associatedProject.id as string));
+        dispatch(unsetSolverResults());
         dispatch(
           publishMessage({
             queue: 'management_solver',
@@ -237,8 +237,19 @@ const SimulationStatusItem: React.FC<{
             },
           }),
         );
-        setRunningSimulation(undefined)
-        axios.post("http://127.0.0.1:8001/stop_computation?sim_id="+associatedProject.id)
+        setRunningSimulation(undefined);
+        axios
+          .post(
+            'http://127.0.0.1:8001/stop_computation?sim_id=' +
+              associatedProject.id,
+          )
+          .catch((e) => {
+            dispatch(
+              setMessageInfoModal('Something went wrong! Check Solver status.'),
+            );
+            dispatch(setIsAlertInfoModal(false));
+            dispatch(setShowInfoModal(true));
+          });
       }
     }
   }, [isAlertConfirmed]);
@@ -287,76 +298,62 @@ const SimulationStatusItem: React.FC<{
       convergenceThreshold,
     );
     if (associatedProject.meshData.type === 'Standard') {
-      axios.post('http://127.0.0.1:8001/solve', {
+      axios
+        .post('http://127.0.0.1:8001/solve', {
           ...objectToSendToSolver,
           simulationType: associatedProject.simulation?.simulationType,
-          mesher: 'standard'
+          mesher: 'standard',
+        })
+        .catch((e) => {
+          dispatch(
+            setMessageInfoModal('Something went wrong! Check Solver status.'),
+          );
+          dispatch(setIsAlertInfoModal(false));
+          dispatch(setShowInfoModal(true));
         });
-      // dispatch(
-      //   publishMessage({
-      //     queue: 'management_solver',
-      //     body: { message: 'solving', body: objectToSendToSolver },
-      //   }),
-      // );
     } else {
       if (associatedProject.simulation?.simulationType === 'Matrix') {
-        axios.post('http://127.0.0.1:8001/solve', {
-          ...objectToSendToSolver,
-          simulationType: associatedProject.simulation?.simulationType,
-          mesher: 'ris'
-        });
-        // dispatch(
-        //   publishMessage({
-        //     queue: 'management_solver',
-        //     body: { message: 'solving ris', body: objectToSendToSolver },
-        //   }),
-        // );
+        axios
+          .post('http://127.0.0.1:8001/solve', {
+            ...objectToSendToSolver,
+            simulationType: associatedProject.simulation?.simulationType,
+            mesher: 'ris',
+          })
+          .catch((e) => {
+            dispatch(
+              setMessageInfoModal('Something went wrong! Check Solver status.'),
+            );
+            dispatch(setIsAlertInfoModal(false));
+            dispatch(setShowInfoModal(true));
+          });
       } else {
-        axios.post('http://127.0.0.1:8001/solve', {
-          ...objectToSendToSolver,
-          simulationType: associatedProject.simulation?.simulationType,
-          mesher: 'ris',
-          theta: associatedProject.planeWaveParameters?.input.theta,
-          phi: associatedProject.planeWaveParameters?.input.phi,
-          e_theta: associatedProject.planeWaveParameters?.input.ETheta,
-          e_phi: associatedProject.planeWaveParameters?.input.EPhi,
-          baricentro: [
-            associatedProject.radialFieldParameters?.center.x,
-            associatedProject.radialFieldParameters?.center.y,
-            associatedProject.radialFieldParameters?.center.z,
-          ],
-          r_circ: associatedProject.radialFieldParameters?.radius,
-          times: associatedProject.times,
-          signal_type_E: associatedProject.planeWaveParameters?.input.ESignal,
-          ind_freq_interest: associatedProject.interestFrequenciesIndexes,
-          unit: associatedProject.modelUnit,
-        });
-        // dispatch(
-        //   publishMessage({
-        //     queue: 'management_solver',
-        //     body: {
-        //       message: 'solving electric fields',
-        //       body: {
-        //         ...objectToSendToSolver,
-        //         theta: associatedProject.planeWaveParameters?.input.theta,
-        //         phi: associatedProject.planeWaveParameters?.input.phi,
-        //         e_theta: associatedProject.planeWaveParameters?.input.ETheta,
-        //         e_phi: associatedProject.planeWaveParameters?.input.EPhi,
-        //         baricentro: [
-        //           associatedProject.radialFieldParameters?.center.x,
-        //           associatedProject.radialFieldParameters?.center.y,
-        //           associatedProject.radialFieldParameters?.center.z,
-        //         ],
-        //         r_circ: associatedProject.radialFieldParameters?.radius,
-        //         times: associatedProject.times,
-        //         signal_type_E:
-        //         associatedProject.planeWaveParameters?.input.ESignal,
-        //         ind_freq_interest: associatedProject.interestFrequenciesIndexes,
-        //         unit: associatedProject.modelUnit
-        //       },
-        //     },
-        //   }),
-        // );
+        axios
+          .post('http://127.0.0.1:8001/solve', {
+            ...objectToSendToSolver,
+            simulationType: associatedProject.simulation?.simulationType,
+            mesher: 'ris',
+            theta: associatedProject.planeWaveParameters?.input.theta,
+            phi: associatedProject.planeWaveParameters?.input.phi,
+            e_theta: associatedProject.planeWaveParameters?.input.ETheta,
+            e_phi: associatedProject.planeWaveParameters?.input.EPhi,
+            baricentro: [
+              associatedProject.radialFieldParameters?.center.x,
+              associatedProject.radialFieldParameters?.center.y,
+              associatedProject.radialFieldParameters?.center.z,
+            ],
+            r_circ: associatedProject.radialFieldParameters?.radius,
+            times: associatedProject.times,
+            signal_type_E: associatedProject.planeWaveParameters?.input.ESignal,
+            ind_freq_interest: associatedProject.interestFrequenciesIndexes,
+            unit: associatedProject.modelUnit,
+          })
+          .catch((e) => {
+            dispatch(
+              setMessageInfoModal('Something went wrong! Check Solver status.'),
+            );
+            dispatch(setIsAlertInfoModal(false));
+            dispatch(setShowInfoModal(true));
+          });
       }
     }
   }, []);
@@ -453,7 +450,7 @@ const SimulationStatusItem: React.FC<{
         dispatch(unsetComputingLp(simulation.associatedProject as string));
         dispatch(unsetComputingP(simulation.associatedProject as string));
         dispatch(unsetIterations(simulation.associatedProject as string));
-        dispatch(unsetSolverResults(simulation.associatedProject as string));
+        dispatch(unsetSolverResults());
         dispatch(setSolverResultsS3(undefined));
       });
     }
@@ -567,8 +564,7 @@ const SimulationStatusItem: React.FC<{
                     <div className="flex flex-row items-center gap-2">
                       <span className="flex flex-row items-center gap-2">
                         Doing Iterations:{' '}
-                        {simulation?.simulationType ===
-                        'Matrix' ? (
+                        {simulation?.simulationType === 'Matrix' ? (
                           <div className="flex flex-row gap-2 items-center">
                             <span className="font-semibold">
                               freq {iterations ? iterations.freqNumber : 0}/
@@ -611,11 +607,11 @@ const SimulationStatusItem: React.FC<{
                       max={
                         simulation?.simulationType === 'Matrix'
                           ? frequenciesNumber
-                          : associatedProject?.interestFrequenciesIndexes?.length
+                          : associatedProject?.interestFrequenciesIndexes
+                              ?.length
                       }
                     />
-                    {simulation?.simulationType ===
-                      'Electric Fields' && (
+                    {simulation?.simulationType === 'Electric Fields' && (
                       <div className="flex flex-col gap-2 mt-2">
                         <div className="flex flex-row items-center gap-2">
                           <span>
@@ -652,8 +648,7 @@ const SimulationStatusItem: React.FC<{
                         </div>
                       </div>
                     )}
-                    {simulation?.simulationType ===
-                      'Matrix' && (
+                    {simulation?.simulationType === 'Matrix' && (
                       <div className="max-h-[200px] overflow-y-scroll flex flex-col gap-2">
                         {associatedProject.ports
                           .filter((p) => p.category === 'port')

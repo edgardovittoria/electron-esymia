@@ -134,6 +134,10 @@ export const useStorageData = () => {
       deleteFileS3(project?.meshData.externalGrids as string).catch((err) =>
         console.log(err),
       );
+    project?.meshData.surface &&
+      deleteFileS3(project?.meshData.surface as string).catch((err) =>
+        console.log(err),
+      );
   };
 
   const deleteMeshDataLocal = (project: Project) => {
@@ -230,7 +234,7 @@ export const useStorageData = () => {
                 surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.gz`
               },
               ports: [],
-              portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
+              portsS3: project.portsS3 ? `${clonedProject.id}_ports.json` : undefined,
               simulation: {
                 ...clonedProject.simulation,
                 associatedProject: clonedProject.id,
@@ -262,7 +266,7 @@ export const useStorageData = () => {
               surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.gz`
             },
             ports: [],
-            portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
+            portsS3: project.portsS3 ? `${clonedProject.id}_ports.json` : undefined,
           } as Project;
           execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
             selectedFolder?.id !== 'root' &&
@@ -302,13 +306,13 @@ export const useStorageData = () => {
             clonedProject = {
               ...clonedProject,
               meshData: {
-                ...clonedProject.meshData,
-                mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`,
-                externalGrids: clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : undefined,
-                surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.gz`
+                ...project.meshData,
+                mesh: `${project.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`,
+                externalGrids: project.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : undefined,
+                surface: project.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.gz`
               },
               ports: [],
-              portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
+              portsS3: project.portsS3 ? `${clonedProject.id}_ports.json` : undefined,
               simulation: {
                 ...clonedProject.simulation,
                 associatedProject: clonedProject.id,
@@ -333,13 +337,13 @@ export const useStorageData = () => {
           clonedProject = {
             ...clonedProject,
             meshData: {
-              ...clonedProject.meshData,
-              mesh: `${clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`,
-              externalGrids: clonedProject.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : undefined,
-              surface: clonedProject.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.gz`
+              ...project.meshData,
+              mesh: `${project.meshData.type === 'Standard' ? `${clonedProject.id}_mesh.json.gz` : `${clonedProject.id}_mesh.json.gz`}`,
+              externalGrids: project.meshData.type === 'Standard' ? `${clonedProject.id}_grids.json.gz` : undefined,
+              surface: project.meshData.type === 'Standard' ? undefined : `${clonedProject.id}_surface.json.gz`
             },
             ports: [],
-            portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
+            portsS3: project.portsS3 ? `${clonedProject.id}_ports.json` : undefined,
           } as Project;
           execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
             selectedFolder?.id !== 'root' &&
@@ -443,7 +447,7 @@ export const useStorageData = () => {
               clonedProject = {
                 ...clonedProject,
                 ports: [],
-                portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
+                portsS3: project.portsS3 ? `${clonedProject.id}_ports.json` : undefined,
               } as Project;
               execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
                 selectedFolder?.id !== 'root' &&
@@ -508,7 +512,7 @@ export const useStorageData = () => {
                 surface: project.meshData.type === "Standard" ? undefined : `${clonedProject.id}_surface.json.gz`
               },
               ports: [],
-              portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
+              portsS3: project.portsS3 ? `${clonedProject.id}_ports.json` : undefined,
               simulation: {
                 ...clonedProject.simulation,
                 associatedProject: clonedProject.id,
@@ -531,7 +535,7 @@ export const useStorageData = () => {
               surface: project.meshData.type === "Standard" ? undefined : `${clonedProject.id}_surface.json.gz`
             },
             ports: [],
-            portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
+            portsS3: project.portsS3 ? `${clonedProject.id}_ports.json` : undefined,
           } as Project;
           execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
             setShowSearchUser(false)
@@ -576,7 +580,7 @@ export const useStorageData = () => {
               clonedProject = {
                 ...clonedProject,
                 ports: [],
-                portsS3: project.ports.length > 0 ? `${clonedProject.id}_ports.json` : undefined,
+                portsS3: project.portsS3 ? `${clonedProject.id}_ports.json` : undefined,
               } as Project;
               execQuery2(createOrUpdateProjectInDynamoDB, clonedProject, dispatch).then(() => {
                 setShowSearchUser(false)

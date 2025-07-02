@@ -290,11 +290,11 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
       {/* Pannello principale */}
       {sidebarItemSelected === 'Solver' && (
         <div
-          className={`flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[40%] w-[28%] rounded-tl rounded-tr ${
+          className={`flex-col absolute xl:left-[5%] left-[6%] top-[180px] xl:w-[40%] w-[28%] rounded-tl rounded-tr pb-5 ${
             theme === 'light'
               ? 'bg-white text-textColor'
               : 'bg-bgColorDark2 text-textColorDark'
-          } p-[10px] shadow-2xl lg:max-h-[300px] xl:max-h-[700px]`}
+          } p-[10px] shadow-2xl lg:max-h-[300px] xl:max-h-[750px]`}
         >
           {/* Barra di navigazione delle tab fissa tramite 'sticky' */}
           <nav className="border-b border-gray-200 sticky top-0 bg-inherit z-10">

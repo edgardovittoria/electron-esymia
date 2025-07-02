@@ -100,9 +100,7 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
       } else if (am.selectedProject.meshData.meshGenerated === 'Queued') {
         if (
           queuedMesh.filter(
-            (qm) =>
-              qm.selectedProject.id ===
-              am.selectedProject.id,
+            (qm) => qm.selectedProject.id === am.selectedProject.id,
           ).length === 0
         ) {
           setqueuedMesh((prev) => [...prev, am]);
@@ -114,17 +112,13 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
       dispatch(
         setMeshGenerated({
           status: 'Generating',
-          projectToUpdate: item
-            ? (item.selectedProject.id as string)
-            : '',
+          projectToUpdate: item ? (item.selectedProject.id as string) : '',
         }),
       );
       if (item) {
         setqueuedMesh(
           queuedMesh.filter(
-            (qm) =>
-              qm.selectedProject.id !==
-              item.selectedProject.id,
+            (qm) => qm.selectedProject.id !== item.selectedProject.id,
           ),
         );
         setrunningMesh({
@@ -232,41 +226,35 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
         id: selectedProject.id as string,
         meshingType: selectedProject.meshData.type,
       };
-      axios.post("http://127.0.0.1:8002/meshing", objToSendToMesher).then(() => {}).catch(e => console.log(e))
-      // dispatch(
-      //   publishMessage({
-      //     queue: 'management',
-      //     body: {
-      //       message: 'compute mesh',
-      //       body: objToSendToMesher,
-      //     },
-      //   }),
-      // );
+      axios
+        .post('http://127.0.0.1:8002/meshing', objToSendToMesher)
+        .then(() => {})
+        .catch((e) => {
+          dispatch(
+            setMessageInfoModal('Something went wrong! Check Mesher status.'),
+          );
+          dispatch(setIsAlertInfoModal(false));
+          dispatch(setShowInfoModal(true));
+        });
     } else {
       if (process.env.MESHER_RIS_MODE === 'backend') {
-        axios.post("http://127.0.0.1:8002/meshing", {
-          fileNameRisGeometry: selectedProject.bricks as string,
-          id: selectedProject.id as string,
-          density: selectedProject.meshData.lambdaFactor,
-          freqMax: selectedProject.maxFrequency,
-          meshingType: selectedProject.meshData.type,
-          escal: getEscalFrom(selectedProject.modelUnit)
-        }).then(() => {}).catch(e => console.log(e))
-        // dispatch(
-        //   publishMessage({
-        //     queue: 'management',
-        //     body: {
-        //       message: 'compute mesh ris',
-        //       body: {
-        //         fileNameRisGeometry: selectedProject.bricks as string,
-        //         id: selectedProject.id as string,
-        //         density: selectedProject.meshData.lambdaFactor,
-        //         freqMax: selectedProject.maxFrequency,
-        //         meshingType: selectedProject.meshData.type
-        //       },
-        //     },
-        //   }),
-        // );
+        axios
+          .post('http://127.0.0.1:8002/meshing', {
+            fileNameRisGeometry: selectedProject.bricks as string,
+            id: selectedProject.id as string,
+            density: selectedProject.meshData.lambdaFactor,
+            freqMax: selectedProject.maxFrequency,
+            meshingType: selectedProject.meshData.type,
+            escal: getEscalFrom(selectedProject.modelUnit),
+          })
+          .then(() => {})
+          .catch((e) => {
+            dispatch(
+              setMessageInfoModal('Something went wrong! Check Mesher status.'),
+            );
+            dispatch(setIsAlertInfoModal(false));
+            dispatch(setShowInfoModal(true));
+          });
       } else {
         const params = {
           Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
@@ -279,12 +267,10 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           const res = JSON.parse(data.Body?.toString() as string);
           window.electron.ipcRenderer.sendMessage('computeMeshRis', [
             selectedProject.meshData.lambdaFactor as number,
-            selectedProject.maxFrequency
-              ? selectedProject.maxFrequency
-              : 10e9,
+            selectedProject.maxFrequency ? selectedProject.maxFrequency : 10e9,
             res.bricks,
             selectedProject.id as string,
-            getEscalFrom(selectedProject.modelUnit)
+            getEscalFrom(selectedProject.modelUnit),
           ]);
         });
         window.electron.ipcRenderer.on('computeMeshRis', (arg: any) => {
@@ -337,8 +323,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                   dispatch(
                     setMeshASize({
                       ASize: mesh.ASize,
-                      projectToUpdate:
-                        selectedProject.id as string,
+                      projectToUpdate: selectedProject.id as string,
                     }),
                   );
                 });
@@ -350,7 +335,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
     }
     return () => {
       window.electron.ipcRenderer.removeAllListeners('computeMeshRis');
-    }
+    };
   }, []);
 
   const { execQuery2 } = useDynamoDBQuery();
@@ -486,23 +471,33 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   useEffect(() => {
     if (isAlertConfirmed) {
       if (!isAlert) {
-        if(process.env.MESHER_RIS_MODE === 'backend' || selectedProject.meshData.type === "Standard") {
-          axios.post("http://127.0.0.1:8002/stop_computation?meshing_id="+selectedProject.id).then(() => {}).catch(e => console.log(e))
-          // dispatch(
-          //   publishMessage({
-          //     queue: 'management',
-          //     body: {
-          //       message: 'stop computation',
-          //       id: selectedProject.id as string,
-          //     },
-          //   }),
-          // );
-        }else{
+        if (
+          process.env.MESHER_RIS_MODE === 'backend' ||
+          selectedProject.meshData.type === 'Standard'
+        ) {
+          axios
+            .post(
+              'http://127.0.0.1:8002/stop_computation?meshing_id=' +
+                selectedProject.id,
+            )
+            .then(() => {})
+            .catch((e) => {
+              dispatch(
+                setMessageInfoModal(
+                  'Something went wrong! Check Mesher status.',
+                ),
+              );
+              dispatch(setIsAlertInfoModal(false));
+              dispatch(setShowInfoModal(true));
+            });
+        } else {
           window.electron.ipcRenderer.sendMessage('stopMeshing', []);
         }
         dispatch(
           setMeshGenerated({
-            status: selectedProject.meshData.previousMeshStatus as "Not Generated" | "Generated",
+            status: selectedProject.meshData.previousMeshStatus as
+              | 'Not Generated'
+              | 'Generated',
             projectToUpdate: selectedProject.id as string,
           }),
         );
@@ -762,16 +757,13 @@ const QueuedMeshingStatusItem: React.FC<QueuedMeshingStatusItemProps> = ({
         onClick={() => {
           setqueuedMeshing((prev) =>
             prev.filter(
-              (item) =>
-                item.selectedProject.id !==
-                project.selectedProject.id,
+              (item) => item.selectedProject.id !== project.selectedProject.id,
             ),
           );
           dispatch(
             setMeshGenerated({
               status: project.meshStatus,
-              projectToUpdate: project.selectedProject
-                .id as string,
+              projectToUpdate: project.selectedProject.id as string,
             }),
           );
         }}

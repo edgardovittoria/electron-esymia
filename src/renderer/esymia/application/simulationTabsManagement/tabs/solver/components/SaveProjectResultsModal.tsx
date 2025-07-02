@@ -46,7 +46,7 @@ export const SaveProjectResultsModal: React.FC<
                             selectedProject.id as string,
                           ),
                         );
-                        dispatch(unsetSolverResults(selectedProject.id as string))
+                        dispatch(unsetSolverResults())
                         dispatch(
                           setMeshApproved({
                             approved: false,

@@ -368,7 +368,7 @@ export const SetCoordsModal: FC<{
                       <label className="ml-2">Xmin:</label>
                       <input
                         type="number"
-                        value={parseFloat(newCoords[0]).toFixed(8)}
+                        defaultValue={parseFloat(newCoords[0]).toFixed(8)}
                         required
                         onChange={(e) => updateNewCoords(0, e.target.value)}
                         className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
@@ -378,7 +378,7 @@ export const SetCoordsModal: FC<{
                       <label className="ml-2">Xmax:</label>
                       <input
                         type="number"
-                        value={parseFloat(newCoords[1]).toFixed(8)}
+                        defaultValue={parseFloat(newCoords[1]).toFixed(8)}
                         required
                         onChange={(e) => updateNewCoords(1, e.target.value)}
                         className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
@@ -392,7 +392,7 @@ export const SetCoordsModal: FC<{
                       <label className="ml-2">Ymin:</label>
                       <input
                         type="number"
-                        value={parseFloat(newCoords[2]).toFixed(8)}
+                        defaultValue={parseFloat(newCoords[2]).toFixed(8)}
                         required
                         onChange={(e) => updateNewCoords(2, e.target.value)}
                         className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
@@ -402,7 +402,7 @@ export const SetCoordsModal: FC<{
                       <label className="ml-2">Ymax:</label>
                       <input
                         type="number"
-                        value={parseFloat(newCoords[3]).toFixed(8)}
+                        defaultValue={parseFloat(newCoords[3]).toFixed(8)}
                         required
                         onChange={(e) => updateNewCoords(3, e.target.value)}
                         className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
@@ -416,7 +416,7 @@ export const SetCoordsModal: FC<{
                       <label className="ml-2">Zmin:</label>
                       <input
                         type="number"
-                        value={parseFloat(newCoords[4]).toFixed(8)}
+                        defaultValue={parseFloat(newCoords[4]).toFixed(8)}
                         required
                         onChange={(e) => updateNewCoords(4, e.target.value)}
                         className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
@@ -426,7 +426,7 @@ export const SetCoordsModal: FC<{
                       <label className="ml-2">Zmax:</label>
                       <input
                         type="number"
-                        value={parseFloat(newCoords[5]).toFixed(8)}
+                        defaultValue={parseFloat(newCoords[5]).toFixed(8)}
                         required
                         onChange={(e) => updateNewCoords(5, e.target.value)}
                         className="border border-black rounded shadow p-1 w-[80%] text-black text-left"

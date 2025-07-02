@@ -129,18 +129,6 @@ export const Results: React.FC<ResultsProps> = ({
           )
           .then((res) => console.log(res))
           .catch((err) => console.log(err));
-        // dispatch(
-        //   publishMessage({
-        //     queue: 'management_solver',
-        //     body: {
-        //       message: 'get results',
-        //       body: {
-        //         portIndex: 0,
-        //         fileId: selectedProject.simulation.resultS3,
-        //       },
-        //     },
-        //   }),
-        // );
       } else if (
         selectedProject.simulation.simulationType === 'Electric Fields' &&
         solverResults.filter((s) => s.id === selectedProject.id).length === 0
@@ -158,19 +146,6 @@ export const Results: React.FC<ResultsProps> = ({
           )
           .then((res) => console.log(res))
           .catch((err) => console.log(err));
-        // dispatch(
-        //   publishMessage({
-        //     queue: 'management_solver',
-        //     body: {
-        //       message: 'get results electric fields',
-        //       body: {
-        //         fileId: selectedProject.simulation.resultS3,
-        //         freq_index: 1,
-        //         id: selectedProject.id,
-        //       },
-        //     },
-        //   }),
-        // );
       }
     }
   }, [solverResults]);
@@ -225,15 +200,12 @@ export const Results: React.FC<ResultsProps> = ({
     }[]
   >([]);
 
-  // useEffect(() => {
-  //   setSelectedLabel([{ label: 'All Ports', id: 0 }]);
-  // }, [selectedProject]);
-
   useEffect(() => {
     setSelectedTabLeftPanel(undefined);
+    dispatch(unsetSolverResults());
     return () => {
       dispatch(resetItemToResultsView());
-      dispatch(unsetSolverResults(selectedProject?.id as string));
+      dispatch(unsetSolverResults());
     };
   }, []);
 

@@ -34,7 +34,7 @@ export const MenuBar: React.FC<MenuBarProps> = () => {
               onClick={() => {
                 dispatch(selectMenuItem(item))
                 if(item !== "Results"){
-                  dispatch(unsetSolverResults(selectedProject?.id as string))
+                  dispatch(unsetSolverResults())
                 }
               }}
             >

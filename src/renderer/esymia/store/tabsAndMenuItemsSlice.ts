@@ -394,11 +394,8 @@ export const TabsAndMenuItemsSlice = createSlice({
     },
     unsetSolverResults(
       state: TabsAndMenuItemsState,
-      action: PayloadAction<string>,
     ) {
-      state.solverResults = state.solverResults.filter(
-        (item) => item.id !== action.payload,
-      );
+      state.solverResults = [];
     },
     setBrokerConnected(state: TabsAndMenuItemsState) {
       state.brokerConnected = true;

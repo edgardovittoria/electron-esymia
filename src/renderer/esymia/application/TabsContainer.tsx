@@ -53,7 +53,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
             onClick={() => {
               dispatch(selectTab('DASHBOARD'));
               dispatch(selectProject(undefined));
-              dispatch(unsetSolverResults(selectedProject?.id as string))
+              dispatch(unsetSolverResults())
             }}
           >
             <MdOutlineDashboard size={20} />
@@ -84,7 +84,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                     onClick={() => {
                       dispatch(selectTab(projectTab.id as string));
                       dispatch(selectProject(projectTab.id));
-                      dispatch(unsetSolverResults(selectedProject?.id as string))
+                      dispatch(unsetSolverResults())
                     }}
                   >
                     {projectTab.name}
