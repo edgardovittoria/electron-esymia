@@ -96,7 +96,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                         closeProjectTab(projectTab.id as string),
                       );
                       dispatch(selectProject(undefined));
-                      dispatch(unsetSolverResults(selectedProject?.id as string))
+                      dispatch(unsetSolverResults())
                     }}
                   >
                     <FaTimes className="w-[12px] h-[12px] text-gray-400" />
