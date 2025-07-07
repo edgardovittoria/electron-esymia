@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   findSelectedPort,
@@ -17,11 +17,6 @@ import {
   Simulation,
   SolverOutput,
 } from '../../../../model/esymiaModels';
-import {
-  alertMessageStyle,
-  emptyResultsMessage,
-  runningSimulationMessageOnResults,
-} from '../../../config/textMessages';
 import { resultsLeftPanelTitle } from '../../../config/panelTitles';
 import { Dataset, pairs } from './sharedElements';
 import { AiOutlineBarChart } from 'react-icons/ai';
@@ -35,7 +30,6 @@ import { TbFileExport } from 'react-icons/tb';
 import toast, { ToastOptions } from 'react-hot-toast';
 import { Dispatch } from '@reduxjs/toolkit';
 import { s3 } from '../../../../aws/s3Config';
-import { RiAlarmWarningFill } from 'react-icons/ri';
 import {
   setMessageInfoModal,
   setIsAlertInfoModal,
@@ -43,14 +37,12 @@ import {
   ThemeSelector,
   resetItemToResultsView,
   solverResultsViewSelector,
-  resultsViewItem,
   solverResultsSelector,
   SolverResultsElectricFields,
   setSpinnerSolverResults,
   spinnerSolverResultsSelector,
   unsetSolverResults,
 } from '../../../../store/tabsAndMenuItemsSlice';
-import { publishMessage } from '../../../../../middleware/stompMiddleware';
 import { ChartListElectricFields } from './chartListElectricFields/ChartListElectricFields';
 import { SolverStatusSelector } from '../../../../store/pluginsSlice';
 import axios from 'axios';
@@ -151,6 +143,12 @@ export const Results: React.FC<ResultsProps> = ({
   const selectedFolder = useSelector(SelectedFolderSelector);
   const resultsView = useSelector(solverResultsViewSelector);
   const spinnerSolverResults = useSelector(spinnerSolverResultsSelector);
+  const [matrixS, setmatrixS] = useState<number[][][][]>([])
+
+  useEffect(() => {
+    setmatrixS(resultsView.map(r => r.results.matrixS))
+  }, [resultsView])
+
 
   const [freq, setfreq] = useState<number[]>([]);
 
@@ -202,6 +200,7 @@ export const Results: React.FC<ResultsProps> = ({
   useEffect(() => {
     setSelectedTabLeftPanel(undefined);
     dispatch(unsetSolverResults());
+    dispatch(resetItemToResultsView())
     dispatch(setSpinnerSolverResults(true))
     return () => {
       dispatch(resetItemToResultsView());
@@ -266,7 +265,8 @@ export const Results: React.FC<ResultsProps> = ({
           <button
             disabled={
               !selectedProject?.simulation ||
-              selectedProject.simulation.status === 'Running'
+              selectedProject.simulation.status === 'Running' ||
+              selectedProject.simulation.simulationType === "Electric Fields"
             }
             className={`p-2 tooltip tooltip-right relative z-10 disabled:opacity-40 ${
               theme === 'light'
@@ -305,7 +305,8 @@ export const Results: React.FC<ResultsProps> = ({
           <button
             disabled={
               !selectedProject?.simulation ||
-              selectedProject.simulation.status === 'Running'
+              selectedProject.simulation.status === 'Running' ||
+              selectedProject.simulation.simulationType === "Electric Fields"
             }
             className={`p-2 tooltip rounded-b tooltip-right relative z-10 disabled:opacity-40 ${
               theme === 'light'
@@ -317,10 +318,7 @@ export const Results: React.FC<ResultsProps> = ({
               if (selectedProject) {
                 window.electron.ipcRenderer.sendMessage('exportTouchstone', [
                   selectedProject.frequencies,
-                  JSON.parse(
-                    (selectedProject?.simulation?.results as SolverOutput)
-                      .matrix_S as string,
-                  ),
+                  matrixS,
                   selectedProject.scatteringValue,
                   selectedProject.ports.filter((p) => p.category === 'port')
                     .length,
