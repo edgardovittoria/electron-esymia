@@ -87,6 +87,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({index}) => {
                               message: 'stop',
                             }}))
                           setMesherLogs(["MESHER HALTED"])
+                          window.electron.ipcRenderer.sendMessage('haltMesher', [])
                         }}
                 />
               </button>
@@ -150,6 +151,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({index}) => {
                           //   }),
                           // });
                           setSolverLogs(["SOLVER HALTED"])
+                          window.electron.ipcRenderer.sendMessage('haltSolver', [])
                         }}
                 />
               </button>

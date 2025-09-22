@@ -3,12 +3,9 @@ import { BsGrid3X3Gap } from 'react-icons/bs';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectedProjectSelector } from '../../../../store/projectSlice';
-import { Port, Project } from '../../../../model/esymiaModels';
+import { Port } from '../../../../model/esymiaModels';
 import { Dataset, pairs } from './sharedElements';
-import { ExportToCsvZippedButton } from './ExportToCsvZippedButton';
-import { ExportTouchstoneButton } from './ExportTouchstoneButton';
 import { removeItemToResultsView, setSpinnerSolverResults, ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
-import { publishMessage } from '../../../../../middleware/stompMiddleware';
 import axios from 'axios';
 
 interface ChartVisualizationModeProps {

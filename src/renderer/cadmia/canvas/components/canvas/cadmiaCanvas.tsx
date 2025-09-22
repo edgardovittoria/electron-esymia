@@ -124,8 +124,8 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
                 dispatchEvent={undefined}
                 zoomToCursor
                 makeDefault
-                minDistance={10}
-                maxDistance={1000}
+                // minDistance={10}
+                // maxDistance={1000}
                 zoomSpeed={0.5}
                 // target={(orbitTarget) ? new THREE.Vector3(orbitTarget?.position[0], orbitTarget?.position[1], orbitTarget?.position[2]): new THREE.Vector3(0,0,0)}
               />

@@ -206,7 +206,7 @@ const getDockerPath = (...paths: string[]): string => {
 };
 
 ipcMain.on('runMesher', (e, args) => {
-  let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES/Mesher')]);
+  let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES')]);
   serverProcesses.mesher = scriptMesher
   scriptMesher.stdout.on('data', (data: string) => {
     e.reply('runMesher', '' + data);
@@ -222,7 +222,7 @@ ipcMain.on('runMesher', (e, args) => {
 });
 
 ipcMain.on('runSolver', (e, args) => {
-  let scriptSolver = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverINIT.sh'), getServerPath('MSGUI/juliaCODES/Solver')]);
+  let scriptSolver = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverINIT.sh'), getServerPath('MSGUI/juliaCODES')]);
   serverProcesses.solver = scriptSolver
   scriptSolver.stdout.on('data', (data: string) => {
     e.reply('runSolver', '' + data);

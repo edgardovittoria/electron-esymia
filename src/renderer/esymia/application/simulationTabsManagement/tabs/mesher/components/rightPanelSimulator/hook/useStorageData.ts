@@ -103,7 +103,7 @@ export const useStorageData = () => {
       axios.post("http://127.0.0.1:8002/getGrids", {
         grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, 
         id: selectedProject.id
-      })
+      }).then(res => console.log(res)).catch(err => console.log(err));
       // dispatch(publishMessage({
       //   queue: 'management',
       //   body: { message: "get grids", grids_id: selectedProject.meshData.type === 'Standard' ? selectedProject.meshData.externalGrids as string : selectedProject.meshData.surface as string, id: selectedProject.id }}))

@@ -648,7 +648,7 @@ const SimulationStatusItem: React.FC<{
                         </div>
                       </div>
                     )}
-                    {simulation?.simulationType === 'Matrix' && (
+                    {/* {simulation?.simulationType === 'Matrix' && (
                       <div className="max-h-[200px] overflow-y-scroll flex flex-col gap-2">
                         {associatedProject.ports
                           .filter((p) => p.category === 'port')
@@ -688,7 +688,7 @@ const SimulationStatusItem: React.FC<{
                             );
                           })}
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
                 <div
