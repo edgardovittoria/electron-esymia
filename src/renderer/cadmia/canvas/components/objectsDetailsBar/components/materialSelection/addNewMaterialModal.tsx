@@ -89,7 +89,8 @@ export const AddNewMaterialModal: FC<{ showModal: Function, updateMaterials: Fun
             execQuery2(createOrUpdateMaterialDynamoDB, {
                 id: crypto.randomUUID(),
                 name: name,
-                ownerEmail: user?.email as string,
+                //TODO: sostituirte user.name con user.email nella versione integrale
+                ownerEmail: user?.name as string,
                 color: color,
                 permeability: permeability,
                 tangent_delta_permeability: tangentDeltaPermeability,

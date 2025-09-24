@@ -20,7 +20,6 @@ export function classNames(...classes: string[]) {
 
 export const Navbar: React.FC<NavbarProps> = ({ setShowCad }) => {
 
-  const { user } = useAuth0();
   const dispatch = useDispatch()
 
   return (

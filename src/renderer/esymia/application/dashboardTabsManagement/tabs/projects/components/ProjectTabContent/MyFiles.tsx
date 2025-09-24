@@ -3,6 +3,8 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  activeMeshingSelector,
+  activeSimulationsSelector,
   mainFolderSelector,
   SelectedFolderSelector,
   selectFolder,
@@ -39,6 +41,8 @@ const MyFiles: React.FC<MyFilesProps> = ({
   const mainFolder = useSelector(mainFolderSelector);
   const selectedFolder = useSelector(SelectedFolderSelector);
   const theme = useSelector(ThemeSelector);
+  const activeMeshing = useSelector(activeMeshingSelector)
+  const activeSimulation = useSelector(activeSimulationsSelector)
   const dispatch = useDispatch();
 
   const { loadFolders } = useStorage()
@@ -177,14 +181,14 @@ const MyFiles: React.FC<MyFilesProps> = ({
                 >
                   Projects
                 </h5>
-                <div className="tooltip tooltip-top hover:cursor-pointer hover:opacity-90" data-tip="Reload Projects"
+                <button disabled={activeMeshing.length > 0 || activeSimulation.length > 0} className="tooltip tooltip-top hover:cursor-pointer hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60" data-tip="Reload Projects"
                   onClick={() => {
                     setLoadingSpinner(true)
                     loadFolders(setLoadingSpinner)
                   }}
                 >
                   <IoReload size={20}/>
-                </div>
+                </button>
                 
               </div>
 

@@ -11,9 +11,9 @@ export const useMaterials = () => {
   const [availableMaterials, setAvailableMaterials] = useState<Material[]>([]);
   const { execQuery2 } = useDynamoDBQuery();
   const dispatch = useDispatch();
-
+  //TODO: sostituirte user.name con user.email nella versione integrale
   const updateMaterials = () => {
-    execQuery2(getMaterialsDynamoDB, dispatch, user?.email as string)?.then((res) => {
+    execQuery2(getMaterialsDynamoDB, dispatch, user?.name as string)?.then((res) => {
       let items: any[] = [];
       if (res.Items) {
         res.Items.forEach((i: any) => items.push(convertFromDynamoDBFormat(i)));
@@ -24,7 +24,7 @@ export const useMaterials = () => {
 
   useEffect(() => {
     user &&
-      execQuery2(getMaterialsDynamoDB, dispatch, user?.email as string)?.then((res) => {
+      execQuery2(getMaterialsDynamoDB, dispatch, user?.name as string)?.then((res) => {
         let items: any[] = [];
         if (res.Items) {
           res.Items.forEach((i: any) =>

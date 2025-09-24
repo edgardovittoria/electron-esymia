@@ -55,9 +55,9 @@ const MyProject: React.FC<ContextMenuProps> = ({
       },
     });
   }
-
+  //TODO: cambiare user.name con user.email nella versione integrale
   useEffect(() => {
-    execQuery2(getSimulationProjectsByUserEmailDynamoDB, user?.email, dispatch).then(
+    execQuery2(getSimulationProjectsByUserEmailDynamoDB, user?.name, dispatch).then(
       (res) => {
         let projects: any[] = []
         console.log(res)
