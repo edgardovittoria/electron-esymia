@@ -128,9 +128,10 @@ export const Modeler: React.FC<ModelerProps> = ({
       <div className="absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0">
         <button
           disabled={
-            selectedProject &&
+            (selectedProject &&
             selectedProject.simulation &&
-            selectedProject.simulation.status === 'Running'
+            selectedProject.simulation.status === 'Running') ||
+            (process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)
           }
           className={`p-2 tooltip rounded tooltip-right relative z-10 disabled:opacity-40 ${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`}
           data-tip="Clone Project"

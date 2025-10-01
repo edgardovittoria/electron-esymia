@@ -1,4 +1,4 @@
-import { PutItemInput, QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb';
+import { DeleteItemInput, PutItemInput, QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb';
 import { MaterialDynamoDB } from '../cadmia/canvas/components/objectsDetailsBar/components/materialSelection/addNewMaterialModal';
 import { convertToDynamoDBFormat } from './utility/formatDynamoDBData';
 import { dynamoDB } from '../esymia/aws/s3Config';
@@ -75,3 +75,25 @@ export async function getMaterialsDynamoDB(dispatch: Dispatch, ownerEmail: strin
     return undefined; // Indica che c'è stato un errore
   }
 };
+
+export async function deleteMaterialDynamoDB(
+  materialToDelete: string,
+  dispatch: Dispatch,
+) {
+  let params: DeleteItemInput = {
+    TableName: 'Materials',
+    Key: { id: { S: materialToDelete } },
+  };
+  return await dynamoDB
+    .deleteItem(params)
+    .promise()
+    .catch((err) => {
+      dispatch(
+        setMessageInfoModal(
+          'Connection Error!!! Make sure your internet connection is active and try log out and log in. Any unsaved data will be lost.',
+        ),
+      );
+      dispatch(setIsAlertInfoModal(false));
+      dispatch(setShowInfoModal(true));
+    });
+}

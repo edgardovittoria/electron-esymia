@@ -29,7 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({ setShowCad }) => {
           <FileItem />
           <ViewItem />
           <EditItem />
-          <Shapes />
+          {/* <Shapes /> */}
         </Popover.Group>
 
         {/* <span className='text-2xl font-semibold'>CADmIA</span> */}

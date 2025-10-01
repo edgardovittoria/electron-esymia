@@ -107,19 +107,20 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
                   />
                 );
               })}
-              <div
-                className={`px-10 py-12 relative rounded-xl border ${theme === 'light' ? 'border-textColor text-textColor hover:bg-secondaryColor hover:text-white' : 'border-textColorDark text-textColorDark hover:bg-secondaryColorDark hover:text-textColor'}  flex flex-col items-center hover:cursor-pointer hover:shadow-2xl`}
+              <button
+                className={`px-10 py-12 relative rounded-xl border ${theme === 'light' ? 'border-textColor text-textColor hover:bg-secondaryColor hover:text-white' : 'border-textColorDark text-textColorDark hover:bg-secondaryColorDark hover:text-textColor'}  flex flex-col items-center hover:cursor-pointer hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-textColor disabled:hover:bg-transparent`}
                 onClick={() => {
                   dispatch(resetState());
                   dispatch(ActionCreators.clearHistory());
                   setShowCad(true);
                 }}
+                disabled={models.length === 3}
               >
                 <AiOutlineAppstoreAdd size={75} />
                 <span className='absolute bottom-2 font-semibold'>
                   New Blank Project
                 </span>
-              </div>
+              </button>
             </div>
           )}
         </div>

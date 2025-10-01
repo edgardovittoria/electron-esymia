@@ -23,12 +23,12 @@ export const KeyboardEventMapper: React.FC<KeyboardEventMapperProps> = () => {
 
     function KeyPress(e: KeyboardEvent) {
         // undo last action
-        if(e.ctrlKey && e.key === 'z' && pastStateLength > 0){
+        if(e.ctrlKey && e.key === 'z' && pastStateLength > 0 && process.env.APP_VERSION !== 'demo'){
             e.preventDefault()
             undoFunction(lastActionType, undoActions, setundoActions, dispatch)
         }
         // redo last action
-        if(e.ctrlKey && e.key === 'x' && futureStateLength > 0){
+        if(e.ctrlKey && e.key === 'x' && futureStateLength > 0 && process.env.APP_VERSION !== 'demo'){
             e.preventDefault()
             redoFunction(undoActions, setundoActions, dispatch)
         }

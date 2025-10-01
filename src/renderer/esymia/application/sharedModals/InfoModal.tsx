@@ -26,7 +26,7 @@ const InfoModal: React.FC<InfoModalProps> = ({}) => {
 
     return(
       <Transition appear show={infoModal.showInfoModal} as={Fragment}>
-        <Dialog as='div' className='relative z-10' onClose={() => {}}>
+        <Dialog as='div' className='relative z-50' onClose={() => {}}>
           <Transition.Child
             as={Fragment}
             enter='ease-out duration-300'

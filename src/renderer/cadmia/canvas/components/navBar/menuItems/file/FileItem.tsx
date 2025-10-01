@@ -18,6 +18,7 @@ import { setUnit, unitSelector } from '../../../statusBar/statusBarSlice';
 import { s3 } from '../../../../../aws/s3Config';
 import {
   addModel,
+  ModelsSelector,
   SelectedModelSelector,
   selectModel,
   setLoadingSpinner,
@@ -70,6 +71,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
   const [modalRisSave, setModalRisSave] = useState(false);
   const [modalLoad, setModalLoad] = useState(false);
   const { isAuthenticated } = useAuth0();
+  const models = useSelector(ModelsSelector);
   const selectedModel = useSelector(SelectedModelSelector);
   const canvas = useSelector(canvasStateSelector);
   const unit = useSelector(unitSelector);
@@ -217,9 +219,10 @@ export const FileItem: React.FC<FileItemProps> = () => {
                       </span>
                     )} */}
                     {isAuthenticated && (
-                      <span
+                      <button
                         className={navbarDropdownItemStyle}
                         onClick={() => setModalSave(true)}
+                        disabled={(process.env.APP_VERSION === 'demo' && models.length === 3)}
                       >
                         <div className="flex justify-between w-full hover:cursor-pointer">
                           <div className="flex">
@@ -227,12 +230,13 @@ export const FileItem: React.FC<FileItemProps> = () => {
                             <p className="text-base font-medium">Save As...</p>
                           </div>
                         </div>
-                      </span>
+                      </button>
                     )}
                     {isAuthenticated && (
-                      <span
+                      <button
                         className={navbarDropdownItemStyle}
                         onClick={() => setModalRisSave(true)}
+                        disabled={(process.env.APP_VERSION === 'demo' && models.length === 3)}
                       >
                         <div className="flex justify-between w-full hover:cursor-pointer">
                           <div className="flex">
@@ -240,7 +244,7 @@ export const FileItem: React.FC<FileItemProps> = () => {
                             <p className="text-base font-medium">Save With Ris Geometry Data</p>
                           </div>
                         </div>
-                      </span>
+                      </button>
                     )}
                     {isAuthenticated && (
                       <span

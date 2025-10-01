@@ -40,11 +40,12 @@ export const UndoRedo: React.FC<UndoRedoProps> = () => {
   return (
     <>
       {pastStateLength > 0 ? (
-        <div
+        <button
           onClick={() => {
             undoFunction(lastActionType, undoActions, setundoActions, dispatch);
           }}
           className={navbarDropdownItemStyle}
+          disabled={(process.env.APP_VERSION === 'demo')}
         >
           <div className='flex w-full justify-between'>
             <div className='flex items-center'>
@@ -53,7 +54,7 @@ export const UndoRedo: React.FC<UndoRedoProps> = () => {
             </div>
             <p className={navbarShortcutStyle}>Ctrl + Z</p>
           </div>
-        </div>
+        </button>
       ) : (
         <div className={navbarDropdownItemStyle}>
           <div className='flex w-full justify-between'>
@@ -65,13 +66,12 @@ export const UndoRedo: React.FC<UndoRedoProps> = () => {
           </div>
         </div>
       )}
-
-      {futureStateLength > 0 ? (
-        <div
+      <button
           onClick={() => {
             redoFunction(undoActions, setundoActions, dispatch);
           }}
           className={navbarDropdownItemStyle}
+          disabled={(process.env.APP_VERSION === 'demo' || futureStateLength === 0)}
         >
           <div className='flex w-full justify-between'>
             <div className='flex items-center'>
@@ -82,20 +82,7 @@ export const UndoRedo: React.FC<UndoRedoProps> = () => {
             </div>
             <p className={navbarShortcutStyle}>Ctrl + X</p>
           </div>
-        </div>
-      ) : (
-        <div className={navbarDropdownItemStyle}>
-          <div className='flex w-full justify-between'>
-            <div className='flex items-center'>
-              <FontAwesomeIcon icon={faRedo} className='text-gray-300 mr-5' />
-              <span className='text-base font-medium text-gray-300'>
-              Redo Last Action
-            </span>
-            </div>
-            <p className={navbarShortcutStyle}>Ctrl + X</p>
-          </div>
-        </div>
-      )}
+        </button>
     </>
   );
 };

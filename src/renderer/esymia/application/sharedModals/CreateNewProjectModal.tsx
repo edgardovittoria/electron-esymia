@@ -25,7 +25,6 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
   const dispatch = useDispatch();
 
   const user = useSelector(usersStateSelector);
-  console.log(user)
   const selectedFolder = useSelector(SelectedFolderSelector);
   const theme = useSelector(ThemeSelector)
 

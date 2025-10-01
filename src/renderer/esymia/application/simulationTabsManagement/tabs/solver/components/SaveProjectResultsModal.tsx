@@ -159,7 +159,8 @@ export const SaveProjectResultsModal: React.FC<
                         theme === 'light'
                           ? ''
                           : 'bg-secondaryColorDark text-textColor'
-                      }`}
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      disabled={(process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)}
                       onClick={() => {
                         setcloning(true)
                         cloneProjectToSaveResults(

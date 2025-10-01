@@ -9,8 +9,11 @@ export const SetUserInfo:FC<{}> = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-      //TODO: sostituire user.name con user.email nella versione integrale
+      if(process.env.APP_VERSION === "demo"){
         (user && user.nickname && user.name) ? dispatch(setUser({email: user.name, userName: user.nickname, userRole: user['https://db.fauna.com/roles'][0]})) : dispatch(unsetUser())
+      }else{
+        (user && user.nickname && user.email) ? dispatch(setUser({email: user.email, userName: user.nickname, userRole: user['https://db.fauna.com/roles'][0]})) : dispatch(unsetUser())
+      }
       }, [user])
 
       return <></>

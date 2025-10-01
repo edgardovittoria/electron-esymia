@@ -133,6 +133,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
             <Submenu
               className='hover:text-white  text-primaryColor'
               data-testid="moveMenu"
+              disabled={user.userRole !== 'Premium' || process.env.APP_VERSION === 'demo'}
               label={
                 <>
                   <BsFillFolderSymlinkFill className="mr-4 w-[20px] h-[20px]" />
@@ -195,7 +196,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                 cloneProject(project, selectedFolder as Folder, setcloning)
                 hideAll();
               }}
-              disabled={user.userRole !== 'Premium'}
+              disabled={user.userRole !== 'Premium' || (process.env.APP_VERSION === 'demo' && selectedFolder.projectList.length === 3)}
               className='hover:text-white  text-primaryColor'
             >
               <GrClone className="mr-4 w-[20px] h-[20px]" />
@@ -207,7 +208,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                 setShowSearchUser(true);
                 hideAll();
               }}
-              disabled={user.userRole !== 'Premium'}
+              disabled={user.userRole !== 'Premium' || process.env.APP_VERSION === 'demo'}
               className='hover:text-white  text-primaryColor'
             >
               <BiShareAlt className="mr-4 w-[20px] h-[20px]" />

@@ -84,28 +84,28 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
     <>
       <div className="flex row">
         <div key="xmin" className="flex">
-          <span className="text-black w-[40%] text-left text-[10px]">Xmin</span>
+          <span className="text-black w-[40%] text-left text-[12px]">Xmin</span>
           <div className="flex mb-[5px]">
             <input
               key="xmin"
               disabled
               type="number"
               step="0.1"
-              className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+              className="border border-black rounded shadow px-1 w-[60%] text-black text-left text-[12px] font-semibold"
               autoComplete="off"
               value={coords[0]}
             />
           </div>
         </div>
         <div key="xmax" className="flex">
-          <span className="text-black w-[40%] text-left text-[10px]">Xmax</span>
+          <span className="text-black w-[40%] text-left text-[12px]">Xmax</span>
           <div className="flex mb-[5px]">
             <input
               key="xmax"
               disabled
               type="number"
               step="0.1"
-              className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+              className="border border-black rounded shadow px-1 w-[60%] text-black text-left text-[12px] font-semibold"
               autoComplete="off"
               value={coords[1]}
             />
@@ -114,28 +114,28 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
       </div>
       <div className="flex row">
         <div key="ymin" className="flex">
-          <span className="text-black w-[40%] text-left text-[10px]">Ymin</span>
+          <span className="text-black w-[40%] text-left text-[12px]">Ymin</span>
           <div className="flex mb-[5px]">
             <input
               key="ymin"
               disabled
               type="number"
               step="0.1"
-              className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+              className="border border-black rounded shadow px-1 w-[60%] text-black text-left text-[12px] font-semibold"
               autoComplete="off"
               value={coords[2]}
             />
           </div>
         </div>
         <div key="ymax" className="flex">
-          <span className="text-black w-[40%] text-left text-[10px]">Ymax</span>
+          <span className="text-black w-[40%] text-left text-[12px]">Ymax</span>
           <div className="flex mb-[5px]">
             <input
               key="ymax"
               disabled
               type="number"
               step="0.1"
-              className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+              className="border border-black rounded shadow px-1 w-[60%] text-black text-left text-[12px] font-semibold"
               autoComplete="off"
               value={coords[3]}
             />
@@ -144,28 +144,28 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
       </div>
       <div className="flex row">
         <div key="zmin" className="flex">
-          <span className="text-black w-[40%] text-left text-[10px]">Zmin</span>
+          <span className="text-black w-[40%] text-left text-[12px]">Zmin</span>
           <div className="flex mb-[5px]">
             <input
               key="zmin"
               disabled
               type="number"
               step="0.1"
-              className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+              className="border border-black rounded shadow px-1 w-[60%] text-black text-left text-[12px] font-semibold"
               autoComplete="off"
               value={coords[4]}
             />
           </div>
         </div>
         <div key="zmax" className="flex">
-          <span className="text-black w-[40%] text-left text-[10px]">Zmax</span>
+          <span className="text-black w-[40%] text-left text-[12px]">Zmax</span>
           <div className="flex mb-[5px]">
             <input
               key="zmax"
               type="number"
               disabled
               step="0.1"
-              className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+              className="border border-black rounded shadow px-1 w-[60%] text-black text-left text-[12px] font-semibold"
               autoComplete="off"
               value={coords[5]}
             />
@@ -174,18 +174,18 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
       </div>
       <button
         type="button"
-        className="rounded bg-gray-500 shadow p-2 mt-[20px] w-full"
+        className="rounded bg-black hover:opacity-75 hover:cursor-pointer text-sm capitalize shadow p-2 mt-5 w-full"
         onClick={() => setShowCoordsModal(true)}
       >
         Change Coords
       </button>
       {/* <div key="width" className="flex">
-                <span className="text-black w-[40%] text-left text-[10px]">width</span>
+                <span className="text-black w-[40%] text-left text-[12px] font-semibold">width</span>
                 <div className="flex mb-[5px]">
                     <input key="width"
                            type="number"
                            step="0.1"
-                           className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+                           className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[12px] font-semibold"
                            autoComplete="off"
                            value={(entity.geometryAttributes as CubeGeometryAttributes).width}
                            onChange={(e) => updateParams({
@@ -196,12 +196,12 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
                 </div>
             </div>
             <div key="heigth" className="flex">
-                <span className="text-black w-[40%] text-left text-[10px]">heigth</span>
+                <span className="text-black w-[40%] text-left text-[12px] font-semibold">heigth</span>
                 <div className="flex mb-[5px]">
                     <input key="height"
                            type="number"
                            step="0.1"
-                           className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+                           className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[12px] font-semibold"
                            autoComplete="off"
                            value={(entity.geometryAttributes as CubeGeometryAttributes).height}
                            onChange={(e) => updateParams({
@@ -212,12 +212,12 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
                 </div>
             </div>
             <div key="depth" className="flex">
-                <span className="text-black w-[40%] text-left text-[10px]">depth</span>
+                <span className="text-black w-[40%] text-left text-[12px] font-semibold">depth</span>
                     <div className="flex mb-[5px]">
                         <input key="depth"
                                type="number"
                                step="0.1"
-                               className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+                               className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[12px] font-semibold"
                                autoComplete="off"
                                value={(entity.geometryAttributes as CubeGeometryAttributes).depth}
                                onChange={(e) => updateParams({
@@ -227,8 +227,8 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
                         />
                     </div>
             </div> */}
-      <div key="width_segments" className="flex">
-        <span className="text-black w-[40%] text-left text-[10px]">
+      <div key="width_segments" className="flex mt-5">
+        <span className="text-black w-[40%] text-left text-[12px] capitalize">
           width segments
         </span>
         <div className="flex mb-[5px]">
@@ -236,7 +236,7 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
             key="width_segments"
             type="number"
             step="1"
-            className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+            className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[12px] font-semibold"
             autoComplete="off"
             value={
               (entity.geometryAttributes as CubeGeometryAttributes)
@@ -252,7 +252,7 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
         </div>
       </div>
       <div key="heigth_segments" className="flex">
-        <span className="text-black w-[40%] text-left text-[10px]">
+        <span className="text-black w-[40%] text-left text-[12px] capitalize">
           heigth segments
         </span>
         <div className="flex mb-[5px]">
@@ -260,7 +260,7 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
             key="height_segments"
             type="number"
             step="1"
-            className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+            className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[12px] font-semibold"
             autoComplete="off"
             value={
               (entity.geometryAttributes as CubeGeometryAttributes)
@@ -276,7 +276,7 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
         </div>
       </div>
       <div key="depth_segments" className="flex">
-        <span className="text-black w-[40%] text-left text-[10px]">
+        <span className="text-black w-[40%] text-left text-[12px] capitalize">
           depth segments
         </span>
         <div className="flex mb-[5px]">
@@ -284,7 +284,7 @@ export const CubeGeometryParams: FC<GeometryParamsGeneralProps> = ({
             key="depth_segments"
             type="number"
             step="1"
-            className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[10px]"
+            className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-[12px] font-semibold"
             autoComplete="off"
             value={
               (entity.geometryAttributes as CubeGeometryAttributes)

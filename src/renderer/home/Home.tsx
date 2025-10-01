@@ -105,16 +105,16 @@ const Home: React.FC<HomeProps> = ({ setSelectedTab }) => {
                 className="flex flex-col gap-5 w-1/5 items-center px-10 py-2 border border-black rounded-xl hover:bg-white hover:text-black hover:cursor-pointer"
                 onClick={() =>
                   process.env.APP_MODE === 'test'
-                    ? loginWithRedirect({
+                    ? (process.env.APP_VERSION === 'demo') ? loginWithRedirect({
                         authorizationParams: {
                           connection: 'sms',
                         },
-                      })
-                    : loginWithPopup({
+                      }) : loginWithRedirect()
+                    : (process.env.APP_VERSION === 'demo') ? loginWithPopup({
                         authorizationParams: {
                           connection: 'sms',
                         },
-                      })
+                      }) : loginWithPopup()
                 }
               >
                 <div className="flex flex-row justify-between items-center gap-2">

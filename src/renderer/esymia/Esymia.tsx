@@ -58,7 +58,7 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
     }
   }, [activePlugins.length]);
 
-  const showInfoModal = useSelector(showInfoModalSelector);
+  //const showInfoModal = useSelector(showInfoModalSelector);
   const showCreateNewProjectModal = useSelector(
     showCreateNewProjectModalSelector,
   );
@@ -108,7 +108,6 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
           {loginSpinner && (
             <ImSpinner className="animate-spin w-12 h-12 absolute left-1/2 top-1/2" />
           )}
-          {showInfoModal && <InfoModal />}
           {showCreateNewProjectModal && <CreateNewProjectModal />}
           <div className={`${loginSpinner && 'opacity-40'}`}>
             {memoizedTabsContainer}

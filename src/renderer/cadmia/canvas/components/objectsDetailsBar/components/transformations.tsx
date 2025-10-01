@@ -30,7 +30,7 @@ export const Transformations: FC<{
         </div>
       </div>
       <div key="position" className="flex justify-between">
-        <span className="text-black w-[15%] text-[10px]">position</span>
+        <span className="text-black w-[15%] text-[12px]">Position</span>
         <div className="flex mb-[5px] justify-between pr-[15px] w-[83%]">
           {transformationParams.position.map((paramValue, index) => (
             <input
@@ -38,7 +38,7 @@ export const Transformations: FC<{
               disabled
               type="number"
               step="0.1"
-              className="border border-black rounded shadow w-[30%] text-black text-[10px] px-1"
+              className="border border-black rounded shadow w-[30%] text-black text-[12px] px-1 font-semibold"
               autoComplete="off"
               value={paramValue}
               onChange={(e) => {
@@ -58,7 +58,7 @@ export const Transformations: FC<{
         </div>
       </div>
       <div key="rotation" className="flex justify-between">
-        <span className="text-black w-[15%] text-[10px]">rotation</span>
+        <span className="text-black w-[15%] text-[12px]">Rotation</span>
         <div className="flex mb-[5px] justify-between pr-[15px] w-[83%]">
           {transformationParams.rotation.map((paramValue, index) => (
             <div
@@ -71,7 +71,7 @@ export const Transformations: FC<{
                 step="1"
                 min={-180}
                 max={180}
-                className="border border-black rounded shadow w-full text-black text-[10px] px-1"
+                className="border border-black rounded shadow w-full text-black text-[12px] px-1 font-semibold"
                 autoComplete="off"
                 value={(paramValue * 180) / Math.PI}
                 onChange={(e) => {
@@ -97,7 +97,7 @@ export const Transformations: FC<{
       </div>
       <button
         type="button"
-        className="rounded bg-gray-500 shadow p-2 mt-[20px] w-full"
+        className="rounded bg-black hover:opacity-75 hover:cursor-pointer text-sm capitalize shadow p-2 mt-5 w-full"
         onClick={() => setShowTransformationModal(true)}
       >
         Change Transformation Params
@@ -144,17 +144,37 @@ export const SetTransformationParamsModal: FC<{
   const dispatch = useDispatch();
 
   const updateNewPositionCoord = (index: number, value: string) => {
-    if (/^-?\d*\.?\d{0,6}$/.test(value)) {
+    const numericValue = value.replace(/[^0-9.-]/g, '');
+
+    let finalValue;
+    if (numericValue === '') {
+      // Se la stringa è vuota, potresti voler impostare lo stato a 0 o null
+      finalValue = '0'; // O la logica che preferisci
+    } else {
+      // Converte la stringa numerica in un float
+      finalValue = numericValue;
+    }
+    if (/^-?\d*\.?\d{0,6}$/.test(finalValue)) {
       const newValues = [...newPosition];
-      newValues[index] = value;
+      newValues[index] = finalValue;
       setNewPosition(newValues);
     }
   };
 
   const updateNewRotation = (index: number, value: string) => {
-    if (/^-?\d*\.?\d{0,6}$/.test(value)) {
+    const numericValue = value.replace(/[^0-9.-]/g, '');
+
+    let finalValue;
+    if (numericValue === '') {
+      // Se la stringa è vuota, potresti voler impostare lo stato a 0 o null
+      finalValue = '0'; // O la logica che preferisci
+    } else {
+      // Converte la stringa numerica in un float
+      finalValue = numericValue;
+    }
+    if (/^-?\d*\.?\d{0,6}$/.test(finalValue)) {
       const newValues = [...newRotation];
-      newValues[index] = value;
+      newValues[index] = finalValue;
       setNewRotation(newValues);
     }
   };
@@ -189,7 +209,8 @@ export const SetTransformationParamsModal: FC<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel
+              className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900"
@@ -201,7 +222,7 @@ export const SetTransformationParamsModal: FC<{
                     <div>
                       <label className="ml-2">position x:</label>
                       <input
-                        type="number"
+                        type="text"
                         value={newPosition[0]}
                         required
                         onChange={(e) =>
@@ -213,9 +234,8 @@ export const SetTransformationParamsModal: FC<{
                     <div>
                       <label className="ml-2">position y:</label>
                       <input
-                        type="number"
+                        type="text"
                         value={newPosition[1]}
-                        required
                         onChange={(e) =>
                           updateNewPositionCoord(1, e.target.value)
                         }
@@ -225,7 +245,7 @@ export const SetTransformationParamsModal: FC<{
                     <div>
                       <label className="ml-2">position z:</label>
                       <input
-                        type="number"
+                        type="text"
                         value={newPosition[2]}
                         required
                         onChange={(e) =>
@@ -241,7 +261,7 @@ export const SetTransformationParamsModal: FC<{
                     <div>
                       <label className="ml-2">rotation x:</label>
                       <input
-                        type="number"
+                        type="text"
                         value={newRotation[0]}
                         required
                         onChange={(e) => updateNewRotation(0, e.target.value)}
@@ -254,7 +274,7 @@ export const SetTransformationParamsModal: FC<{
                     <div>
                       <label className="ml-2">rotation y:</label>
                       <input
-                        type="number"
+                        type="text"
                         value={newRotation[1]}
                         required
                         onChange={(e) => updateNewRotation(1, e.target.value)}
@@ -267,7 +287,7 @@ export const SetTransformationParamsModal: FC<{
                     <div>
                       <label className="ml-2">rotation z:</label>
                       <input
-                        type="number"
+                        type="text"
                         value={newRotation[2]}
                         required
                         onChange={(e) => updateNewRotation(2, e.target.value)}
@@ -297,9 +317,10 @@ export const SetTransformationParamsModal: FC<{
                       let newRot: TransformationParamDetails = newRotation.map(
                         (r) => {
                           if (isNaN(parseFloat(r))) return 0;
-                          if (parseFloat(r) > 180) return 180*Math.PI/180;
-                          if (parseFloat(r) < -180) return -180*Math.PI/180;
-                          return parseFloat(r)*Math.PI/180;
+                          if (parseFloat(r) > 180) return (180 * Math.PI) / 180;
+                          if (parseFloat(r) < -180)
+                            return (-180 * Math.PI) / 180;
+                          return (parseFloat(r) * Math.PI) / 180;
                         },
                       ) as TransformationParamDetails;
                       dispatch(

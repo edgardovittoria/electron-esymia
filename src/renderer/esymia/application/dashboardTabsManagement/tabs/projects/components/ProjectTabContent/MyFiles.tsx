@@ -58,6 +58,8 @@ const MyFiles: React.FC<MyFilesProps> = ({
     };
   }, []);
 
+  
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div
@@ -128,22 +130,24 @@ const MyFiles: React.FC<MyFilesProps> = ({
             })}
           </div>
           <div className="flex p-2 gap-4 items-center w-1/6">
-            <div
+            <button
               className={`text-end text-sm ${
                 theme === 'light' ? 'text-textColor' : 'text-textColorDark'
-              } hover:cursor-pointer hover:underline`}
+              } hover:cursor-pointer hover:underline disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:no-underline`}
               onClick={() => dispatch(setShowCreateNewProjectModal(true))}
+              disabled={projects && projects?.length === 3 }
             >
               + New Project
-            </div>
-            <div
+            </button>
+            <button
               className={`text-end text-sm ${
                 theme === 'light' ? 'text-textColor' : 'text-textColorDark'
-              } hover:cursor-pointer hover:underline`}
+              } hover:cursor-pointer hover:underline disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:no-underline`}
               onClick={() => setShowCreateNewFolderModal(true)}
+              disabled={process.env.APP_VERSION === 'demo'}
             >
               + New Folder
-            </div>
+            </button>
           </div>
         </div>
 
@@ -152,26 +156,30 @@ const MyFiles: React.FC<MyFilesProps> = ({
           folders &&
           (projects.length > 0 || folders.length > 0) ? (
             <>
-              <h5
+            {process.env.APP_VERSION !== 'demo' &&
+              <>
+                <h5
                 className={`w-[100%] text-sm font-semibold uppercase p-2 ${
                   theme === 'light' ? 'text-textColor' : 'text-textColorDark'
                 }`}
-              >
-                Folders
-              </h5>
+                >
+                  Folders
+                </h5>
 
-              <div className="grid xl:grid-cols-9 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 overflow-scroll max-h-[120px] overflow-y-auto">
-                {folders.map((folder) => {
-                  return (
-                    <DroppableAndDraggableFolder
-                      key={folder.id}
-                      folder={folder}
-                      path={path}
-                      setPath={setPath}
-                    />
-                  );
-                })}
-              </div>
+                <div className="grid xl:grid-cols-9 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 overflow-scroll max-h-[120px] overflow-y-auto">
+                  {folders.map((folder) => {
+                    return (
+                      <DroppableAndDraggableFolder
+                        key={folder.id}
+                        folder={folder}
+                        path={path}
+                        setPath={setPath}
+                      />
+                    );
+                  })}
+                </div>
+              </>
+            }
 
               <div className="flex flex-row gap-2 items-center w-[100%] mt-4 mb-2">
                 <h5

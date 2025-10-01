@@ -301,7 +301,8 @@ export const Solver: React.FC<SolverProps> = ({
           disabled={
             selectedProject &&
             selectedProject.simulation &&
-            selectedProject.simulation.status === 'Running'
+            selectedProject.simulation.status === 'Running' ||
+            (process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)
           }
           className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
           data-tip="Clone Project"
@@ -521,12 +522,12 @@ const SurfaceAdvicesButton: FC<{
           theme === 'light'
             ? 'bg-white text-textColor'
             : 'bg-bgColorDark2 text-textColorDark'
-        } rounded p-2 disabled:opacity-40`}
+        } rounded p-2 disabled:opacity-40 disabled:cursor-not-allowed`}
         onClick={() => setSurfaceAdvices(!surfaceAdvices)}
         disabled={
-          selectedProject && selectedProject?.simulation?.resultS3
+          (selectedProject && selectedProject?.simulation?.resultS3
             ? true
-            : false
+            : false) || (process.env.APP_VERSION === 'demo')
         }
       >
         {surfaceAdvices ? (

@@ -38,18 +38,24 @@ export type ComponentEntity = {
     previousGeometryAttributes?: GeometryAttributes
 }
 
+export type CustomMaterialAttribute = {
+    frequencies: number[],
+    values: {Re: number, Im: number}[]
+}
+
 export type Material = {
+    id: string,
     name: string,
     color: string,
     permeability: number,
     tangent_delta_permeability?: number,
-    custom_permeability?: [number, number],
+    custom_permeability?: CustomMaterialAttribute,
     permittivity: number,
     tangent_delta_permittivity?: number,
-    custom_permittivity?: [number, number],
+    custom_permittivity?: CustomMaterialAttribute,
     conductivity: number,
     tangent_delta_conductivity?: number,
-    custom_conductivity?: [number, number]
+    custom_conductivity?: CustomMaterialAttribute
     associatedComponentKey: number[]
     ownerEmail: string
 }

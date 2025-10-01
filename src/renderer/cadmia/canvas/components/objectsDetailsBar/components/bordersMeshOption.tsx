@@ -15,12 +15,12 @@ export const BordersMeshOption: React.FC<BordersMeshOptionProps> = () => {
     return (
         <>
             <div className="flex justify-between items-center px-2">
-                <span className="text-black text-xs">Border</span>
+                <span className="text-black text-[12px]">Border</span>
                 <div>
                     <Switch
                         checked={isBordersVisible}
                         onChange={(checked: boolean) => (checked) ? dispatch(enableBordersForComponent(componentKey)) : dispatch(disableBordersForComponent(componentKey))}
-                        className={`${isBordersVisible ? 'bg-teal-900' : 'bg-teal-700'} relative inline-flex mt-1 h-[14px] w-[30px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
+                        className={`${isBordersVisible ? 'bg-black' : 'bg-gray-400'} relative inline-flex mt-1 h-[14px] w-[30px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
                     >
                             <span
                                 aria-hidden="true"

@@ -262,7 +262,8 @@ export const Mesher: React.FC<MesherProps> = ({
           disabled={
             selectedProject &&
             selectedProject.simulation &&
-            selectedProject.simulation.status === 'Running'
+            selectedProject.simulation.status === 'Running' ||
+            (process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)
           }
           className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
           data-tip="Clone Project"

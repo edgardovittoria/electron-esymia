@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FaunaCadModel } from '../../cad_library';
+import { DynamoDBCadModel } from '../../cad_library/components/faunadb/api/modelsAPIs';
 
 export interface ModelState {
-  models: FaunaCadModel[];
-  sharedModels: FaunaCadModel[];
-  selectedModel: FaunaCadModel | undefined;
+  models: DynamoDBCadModel[];
+  sharedModels: DynamoDBCadModel[];
+  selectedModel: DynamoDBCadModel | undefined;
   loadingSpinner: boolean
 }
 
@@ -17,7 +17,7 @@ export const ModelSlice = createSlice({
     loadingSpinner: false
   } as ModelState,
   reducers: {
-    addModel(state: ModelState, action: PayloadAction<FaunaCadModel>) {
+    addModel(state: ModelState, action: PayloadAction<DynamoDBCadModel>) {
       state.models.push(action.payload);
     },
     resetModel(state: ModelState) {
@@ -26,15 +26,15 @@ export const ModelSlice = createSlice({
     removeModel(state: ModelState, action: PayloadAction<string>) {
       state.models = state.models.filter((m) => m.id !== action.payload);
     },
-    updateModel(state: ModelState, action: PayloadAction<FaunaCadModel>) {
+    updateModel(state: ModelState, action: PayloadAction<DynamoDBCadModel>) {
       state.models = state.models.map((m) =>
         m.id === action.payload.id ? action.payload : m,
       );
     },
-    selectModel(state: ModelState, action: PayloadAction<FaunaCadModel | undefined>) {
+    selectModel(state: ModelState, action: PayloadAction<DynamoDBCadModel | undefined>) {
       state.selectedModel = action.payload;
     },
-    setSharedModel(state: ModelState, action: PayloadAction<FaunaCadModel[]>) {
+    setSharedModel(state: ModelState, action: PayloadAction<DynamoDBCadModel[]>) {
       state.sharedModels = action.payload
     },
     setLoadingSpinner(state: ModelState, action: PayloadAction<boolean>){

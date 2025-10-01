@@ -4,14 +4,19 @@ import { MdOutlineDashboard } from 'react-icons/md';
 import { useAuth0 } from '@auth0/auth0-react';
 import { HiOutlineLogout } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectedFolderSelector, selectedProjectSelector, selectProject } from '../store/projectSlice';
+import {
+  SelectedFolderSelector,
+  selectedProjectSelector,
+  selectProject,
+} from '../store/projectSlice';
 import {
   closeProjectTab,
   projectsTabsSelector,
-  selectTab, setShowCreateNewProjectModal,
+  selectTab,
+  setShowCreateNewProjectModal,
   tabSelectedSelector,
   ThemeSelector,
-  unsetSolverResults
+  unsetSolverResults,
 } from '../store/tabsAndMenuItemsSlice';
 import { BsPlugin } from 'react-icons/bs';
 import { VscServerProcess } from 'react-icons/vsc';
@@ -20,26 +25,36 @@ import { SetUserInfo, UsersState } from '../../cad_library';
 
 interface TabsContainerProps {
   user: UsersState;
-  setPluginModalVisible: (v: boolean) => void
-  pluginModalVisible: boolean
+  setPluginModalVisible: (v: boolean) => void;
+  pluginModalVisible: boolean;
 }
 
-export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginModalVisible, pluginModalVisible }) => {
+export const TabsContainer: React.FC<TabsContainerProps> = ({
+  user,
+  setPluginModalVisible,
+  pluginModalVisible,
+}) => {
   const tabSelected = useSelector(tabSelectedSelector);
   const projectsTabs = useSelector(projectsTabsSelector);
   const dispatch = useDispatch();
-  const selectedFolder = useSelector(SelectedFolderSelector)
-  const theme = useSelector(ThemeSelector)
-  const selectedProject = useSelector(selectedProjectSelector)
+  const selectedFolder = useSelector(SelectedFolderSelector);
+  const theme = useSelector(ThemeSelector);
+  const projects = selectedFolder?.projectList;
 
   const { loginWithPopup, isAuthenticated, loginWithRedirect } = useAuth0();
-  const activePlugins = useSelector(ActivePluginsSelector)
+  const activePlugins = useSelector(ActivePluginsSelector);
 
   return (
     <>
       <SetUserInfo />
       <div className="grid grid-cols-12 px-8 pt-6 items-center">
-        <span className={`xl:col-span-1 sm:col-span-2 col-span-3 ${theme === 'light' ? 'text-secondaryColor' : 'text-secondaryColorDark'} text-2xl font-semibold mr-4 ml-4 flex justify-center`}>
+        <span
+          className={`xl:col-span-1 sm:col-span-2 col-span-3 ${
+            theme === 'light'
+              ? 'text-secondaryColor'
+              : 'text-secondaryColorDark'
+          } text-2xl font-semibold mr-4 ml-4 flex justify-center`}
+        >
           ESimIA
         </span>
         <ul className="flex xl:col-span-9 sm:col-span-7 col-span-7 flex-row gap-1 pl-0 mb-0 overflow-auto w-full">
@@ -47,13 +62,21 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
             data-testid="dashboard"
             className={
               tabSelected === 'DASHBOARD'
-                ? `px-3 py-3 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} rounded-t flex justify-between items-center gap-2`
-                : `${theme === 'light' ? 'bg-white text-textColor opacity-60' : 'bg-bgColorDark2 text-textColorDark opacity-60'} rounded-t flex items-center px-3 py-3 hover:cursor-pointer`
+                ? `px-3 py-3 ${
+                    theme === 'light'
+                      ? 'bg-white text-textColor'
+                      : 'bg-bgColorDark2 text-textColorDark'
+                  } rounded-t flex justify-between items-center gap-2`
+                : `${
+                    theme === 'light'
+                      ? 'bg-white text-textColor opacity-60'
+                      : 'bg-bgColorDark2 text-textColorDark opacity-60'
+                  } rounded-t flex items-center px-3 py-3 hover:cursor-pointer`
             }
             onClick={() => {
               dispatch(selectTab('DASHBOARD'));
               dispatch(selectProject(undefined));
-              dispatch(unsetSolverResults())
+              dispatch(unsetSolverResults());
             }}
           >
             <MdOutlineDashboard size={20} />
@@ -65,26 +88,38 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
             return (
               <li
                 key={projectTab.id}
-                className={`${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} rounded-t`}
+                className={`${
+                  theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'
+                } rounded-t`}
               >
                 <div
                   className={
                     tabSelected === projectTab.id
-                      ? `px-3 py-3 ${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} flex items-center rounded-t`
-                      : `px-3 py-3 ${theme === 'light' ? 'bg-white opacity-60' : 'bg-bgColorDark2 opacity-60'} flex items-center`
+                      ? `px-3 py-3 ${
+                          theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'
+                        } flex items-center rounded-t`
+                      : `px-3 py-3 ${
+                          theme === 'light'
+                            ? 'bg-white opacity-60'
+                            : 'bg-bgColorDark2 opacity-60'
+                        } flex items-center`
                   }
                 >
                   <div
                     className={
                       tabSelected === projectTab.id
-                        ? `${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} font-bold text-sm`
+                        ? `${
+                            theme === 'light'
+                              ? 'text-textColor'
+                              : 'text-textColorDark'
+                          } font-bold text-sm`
                         : 'text-gray-400 hover:cursor-pointer text-sm'
                     }
                     aria-current="page"
                     onClick={() => {
                       dispatch(selectTab(projectTab.id as string));
                       dispatch(selectProject(projectTab.id));
-                      dispatch(unsetSolverResults())
+                      dispatch(unsetSolverResults());
                     }}
                   >
                     {projectTab.name}
@@ -92,11 +127,9 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                   <div
                     className="ml-8"
                     onClick={() => {
-                      dispatch(
-                        closeProjectTab(projectTab.id as string),
-                      );
+                      dispatch(closeProjectTab(projectTab.id as string));
                       dispatch(selectProject(undefined));
-                      dispatch(unsetSolverResults())
+                      dispatch(unsetSolverResults());
                     }}
                   >
                     <FaTimes className="w-[12px] h-[12px] text-gray-400" />
@@ -106,29 +139,42 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
             );
           })}
           <li className="nav-item m-auto mx-4">
-            <FaPlus
-              onClick={() => (selectedFolder?.id !== "shared_root") && dispatch(setShowCreateNewProjectModal(true))}
-              className="w-[12px] h-[12px] text-gray-400"
-            />
+            <button onClick={() =>
+                  selectedFolder?.id !== 'shared_root' &&
+                  dispatch(setShowCreateNewProjectModal(true))
+                }
+                className='disabled:opacity-50 disabled:cursor-not-allowed'
+                disabled={projects && projects.length === 3}
+            >
+              <FaPlus
+                className="w-[12px] h-[12px] text-gray-400"
+              />
+            </button>
           </li>
         </ul>
         <div className="flex flex-row items-center justify-end xl:col-span-2 sm:col-span-3 col-span-4 ">
           {isAuthenticated ? (
             <>
-              <div className={`px-3 py-1 mb-[-2px] ${theme === 'light' ? 'bg-white hover:bg-secondaryColor text-textColor' : 'bg-bgColorDark2 text-textColorDark'} rounded-t list-none mr-10 hover:text-white hover:cursor-pointer z-[1000]`}
+              <div
+                className={`px-3 py-1 mb-[-2px] ${
+                  theme === 'light'
+                    ? 'bg-white hover:bg-secondaryColor text-textColor'
+                    : 'bg-bgColorDark2 text-textColorDark'
+                } rounded-t list-none mr-10 hover:text-white hover:cursor-pointer z-[1000]`}
                 onClick={() => {
-                  if(activePlugins.filter(p => p === "serverGUI").length === 0) {
-                    dispatch(addActivePlugin("serverGUI"))
-                    setPluginModalVisible(true)
+                  if (
+                    activePlugins.filter((p) => p === 'serverGUI').length === 0
+                  ) {
+                    dispatch(addActivePlugin('serverGUI'));
+                    setPluginModalVisible(true);
                   }
-                  setPluginModalVisible(!pluginModalVisible)
+                  setPluginModalVisible(!pluginModalVisible);
                 }}
               >
-                  <div className="flex items-center p-[5px]">
-                    <VscServerProcess className="w-[20px] h-[20px] mr-[10px]" />
-                    <li>Mesher & Solver</li>
-                  </div>
-
+                <div className="flex items-center p-[5px]">
+                  <VscServerProcess className="w-[20px] h-[20px] mr-[10px]" />
+                  <li>Mesher & Solver</li>
+                </div>
               </div>
               {/* <div>
                 <FaUser
@@ -165,11 +211,14 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({ user, setPluginMod
                 </ul>
               </div> */}
             </>
-
           ) : (
             <button
               className="text-primaryColor rounded mr-[20px] border-2 border-secondaryColor font-bold py-[4px] px-[10px] hover:bg-green-200"
-              onClick={() => process.env.NODE_ENV === 'development' ? loginWithRedirect() : loginWithPopup()}
+              onClick={() =>
+                process.env.NODE_ENV === 'development'
+                  ? loginWithRedirect()
+                  : loginWithPopup()
+              }
               name="loginButton"
             >
               Login

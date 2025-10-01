@@ -19,9 +19,10 @@ import {
   publishMessage,
 } from './middleware/stompMiddleware';
 import { ImSpinner } from 'react-icons/im';
-import { brokerConnectedSelector, setTheme, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
+import { brokerConnectedSelector, setTheme, showInfoModalSelector, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
 import { MesherStatusSelector, SolverStatusSelector } from './esymia/store/pluginsSlice';
 import { useAllowSingleSessionUser } from './useAllowSingleSessionUser';
+import InfoModal from './esymia/application/sharedModals/InfoModal';
 
 
 // export const client = new Client({
@@ -133,11 +134,14 @@ export default function App() {
     }
   }, [activeMeshing.length]);
 
+  const showInfoModal = useSelector(showInfoModalSelector)
+
 
 
   return (
     <div className={theme==='dark' ? 'bg-bgColorDark' :'bg-bgColor'}>
       {/* {dockerInstallationBox && allowedUser && ( */}
+      {showInfoModal && <InfoModal />}
       {dockerInstallationBox && (
         <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
           <div className="flex flex-col items-center gap-2 p-3 bg-white rounded border border-black">

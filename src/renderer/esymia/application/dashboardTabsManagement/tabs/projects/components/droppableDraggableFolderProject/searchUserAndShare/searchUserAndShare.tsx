@@ -103,13 +103,15 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
     }
   }, [folderToShare?.sharedWith]);
 
+  console.log(users)
+
   const filteredPeople: UsersState[] =
     query === ''
       ? users.filter((p) => p.email !== user.email)
       : users
           .filter((p) => p.email !== user.email)
           .filter((person) =>
-            (person.email as string)
+            person.email && (person.email as string)
               .toLowerCase()
               .replace(/\s+/g, '')
               .includes(query.toLowerCase().replace(/\s+/g, '')),

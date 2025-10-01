@@ -18,9 +18,9 @@ export const ObjectsDetails: React.FC<ObjectsDetailsProps> = () => {
 
   return (
     <div
-      className={`absolute bottom-0 z-10 left-0 w-[18vw] bg-white px-[20px] pt-[20px] pb-[50px] text-white text-center translate-y-0 transition border border-black border-b-0 rounded-tr-xl`}
+      className={`absolute bottom-0 z-10 left-0 w-[20vw] bg-white px-[20px] pt-[20px] pb-[50px] text-white text-center translate-y-0 transition border border-black border-b-0 rounded-tr-xl`}
     >
-      <div className="h-full max-h-[800px] overflow-scroll">
+      <div className="h-full max-h-[800px]">
         { objectsDetailsOptsBasedOnModality.elementsVisibility.selectAll && <SelectAllCheckBox label='Select all: ' /> }
         <Outliner
           components={canvasComponents}
