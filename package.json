@@ -97,6 +97,7 @@
     }
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.9",
     "@stdlib/array-linspace": "^0.2.1",
     "@stdlib/array-logspace": "^0.2.1",
     "@stomp/stompjs": "^7.0.0",
@@ -156,7 +157,6 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
-    "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.0.12",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
     "@react-spring/web": "^9.2.4",

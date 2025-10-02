@@ -2,7 +2,6 @@ import React, { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Port, Probe } from "../../../../../../model/esymiaModels";
 import { selectedProjectSelector, updatePortPosition } from "../../../../../../store/projectSlice";
-import { DebounceInput } from "react-debounce-input";
 import { ThemeSelector } from "../../../../../../store/tabsAndMenuItemsSlice";
 
 interface PortPositionProps {
@@ -234,12 +233,11 @@ interface TerminationPositionInputProps {
 const TerminationPositionInput: FC<TerminationPositionInputProps> = ({dataTestId, disabled, debounceTimeoutMilliSecs, inputStep, value, onChange}) => {
   return (
     <div className="lg:w-[30%] w-full">
-								<DebounceInput
+								<input
                   id={dataTestId}
 									disabled={disabled}
 									className={`w-full p-[4px] border-[1px] border-[#a3a3a3] text-black text-[12px] font-bold rounded formControl`}
 									type="number"
-                  debounceTimeout={debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 1000}
 									step={inputStep ? inputStep : 0.000001}
 									value={parseFloat(value.toString())}
 									onChange={onChange}

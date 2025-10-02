@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import axios from 'axios';
@@ -94,6 +94,18 @@ const createWindow = async () => {
       nodeIntegration: true
     },
   });
+  const menu = Menu.buildFromTemplate([
+    { role: 'copy' },
+    { role: 'cut' },
+    { role: 'paste' },
+    { role: 'selectAll' }
+  ])
+  mainWindow.webContents.on('context-menu', (_event, params) => {
+    // only show the context menu if the element is editable
+    if (params.isEditable) {
+      menu.popup()
+    }
+  })
   mainWindow.loadURL(resolveHtmlPath('index.html'));
   //mainWindow.webContents.openDevTools();
   mainWindow.on('ready-to-show', () => {
@@ -134,6 +146,7 @@ const createWindow = async () => {
   // eslint-disable-next-line
   new AppUpdater();
 };
+
 
 /**
  * Add event listeners...

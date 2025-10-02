@@ -1,11 +1,11 @@
-import { FC, Fragment, useState } from 'react';
+import { FC, Fragment, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   TransformationParamDetails,
   TransformationParams,
   updateTransformationParams,
 } from '../../../../../cad_library';
-import { Transition, Dialog } from '@headlessui/react';
+import { Transition, Dialog, TransitionChild, DialogPanel, DialogTitle } from '@headlessui/react';
 
 export const Transformations: FC<{
   transformationParams: TransformationParams;
@@ -179,6 +179,19 @@ export const SetTransformationParamsModal: FC<{
     }
   };
 
+
+  // 2. Nella funzione handlePaste:
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+
+    // ... Logica di estrazione del testo e update ...
+    const pastedText = e.clipboardData.getData('text/plain');
+    updateNewPositionCoord(0, pastedText);
+
+    // 🛑 AGGIUNGI QUESTO LOG DI SICUREZZA
+    console.log('Tentativo di Paste su X eseguito. Valore:', pastedText);
+  };
+
   return (
     <Transition appear show as={Fragment}>
       <Dialog
@@ -186,7 +199,7 @@ export const SetTransformationParamsModal: FC<{
         className="relative z-10"
         onClose={() => showTransformationModal(false)}
       >
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -196,11 +209,11 @@ export const SetTransformationParamsModal: FC<{
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black bg-opacity-25" />
-        </Transition.Child>
+        </TransitionChild>
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <Transition.Child
+            <TransitionChild
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
@@ -209,14 +222,13 @@ export const SetTransformationParamsModal: FC<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel
-              className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
+              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <DialogTitle
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900"
                 >
                   Set new transformation params
-                </Dialog.Title>
+                </DialogTitle>
                 <div className="mt-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -336,8 +348,8 @@ export const SetTransformationParamsModal: FC<{
                     Save
                   </button>
                 </div>
-              </Dialog.Panel>
-            </Transition.Child>
+              </DialogPanel>
+            </TransitionChild>
           </div>
         </div>
       </Dialog>

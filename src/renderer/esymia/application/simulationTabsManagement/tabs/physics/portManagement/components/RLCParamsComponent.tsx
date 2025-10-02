@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RLCParams, TempLumped } from '../../../../../../model/esymiaModels';
 import { setRLCParams } from '../../../../../../store/projectSlice';
-import { DebounceInput } from 'react-debounce-input';
 import { ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
 
 interface RLCParamsProps {

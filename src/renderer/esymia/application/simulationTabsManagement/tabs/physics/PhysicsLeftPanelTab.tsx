@@ -11,13 +11,8 @@ import {
   selectPort,
   setPortName,
   setPortsS3,
-  unsetScatteringValue,
 } from '../../../../store/projectSlice';
-import noPhysicsIcon from '../../../../../../../assets/noPhysicsIcon.png';
-import noPhysicsIconDark from '../../../../../../../assets/noPhysicsIconDark.png';
-import { useEffectNotOnMount } from '../../../../hook/useEffectNotOnMount';
 import { isTerminationNameValid } from './portManagement/selectPorts/portLumpedProbeGenerator';
-import { DebounceInput } from 'react-debounce-input';
 import toast from 'react-hot-toast';
 import { MdDeleteSweep } from 'react-icons/md';
 import { deleteFileS3 } from '../../../../aws/mesherAPIs';
@@ -201,8 +196,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                                   Rename Port
                                 </h3>
                                 <div className="flex justify-center items-center py-5">
-                                  <DebounceInput
-                                    debounceTimeout={500}
+                                  <input
                                     type="text"
                                     placeholder="Type here"
                                     className={`input input-bordered w-full max-w-xs ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'}`}

@@ -20,9 +20,7 @@ import {
   selectMenuItem,
   ThemeSelector,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { DebounceInput } from 'react-debounce-input';
 import { ComponentEntity, Material } from '../../../../../../../cad_library';
-import { publishMessage } from '../../../../../../../middleware/stompMiddleware';
 import { MesherStatusSelector } from '../../../../../../store/pluginsSlice';
 import { generateSTLListFromComponents } from '../rightPanelSimulator/components/rightPanelFunctions';
 import {
@@ -571,7 +569,6 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({
   label,
 }) => {
   const theme = useSelector(ThemeSelector);
-  console.log(value);
   return (
     <div className="xl:w-[30%] w-full flex flex-col items-center relative">
       <span
@@ -581,7 +578,7 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({
       >
         {label}
       </span>
-      <DebounceInput
+      <input
         data-testid={dataTestId}
         disabled={disabled}
         min={0.0}
@@ -589,9 +586,6 @@ const QuantumDimsInput: FC<QuantumDimsInputProps> = ({
           theme === 'light' ? 'bg-[#f6f6f6]' : 'bg-bgColorDark'
         } text-[12px] font-bold rounded formControl`}
         type="number"
-        debounceTimeout={
-          debounceTimeoutMilliSecs ? debounceTimeoutMilliSecs : 500
-        }
         step={inputStep ? inputStep : 0.0001}
         value={isNaN(value) ? 0 : value}
         onChange={onChange}

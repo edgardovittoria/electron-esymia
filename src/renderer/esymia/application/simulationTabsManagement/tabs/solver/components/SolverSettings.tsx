@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { TbServerBolt } from 'react-icons/tb';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
 import { FaLock, FaLockOpen } from 'react-icons/fa6';
-import { DebounceInput } from 'react-debounce-input';
 import * as THREE from 'three';
 
 import {
@@ -874,8 +873,7 @@ const SolverParameters: React.FC<SolverParametersProps> = () => {
         </div>
         <div className="mt-3 p-2">
           <h6 className="text-sm xl:text-base">Convergence Threshold</h6>
-          <DebounceInput
-            debounceTimeout={500}
+          <input
             disabled={
               selectedProject?.simulation?.status === 'Completed' ||
               selectedProject?.meshData.meshGenerated !== 'Generated'
