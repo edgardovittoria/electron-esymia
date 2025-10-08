@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
-import { Disclosure } from '@headlessui/react';
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
@@ -471,7 +471,7 @@ const SimulationStatusItem: React.FC<{
         <Disclosure defaultOpen>
           {({ open }) => (
             <>
-              <Disclosure.Button
+              <DisclosureButton
                 className={`flex w-full justify-between rounded-lg border px-4 py-2 text-left text-sm font-medium ${
                   theme === 'light'
                     ? 'border-secondaryColor text-secondaryColor hover:bg-green-100'
@@ -480,7 +480,7 @@ const SimulationStatusItem: React.FC<{
               >
                 <span>{name}</span>
                 <div className="badge bg-green-500 text-white flex flex-row gap-2 items-center py-3">
-                  <ImSpinner className="w-4 h-4 animate-spin" />
+                  <ImSpinner className={`w-4 h-4 animate-spin ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                   <span>solving</span>
                 </div>
                 <MdKeyboardArrowUp
@@ -490,8 +490,8 @@ const SimulationStatusItem: React.FC<{
                       : 'text-textColorDark'
                   }`}
                 />
-              </Disclosure.Button>
-              <Disclosure.Panel className="px-4 pb-2 pt-4 text-sm">
+              </DisclosureButton>
+              <DisclosurePanel className="px-4 pb-2 pt-4 text-sm">
                 <div
                   className={`p-5 w-full border ${
                     theme === 'light'
@@ -503,7 +503,7 @@ const SimulationStatusItem: React.FC<{
                     <div className="flex flex-row items-center gap-2">
                       <span>Computing P</span>
                       {!computingP && (
-                        <ImSpinner className="w-3 h-3 animate-spin" />
+                        <ImSpinner className={`w-3 h-3 animate-spin ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                       )}
                     </div>
 
@@ -534,7 +534,7 @@ const SimulationStatusItem: React.FC<{
                     <div className="flex flex-row items-center gap-2">
                       <span>Computing Lp</span>
                       {computingP && computingP.done && !computingLpx && (
-                        <ImSpinner className="w-3 h-3 animate-spin" />
+                        <ImSpinner className={`w-3 h-3 animate-spin ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                       )}
                     </div>
                     <div className="flex flex-row justify-between items-center w-full">
@@ -575,7 +575,7 @@ const SimulationStatusItem: React.FC<{
                               ((iterations &&
                                 iterations.freqNumber < frequenciesNumber) ||
                                 !iterations) && (
-                                <ImSpinner className="w-3 h-3 animate-spin" />
+                                <ImSpinner className={`w-3 h-3 animate-spin ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                               )}
                           </div>
                         ) : (
@@ -595,7 +595,7 @@ const SimulationStatusItem: React.FC<{
                                   associatedProject?.interestFrequenciesIndexes
                                     ?.length) ||
                                 !iterations) && (
-                                <ImSpinner className="w-3 h-3 animate-spin" />
+                                <ImSpinner className={`w-3 h-3 animate-spin ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                               )}
                           </div>
                         )}
@@ -625,7 +625,7 @@ const SimulationStatusItem: React.FC<{
                             iterations.freqNumber <=
                               associatedProject?.interestFrequenciesIndexes
                                 ?.length && (
-                              <ImSpinner className="w-3 h-3 animate-spin" />
+                              <ImSpinner className={`w-3 h-3 animate-spin ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                             )}
                         </div>
 
@@ -709,7 +709,7 @@ const SimulationStatusItem: React.FC<{
                 >
                   Stop Simulation
                 </div>
-              </Disclosure.Panel>
+              </DisclosurePanel>
             </>
           )}
         </Disclosure>

@@ -2,9 +2,11 @@ import { useLayoutEffect, useState } from 'react';
 
 export const useWindowInnerWidth = () => {
   const [windowInnerWidth, setWindowInnerWidth] = useState(0);
+  const [windowInnerHeight, setwindowInnerHeight] = useState(0)
 
   const onResize = () => {
     setWindowInnerWidth(window.innerWidth);
+    setwindowInnerHeight(window.innerHeight);
   };
 
   useLayoutEffect(() => {
@@ -16,5 +18,5 @@ export const useWindowInnerWidth = () => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  return windowInnerWidth;
+  return {windowInnerWidth, windowInnerHeight};
 };

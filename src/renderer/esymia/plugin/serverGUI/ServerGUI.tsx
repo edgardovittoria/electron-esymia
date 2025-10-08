@@ -107,7 +107,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({index}) => {
           </div>
           {mesherLogsVisibility &&
             <div className={`h-[150px] max-h-[150px] overflow-y-scroll border ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'} p-3 flex flex-col ${spinnerMesher ? 'items-center justify-center bg-gray-100 bg-opacity-30': ''}`}>
-              {spinnerMesher && <ImSpinner className='animate-spin w-12 h-12 z-50' />}
+              {spinnerMesher && <ImSpinner className={`animate-spin w-12 h-12 z-50 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />}
               {mesherLogs.map((ml, index) => <div key={index} className="text-[12px]">{ml}</div>)}
             </div>
           }
@@ -171,7 +171,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({index}) => {
           </div>
           {solverLogsVisibility &&
             <div className={`h-[150px] max-h-[150px] overflow-y-scroll border ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'} p-3 flex flex-col ${spinnerSolver ? 'items-center justify-center bg-gray-100 bg-opacity-30': ''}`}>
-              {spinnerSolver && <ImSpinner className='animate-spin w-12 h-12 z-50' />}
+              {spinnerSolver && <ImSpinner className={`animate-spin w-12 h-12 z-50 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />}
               {solverLogs.map((ml, index) => <div key={index} className="text-[12px]">{ml}</div>)}
             </div>
           }

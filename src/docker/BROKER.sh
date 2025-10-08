@@ -2,6 +2,7 @@ cd "$1"
 which docker;
 if [[ $? != 0 ]] ; then
     printf "docker not installed"
+    exit 10
 else
     #Open Docker, only if is not running
     if (! docker stats --no-stream ); then

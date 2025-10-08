@@ -174,7 +174,7 @@ export const SaveProjectResultsModal: React.FC<
                     >
                       <span>Save results</span>
                       {cloning && (
-                        <ImSpinner className="z-50 top-3 bottom-1/2 animate-spin w-5 h-5" />
+                        <ImSpinner className={`z-50 top-3 bottom-1/2 animate-spin w-5 h-5 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                       )}
                     </button>
                   </div>

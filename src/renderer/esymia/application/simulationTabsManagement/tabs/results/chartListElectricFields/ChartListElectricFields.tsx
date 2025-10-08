@@ -1,14 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { RadiationDiagram2D } from './components/RiadiationDiagram2D';
 import { RadiationDiagram3D } from './components/RadiationDiagram3D';
-import { publishMessage } from '../../../../../../middleware/stompMiddleware';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectedProjectSelector } from '../../../../../store/projectSlice';
 import {
   setSpinnerSolverResults,
   spinnerSolverResultsSelector,
 } from '../../../../../store/tabsAndMenuItemsSlice';
-import { ImSpinner } from 'react-icons/im';
 import axios from 'axios';
 
 interface ChartListElectricFieldsProps {

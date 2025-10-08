@@ -19,27 +19,32 @@ import {
   publishMessage,
 } from './middleware/stompMiddleware';
 import { ImSpinner } from 'react-icons/im';
-import { brokerConnectedSelector, setTheme, showInfoModalSelector, ThemeSelector } from './esymia/store/tabsAndMenuItemsSlice';
-import { MesherStatusSelector, SolverStatusSelector } from './esymia/store/pluginsSlice';
+import {
+  brokerConnectedSelector,
+  setTheme,
+  showInfoModalSelector,
+  ThemeSelector,
+} from './esymia/store/tabsAndMenuItemsSlice';
+import {
+  MesherStatusSelector,
+  SolverStatusSelector,
+} from './esymia/store/pluginsSlice';
 import { useAllowSingleSessionUser } from './useAllowSingleSessionUser';
 import InfoModal from './esymia/application/sharedModals/InfoModal';
-
 
 // export const client = new Client({
 //   brokerURL: 'ws://localhost:15674/ws'
 // });
-
-
 
 export default function App() {
   const dispatch = useDispatch();
   const brokerActive = useSelector(brokerConnectedSelector);
   const [dockerInstallationBox, setDockerInstallationBox] =
     useState<boolean>(false);
-  const mesherStatus = useSelector(MesherStatusSelector)
-  const solverStatus = useSelector(SolverStatusSelector)
-  const [logout, setLogout] = useState(false)
-  const theme = useSelector(ThemeSelector)
+  const mesherStatus = useSelector(MesherStatusSelector);
+  const solverStatus = useSelector(SolverStatusSelector);
+  const [logout, setLogout] = useState(false);
+  const theme = useSelector(ThemeSelector);
 
   // const [brokerActive, setBrokerActive] = useState<boolean>(false);
   // const [progressBarValue, setProgressBarValue] = useState<number>(0)
@@ -59,15 +64,43 @@ export default function App() {
   }, []);
 
   window.electron.ipcRenderer.on('runBroker', (arg) => {
-    (arg as string).split("\n").filter(s => {
-      if (s === 'docker not installed') {
-        setDockerInstallationBox(true);
+    const response = arg as {
+      type: string;
+      message?: string;
+      success?: boolean;
+      exitCode?: number;
+    };
+    if (response.type === 'status') {
+      if (!response.success) {
+        // Controlla il codice di uscita specifico
+        if (response.exitCode === 10) {
+          // Se lo script esce con l'errore generico 10
+          // e sai che l'unico errore a quel punto è Docker non installato...
+          setDockerInstallationBox(true);
+        } else {
+          // Altri errori
+          console.error(
+            'Errore generico script Docker. Codice:',
+            response.exitCode,
+          );
+        }
+      } else {
+        // Successo
+        console.log(response.message);
       }
-      //console.log(s.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
-    })
+    }
   });
 
-  if (process.env.APP_MODE !== "test") {
+  // window.electron.ipcRenderer.on('runBroker', (arg) => {
+  //   (arg as string).split("\n").filter(s => {
+  //     if (s === 'docker not installed') {
+  //       setDockerInstallationBox(true);
+  //     }
+  //     //console.log(s.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
+  //   })
+  // });
+
+  if (process.env.APP_MODE !== 'test') {
     window.electron.ipcRenderer.on('checkLogout', (arg) => {
       if ((arg as string) == 'allowed') {
         if (mesherStatus != 'idle') {
@@ -86,21 +119,19 @@ export default function App() {
             }),
           );
         }
-        setLogout(true)
+        setLogout(true);
       }
     });
   }
 
-
   useEffect(() => {
-    if (logout && process.env.APP_MODE !== "test") {
+    if (logout && process.env.APP_MODE !== 'test') {
       window.electron.ipcRenderer.sendMessage('logout', [
         process.env.REACT_APP_AUTH0_DOMAIN,
       ]);
-      setLogout(false)
+      setLogout(false);
     }
-  }, [logout])
-
+  }, [logout]);
 
   // useEffect(() => {
   //   if(progressBarValue !== 70){
@@ -134,21 +165,23 @@ export default function App() {
     }
   }, [activeMeshing.length]);
 
-  const showInfoModal = useSelector(showInfoModalSelector)
-
-
+  const showInfoModal = useSelector(showInfoModalSelector);
 
   return (
-    <div className={theme==='dark' ? 'bg-bgColorDark' :'bg-bgColor'}>
+    <div className={theme === 'dark' ? 'bg-bgColorDark' : 'bg-bgColor'}>
       {/* {dockerInstallationBox && allowedUser && ( */}
       {showInfoModal && <InfoModal />}
       {dockerInstallationBox && (
         <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
           <div className="flex flex-col items-center gap-2 p-3 bg-white rounded border border-black">
-            <span className='text-2xl'>Docker Needed</span>
+            <span className="text-2xl">Docker Needed</span>
             <hr className="w-full border-[.5px] border-black" />
             <span>Please Install Docker and restart the application</span>
-            <a href="https://www.docker.com/get-started/" target='_blank' className='font-bold text-blue-600 underline'>
+            <a
+              href="https://www.docker.com/get-started/"
+              target="_blank"
+              className="font-bold text-blue-600 underline"
+            >
               Get Started with Docker
             </a>
             {/* <progress className="progress w-full mr-4" value={progressBarValue} max={70} /> */}
@@ -162,7 +195,11 @@ export default function App() {
             <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
               <div className="flex flex-col items-center gap-2 p-3 bg-white rounded">
                 <span>Starting Services...</span>
-                <ImSpinner className="animate-spin w-8 h-8" />
+                <ImSpinner
+                  className={`animate-spin w-8 h-8 ${
+                    theme === 'light' ? 'text-textColor' : 'text-textColorDark'
+                  }`}
+                />
                 {/* <progress className="progress w-full mr-4" value={progressBarValue} max={70} /> */}
               </div>
             </div>
@@ -177,18 +214,38 @@ export default function App() {
                     type="radio"
                     name="dashboard"
                     role="tab"
-                    className={`tab ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} ${theme === 'dark' && tabsSelected === 'home' ? 'border-textColorDark' : 'border-gray-400 border-opacity-35'}`}
+                    className={`tab ${
+                      theme === 'light'
+                        ? 'text-textColor'
+                        : 'text-textColorDark'
+                    } ${
+                      tabsSelected === 'home'
+                        ? theme === 'light'
+                          ? 'border-textColor'
+                          : 'border-white'
+                        : 'border-gray-400 border-opacity-35'
+                    }`}
                     aria-label="Home"
-                    checked={tabsSelected === 'home'}
+                    defaultChecked={tabsSelected === 'home'}
                     onClick={() => setTabsSelected('home')}
                   />
                   <input
                     type="radio"
                     name="cadmia"
                     role="tab"
-                    className={`tab ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} ${theme === 'dark' && tabsSelected === 'cadmia' ? 'border-textColorDark' : 'border-gray-400 border-opacity-35'}`}
+                    className={`tab ${
+                      theme === 'light'
+                        ? 'text-textColor'
+                        : 'text-textColorDark'
+                    } ${
+                      tabsSelected === 'cadmia'
+                        ? theme === 'light'
+                          ? 'border-textColor'
+                          : 'border-white'
+                        : 'border-gray-400 border-opacity-35'
+                    }`}
                     aria-label="CADmIA"
-                    checked={tabsSelected === 'cadmia'}
+                    defaultChecked={tabsSelected === 'cadmia'}
                     disabled={!user}
                     onClick={() => setTabsSelected('cadmia')}
                   />
@@ -196,9 +253,19 @@ export default function App() {
                     type="radio"
                     name="esymia"
                     role="tab"
-                    className={`tab ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} ${theme === 'dark' && tabsSelected === 'esymia' ? 'border-textColorDark' : 'border-gray-400 border-opacity-35'}`}
+                    className={`tab ${
+                      theme === 'light'
+                        ? 'text-textColor'
+                        : 'text-textColorDark'
+                    } ${
+                      tabsSelected === 'esymia'
+                        ? theme === 'light'
+                          ? 'border-textColor'
+                          : 'border-white'
+                        : 'border-gray-400 border-opacity-35'
+                    }`}
                     aria-label="ESymIA"
-                    checked={tabsSelected === 'esymia'}
+                    defaultChecked={tabsSelected === 'esymia'}
                     disabled={!user}
                     onClick={() => setTabsSelected('esymia')}
                   />
@@ -208,7 +275,11 @@ export default function App() {
                     {/* <span className='absolute top-0 left-0 text-center p-1 border-b-2 border-r-2 border-secondaryColor rounded-br-xl bg-white font-bold text-sm'>DEMO: {remainingDemoDays} days remaining</span> */}
                     <FaUser
                       id="profileIcon"
-                      className={`w-[20px] h-[20px] mr-4 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'} hover:opacity-40 hover:cursor-pointer`}
+                      className={`w-[20px] h-[20px] mr-4 ${
+                        theme === 'light'
+                          ? 'text-textColor'
+                          : 'text-textColorDark'
+                      } hover:opacity-40 hover:cursor-pointer`}
                       onClick={() => {
                         setUserDropdownVisibility(!userDropdownVisibility);
                       }}
@@ -217,11 +288,13 @@ export default function App() {
                       style={{
                         display: !userDropdownVisibility ? 'none' : 'block',
                       }}
-                      className={`px-4 py-2 ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} rounded list-none absolute right-[10px] mt-[20px] w-max shadow z-[10000]`}
+                      className={`px-4 py-2 ${
+                        theme === 'light'
+                          ? 'bg-white text-textColor'
+                          : 'bg-bgColorDark2 text-textColorDark'
+                      } rounded list-none absolute right-[10px] mt-[20px] w-max shadow z-[10000]`}
                     >
-                      <li className="font-bold text-lg">
-                        {user.nickname}
-                      </li>
+                      <li className="font-bold text-lg">{user.nickname}</li>
                       <hr className="mb-3" />
                       <label className="flex cursor-pointer gap-2 mb-2">
                         <svg
@@ -233,18 +306,23 @@ export default function App() {
                           stroke="currentColor"
                           strokeWidth="2"
                           strokeLinecap="round"
-                          strokeLinejoin="round">
+                          strokeLinejoin="round"
+                        >
                           <circle cx="12" cy="12" r="5" />
-                          <path
-                            d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
+                          <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
                         </svg>
-                        <input type="checkbox" value={theme} className="toggle toggle-sm theme-controller" onChange={() => {
-                          if(theme === 'light'){
-                            dispatch(setTheme('dark'))
-                          }else{
-                            dispatch(setTheme('light'))
-                          }
-                        }}/>
+                        <input
+                          type="checkbox"
+                          value={theme}
+                          className="toggle toggle-sm theme-controller"
+                          onChange={() => {
+                            if (theme === 'light') {
+                              dispatch(setTheme('dark'));
+                            } else {
+                              dispatch(setTheme('light'));
+                            }
+                          }}
+                        />
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="20"
@@ -254,7 +332,8 @@ export default function App() {
                           stroke="currentColor"
                           strokeWidth="2"
                           strokeLinecap="round"
-                          strokeLinejoin="round">
+                          strokeLinejoin="round"
+                        >
                           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                       </label>
@@ -263,7 +342,9 @@ export default function App() {
                         onClick={() => {
                           if (process.env.APP_MODE !== 'test') {
                             //closeUserSessionOnFauna()
-                            window.electron.ipcRenderer.sendMessage('checkLogout');
+                            window.electron.ipcRenderer.sendMessage(
+                              'checkLogout',
+                            );
                           }
                         }}
                       >

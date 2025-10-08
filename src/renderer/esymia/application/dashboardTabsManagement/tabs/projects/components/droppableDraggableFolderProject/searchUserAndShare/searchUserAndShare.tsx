@@ -13,6 +13,7 @@ import { UsersState, usersStateSelector } from '../../../../../../../../cad_libr
 import { useStorageData } from '../../../../../../simulationTabsManagement/tabs/mesher/components/rightPanelSimulator/hook/useStorageData';
 import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { recursiveUpdateSharingInfoFolderInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
+import { ThemeSelector } from '../../../../../../../store/tabsAndMenuItemsSlice';
 
 
 interface SearchUserAndShareProps {
@@ -33,6 +34,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
   const [query, setQuery] = useState('');
   const [spinner, setSpinner] = useState(true);
   const { shareProject } = useStorageData()
+  const theme = useSelector(ThemeSelector);
   useEffect(() => {
     const usersList: UsersState[] = [];
     setSpinner(true);
@@ -152,7 +154,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                 <hr className="mb-10" />
                 {spinner ? (
                   <div className="flex justify-center items-center">
-                    <ImSpinner className="animate-spin w-8 h-8" />
+                    <ImSpinner className={`animate-spin w-8 h-8 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                   </div>
                 ) : (
                   <>

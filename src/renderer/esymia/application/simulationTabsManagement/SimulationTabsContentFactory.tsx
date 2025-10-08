@@ -17,9 +17,9 @@ export const SimulationTabsContentFactory: React.FC<
   const [selectedTabLeftPanel, setSelectedTabLeftPanel] = useState<string | undefined>(undefined);
   const menuItemSelected = useSelector(selectedMenuItemSelector);
 
-  const windowInnerWidth = useWindowInnerWidth();
+  const {windowInnerWidth, windowInnerHeight} = useWindowInnerWidth();
 
-  if (windowInnerWidth < 1024) {
+  if (windowInnerWidth < 1280 || windowInnerHeight < 800) {
     return (
       <div className="flex flex-col justify-center items-center my-auto lg:h-[70vh] xl:h-[80vh]">
         <span className="font-bold">

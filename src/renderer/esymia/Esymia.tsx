@@ -4,6 +4,7 @@ import {
   showCreateNewProjectModalSelector,
   showInfoModalSelector,
   tabSelectedSelector,
+  ThemeSelector,
 } from './store/tabsAndMenuItemsSlice';
 import {
   ActivePluginsSelector,
@@ -30,6 +31,7 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   const tabSelected = useSelector(tabSelectedSelector);
   const { loadFolders } = useStorage();
   const [loginSpinner, setLoginSpinner] = useState(false);
+  const theme = useSelector(ThemeSelector);
   // da scommentare nel caso esymia dovesse essere estrapolata
   /* const [alert, setAlert] = useState<boolean>(false);
   const activeSimulations = useSelector(activeSimulationsSelector);
@@ -106,7 +108,7 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
       {selectedTab === 'esymia' && (
         <div className="lg:h-[97vh] h-screen overflow-x-hidden">
           {loginSpinner && (
-            <ImSpinner className="animate-spin w-12 h-12 absolute left-1/2 top-1/2" />
+            <ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
           )}
           {showCreateNewProjectModal && <CreateNewProjectModal />}
           <div className={`${loginSpinner && 'opacity-40'}`}>

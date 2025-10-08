@@ -22,7 +22,6 @@ import {
 } from '../../../../store/tabsAndMenuItemsSlice';
 import zoomPlugin, { pan } from 'chartjs-plugin-zoom';
 import { spinnerSolverResultsSelector } from '../../../../store/tabsAndMenuItemsSlice';
-import { ImSpinner } from 'react-icons/im';
 import { setPortsFromS3 } from '../physics/Physics';
 
 

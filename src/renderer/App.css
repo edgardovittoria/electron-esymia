@@ -71,7 +71,7 @@ body{
 .cadmia{
   background-image: url("../../assets/cadmia.png");
   background-size: cover;
-  background-repeat: no-repeat;
+  background-repeat: repeat;
 }
 
 .esymia{

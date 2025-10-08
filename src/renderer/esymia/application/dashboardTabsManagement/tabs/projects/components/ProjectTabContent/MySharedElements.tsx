@@ -21,7 +21,7 @@ import {
 	faunaProjectHaveParentInFolderList
 } from '../../../../../../faunadb/apiAuxiliaryFunctions';
 import { ImSpinner } from 'react-icons/im';
-import { setShowCreateNewProjectModal } from '../../../../../../store/tabsAndMenuItemsSlice';
+import { setShowCreateNewProjectModal, ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
 import { usersStateSelector } from '../../../../../../../cad_library';
 
@@ -38,6 +38,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 	const selectedFolder = useSelector(SelectedFolderSelector);
 	const myFilesFolder = useSelector(mainFolderSelector);
 	const user = useSelector(usersStateSelector);
+  const theme = useSelector(ThemeSelector);
 	const dispatch = useDispatch();
   const [spinner, setSpinner] = useState<boolean>(false);
 	const [path, setPath] = useState([mainFolder]);
@@ -90,7 +91,7 @@ const MySharedElements: React.FC<MySharedElementsProps> = ({
 	return (
     <>
       {spinner && (
-        <ImSpinner className='animate-spin w-12 h-12 absolute left-1/2 top-1/2 z-40' />
+        <ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2 z-40 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}/>
       )}
       <DndProvider backend={HTML5Backend}>
         <div className="box w-full z-10" style={{opacity: spinner ? .5 : 1}}>

@@ -317,22 +317,53 @@ ipcMain.handle('deleteFolder', (e, args) => {
 
 ipcMain.on('runBroker', (e, args) => {
   let scriptBroker = nodeChildProcess.spawn('bash', [getDockerPath('BROKER.sh'), getDockerPath('')])
+  
+  // Continuare a inviare l'output per feedback in tempo reale (opzionale)
   scriptBroker.stdout.on('data', (data: string) => {
-    e.reply('runBroker', '' + data);
+    e.reply('runBroker', { type: 'log', message: '' + data }); // Invio come LOG
   });
 
   scriptBroker.stderr.on('data', (err: string) => {
-    e.reply('runBroker', '' + err);
+    e.reply('runBroker', { type: 'error', message: '' + err }); // Invio come ERRORE
   });
 
-  scriptBroker.on('exit', (code: string) => {
-    e.reply('runBroker', 'Exit Code: ' + code);
+  // *** Intercettare il codice di uscita ***
+  scriptBroker.on('exit', (code: number) => { // 'code' è un numero, non una stringa
+    if (code === 10) {
+      e.reply('runBroker', {
+        type: 'status',
+        success: false,
+        message: 'Docker is not installed. Please install Docker to use this feature.',
+        exitCode: code
+      });
+    } else {
+      e.reply('runBroker', {
+        type: 'status',
+        success: true,
+        message: 'Broker started successfully.'
+      });
+    }
   });
-  // .stdout.on('data', (data) => {
-  //   console.log(`${data}`);
-  //   //return {data: `${data}`}
-  // })
 });
+
+// ipcMain.on('runBroker', (e, args) => {
+//   let scriptBroker = nodeChildProcess.spawn('bash', [getDockerPath('BROKER.sh'), getDockerPath('')])
+//   scriptBroker.stdout.on('data', (data: string) => {
+//     e.reply('runBroker', '' + data);
+//   });
+
+//   scriptBroker.stderr.on('data', (err: string) => {
+//     e.reply('runBroker', '' + err);
+//   });
+
+//   scriptBroker.on('exit', (code: string) => {
+//     e.reply('runBroker', 'Exit Code: ' + code);
+//   });
+//   // .stdout.on('data', (data) => {
+//   //   console.log(`${data}`);
+//   //   //return {data: `${data}`}
+//   // })
+// });
 
 ipcMain.on('exportTouchstone', (e, args) => {
   let fileName = path.join(app.getPath("home"), "Downloads", args[4] + `.s${args[3]}p`)

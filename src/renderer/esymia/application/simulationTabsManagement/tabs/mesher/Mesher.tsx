@@ -224,7 +224,7 @@ export const Mesher: React.FC<MesherProps> = ({
     <>
       {spinner && mesherStatus === 'ready' && (
         <div className="absolute top-1/2 left-1/2">
-          <ImSpinner className="animate-spin w-8 h-8" />
+          <ImSpinner className={`animate-spin w-8 h-8 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
         </div>
       )}
       {process.env.MESHER_RIS_MODE === 'backend' &&
@@ -281,7 +281,7 @@ export const Mesher: React.FC<MesherProps> = ({
             className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
           />
           {cloning && (
-            <ImSpinner className="absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5" />
+            <ImSpinner className={`absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
           )}
         </button>
       </div>

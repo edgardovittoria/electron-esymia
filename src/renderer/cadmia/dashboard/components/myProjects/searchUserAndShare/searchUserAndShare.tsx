@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, Transition, TransitionChild } from '@headlessui/react';
 import { ImSpinner } from 'react-icons/im';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
@@ -12,6 +12,7 @@ import { useFaunaQuery } from '../../../../../esymia/faunadb/hook/useFaunaQuery'
 import { FaunaCadModel, usersStateSelector } from '../../../../../cad_library';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateModelInDynamoDB } from '../../../../../dynamoDB/modelsApis';
+import { ThemeSelector } from '../../../../../esymia/store/tabsAndMenuItemsSlice';
 
 interface SearchUserAndShareProps {
   setShowSearchUser: (v: boolean) => void;
@@ -27,6 +28,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
   const [selected, setSelected] = useState('');
   const [query, setQuery] = useState('');
   const [spinner, setSpinner] = useState(true);
+  const theme = useSelector(ThemeSelector);
   useEffect(() => {
     const usersList: string[] = [];
     setSpinner(true);
@@ -115,7 +117,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
         className="relative z-10"
         onClose={() => setShowSearchUser(false)}
       >
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -125,11 +127,11 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black bg-opacity-25" />
-        </Transition.Child>
+        </TransitionChild>
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <Transition.Child
+            <TransitionChild
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
@@ -143,7 +145,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                 <hr className="mb-10" />
                 {spinner ? (
                   <div className="flex justify-center items-center">
-                    <ImSpinner className="animate-spin w-8 h-8" />
+                    <ImSpinner className={`animate-spin w-8 h-8 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                   </div>
                 ) : (
                   <>
@@ -208,7 +210,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                   </>
                 )}
               </div>
-            </Transition.Child>
+            </TransitionChild>
           </div>
         </div>
       </Dialog>

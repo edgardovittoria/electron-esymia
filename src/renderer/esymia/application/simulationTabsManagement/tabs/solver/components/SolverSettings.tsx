@@ -260,7 +260,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
   return (
     <>
       {/* Bottone per mostrare/nascondere il pannello Solver */}
-      <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
+      <div className="absolute left-[2%] top-[180px] rounded flex flex-col items-center gap-0">
         <div
           className={`p-2 tooltip rounded tooltip-right ${
             sidebarItemSelected === 'Solver'
@@ -293,7 +293,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
             theme === 'light'
               ? 'bg-white text-textColor'
               : 'bg-bgColorDark2 text-textColorDark'
-          } p-[10px] shadow-2xl lg:max-h-[300px] xl:max-h-[750px]`}
+          } p-[10px] shadow-2xl lg:max-h-[300px] xl:max-h-[68vh]`}
         >
           {/* Barra di navigazione delle tab fissa tramite 'sticky' */}
           <nav className="border-b border-gray-200 sticky top-0 bg-inherit z-10">
@@ -323,7 +323,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
             </ul>
           </nav>
           {/* Solo il contenuto della tab è scrollabile */}
-          <div className="p-4 h-[550px] overflow-y-auto">
+          <div className="p-4 h-[55vh] overflow-y-auto">
             {!selectedProject.modelS3 ||
             selectedProject.meshData.meshGenerated !== 'Generated' ? (
               <span>
@@ -366,7 +366,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
                 ) : (
                   <button
                     data-testid="startSimulationButton"
-                    className={`w-full mt-3 button text-sm xl:text-base disabled:bg-gray-400 disabled:cursor-not-allowed ${
+                    className={`w-full mt-0 button text-sm xl:text-base disabled:bg-gray-400 disabled:cursor-not-allowed ${
                       selectedProject?.meshData.meshGenerated !== 'Generated'
                         ? 'bg-gray-300 text-gray-600 opacity-70'
                         : theme === 'light'
@@ -1027,7 +1027,7 @@ const TimeRangeDef: React.FC<TimeRangeDefProps> = ({
         theme === 'light'
           ? 'border-secondaryColor bg-[#f6f6f6]'
           : 'border-white bg-bgColorDark'
-      } text-left overflow-y-scroll max-h-[800px]`}
+      } text-left overflow-y-scroll max-h-[62vh]`}
     >
       <h6 className="w-[100%] mb-3">Time Range Definition</h6>
       <div className="flex flex-row justify-between gap-2 mt-5">

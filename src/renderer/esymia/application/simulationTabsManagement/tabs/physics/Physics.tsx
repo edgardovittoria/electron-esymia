@@ -239,7 +239,7 @@ export const Physics: React.FC<PhysicsProps> = ({
             className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
           />
           {cloning && (
-            <ImSpinner className="absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5" />
+            <ImSpinner className={`absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
           )}
         </button>
       </div>

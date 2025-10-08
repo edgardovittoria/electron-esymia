@@ -334,7 +334,7 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
           >
             {computingSuggestedQuantum && (
                   <div className="w-full absolute top-1/2 flex flex-col items-center rounded-xl -translate-y-1/2 right-1/2 translate-x-1/2 z-50 bg-white p-5">
-                    <ImSpinner className="w-8 h-8 animate-spin" />
+                    <ImSpinner className={`w-8 h-8 animate-spin ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                     <span>Computing suggested quantum</span>
                   </div>
                 )}

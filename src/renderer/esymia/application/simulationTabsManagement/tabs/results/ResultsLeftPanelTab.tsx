@@ -169,7 +169,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
         selectedProject.simulation &&
         selectedProject.simulation.status === 'Running' && (
           <div className="text-center flex flex-col items-center gap-6 lg:max-h-[250px] xl:max-h-fit overflow-y-scroll">
-            <ImSpinner className="w-10 h-10 animate-spin" />
+            <ImSpinner className={`w-10 h-10 animate-spin ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
             <h5 className="lg:text-sm xl:text-xl">Generating Results</h5>
             <p className="text-sm">
               During the generation of the results it is possible to view the

@@ -84,7 +84,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
 
   return (
     <>
-      {cloning && <ImSpinner className='animate-spin w-8 h-8 absolute top-1/2 right-1/2 z-100'/>}
+      {cloning && <ImSpinner className={`animate-spin w-8 h-8 absolute top-1/2 right-1/2 z-100 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}/>}
       <div
         className={`flex flex-col border relative ${theme === 'light' ? 'text-textColor border-green-200 hover:border-secondaryColor' : 'text-textColorDark bg-bgColorDark border-textColorDark hover:border-secondaryColorDark'}  rounded-lg hover:cursor-pointer`}
         key={project.name}

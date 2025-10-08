@@ -533,7 +533,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
           >
             <span>{selectedProject.name}</span>
             <div className="badge bg-green-500 text-white flex flex-row gap-2 items-center py-3">
-              <ImSpinner className="w-4 h-4 animate-spin" />
+              <ImSpinner className={`w-4 h-4 animate-spin ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
               <span>generating</span>
             </div>
             <MdKeyboardArrowUp
@@ -552,7 +552,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                 } rounded-xl flex flex-col gap-4 items-center justify-center w-full`}
               >
                 {stopSpinner && (
-                  <ImSpinner className="animate-spin w-8 h-8 absolute top-1/2 left-1/2" />
+                  <ImSpinner className={`animate-spin w-8 h-8 absolute top-1/2 left-1/2 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
                 )}
                 <div
                   className={`flex flex-col gap-2 w-full ${
