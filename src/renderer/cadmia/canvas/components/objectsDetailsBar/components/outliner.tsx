@@ -154,7 +154,7 @@ const OutlinerItem: FC<OutlinerItemProps> = ({
           <div className="flex flex-row">
             <div className="tooltip tooltip-left" data-tip="save">
               <IoMdSave
-                className="text-black"
+                className="text-white"
                 size={20}
                 onClick={() => {
                   dispatch(updateName({ key: keyComponent, name: newName }));
@@ -164,7 +164,7 @@ const OutlinerItem: FC<OutlinerItemProps> = ({
             </div>
             <div className="tooltip tooltip-left" data-tip="cancel">
               <MdOutlineCancel
-                className="text-black"
+                className="text-white"
                 size={20}
                 onClick={() => {
                   setOutlinerItemVisibility(true);
