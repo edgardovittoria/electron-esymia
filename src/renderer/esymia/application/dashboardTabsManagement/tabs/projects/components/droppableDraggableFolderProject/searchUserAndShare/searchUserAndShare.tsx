@@ -30,7 +30,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
   const [users, setUsers] = useState<UsersState[]>([]);
   const [shareDone, setShareDone] = useState<boolean>(false);
   const { execQuery2 } = useDynamoDBQuery()
-  const [selected, setSelected] = useState({} as UsersState);
+  const [selected, setSelected] = useState<UsersState | null>({} as UsersState);
   const [query, setQuery] = useState('');
   const [spinner, setSpinner] = useState(true);
   const { shareProject } = useStorageData()
@@ -39,11 +39,11 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
     const usersList: UsersState[] = [];
     setSpinner(true);
     axios.post(
-      'https://dev-i414-g1x.us.auth0.com/oauth/token',
+      `https://${process.env.REACT_APP_AUTH0_DOMAIN}/oauth/token`,
       {
         'client_id': process.env.REACT_APP_AUTH0_MANAGEMENT_CLIENT_ID,
         'client_secret': process.env.REACT_APP_AUTH0_MANAGEMENT_CLIENT_SECRET,
-        'audience': 'https://dev-i414-g1x.us.auth0.com/api/v2/',
+        'audience': process.env.REACT_APP_AUTH0_AUDIENCE,
         'grant_type': 'client_credentials'
       },
       {
@@ -53,38 +53,43 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
       }
     ).then(response => {
       axios
-      .get(`https://dev-i414-g1x.us.auth0.com/api/v2/roles`, {
-        // headers: {authorization: `Bearer ${response.data.access_token}`}
+      .get(`https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/users`, {
         headers: {
           authorization: `Bearer ${response.data.access_token}`,
         },
-      })
-      .then((res) => {
-        res.data
-          .filter((r: { name: string }) => r.name === 'Premium')
-          .forEach((role: { id: string, name: string }) => {
-            axios
-              .get(
-                `https://dev-i414-g1x.us.auth0.com/api/v2/roles/${role.id}/users`,
-                {
-                  // headers: {authorization: `Bearer ${response.data.access_token}`}
-                  headers: {
-                    authorization: `Bearer ${response.data.access_token}`,
-                  },
-                },
-              )
-              .then((res) => {
-                // console.log(res.data)
-                res.data.forEach((u: {email: string, name: string}) => {
-                  usersList.push({email: u.email, userName: u.name, userRole: role.name} as UsersState);
-                });
-                setUsers(usersList);
-                setSpinner(false);
-              })
-              .catch((err) => console.log(err));
-          });
-      })
-      .catch((err) => console.log(err));
+      }).then(res => {
+        res.data.forEach((u: { email: string, name: string }) => {
+          if(u.email) usersList.push({email: u.email, userName: u.name, userRole: "Premium"});
+        });
+        setUsers(usersList);
+        setSpinner(false);
+      }).catch(err => console.log(err));
+      // .then((res) => {
+      //   res.data
+      //     .filter((r: { name: string }) => r.name === 'Premium')
+      //     .forEach((role: { id: string }) => {
+      //       axios
+      //         .get(
+      //           `https://dev-i414-g1x.us.auth0.com/api/v2/roles/${role.id}/users`,
+      //           {
+      //             // headers: {authorization: `Bearer ${response.data.access_token}`}
+      //             headers: {
+      //               authorization: `Bearer ${response.data.access_token}`,
+      //             },
+      //           },
+      //         )
+      //         .then((res) => {
+      //           // console.log(res.data)
+      //           res.data.forEach((u: { name: string }) => {
+      //             usersList.push(u.name);
+      //           });
+      //           setUsers(usersList);
+      //           setSpinner(false);
+      //         })
+      //         .catch((err) => console.log(err));
+      //     });
+      // })
+      // .catch((err) => console.log(err));
     })
   }, []);
 
@@ -161,7 +166,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                     <div className="flex items-center">
                       <span className="w-1/3">Share with:</span>
                       <SearchUser
-                        selected={selected}
+                        selected={selected as UsersState}
                         setSelected={setSelected}
                         filteredPeople={filteredPeople}
                         query={query}
@@ -181,7 +186,7 @@ export const SearchUserAndShare: React.FC<SearchUserAndShareProps> = ({
                         className="button buttonPrimary py-1 px-2 text-sm"
                         onClick={() => {
                           setShareDone(true);
-                          shareProject(projectToShare as Project, selected, setShowSearchUser)
+                          shareProject(projectToShare as Project, selected as UsersState, setShowSearchUser)
                         }}
                       >
                         SHARE

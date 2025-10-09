@@ -10,9 +10,9 @@ export const SetUserInfo:FC<{}> = () => {
 
     useEffect(() => {
       if(process.env.APP_VERSION === "demo"){
-        (user && user.nickname && user.name) ? dispatch(setUser({email: user.name, userName: user.nickname, userRole: user['https://db.fauna.com/roles'][0]})) : dispatch(unsetUser())
+        (user && user.nickname && user.name) ? dispatch(setUser({email: user.name, userName: user.nickname, userRole: "Premium"})) : dispatch(unsetUser())
       }else{
-        (user && user.nickname && user.email) ? dispatch(setUser({email: user.email, userName: user.nickname, userRole: user['https://db.fauna.com/roles'][0]})) : dispatch(unsetUser())
+        (user && user.nickname && user.email) ? dispatch(setUser({email: user.email, userName: user.nickname, userRole: "Premium"})) : dispatch(unsetUser())
       }
       }, [user])
 

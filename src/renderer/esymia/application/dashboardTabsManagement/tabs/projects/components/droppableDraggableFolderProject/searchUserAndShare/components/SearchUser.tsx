@@ -6,7 +6,7 @@ import { UsersState } from '../../../../../../../../../cad_library';
 
 interface SearchUserProps {
     selected: UsersState,
-    setSelected: (v: UsersState) => void,
+    setSelected: (v: UsersState | null) => void,
     filteredPeople: UsersState[],
     query: string
     setQuery: (v: string) => void,

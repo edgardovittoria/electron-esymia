@@ -15,8 +15,7 @@ root.render(
       redirect_uri:
         process.env.NODE_ENV === 'production'
           ? 'file://callback'
-          : window.location.origin,
-      audience: process.env.REACT_APP_AUTH0_AUDIENCE,
+          : window.location.origin
     }}
   >
     <Provider store={store}>
