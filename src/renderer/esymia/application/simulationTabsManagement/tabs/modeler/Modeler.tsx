@@ -20,12 +20,12 @@ import {
 import { Folder, Project } from '../../../../model/esymiaModels';
 import { ImSpinner } from 'react-icons/im';
 import { FiEdit } from 'react-icons/fi';
-import { s3 } from '../../../../aws/s3Config';
 import { ImportActionParamsObject, ImportModelFromDBModal, CanvasState } from "../../../../../cad_library";
 import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
+import { s3 } from '../../../../../cadmia/aws/s3Config';
 
 
 interface ModelerProps {
@@ -155,7 +155,6 @@ export const Modeler: React.FC<ModelerProps> = ({
       </div>
       {showModalLoadFromDB && (
         <ImportModelFromDBModal
-          s3Config={s3}
           bucket={process.env.REACT_APP_AWS_BUCKET_NAME as string}
           showModalLoad={setShowModalLoadFromDB}
           importAction={(importActionParamsObject) => {

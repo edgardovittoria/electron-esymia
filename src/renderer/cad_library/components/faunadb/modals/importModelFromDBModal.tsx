@@ -13,18 +13,17 @@ import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
 import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
 import { getModelsByOwnerDynamoDB } from '../../../../dynamoDB/modelsApis';
 import { convertFromDynamoDBFormat } from '../../../../dynamoDB/utility/formatDynamoDBData';
+import { s3 } from '../../../../cadmia/aws/s3Config';
 
 export const ImportModelFromDBModal: FC<{
   showModalLoad: Function;
   importActionParams: ImportActionParamsObject;
   importAction: (params: ImportActionParamsObject) => any;
-  s3Config: AWS.S3;
   bucket: string;
 }> = ({
   showModalLoad,
   importActionParams,
   importAction,
-  s3Config,
   bucket,
 }) => {
   const [models, setModels] = useState<DynamoDBCadModel[]>([]);
@@ -171,7 +170,7 @@ export const ImportModelFromDBModal: FC<{
                           }
                         : () => {
                             getFileS3(
-                              s3Config,
+                              s3,
                               bucket,
                               selectedModel.components,
                               importActionParams,

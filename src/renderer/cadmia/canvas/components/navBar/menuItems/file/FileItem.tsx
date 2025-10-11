@@ -386,7 +386,6 @@ export const FileItem: React.FC<FileItemProps> = () => {
       {modalRisSave && <SaveRisModelWithNameModal showModalSave={setModalRisSave} />}
       {modalLoad && (
         <ImportModelFromDBModal
-          s3Config={s3}
           bucket={process.env.REACT_APP_AWS_BUCKET_NAME as string}
           showModalLoad={setModalLoad}
           importAction={(importActionParams: ImportActionParamsObject) => {
