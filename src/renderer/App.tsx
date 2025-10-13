@@ -176,7 +176,7 @@ export default function App() {
           <div className="flex flex-col items-center gap-2 p-3 bg-white rounded border border-black">
             <span className="text-2xl">Docker Needed</span>
             <hr className="w-full border-[.5px] border-black" />
-            <span>Please Install Docker and restart the application</span>
+            <span>Please install and start Docker and restart the application</span>
             <a
               href="https://www.docker.com/get-started/"
               target="_blank"
@@ -184,6 +184,17 @@ export default function App() {
             >
               Get Started with Docker
             </a>
+            <button
+                type="button"
+                className={`button buttonPrimary ${
+                  theme === 'light' ? '' : 'bg-secondaryColorDark'
+                } text-sm w-full hover:opacity-80 disabled:opacity-60 mt-5`}
+                onClick={() => {
+                  window.electron.ipcRenderer.sendMessage('closeApp', []);
+                }}
+              >
+                Close App
+              </button>
             {/* <progress className="progress w-full mr-4" value={progressBarValue} max={70} /> */}
           </div>
         </div>

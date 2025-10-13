@@ -179,6 +179,10 @@ ipcMain.handle('api:call', async (e, args) => {
   return response.data;
 });
 
+ipcMain.on('closeApp', (e, args) => {
+  app.quit();
+});
+
 ipcMain.on('checkLogout', (e, args) => {
   if (meshingComputations || solvingComputations){
     dialog.showErrorBox('PAY ATTENTION', 'You have pending operations server side, complete or stop them before logout.')
@@ -333,7 +337,7 @@ ipcMain.on('runBroker', (e, args) => {
       e.reply('runBroker', {
         type: 'status',
         success: false,
-        message: 'Docker is not installed. Please install Docker to use this feature.',
+        message: 'Docker is not started.',
         exitCode: code
       });
     } else {
