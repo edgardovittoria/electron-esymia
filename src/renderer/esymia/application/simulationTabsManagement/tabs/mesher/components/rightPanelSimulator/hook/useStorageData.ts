@@ -110,7 +110,7 @@ export const useStorageData = () => {
   const loadGridsFromS3 = (mesherBackend: boolean) => {
     if (mesherBackend) {
       axios
-        .post('http://127.0.0.1:8002/getGrids', {
+        .post('http://localhost:8002/getGrids', {
           grids_id:
             selectedProject.meshData.type === 'Standard'
               ? (selectedProject.meshData.externalGrids as string)

@@ -250,8 +250,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ESymIA",
-    "appId": "org.erb.EsymIA",
+    "productName": "Teema Studio",
+    "appId": "org.erb.teemastudio",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -292,7 +292,8 @@
       "target": {
         "target": "nsis",
         "arch": [
-          "x64"
+          "x64",
+          "arm64"
         ]
       }
     },
@@ -304,6 +305,9 @@
           "x64"
         ]
       },
+      "executableArgs": [
+        "--no-sandbox"
+      ],
       "category": "Development"
     },
     "directories": {

@@ -16,10 +16,33 @@ import axios from 'axios';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import nodeChildProcess, { fork } from 'child_process';
-import { closeSync, mkdir, openSync, readdirSync, readFileSync, rmdir, unlinkSync, writeFileSync, writeSync } from 'fs';
-import getmac from 'getmac'
-import {Worker} from 'worker_threads'
+import {
+  closeSync,
+  mkdir,
+  openSync,
+  readdirSync,
+  readFileSync,
+  rmdir,
+  unlinkSync,
+  writeFileSync,
+  writeSync,
+} from 'fs';
+import getmac from 'getmac';
+import { Worker } from 'worker_threads';
 import { getHeapStatistics } from 'v8';
+import os from 'os';
+
+function getOs() {
+  switch (os.platform()) {
+    case 'win32':
+      return 'windows';
+    case 'darwin': // macOS
+    case 'linux':
+      return 'unix-like';
+    default:
+      return 'unknown';
+  }
+}
 
 class AppUpdater {
   constructor() {
@@ -31,8 +54,8 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-let meshingComputations = false
-let solvingComputations = false
+let meshingComputations = false;
+let solvingComputations = false;
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -41,7 +64,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
 });
 
 if (process.env.NODE_ENV === 'production') {
-  import("fix-path").then((fixPath) => fixPath.default())
+  import('fix-path').then((fixPath) => fixPath.default());
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
@@ -57,7 +80,6 @@ const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
-  
 
   return installer
     .default(
@@ -80,8 +102,6 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-
-
   mainWindow = new BrowserWindow({
     show: false,
     width: 1920,
@@ -91,21 +111,21 @@ const createWindow = async () => {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
-      nodeIntegration: true
+      nodeIntegration: true,
     },
   });
   const menu = Menu.buildFromTemplate([
     { role: 'copy' },
     { role: 'cut' },
     { role: 'paste' },
-    { role: 'selectAll' }
-  ])
+    { role: 'selectAll' },
+  ]);
   mainWindow.webContents.on('context-menu', (_event, params) => {
     // only show the context menu if the element is editable
     if (params.isEditable) {
-      menu.popup()
+      menu.popup();
     }
-  })
+  });
   mainWindow.loadURL(resolveHtmlPath('index.html'));
   //mainWindow.webContents.openDevTools();
   mainWindow.on('ready-to-show', () => {
@@ -119,27 +139,31 @@ const createWindow = async () => {
     }
   });
 
-  mainWindow.on("close", (e) => {
-    e.preventDefault()
-    if(meshingComputations || solvingComputations){
-      dialog.showErrorBox('PAY ATTENTION', 'You have pending operations server side, complete or stop them before quit the application.')
-    }
-    else{
-      mainWindow?.destroy()
+  mainWindow.on('close', (e) => {
+    e.preventDefault();
+    if (meshingComputations || solvingComputations) {
+      dialog.showErrorBox(
+        'PAY ATTENTION',
+        'You have pending operations server side, complete or stop them before quit the application.',
+      );
+    } else {
+      mainWindow?.destroy();
     }
   });
 
   mainWindow.on('closed', () => {
-      mainWindow = null;
+    mainWindow = null;
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 
   // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler(({url}) => {
-    shell.openExternal(url)
-    return { action: url === "https://www.docker.com/get-started/" ? 'deny' : 'allow' };
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return {
+      action: url === 'https://www.docker.com/get-started/' ? 'deny' : 'allow',
+    };
   });
 
   // Remove this if your app does not use auto updates
@@ -147,16 +171,25 @@ const createWindow = async () => {
   new AppUpdater();
 };
 
-
 /**
  * Add event listeners...
  */
 
 app.on('window-all-closed', () => {
+  if(getOs() === 'windows'){
+    nodeChildProcess.spawn('cmd.exe', [
+      '/c',
+      getDockerPath('BROKER_STOP.bat')
+    ]);
+  } else {
+    nodeChildProcess.spawn('bash', [
+      getDockerPath('BROKER_STOP.sh')
+    ]);
+  }
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (process.platform !== 'darwin') {
-      app.quit();
+    app.quit();
   }
 });
 
@@ -184,11 +217,13 @@ ipcMain.on('closeApp', (e, args) => {
 });
 
 ipcMain.on('checkLogout', (e, args) => {
-  if (meshingComputations || solvingComputations){
-    dialog.showErrorBox('PAY ATTENTION', 'You have pending operations server side, complete or stop them before logout.')
-  }
-  else {
-    e.reply("checkLogout", 'allowed')
+  if (meshingComputations || solvingComputations) {
+    dialog.showErrorBox(
+      'PAY ATTENTION',
+      'You have pending operations server side, complete or stop them before logout.',
+    );
+  } else {
+    e.reply('checkLogout', 'allowed');
   }
 });
 
@@ -203,8 +238,10 @@ ipcMain.on('logout', (e, args) => {
   });
 });
 
-
-let serverProcesses: {mesher?: nodeChildProcess.ChildProcessWithoutNullStreams, solver?: nodeChildProcess.ChildProcessWithoutNullStreams} = {}
+let serverProcesses: {
+  mesher?: nodeChildProcess.ChildProcessWithoutNullStreams;
+  solver?: nodeChildProcess.ChildProcessWithoutNullStreams;
+} = {};
 
 const SERVER_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'src/server')
@@ -223,8 +260,18 @@ const getDockerPath = (...paths: string[]): string => {
 };
 
 ipcMain.on('runMesher', (e, args) => {
-  let scriptMesher = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherINIT.sh'), getServerPath('MSGUI/juliaCODES')]);
-  serverProcesses.mesher = scriptMesher
+  let scriptMesher;
+  if (getOs() === 'windows') {
+    scriptMesher = nodeChildProcess.spawn('cmd.exe', [
+      '/c',
+      getServerPath('scripts/mesherINIT.bat')
+    ]);
+  } else {
+    scriptMesher = nodeChildProcess.spawn('bash', [
+      getServerPath('scripts/mesherINIT.sh')
+    ]);
+  }
+  serverProcesses.mesher = scriptMesher;
   scriptMesher.stdout.on('data', (data: string) => {
     e.reply('runMesher', '' + data);
   });
@@ -239,8 +286,18 @@ ipcMain.on('runMesher', (e, args) => {
 });
 
 ipcMain.on('runSolver', (e, args) => {
-  let scriptSolver = nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverINIT.sh'), getServerPath('MSGUI/juliaCODES')]);
-  serverProcesses.solver = scriptSolver
+  let scriptSolver;
+  if (getOs() === 'windows') {
+    scriptSolver = nodeChildProcess.spawn('cmd.exe', [
+      '/c',
+      getServerPath('scripts/solverINIT.bat')
+    ]);
+  } else {
+    scriptSolver = nodeChildProcess.spawn('bash', [
+      getServerPath('scripts/solverINIT.sh')
+    ]);
+  }
+  serverProcesses.solver = scriptSolver;
   scriptSolver.stdout.on('data', (data: string) => {
     e.reply('runSolver', '' + data);
   });
@@ -255,73 +312,100 @@ ipcMain.on('runSolver', (e, args) => {
 });
 
 ipcMain.on('haltMesher', (e, args) => {
-  if (serverProcesses.mesher){
-    serverProcesses.mesher.kill()
-    nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/mesherHALT.sh'), getServerPath('MSGUI/juliaCODES/juliaSolver')]);
+  if (getOs() === 'windows') {
+    if (serverProcesses.mesher) {
+      serverProcesses.mesher.kill();
+      nodeChildProcess.spawn('cmd.exe', [
+        '/c',
+        getServerPath('scripts/mesherHALT.bat')
+      ]);
+    }
+  } else {
+    if (serverProcesses.mesher) {
+      serverProcesses.mesher.kill();
+      nodeChildProcess.spawn('bash', [
+        getServerPath('scripts/mesherHALT.sh')
+      ]);
+    }
   }
 });
 
 ipcMain.on('haltSolver', (e, args) => {
-  if (serverProcesses.solver){
-    serverProcesses.solver.kill()
-    nodeChildProcess.spawn('bash', [getServerPath('MSGUI/scripts/solverHALT.sh'), getServerPath('MSGUI/juliaCODES/juliaSolver')]);
+  if (getOs() === 'windows') {
+    if (serverProcesses.solver) {
+      serverProcesses.solver.kill();
+      nodeChildProcess.spawn('cmd.exe', [
+        '/c',
+        getServerPath('scripts/solverHALT.bat')
+      ]);
+    }
+  } else {
+    if (serverProcesses.solver) {
+      serverProcesses.solver.kill();
+      nodeChildProcess.spawn('bash', [
+        getServerPath('scripts/solverHALT.sh')
+      ]);
+    }
   }
 });
 
 ipcMain.on('meshingComputation', (e, args) => {
-  meshingComputations = args[0]
+  meshingComputations = args[0];
 });
 
 ipcMain.on('solvingComputation', (e, args) => {
-  solvingComputations = args[0]
+  solvingComputations = args[0];
 });
 
 ipcMain.handle('getInstallationDir', (e, args) => {
-  return app.getPath('home')
+  return app.getPath('home');
 });
 
 ipcMain.handle('getMac', (e, args) => {
-  return getmac()
+  return getmac();
 });
 
 ipcMain.handle('directoryContents', (e, args) => {
-  let path = app.getPath('home')+args[0]
-  return readdirSync(path, { withFileTypes: false })
-})
+  let path = app.getPath('home') + args[0];
+  return readdirSync(path, { withFileTypes: false });
+});
 
 ipcMain.handle('saveFile', (e, args) => {
-  let path = app.getPath('home')
-  writeFileSync(path+"/"+args[0], args[1])
-})
+  let path = app.getPath('home');
+  writeFileSync(path + '/' + args[0], args[1]);
+});
 
 ipcMain.handle('readFile', (e, args) => {
-  // let pathExtGrids = path.join(app.getPath('home'), "esymiaProjects/externalGrids", args[1]+".json")
-  // if(pathExtGrids === args[0]){
-
-  // }else{
-  //   return 'path not found'
-  // }
-  return readFileSync(args[0], {encoding: 'utf8', flag: 'r'})
-})
+  return readFileSync(args[0], { encoding: 'utf8', flag: 'r' });
+});
 
 ipcMain.handle('deleteFile', (e, args) => {
   //let path = app.getPath('home')+"/esymiaProjects"
-  unlinkSync(args[0])
-})
+  unlinkSync(args[0]);
+});
 
 ipcMain.handle('createFolder', (e, args) => {
-  let path = app.getPath('home')
-  mkdir(path+"/"+args[0], null, () => {})
-})
+  let path = app.getPath('home');
+  mkdir(path + '/' + args[0], null, () => {});
+});
 
 ipcMain.handle('deleteFolder', (e, args) => {
-  let path = app.getPath('home')
-  rmdir(path+"/"+args[0],  () => {})
-})
+  let path = app.getPath('home');
+  rmdir(path + '/' + args[0], () => {});
+});
 
 ipcMain.on('runBroker', (e, args) => {
-  let scriptBroker = nodeChildProcess.spawn('bash', [getDockerPath('BROKER.sh'), getDockerPath('')])
-  
+  let scriptBroker;
+  if(getOs() === 'windows'){
+    scriptBroker = nodeChildProcess.spawn('cmd.exe', [
+      '/c',
+      getDockerPath('BROKER.bat')
+    ]);
+  } else {
+    scriptBroker = nodeChildProcess.spawn('bash', [
+      getDockerPath('BROKER.sh')
+    ]);
+  }
   // Continuare a inviare l'output per feedback in tempo reale (opzionale)
   scriptBroker.stdout.on('data', (data: string) => {
     e.reply('runBroker', { type: 'log', message: '' + data }); // Invio come LOG
@@ -332,57 +416,45 @@ ipcMain.on('runBroker', (e, args) => {
   });
 
   // *** Intercettare il codice di uscita ***
-  scriptBroker.on('exit', (code: number) => { // 'code' è un numero, non una stringa
+  scriptBroker.on('exit', (code: number) => {
+    // 'code' è un numero, non una stringa
     if (code === 10) {
       e.reply('runBroker', {
         type: 'status',
         success: false,
         message: 'Docker is not started.',
-        exitCode: code
+        exitCode: code,
       });
     } else {
       e.reply('runBroker', {
         type: 'status',
         success: true,
-        message: 'Broker started successfully.'
+        message: 'Broker started successfully.',
       });
     }
   });
 });
 
-// ipcMain.on('runBroker', (e, args) => {
-//   let scriptBroker = nodeChildProcess.spawn('bash', [getDockerPath('BROKER.sh'), getDockerPath('')])
-//   scriptBroker.stdout.on('data', (data: string) => {
-//     e.reply('runBroker', '' + data);
-//   });
-
-//   scriptBroker.stderr.on('data', (err: string) => {
-//     e.reply('runBroker', '' + err);
-//   });
-
-//   scriptBroker.on('exit', (code: string) => {
-//     e.reply('runBroker', 'Exit Code: ' + code);
-//   });
-//   // .stdout.on('data', (data) => {
-//   //   console.log(`${data}`);
-//   //   //return {data: `${data}`}
-//   // })
-// });
-
 ipcMain.on('exportTouchstone', (e, args) => {
-  let fileName = path.join(app.getPath("home"), "Downloads", args[4] + `.s${args[3]}p`)
-  writeTouchstone(args[0], args[1], args[2], fileName)
-})
+  let fileName = path.join(
+    app.getPath('home'),
+    'Downloads',
+    args[4] + `.s${args[3]}p`,
+  );
+  writeTouchstone(args[0], args[1], args[2], fileName);
+});
 
 ipcMain.on('computeMeshRis', (e, args) => {
-  const worker = new Worker(getServerPath('mesherTypescript/mainfile.js'), {workerData: args})
-  
+  const worker = new Worker(getServerPath('mesherTypescript/mainfile.js'), {
+    workerData: args,
+  });
+
   ipcMain.on('stopMeshing', (e, args) => {
-    worker.terminate()
+    worker.terminate();
   });
 
   worker.on('message', (result) => {
-    e.reply('computeMeshRis', result)
+    e.reply('computeMeshRis', result);
   });
 
   worker.on('error', (error) => {
@@ -392,10 +464,14 @@ ipcMain.on('computeMeshRis', (e, args) => {
   worker.on('exit', (code) => {
     if (code !== 0) console.error(`Worker stopped with exit code ${code}`);
   });
-})
+});
 
-
-function writeTouchstone(freq:number[], S:any, R_chiusura:number, fileNameComplete:string) {
+function writeTouchstone(
+  freq: number[],
+  S: any,
+  R_chiusura: number,
+  fileNameComplete: string,
+) {
   const np = S.length;
   const tab = '   ';
   const fid = openSync(fileNameComplete, 'w');
@@ -404,47 +480,52 @@ function writeTouchstone(freq:number[], S:any, R_chiusura:number, fileNameComple
   writeSync(fid, rowToWrite);
 
   for (let cf = 0; cf < freq.length; cf++) {
-      let rowToWrite = `\n${numToStringFreq(freq[cf])}${tab}`;
-      writeSync(fid, rowToWrite);
-      for (let i = 0; i < np; i++) {
-          const realPartS = S[i][0][cf][0];
-          const imPartS = S[i][0][cf][1];
-          let { modulo, phaseInDeg } = buildModPhaseScatteringParameter(realPartS, imPartS);
-          if (modulo > 1) {
-              modulo = 1;
-          }
-          if (isNaN(modulo) || !isFinite(modulo)) {
-              modulo = 0;
-              phaseInDeg = 0.0;
-          }
-          rowToWrite = `${numToStringAccurate(modulo)}${tab}${numToStringAccurate(phaseInDeg)}${tab}`;
-          writeSync(fid, rowToWrite);
-          if (np > 4 && (i+1)%(Math.sqrt(np)) === 0) {
-              writeSync(fid, '\n');
-              writeSync(fid, tab);
-          }
+    let rowToWrite = `\n${numToStringFreq(freq[cf])}${tab}`;
+    writeSync(fid, rowToWrite);
+    for (let i = 0; i < np; i++) {
+      const realPartS = S[i][0][cf][0];
+      const imPartS = S[i][0][cf][1];
+      let { modulo, phaseInDeg } = buildModPhaseScatteringParameter(
+        realPartS,
+        imPartS,
+      );
+      if (modulo > 1) {
+        modulo = 1;
       }
+      if (isNaN(modulo) || !isFinite(modulo)) {
+        modulo = 0;
+        phaseInDeg = 0.0;
+      }
+      rowToWrite = `${numToStringAccurate(modulo)}${tab}${numToStringAccurate(
+        phaseInDeg,
+      )}${tab}`;
+      writeSync(fid, rowToWrite);
+      if (np > 4 && (i + 1) % Math.sqrt(np) === 0) {
+        writeSync(fid, '\n');
+        writeSync(fid, tab);
+      }
+    }
   }
   closeSync(fid);
 }
 
-function numToStringFreq(val:number) {
+function numToStringFreq(val: number) {
   return val.toFixed(12);
 }
 
-function numToStringAccurate(val:number) {
+function numToStringAccurate(val: number) {
   return val.toFixed(12);
 }
 
-function buildModPhaseScatteringParameter(realPart:number, imPart:number) {
+function buildModPhaseScatteringParameter(realPart: number, imPart: number) {
   let phase = Math.atan(imPart / realPart);
 
   if (realPart < 0) {
-      phase += Math.PI;
+    phase += Math.PI;
   }
 
   const modulo = Math.sqrt(realPart * realPart + imPart * imPart);
-  const phaseInDeg = 180 * phase / Math.PI;
+  const phaseInDeg = (180 * phase) / Math.PI;
 
   return { modulo, phaseInDeg };
 }

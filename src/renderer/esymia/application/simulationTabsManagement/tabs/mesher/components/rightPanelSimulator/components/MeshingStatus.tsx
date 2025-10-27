@@ -227,7 +227,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
         meshingType: selectedProject.meshData.type,
       };
       axios
-        .post('http://127.0.0.1:8002/meshing', objToSendToMesher)
+        .post('http://localhost:8002/meshing', objToSendToMesher)
         .then(() => {})
         .catch((e) => {
           dispatch(
@@ -239,7 +239,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
     } else {
       if (process.env.MESHER_RIS_MODE === 'backend') {
         axios
-          .post('http://127.0.0.1:8002/meshing', {
+          .post('http://localhost:8002/meshing', {
             fileNameRisGeometry: selectedProject.bricks as string,
             id: selectedProject.id as string,
             density: selectedProject.meshData.lambdaFactor,
@@ -477,7 +477,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
         ) {
           axios
             .post(
-              'http://127.0.0.1:8002/stop_computation?meshing_id=' +
+              'http://localhost:8002/stop_computation?meshing_id=' +
                 selectedProject.id,
             )
             .then(() => {})

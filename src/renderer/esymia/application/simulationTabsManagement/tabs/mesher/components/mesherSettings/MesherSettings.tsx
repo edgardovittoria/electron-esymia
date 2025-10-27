@@ -106,7 +106,7 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
         };
         setcomputingSuggestedQuantum(true);
         axios
-          .post('http://127.0.0.1:8002/quantumAdvice', objToSendToMesher)
+          .post('http://localhost:8002/quantumAdvice', objToSendToMesher)
           .then(() => {
           })
           .catch((e) => console.log(e));
