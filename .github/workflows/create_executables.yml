@@ -30,6 +30,7 @@ jobs:
       - name: Create macOS Executable
         env:
           # Segreti replicati per questo job
+          NODE_OPTIONS: "--max-old-space-size=8096"
           GENERATE_SOURCEMAP: ${{ secrets.GENERATE_SOURCEMAP }}
           REACT_APP_AUTH0_DOMAIN: ${{ secrets.REACT_APP_AUTH0_DOMAIN }}
           REACT_APP_AUTH0_SECRET: ${{ secrets.REACT_APP_AUTH0_SECRET }}
