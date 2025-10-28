@@ -1,0 +1,141 @@
+name: Create executables
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+# Variabili d'ambiente comuni (i Secrets devono essere duplicati in ogni job)
+env:
+  NODE_VERSION: 18
+
+jobs:
+  # Job 1: Build per macOS (eseguito su runner macOS)
+  build_macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: npm install
+        run: npm install
+
+      - name: Create macOS Executable
+        env:
+          # Segreti replicati per questo job
+          GENERATE_SOURCEMAP: ${{ secrets.GENERATE_SOURCEMAP }}
+          REACT_APP_AUTH0_DOMAIN: ${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+          REACT_APP_AUTH0_SECRET: ${{ secrets.REACT_APP_AUTH0_SECRET }}
+          REACT_APP_AUTH0_ID: ${{ secrets.REACT_APP_AUTH0_ID }}
+          REACT_APP_AUTH0_AUDIENCE: ${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+          REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN: ${{ secrets.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN }}
+          REACT_APP_AUTH0_MANAGEMENT_CLIENT_ID: ${{ secrets.REACT_APP_AUTH0_MANAGEMENT_CLIENT_ID }}
+          REACT_APP_AUTH0_MANAGEMENT_CLIENT_SECRET: ${{ secrets.REACT_APP_AUTH0_MANAGEMENT_CLIENT_SECRET }}
+          REACT_APP_AWS_ACCESS_KEY_ID: ${{ secrets.REACT_APP_AWS_ACCESS_KEY_ID }}
+          REACT_APP_AWS_SECRET_KEY: ${{ secrets.REACT_APP_AWS_SECRET_KEY }}
+          REACT_APP_AWS_BUCKET_NAME: ${{ secrets.REACT_APP_AWS_BUCKET_NAME }}
+          STORAGE_MODE: ${{ secrets.STORAGE_MODE }}
+          APP_MODE: ${{ secrets.APP_MODE }}
+          APP_VERSION: ${{ secrets.APP_VERSION }}
+          MESHER_RIS_MODE: ${{ secrets.MESHER_RIS_MODE }}
+        run: npm run package # Solo il comando per macOS
+        
+      - name: Upload macOS Executables
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-executables-macos
+          path: release/build/*.dmg # Carica solo il file .dmg (o la cartella specifica di macOS)
+          retention-days: 5
+
+  # Job 2: Build per Windows (eseguito su runner Windows)
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: npm install
+        run: npm install
+
+      - name: Create Windows Executable
+        env:
+          # Segreti replicati per questo job
+          GENERATE_SOURCEMAP: ${{ secrets.GENERATE_SOURCEMAP }}
+          REACT_APP_AUTH0_DOMAIN: ${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+          REACT_APP_AUTH0_SECRET: ${{ secrets.REACT_APP_AUTH0_SECRET }}
+          REACT_APP_AUTH0_ID: ${{ secrets.REACT_APP_AUTH0_ID }}
+          REACT_APP_AUTH0_AUDIENCE: ${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+          REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN: ${{ secrets.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN }}
+          REACT_APP_AUTH0_MANAGEMENT_CLIENT_ID: ${{ secrets.REACT_APP_AUTH0_MANAGEMENT_CLIENT_ID }}
+          REACT_APP_AUTH0_MANAGEMENT_CLIENT_SECRET: ${{ secrets.REACT_APP_AUTH0_MANAGEMENT_CLIENT_SECRET }}
+          REACT_APP_AWS_ACCESS_KEY_ID: ${{ secrets.REACT_APP_AWS_ACCESS_KEY_ID }}
+          REACT_APP_AWS_SECRET_KEY: ${{ secrets.REACT_APP_AWS_SECRET_KEY }}
+          REACT_APP_AWS_BUCKET_NAME: ${{ secrets.REACT_APP_AWS_BUCKET_NAME }}
+          STORAGE_MODE: ${{ secrets.STORAGE_MODE }}
+          APP_MODE: ${{ secrets.APP_MODE }}
+          APP_VERSION: ${{ secrets.APP_VERSION }}
+          MESHER_RIS_MODE: ${{ secrets.MESHER_RIS_MODE }}
+        run: npm run package:win # Solo il comando per Windows
+        
+      - name: Upload Windows Executables
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-executables-windows
+          path: release/build/*.exe # Carica solo i file .exe (o la cartella specifica di Windows)
+          retention-days: 5
+
+  # Job 3: Build per Linux (eseguito su runner Linux)
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: npm install
+        run: npm install
+
+      - name: Create Linux Executable
+        env:
+          # Segreti replicati per questo job
+          GENERATE_SOURCEMAP: ${{ secrets.GENERATE_SOURCEMAP }}
+          REACT_APP_AUTH0_DOMAIN: ${{ secrets.REACT_APP_AUTH0_DOMAIN }}
+          REACT_APP_AUTH0_SECRET: ${{ secrets.REACT_APP_AUTH0_SECRET }}
+          REACT_APP_AUTH0_ID: ${{ secrets.REACT_APP_AUTH0_ID }}
+          REACT_APP_AUTH0_AUDIENCE: ${{ secrets.REACT_APP_AUTH0_AUDIENCE }}
+          REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN: ${{ secrets.REACT_APP_AUTH0_MANAGEMENT_API_ACCESS_TOKEN }}
+          REACT_APP_AUTH0_MANAGEMENT_CLIENT_ID: ${{ secrets.REACT_APP_AUTH0_MANAGEMENT_CLIENT_ID }}
+          REACT_APP_AUTH0_MANAGEMENT_CLIENT_SECRET: ${{ secrets.REACT_APP_AUTH0_MANAGEMENT_CLIENT_SECRET }}
+          REACT_APP_AWS_ACCESS_KEY_ID: ${{ secrets.REACT_APP_AWS_ACCESS_KEY_ID }}
+          REACT_APP_AWS_SECRET_KEY: ${{ secrets.REACT_APP_AWS_SECRET_KEY }}
+          REACT_APP_AWS_BUCKET_NAME: ${{ secrets.REACT_APP_AWS_BUCKET_NAME }}
+          STORAGE_MODE: ${{ secrets.STORAGE_MODE }}
+          APP_MODE: ${{ secrets.APP_MODE }}
+          APP_VERSION: ${{ secrets.APP_VERSION }}
+          MESHER_RIS_MODE: ${{ secrets.MESHER_RIS_MODE }}
+        run: npm run package:linux # Solo il comando per Linux
+        
+      - name: Upload Linux Executables
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-executables-linux
+          path: release/build/*.AppImage # Carica i file .AppImage o .deb (controlla la tua configurazione)
+          retention-days: 5
