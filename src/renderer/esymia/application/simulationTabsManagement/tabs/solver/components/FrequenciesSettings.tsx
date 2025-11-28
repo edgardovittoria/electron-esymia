@@ -33,23 +33,13 @@ export const FrequenciesSettings: React.FC<FrequenciesSettingsProps> = ({
   }, [selectedTabRightPanel]);
   return (
     <>
-      <div
-        className={`absolute left-[2%] top-[225px] rounded max-h-fit flex flex-col items-center gap-0`}
-      >
+
+      <div className="absolute left-[2%] top-[225px] flex flex-col items-center gap-0">
         <div
-          className={`p-2 tooltip rounded-b tooltip-right ${
-            selectedTabRightPanel === physicsRightPanelTitle.second
-              ? `${
-                  theme === 'light'
-                    ? 'text-white bg-primaryColor'
-                    : 'text-textColor bg-secondaryColorDark'
-                }`
-              : `${
-                  theme === 'light'
-                    ? 'text-primaryColor bg-white'
-                    : 'text-textColorDark bg-bgColorDark2'
-                }`
-          }`}
+          className={`p-3 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 cursor-pointer ${selectedTabRightPanel === physicsRightPanelTitle.second
+            ? (theme === 'light' ? 'bg-blue-500 text-white shadow-blue-500/30' : 'bg-blue-600 text-white shadow-blue-600/30')
+            : (theme === 'light' ? 'bg-white/80 text-blue-600 hover:bg-white hover:text-blue-500' : 'bg-black/40 text-blue-400 hover:bg-black/60 hover:text-blue-300 border border-white/10')
+            }`}
           data-testid="frequenciesSettings"
           data-tip="Frequencies"
           onClick={() => {
@@ -62,33 +52,35 @@ export const FrequenciesSettings: React.FC<FrequenciesSettingsProps> = ({
             setsidebarItemSelected(undefined);
           }}
         >
-          <SiAzurefunctions style={{ width: '25px', height: '25px' }} />
+          <SiAzurefunctions size={24} />
         </div>
       </div>
       {selectedTabRightPanel === physicsRightPanelTitle.second && (
         <div
-          className={`${
-            theme === 'light'
-              ? 'bg-white text-textColor'
-              : 'bg-bgColorDark2 text-textColorDark'
-          } p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded w-1/5 max-h-fit`}
+          className={`absolute left-[6%] xl:left-[5%] top-0 w-[350px] rounded-2xl p-4 shadow-2xl backdrop-blur-md border transition-all duration-300 max-h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar ${theme === 'light'
+            ? 'bg-white/90 border-white/40 text-gray-800'
+            : 'bg-black/60 border-white/10 text-gray-200'
+            }`}
         >
-          <div className="flex-col px-[20px] pb-[5px] overflow-x-hidden max-w-[350px]">
-            <span className="font-bold">Frequencies Definition</span>
+          <div className="flex flex-col gap-4">
+            <span className="font-bold text-lg border-b pb-2 border-gray-200/50 dark:border-white/10">
+              Frequencies Definition
+            </span>
             <FrequenciesDef
               disabled={selectedProject?.simulation?.status === 'Completed'}
               setSavedPhysicsParameters={setSavedPhysicsParameters}
             />
           </div>
 
-          {selectedTabRightPanel === physicsRightPanelTitle.second && (
-            <div className={`flex px-[20px] mt-2 flex-row gap-2 items-center`}>
+          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-gray-200/50 dark:border-white/10">
+            <div className="flex items-center gap-2">
               <button
                 data-testid="savePhysics"
                 type="button"
-                className={`button buttonPrimary ${
-                  theme === 'light' ? '' : 'bg-secondaryColorDark'
-                } text-sm w-full hover:opacity-80 disabled:opacity-60`}
+                className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${theme === 'light'
+                  ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'
+                  : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/30'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                 onClick={() => setSavedPhysicsParameters(true)}
                 disabled={savedPhysicsParameters}
               >
@@ -98,10 +90,10 @@ export const FrequenciesSettings: React.FC<FrequenciesSettingsProps> = ({
                 className="tooltip tooltip-left"
                 data-tip="Saving parameters on server now is not necessary in order to launch a simulation. Use this button if you are not intended to launch a simulation now."
               >
-                <IoMdInformationCircleOutline size={15} />
+                <IoMdInformationCircleOutline size={20} className="opacity-60 hover:opacity-100 transition-opacity" />
               </div>
             </div>
-          )}
+          </div>
         </div>
       )}
     </>

@@ -9,16 +9,19 @@ export const ResetFocusButton: FC<{
   const theme = useSelector(ThemeSelector)
   return (
     <div
-      className='tooltip'
+      className='tooltip tooltip-bottom'
       data-tip={
         'Reset canvas focus'
       }
     >
       <button
-        className={`${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} rounded p-2`}
+        className={`p-3 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 ${theme === 'light'
+          ? 'bg-white/80 text-gray-700 hover:bg-white hover:text-green-600 hover:shadow-green-500/20'
+          : 'bg-black/40 text-gray-300 border border-white/10 hover:bg-black/60 hover:text-green-400 hover:border-green-500/30'
+          }`}
         onClick={() => toggleResetFocus()}
       >
-      <TbZoomReset className='h-5 w-5 text-green-300 hover:text-secondaryColor' />
+        <TbZoomReset className='h-6 w-6' />
       </button>
     </div>
   );

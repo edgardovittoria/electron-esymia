@@ -29,6 +29,7 @@ import { Folder, MeshData, Port, Probe, Project, sharingInfoUser, TempLumped } f
 import { setModelInfoFromS3 } from '../../../shared/utilFunctions';
 import noResultsIconForProject from '../../../../../../../../../assets/noResultsIconForProject.png';
 import noResultsIconForProjectDark from '../../../../../../../../../assets/noResultsIconForProjectDark.png';
+import projectIcon from '../../../../../../../../../assets/projectIcon.png';
 import {
   useStorageData
 } from '../../../../../simulationTabsManagement/tabs/mesher/components/rightPanelSimulator/hook/useStorageData';
@@ -53,6 +54,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
   const allProjectFolders = useSelector(allProjectFoldersSelector);
   const user = useSelector(usersStateSelector);
   const theme = useSelector(ThemeSelector)
+  const isDark = theme !== 'light';
   const [showRename, setShowRename] = useState(false);
   const [showSearchUser, setShowSearchUser] = useState(false);
   const { cloneProject } = useStorageData()
@@ -77,16 +79,26 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
 
   function handleContextMenu(e: any) {
     e.preventDefault();
-    show({ event: e, props: { key: 'value' } });
+    const rect = e.currentTarget.getBoundingClientRect();
+    show({
+      event: e,
+      position: {
+        x: rect.right - 100,
+        y: rect.top
+      }
+    });
   }
 
   //console.log(project)
 
   return (
     <>
-      {cloning && <ImSpinner className={`animate-spin w-8 h-8 absolute top-1/2 right-1/2 z-100 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`}/>}
+      {cloning && <ImSpinner className={`animate-spin w-8 h-8 absolute top-1/2 right-1/2 z-100 ${isDark ? 'text-white' : 'text-gray-900'}`} />}
       <div
-        className={`flex flex-col border relative ${theme === 'light' ? 'text-textColor border-green-200 hover:border-secondaryColor' : 'text-textColorDark bg-bgColorDark border-textColorDark hover:border-secondaryColorDark'}  rounded-lg hover:cursor-pointer`}
+        className={`relative group rounded-2xl transition-all duration-300 hover:cursor-pointer hover:shadow-xl hover:-translate-y-1 p-[2px] bg-gradient-to-tr from-blue-500 via-purple-500 to-emerald-500 ${isDark
+          ? 'shadow-green-900/20'
+          : 'shadow-green-500/20'
+          }`}
         key={project.name}
         data-testid={project.name}
         data-tip={project.name}
@@ -100,136 +112,157 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
         style={{ opacity: isDragging ? 0.5 : 1 }}
         onContextMenu={handleContextMenu}
       >
-        {project.shared && <div className={`badge ${theme === 'light' ? 'badge-neutral' : 'bg-secondaryColorDark'}  absolute bottom-[-10px] right-1/2  translate-x-1/2`}>shared</div>}
-        <div className="tooltip tooltip-bottom" data-tip={project.name}>
-          <h5 className="text-center text-sm" role="Handle" ref={dragPreview}>
-            {project.name.length > 15
-              ? `${project.name.substring(0, 15)}...`
-              : project.name}
-          </h5>
-        </div>
-        <div>
-          {theme === 'light' ?
-          <img
-          className="w-[50%] md:w-[60%] mx-auto"
-          alt="project_screenshot"
-          src={noResultsIconForProject}
-        /> :
-        <img
-            className="w-[60%] md:w-[80%] mx-auto"
-            alt="project_screenshot"
-            src={noResultsIconForProjectDark}
-          />
-        }
+        <div className={`flex flex-col h-full w-full rounded-2xl overflow-hidden backdrop-blur-md ${isDark ? 'bg-black' : 'bg-white'}`}>
+          {project.shared && (
+            <div className={`absolute top-3 right-3 z-10 px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-full border shadow-sm ${isDark
+              ? 'bg-black/60 text-green-400 border-green-500/50 backdrop-blur-md'
+              : 'bg-white/80 text-green-600 border-green-200 backdrop-blur-md'
+              }`}>
+              Shared
+            </div>
+          )}
 
-        </div>
+          <div className={`relative flex-1 flex items-center justify-center p-6 transition-colors duration-300 ${isDark ? 'bg-white/5' : 'bg-gray-50'}`}>
+            <div className="aspect-video w-full flex items-center justify-center">
+              <img
+                className="w-full h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
+                alt="project_screenshot"
+                src={projectIcon}
+              />
+            </div>
+          </div>
 
-        {/* <div>
-                    <hr className="mb-3"/>
-                    {(project.description.length > 20) ? project.description.substring(0, 20) + '...' : project.description}
-                </div> */}
-        {project.ownerEmail === user.email && (
-          <Menu id={project.name} theme={theme}>
-            <Submenu
-              className='hover:text-white  text-primaryColor'
-              data-testid="moveMenu"
-              disabled={user.userRole !== 'Premium' || process.env.APP_VERSION === 'demo'}
-              label={
-                <>
-                  <BsFillFolderSymlinkFill className="mr-4 w-[20px] h-[20px]" />
-                  Move
-                </>
-              }
-            >
-              {allProjectFolders
-                .filter(
-                  (n) => n.id !== selectedFolder.id,
-                )
-                .map((f) => {
-                  return (
-                    <div key={f.id}>
-                      <Item
-                        data-testid={f.id}
-                        onClick={(p) => {
-                          p.event.stopPropagation();
-                          dispatch(
-                            moveProject({
-                              objectToMove: project,
-                              targetFolder: f.id as string,
-                            }),
-                          );
-                          execQuery2(
-                            moveProjectInDynamoDB,
-                            {
-                              ...project,
-                              parentFolder: f.id,
-                            } as Project,
-                            selectedFolder,
-                            f,
-                            dispatch
-                          );
-                          hideAll();
-                        }}
-                      >
-                        {f.name}
-                      </Item>
-                    </div>
-                  );
-                })}
-            </Submenu>
-            <Item
-              onClick={(p) => {
-                p.event.stopPropagation();
-                setShowRename(true);
-                hideAll();
-              }}
-              className='hover:text-white  text-primaryColor'
-            >
-              <BiRename className="mr-4 w-[20px] h-[20px]" />
-              Rename
-            </Item>
-            <Separator />
-            <Item
-              onClick={(p) => {
-                p.event.stopPropagation();
-                setcloning(true)
-                cloneProject(project, selectedFolder as Folder, setcloning)
-                hideAll();
-              }}
-              disabled={user.userRole !== 'Premium' || (process.env.APP_VERSION === 'demo' && selectedFolder.projectList.length === 3)}
-              className='hover:text-white  text-primaryColor'
-            >
-              <GrClone className="mr-4 w-[20px] h-[20px]" />
-              Clone
-            </Item>
-            <Item
-              onClick={(p) => {
-                p.event.stopPropagation();
-                setShowSearchUser(true);
-                hideAll();
-              }}
-              disabled={user.userRole !== 'Premium' || process.env.APP_VERSION === 'demo'}
-              className='hover:text-white  text-primaryColor'
-            >
-              <BiShareAlt className="mr-4 w-[20px] h-[20px]" />
-              Share
-            </Item>
-            <Separator />
-            <Item
-              data-testid="deleteButton"
-              onClick={(p) => {
-                p.event.stopPropagation();
-                deleteProject(project, selectedFolder)
-                hideAll();
-              }}
-              className='hover:text-white  text-primaryColor'
-            >
-              <BiTrash className="mr-4 w-[20px] h-[20px]" />
-              Delete
-            </Item>
-          </Menu>
-        )}
+          <div className={`p-3 border-t ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-white'}`}>
+            <div className="tooltip tooltip-bottom w-full" data-tip={project.name}>
+              <h5
+                className={`text-center font-semibold truncate text-sm ${isDark ? 'text-gray-200' : 'text-gray-700'}`}
+                role="Handle"
+                ref={dragPreview}
+              >
+                {project.name}
+              </h5>
+            </div>
+          </div>
+        </div>
       </div>
+      {project.ownerEmail === user.email && (
+        <Menu
+          id={project.name}
+          theme={theme}
+          className={`!z-[9999] rounded-2xl border shadow-2xl backdrop-blur-xl p-2 min-w-[220px] ${isDark
+            ? "bg-black/80 border-white/10"
+            : "bg-white/90 border-white/40"
+            }`}
+          style={{ zIndex: 9999 }}
+        >
+          <Submenu
+            className={`rounded-xl z-50 transition-all duration-200 ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-black/5 text-gray-700'}`}
+            data-testid="moveMenu"
+            disabled={user.userRole !== 'Premium' || process.env.APP_VERSION === 'demo'}
+            label={
+              <div className="flex items-center py-2 px-1">
+                <BsFillFolderSymlinkFill className="mr-3 w-4 h-4 opacity-70" />
+                <span className="font-medium text-sm">Move to...</span>
+              </div>
+            }
+          >
+            {allProjectFolders
+              .filter(
+                (n) => n.id !== selectedFolder.id,
+              )
+              .map((f) => {
+                return (
+                  <div key={f.id}>
+                    <Item
+                      data-testid={f.id}
+                      onClick={(p) => {
+                        p.event.stopPropagation();
+                        dispatch(
+                          moveProject({
+                            objectToMove: project,
+                            targetFolder: f.id as string,
+                          }),
+                        );
+                        execQuery2(
+                          moveProjectInDynamoDB,
+                          {
+                            ...project,
+                            parentFolder: f.id,
+                          } as Project,
+                          selectedFolder,
+                          f,
+                          dispatch
+                        );
+                        hideAll();
+                      }}
+                      className={`rounded-xl ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-black/5 text-gray-700'}`}
+                    >
+                      <span className="py-2 px-1 font-medium text-sm block">{f.name}</span>
+                    </Item>
+                  </div>
+                );
+              })}
+          </Submenu>
+          <Item
+            onClick={(p) => {
+              p.event.stopPropagation();
+              setShowRename(true);
+              hideAll();
+            }}
+            className={`rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-black/5 text-gray-700'}`}
+          >
+            <div className="flex items-center py-2 px-1">
+              <BiRename className="mr-3 w-4 h-4 opacity-70" />
+              <span className="font-medium text-sm">Rename</span>
+            </div>
+          </Item>
+          <div className={`h-px my-1 mx-2 ${isDark ? 'bg-white/10' : 'bg-gray-200/60'}`} />
+          <Item
+            onClick={(p) => {
+              p.event.stopPropagation();
+              setcloning(true)
+              cloneProject(project, selectedFolder as Folder, setcloning)
+              hideAll();
+            }}
+            disabled={user.userRole !== 'Premium' || (process.env.APP_VERSION === 'demo' && selectedFolder.projectList.length === 3)}
+            className={`rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-black/5 text-gray-700'}`}
+          >
+            <div className="flex items-center py-2 px-1">
+              <GrClone className="mr-3 w-4 h-4 opacity-70" />
+              <span className="font-medium text-sm">Clone Project</span>
+            </div>
+          </Item>
+          <Item
+            onClick={(p) => {
+              p.event.stopPropagation();
+              setShowSearchUser(true);
+              hideAll();
+            }}
+            disabled={user.userRole !== 'Premium' || process.env.APP_VERSION === 'demo'}
+            className={`rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-black/5 text-gray-700'}`}
+          >
+            <div className="flex items-center py-2 px-1">
+              <BiShareAlt className="mr-3 w-4 h-4 opacity-70" />
+              <span className="font-medium text-sm">Share Project</span>
+            </div>
+          </Item>
+          <div className={`h-px my-1 mx-2 ${isDark ? 'bg-white/10' : 'bg-gray-200/60'}`} />
+          <Item
+            data-testid="deleteButton"
+            onClick={(p) => {
+              p.event.stopPropagation();
+              deleteProject(project, selectedFolder)
+              hideAll();
+            }}
+            className={`rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-red-500/20 text-red-400' : 'hover:bg-red-50 text-red-600'}`}
+          >
+            <div className="flex items-center py-2 px-1">
+              <BiTrash className="mr-3 w-4 h-4 opacity-70" />
+              <span className="font-medium text-sm">Delete</span>
+            </div>
+          </Item>
+        </Menu>
+      )}
       {showRename && (
         <RenameProject
           projectToRename={project}

@@ -42,6 +42,7 @@ export const DroppableAndDraggableFolder: React.FC<
   const allProjectFolders = useSelector(allProjectFoldersSelector);
   const user = useSelector(usersStateSelector);
   const theme = useSelector(ThemeSelector)
+  const isDark = theme !== 'light';
   const [showRename, setShowRename] = useState(false);
   const [showSearchUser, setShowSearchUser] = useState(false);
 
@@ -126,13 +127,23 @@ export const DroppableAndDraggableFolder: React.FC<
 
   function handleContextMenu(e: any) {
     e.preventDefault();
-    show({ event: e, props: { key: 'value' } });
+    const rect = e.currentTarget.getBoundingClientRect();
+    show({
+      event: e,
+      position: {
+        x: rect.right - 100,
+        y: rect.top - 100
+      }
+    });
   }
 
   return (
     <>
       <div
-        className={`flex items-center py-[2px] px-[5px] border ${theme === 'light' ? 'text-textColor bg-white border-gray-300 hover:border-gray-600' : 'text-textColorDark bg-bgColorDark hover:border-secondaryColorDark'}  rounded-lg hover:cursor-pointer w-full`}
+        className={`flex items-center p-3 rounded-xl transition-all duration-300 border ${isDark
+          ? 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-green-500/50 text-gray-200'
+          : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-green-400 text-gray-700'
+          } hover:cursor-pointer hover:shadow-md group`}
         ref={(ref) => {
           drag(drop(ref));
         }}
@@ -141,7 +152,7 @@ export const DroppableAndDraggableFolder: React.FC<
         data-testid={folder.name}
         role="Dustbin"
         style={{
-          backgroundColor: isOver ? '#e6e6e6' : 'white',
+          backgroundColor: isOver ? (isDark ? 'rgba(34, 197, 94, 0.2)' : '#e6f7ed') : undefined,
           opacity: isDragging ? 0.5 : 1,
         }}
         onDoubleClick={() => {
@@ -149,24 +160,34 @@ export const DroppableAndDraggableFolder: React.FC<
           dispatch(selectFolder(folder.id as string));
         }}
       >
-        <IoMdFolder className={`mr-2 w-[30px] h-[30px] ${theme === 'light' ? 'text-gray-500' : 'text-textColorDark'}`} />
-        <div className="tooltip tooltip-right" data-tip={folder.name}>
-          <span className={`font-bold text-sm ${theme === 'light' ? 'text-gray-500' : 'text-textColorDark'}`}>
-            {folder.name.length > 25
-              ? `${folder.name.substring(0, 25)}...`
-              : folder.name}
+        <div className={`p-2 rounded-lg mr-3 ${isDark ? 'bg-white/10 text-green-400' : 'bg-green-100 text-green-600'}`}>
+          <IoMdFolder className="w-5 h-5" />
+        </div>
+
+        <div className="tooltip tooltip-right flex-1 min-w-0" data-tip={folder.name}>
+          <span className="font-medium text-sm truncate block">
+            {folder.name}
           </span>
         </div>
+
         {folder.ownerEmail === user.email && (
-          <Menu id={folder.name} theme={theme}>
+          <Menu
+            id={folder.name}
+            theme={theme}
+            className={`!z-[9999] rounded-2xl border shadow-2xl backdrop-blur-xl p-2 min-w-[220px] ${isDark
+              ? "bg-black/80 border-white/10"
+              : "bg-white/90 border-white/40"
+              }`}
+            style={{ zIndex: 9999 }}
+          >
             <Submenu
-              className='hover:text-white  text-primaryColor'
+              className={`rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-black/5 text-gray-700'}`}
               data-testid="moveMenu"
               label={
-                <>
-                  <BsFillFolderSymlinkFill className="mr-4 w-[20px] h-[20px]" />
-                  Move
-                </>
+                <div className="flex items-center py-2 px-1">
+                  <BsFillFolderSymlinkFill className="mr-3 w-4 h-4 opacity-70" />
+                  <span className="font-medium text-sm">Move to...</span>
+                </div>
               }
             >
               {allProjectFolders
@@ -197,8 +218,9 @@ export const DroppableAndDraggableFolder: React.FC<
                           );
                           hideAll();
                         }}
+                        className={`rounded-xl ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-black/5 text-gray-700'}`}
                       >
-                        {f.name}
+                        <span className="py-2 px-1 font-medium text-sm block">{f.name}</span>
                       </Item>
                     </div>
                   );
@@ -211,10 +233,12 @@ export const DroppableAndDraggableFolder: React.FC<
                 setShowRename(true);
                 hideAll();
               }}
-              className='hover:text-white  text-primaryColor'
+              className={`rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-black/5 text-gray-700'}`}
             >
-              <BiRename className="mr-4 w-[20px] h-[20px]" />
-              Rename
+              <div className="flex items-center py-2 px-1">
+                <BiRename className="mr-3 w-4 h-4 opacity-70" />
+                <span className="font-medium text-sm">Rename</span>
+              </div>
             </Item>
             {/* <Separator /> */}
             {/* <Item
@@ -228,7 +252,7 @@ export const DroppableAndDraggableFolder: React.FC<
               <BiShareAlt className="mr-4 w-[20px] h-[20px]" />
               Share
             </Item> */}
-            <Separator />
+            <div className={`h-px my-1 mx-2 ${isDark ? 'bg-white/10' : 'bg-gray-200/60'}`} />
             <Item
               onClick={(p) => {
                 p.event.stopPropagation();
@@ -242,11 +266,13 @@ export const DroppableAndDraggableFolder: React.FC<
                   hideAll();
                 })
               }}
-              className='hover:text-white  text-primaryColor'
+              className={`rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-red-500/20 text-red-400' : 'hover:bg-red-50 text-red-600'}`}
               data-testid="deleteButtonFolder"
             >
-              <BiTrash className="mr-4 w-[20px] h-[20px]" />
-              Delete
+              <div className="flex items-center py-2 px-1">
+                <BiTrash className="mr-3 w-4 h-4 opacity-70" />
+                <span className="font-medium text-sm">Delete</span>
+              </div>
             </Item>
           </Menu>
         )}

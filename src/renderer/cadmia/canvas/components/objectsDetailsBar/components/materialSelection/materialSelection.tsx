@@ -34,10 +34,9 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
   }, [defaultMaterial]);
 
   return (
-    <div className="flex flex-col">
-      <h6 className="text-black mt-[10px] text-sm font-bold">Material</h6>
-      <hr className="border-black mb-2 mt-1" />
-      <div className="flex flex-row items-center gap-4">
+    <div className="flex flex-col gap-2 mt-4">
+      <h6 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Material</h6>
+      <div className="flex flex-row items-center gap-2">
         <Listbox
           value={defaultMaterial}
           onChange={(material) => {
@@ -45,9 +44,9 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
             setMaterialSelected(material);
           }}
         >
-          <div className="relative mt-1 w-5/6">
-            <Listbox.Button className="relative w-full border-2 border-black cursor-default rounded-lg bg-white py-1 pl-3 x text-left shadow focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-              <span className="block truncate text-black text-xs">
+          <div className="relative w-full">
+            <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-white dark:bg-black/20 border border-gray-200 dark:border-white/10 py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm transition-all">
+              <span className="block truncate text-xs font-medium text-gray-700 dark:text-gray-200">
                 {defaultMaterial && availableMaterials.filter(am => am.id === defaultMaterial.id).length > 0 ? defaultMaterial.name : 'UNDEFINED'}
               </span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -64,17 +63,14 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
               leaveTo="opacity-0"
             >
               <Listbox.Options
-                className={`absolute border-2 border-amber-400 max-h-[120px] w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm`}
+                className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
               >
                 {user ? (
                   availableMaterials.map((material, materialIdx) => (
                     <Listbox.Option
                       key={materialIdx}
                       className={({ active }) =>
-                        `relative cursor-default select-none py-2 pl-5 pr-4 ${
-                          (active || materialSelected?.name === material.name)
-                            ? 'bg-amber-100 text-amber-900'
-                            : 'text-gray-900'
+                        `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100' : 'text-gray-900 dark:text-gray-100'
                         }`
                       }
                       value={material}
@@ -82,19 +78,15 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
                       {({ selected }) => (
                         <>
                           <span
-                            className={`flex flex-row gap-2 items-center truncate ${
-                              (selected || materialSelected?.name === material.name) ? 'font-medium' : 'font-normal'
-                            }`}
+                            className={`flex flex-row gap-2 items-center truncate ${selected ? 'font-medium' : 'font-normal'
+                              }`}
                           >
-                            <MdCircle color={material.color}/>
-                            <span>{material.name}</span>
+                            <MdCircle color={material.color} className="w-3 h-3" />
+                            <span className="text-xs">{material.name}</span>
                           </span>
-                          {(selected || materialSelected?.name === material.name) ? (
-                            <span className="absolute inset-y-0 right-3 flex items-center pl-3 text-amber-600">
-                              <CheckIcon
-                                className="h-5 w-5"
-                                aria-hidden="true"
-                              />
+                          {selected ? (
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600 dark:text-blue-400">
+                              <CheckIcon className="h-4 w-4" aria-hidden="true" />
                             </span>
                           ) : null}
                         </>
@@ -102,9 +94,9 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
                     </Listbox.Option>
                   ))
                 ) : (
-                  <Listbox.Option value={undefined}>
-                    <span className="text-black p-2">
-                      Login to access the available materials
+                  <Listbox.Option value={undefined} disabled>
+                    <span className="text-gray-500 dark:text-gray-400 p-2 text-xs italic">
+                      Login to access materials
                     </span>
                   </Listbox.Option>
                 )}
@@ -114,35 +106,21 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
         </Listbox>
         <div className="tooltip tooltip-left" data-tip="Material Details">
           <TbInfoSquareRounded
-            color="black"
-            className="hover:cursor-pointer w-5 h-5 "
+            className="hover:cursor-pointer w-5 h-5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
             onClick={() => {
               setShowDetails(!showDetails);
             }}
           />
         </div>
       </div>
-      {/* {showDetails && materialSelected && (
-        <div className="overflow-scroll max-h-[200px] justify-between mt-2 px-2">
-          {Object.entries(materialSelected).map(([p, value]) => (
-            <>
-              {p !== 'coll' && p !== 'ts' && p !== 'ttl' && p !== "id" && (
-                <div className="flex flex-row justify-between text-sm leading-tight">
-                  <div className="text-black text-[12px]">{p}:</div>
-                  <div className="text-black text-[12px]">{value}</div>
-                </div>
-              )}
-            </>
-          ))}
-        </div>
-      )} */}
+
       {user && (
         <button
           type="button"
-          className="rounded bg-black hover:opacity-75 hover:cursor-pointer text-sm capitalize shadow p-2 mt-5 w-full"
+          className="w-full py-1.5 px-3 bg-gray-900 hover:bg-gray-800 dark:bg-white/10 dark:hover:bg-white/20 text-white text-xs font-medium rounded-lg shadow-sm transition-all duration-200"
           onClick={() => setShowManageMaterialModal(true)}
         >
-          Manage Material
+          Manage Materials
         </button>
       )}
       {showManageMaterialModal && !showNewMaterialModal && (
@@ -162,7 +140,7 @@ export const MaterialSelection: FC<MaterialSelectionProps> = ({
         />
       )}
       {showDetails && (
-        <MaterialDetailsModal showModal={setShowDetails} material={materialSelected as Material}/>
+        <MaterialDetailsModal showModal={setShowDetails} material={materialSelected as Material} />
       )}
     </div>
   );

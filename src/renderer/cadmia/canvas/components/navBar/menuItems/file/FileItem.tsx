@@ -38,7 +38,7 @@ import { addComponent, BufferGeometryAttributes, canvasStateSelector, ComponentE
 import { importRisGeometry } from '../../../../../../cad_library/components/importFunctions/importFunctions';
 import { SaveRisModelWithNameModal } from './components/saveRisModelWithNameModal';
 
-interface FileItemProps {}
+interface FileItemProps { }
 
 export const exportJSONProject = (canvas: CanvasState) => {
   const link = document.createElement('a');
@@ -151,83 +151,17 @@ export const FileItem: React.FC<FileItemProps> = () => {
               <Popover.Panel className={navbarDropdownStyle}>
                 <div className={navbarDropdownBoxStyle}>
                   <div className={navbarDropdownPadding}>
-                    {/* {isAuthenticated ? (
-                      <span
-                        className={navbarDropdownItemStyle}
-                        onClick={() => {
-                          dispatch(setLoadingSpinner(true))
-                          deleteFileS3(
-                            selectedModel?.components as string,
-                          ).then(() => {
-                            const model = JSON.stringify({
-                              components: canvas.components,
-                              unit,
-                            });
-                            const blobFile = new Blob([model]);
-                            const modelFile = new File(
-                              [blobFile],
-                              `${selectedModel?.name}_model.json`,
-                              {
-                                type: 'application/json',
-                              },
-                            );
 
-                            uploadFileS3(modelFile).then((res) => {
-                              if (res && selectedModel) {
-                                // modificare documento fauna con il nuovo riferimento a oggetto s3
-                                const newModel: FaunaCadModel = {
-                                  ...selectedModel,
-                                  components: res.key,
-                                };
-                                execQuery(updateModelInFauna, newModel, dispatch)
-                                  .then(() => {
-                                    dispatch(updateModel(newModel));
-                                    toast.success('Model updated!');
-                                    dispatch(setLoadingSpinner(false))
-                                  })
-                                  .catch((err) => {
-                                    console.log(err);
-                                    toast.error('Model not updated!');
-                                    dispatch(setLoadingSpinner(false))
-                                  });
-                              }
-                            });
-                          });
-                        }}
-                      >
-                        <button className="flex justify-between w-full hover:cursor-pointer disabled:opa"
-                                disabled={!selectedModel}
-                        >
-                          <div className="flex">
-                            <CloudArrowDownIcon className="w-[20px] mr-4" />
-                            <p className="text-base font-medium">
-                              Save
-                            </p>
-                          </div>
-                        </button>
-                      </span>
-                    ) : (
-                      <span className={navbarDropdownItemStyle}>
-                        <div className="flex justify-between w-full hover:cursor-pointer">
-                          <div className="flex">
-                            <CloudArrowDownIcon className="w-[20px] mr-4 text-gray-300" />
-                            <p className="text-base font-medium text-gray-300">
-                              Save As New Model
-                            </p>
-                          </div>
-                        </div>
-                      </span>
-                    )} */}
                     {isAuthenticated && (
                       <button
                         className={navbarDropdownItemStyle}
                         onClick={() => setModalSave(true)}
                         disabled={(process.env.APP_VERSION === 'demo' && models.length === 3)}
                       >
-                        <div className="flex justify-between w-full hover:cursor-pointer">
-                          <div className="flex">
-                            <CloudArrowDownIcon className="w-[20px] mr-4" />
-                            <p className="text-base font-medium">Save As...</p>
+                        <div className="flex w-full items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <CloudArrowDownIcon className="h-5 w-5" />
+                            <span>Save As...</span>
                           </div>
                         </div>
                       </button>
@@ -238,10 +172,10 @@ export const FileItem: React.FC<FileItemProps> = () => {
                         onClick={() => setModalRisSave(true)}
                         disabled={(process.env.APP_VERSION === 'demo' && models.length === 3)}
                       >
-                        <div className="flex justify-between w-full hover:cursor-pointer">
-                          <div className="flex">
-                            <CloudArrowDownIcon className="w-[20px] mr-4" />
-                            <p className="text-base font-medium">Save With Ris Geometry Data</p>
+                        <div className="flex w-full items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <CloudArrowDownIcon className="h-5 w-5" />
+                            <span>Save With Ris Geometry Data</span>
                           </div>
                         </div>
                       </button>
@@ -251,16 +185,13 @@ export const FileItem: React.FC<FileItemProps> = () => {
                         className={navbarDropdownItemStyle}
                         onClick={() => setModalLoad(true)}
                       >
-                        <div className="flex justify-between w-full hover:cursor-pointer"
-                             onClick={() => dispatch(setModality("NormalSelection"))}
+                        <div className="flex w-full items-center justify-between cursor-pointer"
+                          onClick={() => dispatch(setModality("NormalSelection"))}
                         >
-                          <div className="flex">
-                            <CloudArrowUpIcon className="w-[20px] mr-4" />
-                            <p className="text-base font-medium">
-                              Load
-                            </p>
+                          <div className="flex items-center gap-3">
+                            <CloudArrowUpIcon className="h-5 w-5" />
+                            <span>Load</span>
                           </div>
-                          {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
                         </div>
                       </span>
                     )}
@@ -269,32 +200,26 @@ export const FileItem: React.FC<FileItemProps> = () => {
                       actionParams={{} as ImportActionParamsObject}
                       importAction={importStateCanvas}
                     >
-                      <div className="flex justify-between w-full hover:cursor-pointer"
-                           onClick={() => dispatch(setModality("NormalSelection"))}
+                      <div className="flex w-full items-center justify-between cursor-pointer"
+                        onClick={() => dispatch(setModality("NormalSelection"))}
                       >
-                        <div className="flex">
-                          <ArrowDownTrayIcon className="w-[20px] mr-4" />
-                          <p className="text-base font-medium">
-                            Import Project
-                          </p>
+                        <div className="flex items-center gap-3">
+                          <ArrowDownTrayIcon className="h-5 w-5" />
+                          <span>Import Project</span>
                         </div>
-                        {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
                       </div>
                     </ImportCadProjectButton>
                     <div
                       className={navbarDropdownItemStyle}
                       onClick={onImportSTLClick}
                     >
-                      <div className="flex justify-between w-full hover:cursor-pointer"
-                          onClick={() => dispatch(setModality("NormalSelection"))}
+                      <div className="flex w-full items-center justify-between cursor-pointer"
+                        onClick={() => dispatch(setModality("NormalSelection"))}
                       >
-                        <div className="flex">
-                          <ArrowDownTrayIcon className="w-[20px] mr-4" />
-                          <p className="text-base font-medium">
-                            Import STL File
-                          </p>
+                        <div className="flex items-center gap-3">
+                          <ArrowDownTrayIcon className="h-5 w-5" />
+                          <span>Import STL File</span>
                         </div>
-                        {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
                       </div>
                       <input
                         type="file"
@@ -316,16 +241,13 @@ export const FileItem: React.FC<FileItemProps> = () => {
                       className={navbarDropdownItemStyle}
                       onClick={onImportRisClick}
                     >
-                      <div className="flex justify-between w-full hover:cursor-pointer"
-                          onClick={() => dispatch(setModality("NormalSelection"))}
+                      <div className="flex w-full items-center justify-between cursor-pointer"
+                        onClick={() => dispatch(setModality("NormalSelection"))}
                       >
-                        <div className="flex">
-                          <ArrowDownTrayIcon className="w-[20px] mr-4" />
-                          <p className="text-base font-medium">
-                            Import Ris Geometry
-                          </p>
+                        <div className="flex items-center gap-3">
+                          <ArrowDownTrayIcon className="h-5 w-5" />
+                          <span>Import Ris Geometry</span>
                         </div>
-                        {/* <p className="text-base font-medium text-gray-300">Ctrl + S</p> */}
                       </div>
                       <input
                         type="file"
@@ -345,16 +267,12 @@ export const FileItem: React.FC<FileItemProps> = () => {
                         exportJSONProject(canvasState);
                       }}
                     >
-                      <div className="flex justify-between w-full hover:cursor-pointer">
-                        <div className="flex">
-                          <ArrowUpTrayIcon className="w-[20px] mr-4" />
-                          <p className="text-base font-medium">
-                            Export Project
-                          </p>
+                      <div className="flex w-full items-center justify-between cursor-pointer">
+                        <div className="flex items-center gap-3">
+                          <ArrowUpTrayIcon className="h-5 w-5" />
+                          <span>Export Project</span>
                         </div>
-                        <p className={navbarShortcutStyle}>
-                          Ctrl + S
-                        </p>
+                        <span className={navbarShortcutStyle}>Ctrl + S</span>
                       </div>
                     </span>
                     <span
@@ -363,16 +281,12 @@ export const FileItem: React.FC<FileItemProps> = () => {
                         exportToSTLFormat(entities);
                       }}
                     >
-                      <div className="flex justify-between w-full hover:cursor-pointer">
-                        <div className="flex">
-                          <ArrowUpTrayIcon className="w-[20px] mr-4" />
-                          <p className="text-base font-medium">
-                            Export STL Format
-                          </p>
+                      <div className="flex w-full items-center justify-between cursor-pointer">
+                        <div className="flex items-center gap-3">
+                          <ArrowUpTrayIcon className="h-5 w-5" />
+                          <span>Export STL Format</span>
                         </div>
-                        <p className={navbarShortcutStyle}>
-                          Ctrl + Alt + S
-                        </p>
+                        <span className={navbarShortcutStyle}>Ctrl + Alt + S</span>
                       </div>
                     </span>
                   </div>

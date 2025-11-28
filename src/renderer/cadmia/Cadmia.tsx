@@ -10,23 +10,26 @@ export interface CadmiaProps {
 
 const Cadmia: React.FC<CadmiaProps> = ({ selectedTab }) => {
   const [showCad, setShowCad] = useState<boolean>(false);
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
+  const isDark = theme !== 'light';
+
   return (
     <>
       {selectedTab === 'cadmia' && (
-        <div>
+        <div className="h-full flex flex-col animate-fade-in-up">
           {showCad ? (
             <CAD setShowCad={setShowCad} />
           ) : (
             <>
-              <div className="grid grid-cols-12 px-8 pt-6 items-center">
-                <span className={`xl:col-span-1 sm:col-span-2 col-span-3 ${theme === 'light' ? 'text-secondaryColor' : 'text-secondaryColorDark'} text-2xl font-semibold mr-4 ml-4 flex justify-center pb-1`}>
+              <div className="w-full px-8 py-6 flex items-center justify-between">
+                <h1 className={`text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
                   CADmIA
-                </span>
+                </h1>
               </div>
-              <Dashboard showCad={showCad} setShowCad={setShowCad} />
+              <div className="flex-1 px-8 pb-8 overflow-auto">
+                <Dashboard showCad={showCad} setShowCad={setShowCad} />
+              </div>
             </>
-
           )}
         </div>
       )}

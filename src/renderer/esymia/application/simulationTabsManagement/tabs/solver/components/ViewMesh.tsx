@@ -18,26 +18,26 @@ export const ViewMesh: React.FC<ViewMeshProps> = ({
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
   return (
+
     <button
-      className="absolute right-[2%] top-[180px] rounded flex flex-col items-center gap-0 disabled:opacity-50"
+      className="absolute right-[2%] top-0 rounded-xl flex flex-col items-center gap-0 disabled:opacity-50 transition-all duration-300"
       disabled={selectedProject?.meshData.meshGenerated !== 'Generated'}
+      onClick={() => {
+        setViewMesh(!viewMesh);
+        setResetFocus(true);
+      }}
     >
       <div
-        className={`p-2 tooltip rounded tooltip-left ${
-          theme === 'light'
-            ? 'text-primaryColor bg-white'
-            : 'text-textColorDark bg-bgColorDark2'
-        }`}
+        className={`p-3 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 ${theme === 'light'
+          ? 'bg-white/80 text-blue-600 hover:bg-white hover:text-blue-500 shadow-blue-500/20'
+          : 'bg-black/40 text-blue-400 hover:bg-black/60 hover:text-blue-300 border border-white/10 shadow-blue-600/20'
+          }`}
         data-tip={viewMesh ? 'View Model' : 'View Mesh'}
-        onClick={() => {
-          setViewMesh(!viewMesh);
-          setResetFocus(true);
-        }}
       >
         {viewMesh ? (
-          <MdOutlineViewInAr style={{ width: '25px', height: '25px' }} />
+          <MdOutlineViewInAr size={24} />
         ) : (
-          <GiCubes style={{ width: '25px', height: '25px' }} />
+          <GiCubes size={24} />
         )}
       </div>
     </button>

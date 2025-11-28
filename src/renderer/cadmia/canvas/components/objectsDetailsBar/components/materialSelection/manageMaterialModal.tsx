@@ -67,159 +67,164 @@ export const ManageMaterialModal: FC<{
   availableMaterials,
   deleteMaterial,
 }) => {
-  const models = useSelector(ModelsSelector);
-  const dispatch = useDispatch();
+    const models = useSelector(ModelsSelector);
+    const dispatch = useDispatch();
 
-  async function isMaterialUsed(
-    models: DynamoDBCadModel[],
-    m: Material,
-    s3: S3,
-  ) {
-    // 1. Mappa ogni modello a una Promise che scarica e controlla i componenti
-    const usageChecks = models.map((model) => {
-      const params = {
-        Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
-        Key: model.components,
-      };
+    async function isMaterialUsed(
+      models: DynamoDBCadModel[],
+      m: Material,
+      s3: S3,
+    ) {
+      // 1. Mappa ogni modello a una Promise che scarica e controlla i componenti
+      const usageChecks = models.map((model) => {
+        const params = {
+          Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
+          Key: model.components,
+        };
 
-      // Chiama s3.getObject e la converte in una Promise con .promise()
-      return s3
-        .getObject(params)
-        .promise()
-        .then((data: any) => {
-          // Logica di controllo all'interno del .then()
-          const parsedModel = JSON.parse(data.Body?.toString() as string) as {
-            components: ComponentEntity[];
-            unit: string;
-          };
+        // Chiama s3.getObject e la converte in una Promise con .promise()
+        return s3
+          .getObject(params)
+          .promise()
+          .then((data: any) => {
+            // Logica di controllo all'interno del .then()
+            const parsedModel = JSON.parse(data.Body?.toString() as string) as {
+              components: ComponentEntity[];
+              unit: string;
+            };
 
-          // Restituisce true se il materiale è trovato, altrimenti false
-          return parsedModel.components.some((c) => c.material?.id === m.id);
-        })
-        .catch((err: any) => {
-          console.error('Errore nel recupero da S3:', err);
-          return false; // Gestisce l'errore come "non in uso" per sicurezza o logica specifica
-        });
-    });
+            // Restituisce true se il materiale è trovato, altrimenti false
+            return parsedModel.components.some((c) => c.material?.id === m.id);
+          })
+          .catch((err: any) => {
+            console.error('Errore nel recupero da S3:', err);
+            return false; // Gestisce l'errore come "non in uso" per sicurezza o logica specifica
+          });
+      });
 
-    // 2. Aspetta che TUTTE le Promise siano risolte
-    const results = await Promise.all(usageChecks);
+      // 2. Aspetta che TUTTE le Promise siano risolte
+      const results = await Promise.all(usageChecks);
 
-    // 3. Controlla se almeno uno dei risultati è TRUE
-    const isMaterialUsed = results.some((isUsed) => isUsed === true);
+      // 3. Controlla se almeno uno dei risultati è TRUE
+      const isMaterialUsed = results.some((isUsed) => isUsed === true);
 
-    // A questo punto puoi eseguire la logica di cancellazione
-    if (isMaterialUsed) {
-      // Non cancellare
-      console.log('Materiale in uso, non cancellabile.');
-      return true;
-    } else {
-      // Cancellare il materiale
-      console.log('Materiale non in uso, cancellabile.');
-      return false;
+      // A questo punto puoi eseguire la logica di cancellazione
+      if (isMaterialUsed) {
+        // Non cancellare
+        console.log('Materiale in uso, non cancellabile.');
+        return true;
+      } else {
+        // Cancellare il materiale
+        console.log('Materiale non in uso, cancellabile.');
+        return false;
+      }
     }
-  }
 
-  return (
-    <>
-      <Transition appear show={true} as={Fragment}>
-        <Dialog as="div" className="relative z-20" onClose={() => {}}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
+    return (
+      <>
+        <Transition appear show={true} as={Fragment}>
+          <Dialog as="div" className="relative z-50" onClose={() => { }}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
+            </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <IoCloseCircleOutline
-                    size={30}
-                    className="absolute top-0 right-0 hover:opacity-70 hover:cursor-pointer"
-                    onClick={() => showModal(false)}
-                  />
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Manage Materials
-                  </Dialog.Title>
-                  <hr className="my-4 border-gray-800" />
-                  {availableMaterials.map((m, index) => {
-                    return (
-                      <div
-                        className={`flex flex-row items-center justify-between p-2 ${
-                          index % 2 === 0 ? 'bg-gray-200' : 'bg-white'
-                        }`}
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white/90 dark:bg-black/80 backdrop-blur-md border border-gray-200 dark:border-white/10 p-6 text-left align-middle shadow-xl transition-all">
+                    <div className="flex justify-between items-center mb-4">
+                      <Dialog.Title
+                        as="h3"
+                        className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
                       >
-                        <div className="flex flex-row gap-2 items-center">
-                          <MdCircle color={m.color} />
-                          <span>{m.name}</span>
-                        </div>
-                        <div className="flex flex-row items-center gap-4">
-                          <TbInfoSquareRounded
-                            color="black"
-                            className="hover:scale-125 hover:cursor-pointer transition hover:transition w-5 h-5 "
-                            onClick={() => {
-                              setShowDetails(!showDetails);
-                            }}
-                          />
-                          <PiTrash
-                            color="red"
-                            className="hover:scale-125 hover:cursor-pointer transition hover:transition"
-                            onClick={async() => {
-                              let materialUsed = await isMaterialUsed(models, m, s3)
-                              if (!materialUsed) {
-                                let confirm = window.confirm(
-                                  `Are You sure to delete ${m.name} ?`,
-                                );
-                                confirm && deleteMaterial(m.id);
-                              } else {
-                                dispatch(
-                                  setMessageInfoModal(
-                                    'Material used in a model, you can not delete it!',
-                                  ),
-                                );
-                                dispatch(setIsAlertInfoModal(false));
-                                dispatch(setShowInfoModal(true));
-                              }
-                            }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <hr className="my-4 border-gray-800" />
-                  <div className="mt-4 flex justify-between">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={() => setShowNewMaterialModal(true)}
-                    >
-                      Add New Material
-                    </button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
+                        Manage Materials
+                      </Dialog.Title>
+                      <IoCloseCircleOutline
+                        size={24}
+                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer transition-colors"
+                        onClick={() => showModal(false)}
+                      />
+                    </div>
+
+                    <div className="max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 space-y-2">
+                      {availableMaterials.map((m, index) => {
+                        return (
+                          <div
+                            key={m.id}
+                            className="flex flex-row items-center justify-between p-3 rounded-lg bg-white/50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors border border-gray-100 dark:border-white/5"
+                          >
+                            <div className="flex flex-row gap-3 items-center">
+                              <MdCircle color={m.color} className="w-4 h-4 shadow-sm rounded-full" />
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{m.name}</span>
+                            </div>
+                            <div className="flex flex-row items-center gap-3">
+                              <div className="tooltip tooltip-left" data-tip="Details">
+                                <TbInfoSquareRounded
+                                  className="w-5 h-5 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 cursor-pointer transition-colors"
+                                  onClick={() => {
+                                    setShowDetails(!showDetails);
+                                  }}
+                                />
+                              </div>
+                              <div className="tooltip tooltip-left" data-tip="Delete">
+                                <PiTrash
+                                  className="w-5 h-5 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 cursor-pointer transition-colors"
+                                  onClick={async () => {
+                                    let materialUsed = await isMaterialUsed(models, m, s3)
+                                    if (!materialUsed) {
+                                      let confirm = window.confirm(
+                                        `Are You sure to delete ${m.name} ?`,
+                                      );
+                                      confirm && deleteMaterial(m.id);
+                                    } else {
+                                      dispatch(
+                                        setMessageInfoModal(
+                                          'Material used in a model, you can not delete it!',
+                                        ),
+                                      );
+                                      dispatch(setIsAlertInfoModal(false));
+                                      dispatch(setShowInfoModal(true));
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                      <button
+                        type="button"
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-lg shadow-blue-500/30 transition-all focus:outline-none flex items-center gap-2"
+                        onClick={() => setShowNewMaterialModal(true)}
+                      >
+                        <span>+</span> Add New Material
+                      </button>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
             </div>
-          </div>
-        </Dialog>
-      </Transition>
-    </>
-  );
-};
+          </Dialog>
+        </Transition>
+      </>
+    );
+  };

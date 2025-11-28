@@ -39,43 +39,51 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
     (p) => p.category === 'port',
   ) as Port[];
   const labels = pairs(ports.map((p) => p.name));
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    if (labels.length > 0 && selectedLabel.length === 0) {
+      // Default to the first label if nothing is selected
+      const defaultLabel = `${labels[0][0]} - ${labels[0][1]}`;
+      setSelectedLabel([{ label: defaultLabel, id: 0 }]);
+
+      // Trigger data fetch for the default label
+      dispatch(setSpinnerSolverResults(true));
+      axios.post('http://127.0.0.1:8001/get_results_matrix?file_id=' + selectedProject?.simulation?.resultS3, {
+        fileId: selectedProject?.simulation?.resultS3,
+        port_index: 0
+      }).then(res => console.log(res)).catch(err => console.log(err));
+    }
+  }, [labels.length, selectedLabel.length, selectedProject?.simulation?.resultS3, dispatch, setSelectedLabel]);
 
   return (
-    <div className="mt-8 flex justify-between">
-      <div className="flex">
+    <div className="mt-8 flex justify-between items-center">
+      <div className="flex gap-2">
         <div
-          className={`box p-[5px] ${
-            theme === 'light' ? '' : 'bg-bgColorDark2'
-          } mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${
-            chartVisualizationMode === 'grid'
-              ? 'border-[#0fb25b]'
-              : 'border-bgColorDark'
-          }`}
+          className={`p-2 rounded-lg border transition-all duration-200 cursor-pointer ${chartVisualizationMode === 'grid'
+            ? (theme === 'light' ? 'bg-green-50 border-green-500 text-green-600' : 'bg-green-900/20 border-green-500 text-green-400')
+            : (theme === 'light' ? 'bg-white border-gray-200 text-gray-400 hover:border-green-500 hover:text-green-600' : 'bg-white/5 border-white/10 text-gray-500 hover:border-green-500 hover:text-green-400')
+            }`}
           onClick={() => setChartVisualizationMode('grid')}
         >
-          <BsGrid3X3Gap size={20} color="#0fb25b" />
+          <BsGrid3X3Gap size={20} />
         </div>
         <div
-          className={`box p-[5px] ${
-            theme === 'light' ? '' : 'bg-bgColorDark2'
-          } ml-2 mb-3 flex flex-col items-center border-2 hover:cursor-pointer hover:border-[#0fb25b] ${
-            chartVisualizationMode === 'full'
-              ? 'border-[#0fb25b]'
-              : 'border-bgColorDark'
-          }`}
+          className={`p-2 rounded-lg border transition-all duration-200 cursor-pointer ${chartVisualizationMode === 'full'
+            ? (theme === 'light' ? 'bg-green-50 border-green-500 text-green-600' : 'bg-green-900/20 border-green-500 text-green-400')
+            : (theme === 'light' ? 'bg-white border-gray-200 text-gray-400 hover:border-green-500 hover:text-green-600' : 'bg-white/5 border-white/10 text-gray-500 hover:border-green-500 hover:text-green-400')
+            }`}
           onClick={() => setChartVisualizationMode('full')}
         >
-          <GiHamburgerMenu size={20} color="#0fb25b" />
+          <GiHamburgerMenu size={20} />
         </div>
       </div>
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center gap-2">
         <select
-          className={`select select-success disabled:opacity-35 disabled:hover:cursor-not-allowed w-full max-w-xs h-[35px] min-h-[35px] mr-2 text-sm ${
-            theme === 'light'
-              ? 'bg-white text-textColor'
-              : 'bg-bgColorDark2 text-textColorDark'
-          }`}
+          className={`select select-sm w-full max-w-xs h-[40px] text-sm rounded-xl border outline-none focus:ring-2 focus:ring-green-500/20 transition-all ${theme === 'light'
+            ? 'bg-white text-gray-700 border-gray-200 focus:border-green-500'
+            : 'bg-black/20 text-gray-200 border-white/10 focus:border-green-500'
+            } disabled:opacity-35 disabled:cursor-not-allowed`}
           onChange={(e) => setGraphToVisualize(e.currentTarget.value)}
           disabled={selectedProject?.simulation?.status !== "Completed"}
           defaultValue={'All Graph'}
@@ -85,80 +93,65 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
           <option>Y</option>
           <option>S</option>
         </select>
-        <button className={`dropdown dropdown-bottom disabled:opacity-35 disabled:hover:cursor-not-allowed`} 
-          disabled={selectedProject?.simulation?.status !== "Completed"}
-        >
+
+        <div className="dropdown dropdown-bottom dropdown-end z-40">
           <label
             tabIndex={0}
-            className={`select select-success ${
-              theme === 'light'
-                ? 'bg-white text-textColor'
-                : 'bg-bgColorDark2 text-textColorDark'
-            } h-[35px] w-[300px] min-h-[35px] mr-2 flex items-center`}
+            className={`flex items-center justify-between px-4 h-[40px] w-[300px] text-sm rounded-xl border cursor-pointer transition-all ${theme === 'light'
+              ? 'bg-white text-gray-700 border-gray-200 hover:border-green-500'
+              : 'bg-black/20 text-gray-200 border-white/10 hover:border-green-500'
+              } ${selectedProject?.simulation?.status !== "Completed" ? 'opacity-35 cursor-not-allowed pointer-events-none' : ''}`}
           >
-            {selectedLabel.length > 2
-              ? 'Open to see and select ports...'
-              : selectedLabel.reduce(
-                  (label, currentPc) => label + currentPc.label + ' ',
-                  '',
-                )}
+            <span className="truncate">
+              {selectedLabel.length > 0
+                ? selectedLabel.map(l => l.label).join(', ')
+                : 'Select ports...'}
+            </span>
+            <span className="text-xs opacity-50">▼</span>
           </label>
           <ul
             tabIndex={0}
-            className={`dropdown-content ${
-              theme === 'light'
-                ? 'bg-white text-textColor'
-                : 'bg-bgColorDark2 text-textColorDark'
-            } p-2 shadow rounded-box w-full h-fit max-h-[500px] overflow-y-scroll`}
+            className={`dropdown-content mt-2 p-2 shadow-xl rounded-xl w-[300px] max-h-[400px] overflow-y-auto custom-scrollbar backdrop-blur-md border ${theme === 'light'
+              ? 'bg-white/95 text-gray-700 border-gray-100'
+              : 'bg-black/80 text-gray-200 border-white/10'
+              }`}
           >
             {labels.map((l, index) => {
+              const labelString = `${l[0]} - ${l[1]}`;
+              const isChecked = selectedLabel.some(pc => pc.label === labelString);
               return (
                 <li
-                  className="flex flex-row items-center justify-between p-2"
-                  key={`${l[0]} - ${l[1]}`}
+                  className={`flex flex-row items-center justify-between p-3 rounded-lg transition-colors ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-white/5'
+                    }`}
+                  key={labelString}
                 >
-                  <span>{`${l[0]} - ${l[1]}`}</span>
+                  <span className="text-sm font-medium">{labelString}</span>
                   <input
                     type="checkbox"
-                    className={`checkbox checkbox-xs ${
-                      theme === 'light' ? '' : 'border-textColorDark'
-                    }`}
-                    checked={
-                      selectedLabel.filter(
-                        (pc) => pc.label === `${l[0]} - ${l[1]}`,
-                      ).length > 0
-                    }
-                    value={`${l[0]} - ${l[1]}`}
+                    className={`checkbox checkbox-xs rounded ${theme === 'light'
+                      ? 'checkbox-success'
+                      : 'checkbox-success border-white/30'
+                      }`}
+                    checked={isChecked}
+                    value={labelString}
                     onChange={(e) => {
                       if (e.currentTarget.checked) {
                         dispatch(setSpinnerSolverResults(true))
-                        axios.post('http://127.0.0.1:8001/get_results_matrix?file_id='+selectedProject?.simulation?.resultS3, {
+                        axios.post('http://127.0.0.1:8001/get_results_matrix?file_id=' + selectedProject?.simulation?.resultS3, {
                           fileId: selectedProject?.simulation?.resultS3,
                           port_index: index
                         }).then(res => console.log(res)).catch(err => console.log(err));
-                        // dispatch(
-                        //   publishMessage({
-                        //     queue: 'management_solver',
-                        //     body: {
-                        //       message: 'get results',
-                        //       body: {
-                        //         portIndex: index,
-                        //         fileId: selectedProject?.simulation?.resultS3,
-                        //       },
-                        //     },
-                        //   }),
-                        // );
                         setSelectedLabel([
                           ...selectedLabel.filter(
                             (sl) => sl.label !== 'All Ports',
                           ),
-                          { label: e.currentTarget.value, id: index },
+                          { label: labelString, id: index },
                         ]);
                       } else {
                         dispatch(removeItemToResultsView(index))
                         setSelectedLabel(
                           selectedLabel.filter(
-                            (l) => l.label !== e.currentTarget.value,
+                            (l) => l.label !== labelString,
                           ),
                         );
                       }
@@ -168,7 +161,7 @@ export const ChartVisualizationMode: React.FC<ChartVisualizationModeProps> = ({
               );
             })}
           </ul>
-        </button>
+        </div>
       </div>
       {/* <ExportToCsvZippedButton
         buttonLabel="Export all graphs to csv"

@@ -42,7 +42,9 @@ const MyProject: React.FC<ContextMenuProps> = ({
   const [modalRenameShow, setModalRenameShow] = useState<boolean>(false);
   const [serchUserAndShare, setSerchUserAndShare] = useState<boolean>(false);
   const [modelErasable, setModelErasable] = useState(true);
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
+  const isDark = theme !== 'light';
+
   const { show, hideAll } = useContextMenu({
     id: model.components,
   });
@@ -59,8 +61,8 @@ const MyProject: React.FC<ContextMenuProps> = ({
     execQuery2(getSimulationProjectsByUserEmailDynamoDB, (process.env.APP_VERSION === 'demo') ? user?.name : user?.email, dispatch).then(
       (res) => {
         let projects: any[] = []
-        if(res.Items){
-          res.Items.forEach((i:any) => projects.push(convertFromDynamoDBFormat(i)))
+        if (res.Items) {
+          res.Items.forEach((i: any) => projects.push(convertFromDynamoDBFormat(i)))
         }
         projects.forEach((p) => {
           if (p.modelS3 === model.components) {
@@ -72,18 +74,13 @@ const MyProject: React.FC<ContextMenuProps> = ({
   }, []);
 
   return (
-    <div key={model.id}>
+    <div key={model.id} className="relative group">
       {modalRenameShow && (
         <RenameModal setRenameModalShow={setModalRenameShow} model={model} />
       )}
-      {/* {serchUserAndShare && (
-        <SearchUserAndShare
-          setShowSearchUser={setSerchUserAndShare}
-          modelToShare={model}
-        />
-      )} */}
+
       <div
-        className={`px-10 py-12 relative rounded-xl border ${theme === 'light' ? 'border-textColor text-textColor hover:bg-secondaryColor hover:text-white' : 'border-textColorDark text-textColorDark hover:bg-secondaryColorDark hover:text-textColor'}  flex flex-col items-center hover:cursor-pointer hover:shadow-2xl`}
+        className={`glass-panel ${isDark ? 'glass-panel-dark' : 'glass-panel-light'} p-8 rounded-2xl flex flex-col items-center justify-center gap-4 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl cursor-pointer relative overflow-hidden`}
         onClick={() => {
           dispatch(resetState());
           dispatch(ActionCreators.clearHistory());
@@ -97,32 +94,29 @@ const MyProject: React.FC<ContextMenuProps> = ({
         }}
         onContextMenu={handleContextMenu}
       >
-        <GiCubeforce size={75}  />
-        <span className={`absolute bottom-2 font-semibold`}>{model.name}</span>
+        <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${isDark ? 'from-blue-500/10 to-purple-500/10' : 'from-blue-500/5 to-purple-500/5'}`} />
+
+        <div className={`p-4 rounded-full ${isDark ? 'bg-white/5' : 'bg-black/5'} group-hover:scale-110 transition-transform duration-300`}>
+          <GiCubeforce size={48} className={isDark ? 'text-blue-400' : 'text-blue-600'} />
+        </div>
+
+        <span className={`font-semibold text-lg tracking-wide ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>{model.name}</span>
+
+        <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Right-click for options</div>
       </div>
-      <Menu id={model.components}>
+
+      <Menu id={model.components} theme={isDark ? 'dark' : 'light'} animation="fade">
         <Item
           onClick={(e) => {
             e.event.preventDefault();
             setModalRenameShow(true);
           }}
         >
-          <div className="flex w-full flex-row justify-between items-center">
+          <div className="flex w-full flex-row justify-between items-center gap-4">
             <span>Rename</span>
-            <BiSolidRename size={20} />
+            <BiSolidRename size={16} />
           </div>
         </Item>
-        {/* <Item
-          onClick={(e) => {
-            e.event.preventDefault();
-            setSerchUserAndShare(true);
-          }}
-        >
-          <div className="flex w-full flex-row justify-between items-center">
-            <span>Share With</span>
-            <BiSolidShare size={20} />
-          </div>
-        </Item> */}
         <Separator />
         <Item
           disabled={!modelErasable}
@@ -146,17 +140,14 @@ const MyProject: React.FC<ContextMenuProps> = ({
           }}
         >
           {modelErasable ? (
-            <div className="flex w-full flex-row justify-between items-center">
+            <div className="flex w-full flex-row justify-between items-center gap-4 text-red-500">
               <span>Delete</span>
-              <BiSolidTrash size={20} />
+              <BiSolidTrash size={16} />
             </div>
           ) : (
-            <div className='flex flex-col items-center gap-5'>
-              <div className="flex w-full flex-row justify-between items-center">
+            <div className="flex w-full flex-row justify-between items-center gap-4 opacity-50 cursor-not-allowed" title="Cannot delete: used in a project">
               <span>Delete</span>
-              <BiSolidTrash size={20} />
-            </div>
-            <span className='text-xs'> It is not possible to delete the model  <br />since it is present in at least one <br /> esymia project. <br /> Make sure the project is not <br /> present in any esymia project <br /> and try again.</span>
+              <BiSolidTrash size={16} />
             </div>
           )}
         </Item>

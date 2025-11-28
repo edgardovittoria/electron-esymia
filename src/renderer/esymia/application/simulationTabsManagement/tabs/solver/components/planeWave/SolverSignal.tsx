@@ -21,45 +21,11 @@ const allParamsAreValid = (params: SignalParams): boolean => {
 // A memoized input component for port signals.
 const ValidatedInputPort: FC<InputProps> = memo(({ label, value, onChange }) => {
   const selectedProject = useSelector(selectedProjectSelector);
-  const [error, setError] = useState<string>("");
-
-  const validate = (val: string): string => {
-  if(val.trim() === "") return "Field cannot be empty";
-  if (!floatRegex.test(val.trim())) {
-    return "Insert a valid float or exponential value";
-  }
-  return "";
-};
-
-  const handleChange = (val: string) => {
-    const errMsg = validate(val);
-    setError(errMsg);
-    onChange(val);
-  };
-
-  return (
-    <div className="flex flex-col p-1">
-      <h6>{label}:</h6>
-      <input
-        disabled={selectedProject?.simulation?.status === 'Completed'}
-        type="text"
-        value={value ?? ''}
-        onChange={(e) => handleChange(e.target.value)}
-        className={`w-full p-[4px] border-[1px] ${ error ? "border-red-500" : "border-[#a3a3a3]"} text-black text-[12px] font-bold rounded formControl`}
-      />
-      {error && <span className="text-red-500 text-[10px]">{error}</span>}
-    </div>
-  );
-});
-
-// A memoized input component for wave signals.
-const ValidatedInputWave: FC<InputProps> = memo(({ label, value, onChange }) => {
-  const selectedProject = useSelector(selectedProjectSelector);
   const theme = useSelector(ThemeSelector);
   const [error, setError] = useState<string>("");
 
   const validate = (val: string): string => {
-    if(val.trim() === "") return "";
+    if (val.trim() === "") return "Field cannot be empty";
     if (!floatRegex.test(val.trim())) {
       return "Insert a valid float or exponential value";
     }
@@ -73,18 +39,55 @@ const ValidatedInputWave: FC<InputProps> = memo(({ label, value, onChange }) => 
   };
 
   return (
-    <div className="flex flex-col p-1">
-      <h6>{label}:</h6>
+    <div className="flex flex-col gap-1">
+      <span className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>{label}:</span>
       <input
         disabled={selectedProject?.simulation?.status === 'Completed'}
         type="text"
         value={value ?? ''}
         onChange={(e) => handleChange(e.target.value)}
-        className={`formControl ${
-          theme === 'light'
-            ? 'bg-gray-100 text-textColor'
-            : 'bg-bgColorDark text-textColorDark'
-        } rounded p-2 w-full mt-1 ${ error ? "border-red-500" : "border-[#a3a3a3]" }`}
+        className={`w-full p-2.5 rounded-xl text-sm font-medium outline-none transition-all ${theme === 'light'
+            ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+            : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+          } ${error ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""} disabled:opacity-50 disabled:cursor-not-allowed`}
+      />
+      {error && <span className="text-red-500 text-[10px]">{error}</span>}
+    </div>
+  );
+});
+
+// A memoized input component for wave signals.
+const ValidatedInputWave: FC<InputProps> = memo(({ label, value, onChange }) => {
+  const selectedProject = useSelector(selectedProjectSelector);
+  const theme = useSelector(ThemeSelector);
+  const [error, setError] = useState<string>("");
+
+  const validate = (val: string): string => {
+    if (val.trim() === "") return "";
+    if (!floatRegex.test(val.trim())) {
+      return "Insert a valid float or exponential value";
+    }
+    return "";
+  };
+
+  const handleChange = (val: string) => {
+    const errMsg = validate(val);
+    setError(errMsg);
+    onChange(val);
+  };
+
+  return (
+    <div className="flex flex-col gap-1">
+      <span className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>{label}:</span>
+      <input
+        disabled={selectedProject?.simulation?.status === 'Completed'}
+        type="text"
+        value={value ?? ''}
+        onChange={(e) => handleChange(e.target.value)}
+        className={`w-full p-2.5 rounded-xl text-sm font-medium outline-none transition-all ${theme === 'light'
+            ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+            : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+          } ${error ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""} disabled:opacity-50 disabled:cursor-not-allowed`}
       />
       {error && <span className="text-red-500 text-[10px]">{error}</span>}
     </div>
@@ -95,7 +98,7 @@ export const PortSignal: FC<{
   signal: PortOrPlaneWaveSignal;
   setSavedPhysicsParameters: Function;
   setGraphData: Function;
-}> = ({ signal, setGraphData, setSavedPhysicsParameters}) => {
+}> = ({ signal, setGraphData, setSavedPhysicsParameters }) => {
   const [newSignal, setSignal] = useState(signal);
   const selectedProject = useSelector(selectedProjectSelector);
   const theme = useSelector(ThemeSelector);
@@ -120,22 +123,19 @@ export const PortSignal: FC<{
   }, [signal]);
 
   return (
-    <div
-      className={`mt-3 mb-2 p-[10px] text-left border-[1px] ${
-        theme === 'light'
-          ? 'border-secondaryColor bg-[#f6f6f6]'
-          : 'border-secondaryColorDark bg-bgColorDark'
-      }`}
-    >
-      <h6 className="xl:text-base text-[12px]">Port Signal</h6>
-      <div className="mt-2">
+    <div className={`mt-4 p-4 rounded-xl border ${theme === 'light' ? 'bg-white/50 border-gray-200' : 'bg-white/5 border-white/10'}`}>
+      <h6 className={`text-sm font-bold mb-3 ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>Port Signal</h6>
+      <div className="flex items-center gap-4 mb-4">
         <select
           value={newSignal.type}
           disabled={selectedProject?.simulation?.status === 'Completed'}
           onChange={(e) => {
             resetParams(e.target.value, setSignal);
           }}
-          className="select border border-black w-1/2 p-1 rounded"
+          className={`flex-1 p-2.5 rounded-xl text-sm font-medium outline-none transition-all cursor-pointer ${theme === 'light'
+              ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+              : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           <option value="no_signal">No Signal</option>
           <option value="exponential">Exponential</option>
@@ -143,9 +143,14 @@ export const PortSignal: FC<{
           <option value="sinusoidal">Sinusoidal</option>
           <option value="trapezoidal_pulse">Trapezoidal Pulse</option>
         </select>
-        <div
-          className={`tooltip tooltip-left ml-4 ${!areInputsValid ? 'opacity-50 cursor-default' : 'hover:cursor-pointer'}`}
-          data-tip="Show signal graph"
+        <button
+          className={`p-2.5 rounded-xl transition-all ${!areInputsValid
+              ? 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400'
+              : theme === 'light'
+                ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                : 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30'
+            }`}
+          title="Show signal graph"
           onClick={() => {
             if (!areInputsValid) return;
             setGraphData({
@@ -163,30 +168,38 @@ export const PortSignal: FC<{
             } as InputGraphData);
           }}
         >
-          <BsGraphUp size={25} />
-        </div>
+          <BsGraphUp size={20} />
+        </button>
       </div>
-      {renderInputPortFields(newSignal, handleInputChange)}
-      <div className="mt-4 flex justify-between">
+
+      <div className="mb-6">
+        {renderInputPortFields(newSignal, handleInputChange)}
+      </div>
+
+      <div className="flex justify-between gap-3">
         <button
           type="button"
           disabled={selectedProject?.simulation?.status === 'Completed'}
-          className="button bg-gray-500 text-white disabled:cursor-not-allowed disabled:opacity-30"
+          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${theme === 'light'
+              ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-white/5 text-gray-300 hover:bg-white/10'
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
           onClick={() => resetParams(newSignal.type, setSignal)}
         >
-          DEFAULT VALUES
+          Default Values
         </button>
         <button
           type="button"
-          className={`button disabled:cursor-not-allowed disabled:opacity-30 buttonPrimary ${
-            theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'
-          }`}
+          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${theme === 'light'
+              ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'
+              : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/30'
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
           onClick={() => {
             dispatch(setPortSignal(newSignal));
             setSavedPhysicsParameters(false);
           }}
         >
-          SAVE NEW VALUES
+          Save Changes
         </button>
       </div>
     </div>
@@ -199,6 +212,7 @@ export const PlaneWaveSignal: FC<{
   setSignal: Function;
 }> = ({ signal, setGraphData, setSignal }) => {
   const selectedProject = useSelector(selectedProjectSelector);
+  const theme = useSelector(ThemeSelector);
 
   const handleInputChange = (param: string, value: string) => {
     setSignal({
@@ -213,44 +227,54 @@ export const PlaneWaveSignal: FC<{
   const areInputsValid = allParamsAreValid(signal.params);
 
   return (
-    <>
-      <select
-        value={signal.type}
-        disabled={selectedProject?.simulation?.status === 'Completed'}
-        onChange={(e) => {
-          setSignal({ type: e.target.value, params: signal.params });
-          resetParams(e.target.value, setSignal);
-        }}
-        className="select border border-black w-1/2 p-1 rounded"
-      >
-        <option value="exponential">Exponential</option>
-        <option value="gaussian_modulated">Gaussian Modulated</option>
-        <option value="sinusoidal">Sinusoidal</option>
-      </select>
-      <div
-        className={`tooltip tooltip-left ml-4 ${!areInputsValid ? 'opacity-50 cursor-default' : 'hover:cursor-pointer'}`}
-        data-tip="Show signal graph"
-        onClick={() => {
-          if (!areInputsValid) return;
-          setGraphData({
-            labelX: 'Times',
-            labelY: 'E',
-            dataX: selectedProject?.times?.map((t) =>
-              parseFloat(t.toExponential(2)),
-            ),
-            dataY: generateSignal(
-              signal.type,
-              selectedProject?.times as number[],
-              signal.params,
-            ),
-            signalName: 'E signal',
-          } as InputGraphData);
-        }}
-      >
-        <BsGraphUp size={25} />
+    <div className={`mt-4 p-4 rounded-xl border ${theme === 'light' ? 'bg-white/50 border-gray-200' : 'bg-white/5 border-white/10'}`}>
+      <div className="flex items-center gap-4 mb-4">
+        <select
+          value={signal.type}
+          disabled={selectedProject?.simulation?.status === 'Completed'}
+          onChange={(e) => {
+            setSignal({ type: e.target.value, params: signal.params });
+            resetParams(e.target.value, setSignal);
+          }}
+          className={`flex-1 p-2.5 rounded-xl text-sm font-medium outline-none transition-all cursor-pointer ${theme === 'light'
+              ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+              : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+          <option value="exponential">Exponential</option>
+          <option value="gaussian_modulated">Gaussian Modulated</option>
+          <option value="sinusoidal">Sinusoidal</option>
+        </select>
+        <button
+          className={`p-2.5 rounded-xl transition-all ${!areInputsValid
+              ? 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400'
+              : theme === 'light'
+                ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                : 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30'
+            }`}
+          title="Show signal graph"
+          onClick={() => {
+            if (!areInputsValid) return;
+            setGraphData({
+              labelX: 'Times',
+              labelY: 'E',
+              dataX: selectedProject?.times?.map((t) =>
+                parseFloat(t.toExponential(2)),
+              ),
+              dataY: generateSignal(
+                signal.type,
+                selectedProject?.times as number[],
+                signal.params,
+              ),
+              signalName: 'E signal',
+            } as InputGraphData);
+          }}
+        >
+          <BsGraphUp size={20} />
+        </button>
       </div>
       {renderInputWaveFields(signal, handleInputChange)}
-    </>
+    </div>
   );
 };
 
@@ -261,7 +285,7 @@ const renderInputPortFields = (
   switch (signal.type) {
     case 'exponential':
       return (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-4">
           <ValidatedInputPort
             label="tw"
             value={signal.params.tw}
@@ -281,7 +305,7 @@ const renderInputPortFields = (
       );
     case 'gaussian_modulated':
       return (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-4">
           <ValidatedInputPort
             label="f0"
             value={signal.params.f0}
@@ -301,7 +325,7 @@ const renderInputPortFields = (
       );
     case 'sinusoidal':
       return (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-4">
           <ValidatedInputPort
             label="f0"
             value={signal.params.f0}
@@ -316,7 +340,7 @@ const renderInputPortFields = (
       );
     case 'trapezoidal_pulse':
       return (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-4">
           <ValidatedInputPort
             label="initial_delay_time"
             value={signal.params.initial_delay_time}
@@ -356,7 +380,7 @@ const renderInputWaveFields = (
   switch (signal.type) {
     case 'exponential':
       return (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-4">
           <ValidatedInputWave
             label="tw"
             value={signal.params.tw}
@@ -376,7 +400,7 @@ const renderInputWaveFields = (
       );
     case 'gaussian_modulated':
       return (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-4">
           <ValidatedInputWave
             label="f0"
             value={signal.params.f0}
@@ -396,7 +420,7 @@ const renderInputWaveFields = (
       );
     case 'sinusoidal':
       return (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-4">
           <ValidatedInputWave
             label="f0"
             value={signal.params.f0}
@@ -517,7 +541,7 @@ export function genera_segnale_esponenziale(
   const vs: number[] = time.map((t) =>
     t >= time_delay_vs
       ? Math.pow((t - time_delay_vs) / tr, power) *
-        Math.exp(-power * ((t - time_delay_vs) / tr - 1))
+      Math.exp(-power * ((t - time_delay_vs) / tr - 1))
       : 0,
   );
   return vs;
@@ -536,7 +560,7 @@ export function genera_segnale_Gaussiano_modulato(
     vs.push(
       t >= time_delay_vs
         ? Math.cos(2 * Math.PI * f0 * timeShifted) *
-            Math.exp(-Math.pow(timeShifted, 2) / (2 * Math.pow(dev_stand, 2)))
+        Math.exp(-Math.pow(timeShifted, 2) / (2 * Math.pow(dev_stand, 2)))
         : 0,
     );
   }
@@ -646,9 +670,9 @@ export function genera_segnale_trapezoidal_pulse(
     const x_rise = [
       time_vect[index_start_rise_time - 1],
       time_vect[
-        index_end_rise_time < num_samples - 1
-          ? index_end_rise_time + 1
-          : index_end_rise_time
+      index_end_rise_time < num_samples - 1
+        ? index_end_rise_time + 1
+        : index_end_rise_time
       ],
     ];
     const y_rise = [0, A];
@@ -681,9 +705,9 @@ export function genera_segnale_trapezoidal_pulse(
     const x_fall = [
       time_vect[index_start_falling_time - 1],
       time_vect[
-        index_end_falling_time < num_samples - 1
-          ? index_end_falling_time + 1
-          : index_end_falling_time
+      index_end_falling_time < num_samples - 1
+        ? index_end_falling_time + 1
+        : index_end_falling_time
       ],
     ];
     const y_fall = [A, 0];

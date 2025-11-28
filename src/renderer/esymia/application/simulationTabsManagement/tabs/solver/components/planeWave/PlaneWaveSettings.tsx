@@ -68,206 +68,182 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({
     selectedProject?.planeWaveParameters
       ? selectedProject.planeWaveParameters.input.ESignal
       : {
-          type: 'exponential',
-          params: {
-            tw: String((50 * 0.1) / 3e8),
-            power: '4',
-            time_delay_vs: '3e-9',
-          },
+        type: 'exponential',
+        params: {
+          tw: String((50 * 0.1) / 3e8),
+          power: '4',
+          time_delay_vs: '3e-9',
         },
+      },
   );
 
   return (
     <>
-      <div
-        className={`w-full max-w-full transform overflow-hidden rounded border p-3 ${
-          theme === 'light'
-            ? 'bg-white text-textColor border-textColor'
-            : 'bg-bgColorDark2 text-textColorDark border-textColorDark'
-        }`}
-      >
-        <div className="flex flex-row gap-2 items-center w-full">
-          <div className="flex flex-col w-1/2">
-            <div className="p-1">
-              <h6>θ [0 - π]:</h6>
-              <input
-                type="number"
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                className={`formControl ${
-                  theme === 'light'
-                    ? 'bg-gray-100 text-textColor'
-                    : 'bg-bgColorDark text-textColorDark'
-                }  rounded p-2 w-full mt-1 ${
-                  errorTheta ? 'border border-red-500' : ''
-                }`}
-                placeholder="Tetha (0 - π)"
-                min={0}
-                max={Math.PI}
-                step={0.01}
-                value={tetha}
-                onChange={(e) => {
-                  if (
-                    parseFloat(e.target.value) < 0 ||
-                    parseFloat(e.target.value) > Math.PI
-                  ) {
-                    settetha(parseFloat(e.target.value));
-                    seterrorTheta(true);
-                  } else {
-                    settetha(parseFloat(e.target.value));
-                    seterrorTheta(false);
-                  }
-                }}
-              />
-              {errorTheta && (
-                <span className="text-red-500 mt-2">
-                  θ must be between 0 and π
-                </span>
-              )}
-            </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-row gap-4 w-full">
+          <div className="flex flex-col w-1/2 gap-1">
+            <h6 className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>θ [0 - π]:</h6>
+            <input
+              type="number"
+              disabled={selectedProject?.simulation?.status === 'Completed'}
+              className={`w-full p-2.5 rounded-xl text-sm font-medium outline-none transition-all ${theme === 'light'
+                  ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+                  : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                } ${errorTheta ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''} disabled:opacity-50 disabled:cursor-not-allowed`}
+              placeholder="Tetha (0 - π)"
+              min={0}
+              max={Math.PI}
+              step={0.01}
+              value={tetha}
+              onChange={(e) => {
+                if (
+                  parseFloat(e.target.value) < 0 ||
+                  parseFloat(e.target.value) > Math.PI
+                ) {
+                  settetha(parseFloat(e.target.value));
+                  seterrorTheta(true);
+                } else {
+                  settetha(parseFloat(e.target.value));
+                  seterrorTheta(false);
+                }
+              }}
+            />
+            {errorTheta && (
+              <span className="text-red-500 text-xs mt-1">
+                θ must be between 0 and π
+              </span>
+            )}
           </div>
-          <div className="flex flex-col w-1/2">
-            <div className="p-1">
-              <h6>φ [0 - 2π]:</h6>
-              <input
-                type="number"
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                className={`formControl ${
-                  theme === 'light'
-                    ? 'bg-gray-100 text-textColor'
-                    : 'bg-bgColorDark text-textColorDark'
-                }  rounded p-2 w-full mt-1 ${
-                  errorPhi ? 'border border-red-500' : ''
-                }`}
-                placeholder="Phi (0 - 2π)"
-                min={0}
-                max={Math.PI}
-                step={0.01}
-                value={phi}
-                onChange={(e) => {
-                  if (
-                    parseFloat(e.target.value) < 0 ||
-                    parseFloat(e.target.value) > Math.PI
-                  ) {
-                    setphi(parseFloat(e.target.value));
-                    seterrorPhi(true);
-                  } else {
-                    seterrorPhi(false);
-                    setphi(parseFloat(e.target.value));
-                  }
-                }}
-              />
-              {errorPhi && (
-                <span className="text-red-500 mt-2">
-                  φ must be between 0 and 2π
-                </span>
-              )}
-            </div>
+          <div className="flex flex-col w-1/2 gap-1">
+            <h6 className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>φ [0 - 2π]:</h6>
+            <input
+              type="number"
+              disabled={selectedProject?.simulation?.status === 'Completed'}
+              className={`w-full p-2.5 rounded-xl text-sm font-medium outline-none transition-all ${theme === 'light'
+                  ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+                  : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                } ${errorPhi ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''} disabled:opacity-50 disabled:cursor-not-allowed`}
+              placeholder="Phi (0 - 2π)"
+              min={0}
+              max={Math.PI}
+              step={0.01}
+              value={phi}
+              onChange={(e) => {
+                if (
+                  parseFloat(e.target.value) < 0 ||
+                  parseFloat(e.target.value) > Math.PI
+                ) {
+                  setphi(parseFloat(e.target.value));
+                  seterrorPhi(true);
+                } else {
+                  seterrorPhi(false);
+                  setphi(parseFloat(e.target.value));
+                }
+              }}
+            />
+            {errorPhi && (
+              <span className="text-red-500 text-xs mt-1">
+                φ must be between 0 and 2π
+              </span>
+            )}
           </div>
         </div>
-        <div className="flex flex-row gap-2 items-center w-full">
-          <div className="flex flex-col w-1/2">
-            <div className="p-1">
-              <h6>Eθ:</h6>
-              <input
-                type="number"
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                className={`formControl ${
-                  theme === 'light'
-                    ? 'bg-gray-100 text-textColor'
-                    : 'bg-bgColorDark text-textColorDark'
-                }  rounded p-2 w-full mt-1`}
-                placeholder="E_tetha"
-                value={eTetha}
-                onChange={(e) => seteTetha(parseFloat(e.target.value))}
-              />
-            </div>
+        <div className="flex flex-row gap-4 w-full">
+          <div className="flex flex-col w-1/2 gap-1">
+            <h6 className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>Eθ:</h6>
+            <input
+              type="number"
+              disabled={selectedProject?.simulation?.status === 'Completed'}
+              className={`w-full p-2.5 rounded-xl text-sm font-medium outline-none transition-all ${theme === 'light'
+                  ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+                  : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              placeholder="E_tetha"
+              value={eTetha}
+              onChange={(e) => seteTetha(parseFloat(e.target.value))}
+            />
           </div>
-          <div className="flex flex-col w-1/2">
-            <div className="p-1">
-              <h6>Eφ:</h6>
-              <input
-                type="number"
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                className={`formControl ${
-                  theme === 'light'
-                    ? 'bg-gray-100 text-textColor'
-                    : 'bg-bgColorDark text-textColorDark'
-                }  rounded p-2 w-full mt-1`}
-                placeholder="E_phi"
-                value={ePhi}
-                onChange={(e) => setePhi(parseFloat(e.target.value))}
-              />
-            </div>
+          <div className="flex flex-col w-1/2 gap-1">
+            <h6 className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>Eφ:</h6>
+            <input
+              type="number"
+              disabled={selectedProject?.simulation?.status === 'Completed'}
+              className={`w-full p-2.5 rounded-xl text-sm font-medium outline-none transition-all ${theme === 'light'
+                  ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+                  : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              placeholder="E_phi"
+              value={ePhi}
+              onChange={(e) => setePhi(parseFloat(e.target.value))}
+            />
           </div>
         </div>
-        {/* Separatore orizzontale sopra WaveSignal */}
-        <hr className="border-t border-gray-400 my-2" />
+
+        <hr className={`border-t ${theme === 'light' ? 'border-gray-200' : 'border-white/10'} my-2`} />
+
         <PlaneWaveSignal
           setGraphData={setGraphData}
           signal={signal}
           setSignal={setsignal}
         />
-        {/* Separatore orizzontale sotto WaveSignal */}
-        <hr className="border-t border-gray-400 my-2" />
-        <div className="flex flex-col mt-3">
-          <div className="p-1">
-            <h6>{`Insert radius [${selectedProject?.modelUnit}]`}</h6>
+
+        <hr className={`border-t ${theme === 'light' ? 'border-gray-200' : 'border-white/10'} my-2`} />
+
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <h6 className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>{`Insert radius [${selectedProject?.modelUnit}]`}</h6>
             <input
               type="number"
               disabled={selectedProject?.simulation?.status === 'Completed'}
-              className={`formControl ${
-                theme === 'light'
-                  ? 'bg-gray-100 text-textColor'
-                  : 'bg-bgColorDark text-textColorDark'
-              }  rounded p-2 w-full mt-3`}
+              className={`w-full p-2.5 rounded-xl text-sm font-medium outline-none transition-all ${theme === 'light'
+                  ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+                  : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               placeholder="radius"
               value={radius}
               onChange={(e) => setRadius(parseFloat(e.target.value))}
             />
           </div>
-          <div className="p-1">
-            <h6>{`Center of gravity [${selectedProject?.modelUnit}]`}</h6>
+          <div className="flex flex-col gap-2">
+            <h6 className={`text-xs font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>{`Center of gravity [${selectedProject?.modelUnit}]`}</h6>
             <div className="flex flex-row gap-4">
-              <div className="flex flex-col gap-2 items-center">
-                <span>X</span>
+              <div className="flex flex-col gap-1 items-center flex-1">
+                <span className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>X</span>
                 <input
                   type="number"
                   disabled={selectedProject?.simulation?.status === 'Completed'}
-                  className={`formControl ${
-                    theme === 'light'
-                      ? 'bg-gray-100 text-textColor'
-                      : 'bg-bgColorDark text-textColorDark'
-                  }  rounded p-2 w-full`}
+                  className={`w-full p-2.5 rounded-xl text-sm font-medium outline-none transition-all ${theme === 'light'
+                      ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+                      : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                   placeholder="x"
                   value={centerX}
                   onChange={(e) => setcenterX(parseFloat(e.target.value))}
                 />
               </div>
-              <div className="flex flex-col gap-2 items-center">
-                <span>Y</span>
+              <div className="flex flex-col gap-1 items-center flex-1">
+                <span className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>Y</span>
                 <input
                   type="number"
                   disabled={selectedProject?.simulation?.status === 'Completed'}
-                  className={`formControl ${
-                    theme === 'light'
-                      ? 'bg-gray-100 text-textColor'
-                      : 'bg-bgColorDark text-textColorDark'
-                  }  rounded p-2 w-full`}
+                  className={`w-full p-2.5 rounded-xl text-sm font-medium outline-none transition-all ${theme === 'light'
+                      ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+                      : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                   placeholder="y"
                   value={centerY}
                   onChange={(e) => setcenterY(parseFloat(e.target.value))}
                 />
               </div>
-              <div className="flex flex-col gap-2 items-center">
-                <span>Z</span>
+              <div className="flex flex-col gap-1 items-center flex-1">
+                <span className={`text-xs ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>Z</span>
                 <input
                   type="number"
                   disabled={selectedProject?.simulation?.status === 'Completed'}
-                  className={`formControl ${
-                    theme === 'light'
-                      ? 'bg-gray-100 text-textColor'
-                      : 'bg-bgColorDark text-textColorDark'
-                  }  rounded p-2 w-full`}
+                  className={`w-full p-2.5 rounded-xl text-sm font-medium outline-none transition-all ${theme === 'light'
+                      ? 'bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+                      : 'bg-black/40 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                   placeholder="z"
                   value={centerZ}
                   onChange={(e) => setcenterZ(parseFloat(e.target.value))}
@@ -277,11 +253,14 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({
           </div>
         </div>
       </div>
-      <div className="mt-4 flex justify-between">
+      <div className="mt-6 flex justify-between gap-3">
         <button
           type="button"
           disabled={selectedProject?.simulation?.status === 'Completed'}
-          className="button bg-red-500 text-white disabled:cursor-not-allowed disabled:opacity-30"
+          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${theme === 'light'
+              ? 'bg-red-50 text-red-600 hover:bg-red-100'
+              : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
           onClick={() => {
             dispatch(unsetPlaneWaveParametres());
             seteTetha(0);
@@ -319,13 +298,14 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({
             }
           }}
         >
-          UNSET
+          Unset
         </button>
         <button
           type="button"
-          className={`button disabled:cursor-not-allowed disabled:opacity-30 buttonPrimary ${
-            theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'
-          }`}
+          className={`px-6 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${theme === 'light'
+              ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'
+              : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/30'
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
           disabled={
             errorPhi ||
             errorTheta ||
@@ -380,7 +360,7 @@ export const PlaneWaveSettings: React.FC<PlaneWaveSettingsModal> = ({
             }
           }}
         >
-          SET
+          Set Parameters
         </button>
       </div>
     </>

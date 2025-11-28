@@ -158,7 +158,7 @@ export const Solver: React.FC<SolverProps> = ({
       if (selectedProject?.meshData.type === 'Ris') {
         loadMeshData(process.env.MESHER_RIS_MODE === 'backend');
       } else {
-        if(mesherStatus === "ready"){
+        if (mesherStatus === "ready") {
           loadMeshData(true);
         }
       }
@@ -196,8 +196,8 @@ export const Solver: React.FC<SolverProps> = ({
       setVoxelsPainted(numberOfCells);
       setTotalVoxels(
         (externalGrids as ExternalGridsObject).n_cells.n_cells_x *
-          (externalGrids as ExternalGridsObject).n_cells.n_cells_y *
-          (externalGrids as ExternalGridsObject).n_cells.n_cells_z,
+        (externalGrids as ExternalGridsObject).n_cells.n_cells_y *
+        (externalGrids as ExternalGridsObject).n_cells.n_cells_z,
       );
     }
   }, [externalGrids]);
@@ -241,7 +241,7 @@ export const Solver: React.FC<SolverProps> = ({
           createOrUpdateProjectInDynamoDB,
           selectedProject,
           dispatch,
-        ).then(() => {});
+        ).then(() => { });
       }
     }
   }, [savedPhysicsParameters]);
@@ -290,13 +290,7 @@ export const Solver: React.FC<SolverProps> = ({
         savedPhysicsParameters={savedPhysicsParameters}
         cameraPosition={cameraPosition}
       />
-      <div
-        className={`absolute left-[2%] top-[230px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
-          theme === 'light'
-            ? 'bg-white text-textColor'
-            : 'bg-bgColorDark2 text-textColorDark'
-        }`}
-      >
+      <div className="absolute left-[2%] top-[60px] flex flex-col items-center gap-0">
         <button
           disabled={
             selectedProject &&
@@ -304,7 +298,10 @@ export const Solver: React.FC<SolverProps> = ({
             selectedProject.simulation.status === 'Running' ||
             (process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)
           }
-          className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
+          className={`p-3 tooltip tooltip-right rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 relative disabled:opacity-40 disabled:cursor-not-allowed ${theme === 'light'
+            ? 'bg-white/80 text-gray-700 hover:bg-white hover:text-green-600 hover:shadow-green-500/20'
+            : 'bg-black/40 text-gray-300 border border-white/10 hover:bg-black/60 hover:text-green-400 hover:border-green-500/30'
+            }`}
           data-tip="Clone Project"
           onClick={() => {
             setcloning(true);
@@ -315,36 +312,34 @@ export const Solver: React.FC<SolverProps> = ({
             );
           }}
         >
-          <GrClone
-            style={{ width: '25px', height: '25px' }}
-            className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
-          />
+          <GrClone size={24} className={`${cloning ? 'opacity-20' : 'opacity-100'}`} />
           {cloning && (
-            <ImSpinner className={`absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
+            <ImSpinner className={`absolute inset-0 m-auto animate-spin w-5 h-5 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
           )}
         </button>
       </div>
       {showAdvices && <PositioningPortsInfo />}
-      <div className="absolute left-1/2 -translate-x-1/2 gap-2 top-[180px] flex flex-col items-center">
-        <div className="gap-2 flex flex-row">
+      <div className="absolute left-1/2 -translate-x-1/2 gap-4 top-4 flex flex-col items-center">
+        <div className="gap-4 flex flex-row items-center p-2 rounded-2xl backdrop-blur-md border transition-all duration-300 shadow-lg bg-white/10 border-white/20">
           {selectedProject?.model.components && (
             <>
               <SurfaceAdvicesButton
                 surfaceAdvices={surfaceAdvices}
                 setSurfaceAdvices={setSurfaceAdvices}
               />
+              <div className={`w-px h-8 ${theme === 'light' ? 'bg-gray-300/50' : 'bg-white/10'}`} />
               <ResetFocusButton toggleResetFocus={toggleResetFocus} />
+              <div className={`w-px h-8 ${theme === 'light' ? 'bg-gray-300/50' : 'bg-white/10'}`} />
               <div>
                 <div
-                  className={`tooltip rounded tooltip-right ${
-                    theme === 'light'
-                      ? 'bg-white text-blue-500'
-                      : 'bg-bgColorDark2 text-blue-300'
-                  } p-2`}
+                  className={`p-3 rounded-xl transition-all duration-300 cursor-pointer ${theme === 'light'
+                    ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
+                    : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
+                    }`}
                   data-tip="Port Positioning Info"
                   onClick={() => setShowAdvices(!showAdvices)}
                 >
-                  <GrStatusInfo size={18} />
+                  <GrStatusInfo size={24} />
                 </div>
               </div>
             </>
@@ -352,10 +347,12 @@ export const Solver: React.FC<SolverProps> = ({
         </div>
       </div>
       {viewMesh && (
-        <div className="absolute left-1/2 -translate-x-1/2 gap-2 top-[180px] flex flex-row">
+        <div className="absolute left-1/2 -translate-x-1/2 gap-4 top-20 flex flex-row items-center p-2 rounded-2xl backdrop-blur-md border transition-all duration-300 shadow-lg bg-white/10 border-white/20">
           <ResetFocusButton toggleResetFocus={toggleResetFocus} />
+          <div className={`w-px h-8 ${theme === 'light' ? 'bg-gray-300/50' : 'bg-white/10'}`} />
           <OriginaProportionsButton />
           <AlteredProportionsButton threshold={3} />
+          <div className={`w-px h-8 ${theme === 'light' ? 'bg-gray-300/50' : 'bg-white/10'}`} />
           <NormalMeshVisualizationButton />
           <LightMeshVisualizationButton />
         </div>
@@ -365,41 +362,44 @@ export const Solver: React.FC<SolverProps> = ({
           {!viewMesh &&
             selectedProject?.planeWaveParameters &&
             simulationType === 'Electric Fields' && (
-              <div className="absolute right-[2%] gap-2 bottom-[50px] flex flex-col p-5 rounded bg-white">
-                <div className="flex flex-row justify-between items-center gap-10">
-                  <span>Electric Fields Legend</span>
+              <div className={`absolute right-[2%] gap-2 bottom-[50px] flex flex-col p-5 rounded-xl shadow-2xl backdrop-blur-md border transition-all duration-300 ${theme === 'light'
+                ? 'bg-white/90 border-white/40 text-gray-800'
+                : 'bg-black/60 border-white/10 text-gray-200'
+                }`}>
+                <div className="flex flex-row justify-between items-center gap-10 mb-2">
+                  <span className="font-semibold">Electric Fields Legend</span>
                   <TiArrowMinimise
-                    className="hover:cursor-pointer hover:opacity-50"
+                    className="hover:cursor-pointer hover:opacity-50 w-6 h-6"
                     onClick={() => setShowLegend(false)}
                   />
                 </div>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-2 text-sm">
                   <div className="flex flex-row items-center">
-                    <span className="w-1/5 uppercase">K̂</span>
-                    <hr className="w-4/5 border-2  border-gray-400" />
+                    <span className="w-1/5 uppercase font-bold">K̂</span>
+                    <hr className="w-4/5 border-2 border-gray-400 rounded-full" />
                   </div>
                   <div className="flex flex-row items-center">
-                    <span className="w-1/5">Êθ</span>
-                    <hr className="w-4/5 border-2  border-green-600" />
+                    <span className="w-1/5 font-bold">Êθ</span>
+                    <hr className="w-4/5 border-2 border-green-600 rounded-full" />
                   </div>
                   <div className="flex flex-row items-center">
-                    <span className="w-1/5">Êφ</span>
-                    <hr className="w-4/5 border-2  border-fuchsia-700" />
+                    <span className="w-1/5 font-bold">Êφ</span>
+                    <hr className="w-4/5 border-2 border-fuchsia-700 rounded-full" />
                   </div>
                   <div className="flex flex-row items-center">
-                    <span className="w-1/5">Ĥ</span>
-                    <hr className="w-4/5 border-2  border-red-500" />
+                    <span className="w-1/5 font-bold">Ĥ</span>
+                    <hr className="w-4/5 border-2 border-red-500 rounded-full" />
                   </div>
                   <div className="flex flex-row items-center">
-                    <span className="w-1/5">Ê</span>
-                    <hr className="w-4/5 border-2  border-blue-600" />
+                    <span className="w-1/5 font-bold">Ê</span>
+                    <hr className="w-4/5 border-2 border-blue-600 rounded-full" />
                   </div>
                   <div className="flex flex-row items-center">
-                    <span className="w-1/5">θ</span>
+                    <span className="w-1/5 font-bold">θ</span>
                     <hr className="w-4/5 border-2 border-dashed border-green-600" />
                   </div>
                   <div className="flex flex-row items-center">
-                    <span className="w-1/5">φ</span>
+                    <span className="w-1/5 font-bold">φ</span>
                     <hr className="w-4/5 border-2 border-dashed border-fuchsia-700" />
                   </div>
                 </div>
@@ -411,14 +411,17 @@ export const Solver: React.FC<SolverProps> = ({
           {!viewMesh &&
             selectedProject?.planeWaveParameters &&
             simulationType === 'Electric Fields' && (
-            <div
-              className="absolute right-[2%] gap-2 bottom-[50px] p-3 rounded bg-white tooltip tooltip-left hover:cursor-pointer"
-              data-tip="Electric Fields Legend"
-              onClick={() => setShowLegend(true)}
-            >
-              <LuClipboardList size={20} />
-            </div>
-          )}
+              <div
+                className={`absolute right-[2%] gap-2 bottom-[50px] p-3 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 cursor-pointer ${theme === 'light'
+                  ? 'bg-white/80 text-gray-700 hover:bg-white hover:text-blue-600'
+                  : 'bg-black/40 text-gray-300 border border-white/10 hover:bg-black/60 hover:text-blue-400'
+                  }`}
+                data-tip="Electric Fields Legend"
+                onClick={() => setShowLegend(true)}
+              >
+                <LuClipboardList size={24} />
+              </div>
+            )}
         </>
       )}
     </>
@@ -450,22 +453,19 @@ const NormalMeshVisualizationButton: FC<{}> = () => {
       }
     >
       <button
-        className={`rounded p-2 ${
-          meshVisualization !== 'normal'
-            ? `${
-                theme === 'light'
-                  ? 'bg-white text-green-300 hover:text-secondaryColor'
-                  : 'bg-bgColorDark2 text-secondaryColorDark'
-              }`
-            : `${
-                theme === 'light'
-                  ? 'bg-green-300 text-secondaryColor'
-                  : 'bg-secondaryColorDark text-secondaryColor'
-              }`
-        }`}
+        className={`p-3 rounded-xl transition-all duration-300 ${meshVisualization !== 'normal'
+          ? `${theme === 'light'
+            ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
+            : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
+          }`
+          : `${theme === 'light'
+            ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
+            : 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+          }`
+          }`}
         onClick={() => dispatch(setMeshVisualization('normal'))}
       >
-        <LiaWeightHangingSolid className="h-5 w-5" />
+        <LiaWeightHangingSolid className="h-6 w-6" />
       </button>
     </div>
   );
@@ -483,22 +483,19 @@ const LightMeshVisualizationButton: FC<{}> = () => {
       }
     >
       <button
-        className={`rounded p-2 ${
-          meshVisualization !== 'light'
-            ? `${
-                theme === 'light'
-                  ? 'bg-white text-green-300 hover:text-secondaryColor'
-                  : 'bg-bgColorDark2 text-secondaryColorDark'
-              }`
-            : `${
-                theme === 'light'
-                  ? 'bg-green-300 text-secondaryColor'
-                  : 'bg-secondaryColorDark text-secondaryColor'
-              }`
-        }`}
+        className={`p-3 rounded-xl transition-all duration-300 ${meshVisualization !== 'light'
+          ? `${theme === 'light'
+            ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
+            : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
+          }`
+          : `${theme === 'light'
+            ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
+            : 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+          }`
+          }`}
         onClick={() => dispatch(setMeshVisualization('light'))}
       >
-        <LiaFeatherSolid className="h-5 w-5" />
+        <LiaFeatherSolid className="h-6 w-6" />
       </button>
     </div>
   );
@@ -512,17 +509,16 @@ const SurfaceAdvicesButton: FC<{
   const theme = useSelector(ThemeSelector);
   return (
     <div
-      className="tooltip"
+      className="tooltip tooltip-bottom"
       data-tip={
         surfaceAdvices ? 'Hide Surface Advices' : 'Show Surface Advices'
       }
     >
       <button
-        className={`${
-          theme === 'light'
-            ? 'bg-white text-textColor'
-            : 'bg-bgColorDark2 text-textColorDark'
-        } rounded p-2 disabled:opacity-40 disabled:cursor-not-allowed`}
+        className={`p-3 rounded-xl transition-all duration-300 ${theme === 'light'
+          ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
+          : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
+          } disabled:opacity-40 disabled:cursor-not-allowed`}
         onClick={() => setSurfaceAdvices(!surfaceAdvices)}
         disabled={
           (selectedProject && selectedProject?.simulation?.resultS3
@@ -531,9 +527,9 @@ const SurfaceAdvicesButton: FC<{
         }
       >
         {surfaceAdvices ? (
-          <BiShow className="h-5 w-5 text-green-300 hover:text-secondaryColor" />
+          <BiShow className="h-6 w-6" />
         ) : (
-          <BiHide className="h-5 w-5 text-green-300 hover:text-secondaryColor" />
+          <BiHide className="h-6 w-6" />
         )}
       </button>
     </div>
@@ -544,24 +540,23 @@ const PositioningPortsInfo: FC = () => {
   const theme = useSelector(ThemeSelector);
   return (
     <div
-      className={`absolute bottom-20 right-5 flex flex-col ${
-        theme === 'light'
-          ? 'bg-white text-textColor'
-          : 'bg-bgColorDark2 text-textColorDark'
-      } shadow-2xl text-sm text-start p-[10px] max-w-[300px] max-h-[300px] overflow-y-scroll`}
+      className={`absolute bottom-20 right-5 flex flex-col rounded-xl shadow-2xl backdrop-blur-md border transition-all duration-300 ${theme === 'light'
+        ? 'bg-white/90 border-white/40 text-gray-800'
+        : 'bg-black/60 border-white/10 text-gray-200'
+        } text-sm text-start p-4 max-w-[300px] max-h-[300px] overflow-y-scroll custom-scrollbar`}
     >
-      <span className="font-semibold">
+      <span className="font-semibold mb-2">
         Once you have added a new termination, you can place it in the following
         ways:
       </span>
-      <div className="list-decimal ml-3 mt-2">
+      <ul className="list-decimal ml-4 space-y-1 opacity-80">
         <li>double clicking on model surface point of interest;</li>
         <li>
           <span className="w-full">
             enabling termination location suggestions by clicking on
           </span>
-          <div className="inline mx-2">
-            <BiHide className="w-5 h-5 inline text-green-300" />
+          <div className="inline mx-2 align-middle">
+            <BiHide className="w-5 h-5 inline text-blue-500" />
           </div>
           <span className="w-full">
             button on top of the model, then double clicking on suggestions
@@ -575,7 +570,7 @@ const PositioningPortsInfo: FC = () => {
         <li>
           using controls shown directly on the selected port (discouraged).
         </li>
-      </div>
+      </ul>
     </div>
   );
 };

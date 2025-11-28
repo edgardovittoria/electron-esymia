@@ -21,7 +21,7 @@ import { isConfirmedInfoModalSelector, setIsAlertInfoModal, setMessageInfoModal,
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
-interface PhysicsLeftPanelTabProps {}
+interface PhysicsLeftPanelTabProps { }
 
 export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   const dispatch = useDispatch();
@@ -31,13 +31,8 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   const isConfirmedInfoModal = useSelector(isConfirmedInfoModalSelector)
   const [deleteAllType, setDeleteAllType] = useState<string | undefined>(undefined)
 
-  // useEffectNotOnMount(() => {
-  //   selectedProject?.ports.filter((p) => p.category === 'port').length === 0 &&
-  //     dispatch(unsetScatteringValue());
-  // }, [selectedProject?.ports.length]);
-
   useEffect(() => {
-    if(isConfirmedInfoModal && selectedProject && deleteAllType === "port"){
+    if (isConfirmedInfoModal && selectedProject && deleteAllType === "port") {
       dispatch(deleteAllPorts());
       let ports = selectedProject.ports.filter(
         (p) => p.category !== 'port',
@@ -45,7 +40,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
       if (ports.length > 0) {
         savePortsOnS3(ports, selectedProject, dispatch, execQuery2);
       } else {
-        if(selectedProject.portsS3){
+        if (selectedProject.portsS3) {
           deleteFileS3(selectedProject.portsS3 as string);
         }
         dispatch(setPortsS3(undefined));
@@ -56,9 +51,9 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
             portsS3: null,
           },
           dispatch,
-        ).then(() => {});
+        ).then(() => { });
       }
-    } else if(isConfirmedInfoModal && selectedProject && deleteAllType === "lumped"){
+    } else if (isConfirmedInfoModal && selectedProject && deleteAllType === "lumped") {
       dispatch(deleteAllLumped());
       let ports = selectedProject.ports.filter(
         (p) => p.category !== 'lumped',
@@ -66,7 +61,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
       if (ports.length > 0) {
         savePortsOnS3(ports, selectedProject, dispatch, execQuery2);
       } else {
-        if(selectedProject.portsS3){
+        if (selectedProject.portsS3) {
           deleteFileS3(selectedProject.portsS3 as string);
         }
         dispatch(setPortsS3(undefined));
@@ -77,7 +72,7 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
             portsS3: null,
           },
           dispatch,
-        ).then(() => {});
+        ).then(() => { });
       }
     }
   }, [isConfirmedInfoModal, deleteAllType])
@@ -88,14 +83,14 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
   return (
     <>
       {selectedProject && selectedProject.ports.length !== 0 ? (
-        <div className={`lg:max-h-[150px] overflow-y-scroll bg-white border ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-white bg-bgColorDark'} mt-3 rounded px-5 py-5`}>
-          <div className="flex flex-row items-center justify-between">
-            <span className="font-bold">Terminations</span>
-            <div className="flex flex-row items-center gap-8">
+        <div className={`mt-4 rounded-xl border ${theme === 'light' ? 'bg-white/50 border-gray-200' : 'bg-white/5 border-white/10'}`}>
+          <div className="p-4 border-b border-gray-200/50 dark:border-white/10 flex flex-row items-center justify-between">
+            <span className={`text-sm font-bold ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>Terminations</span>
+            <div className="flex flex-row items-center gap-2">
               <button
-                className="w-[15%] tooltip tooltip-left hover:cursor-pointer disabled:opacity-40 disabled:hover:cursor-not-allowed"
+                className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed group"
                 disabled={selectedProject.simulation?.status === "Completed"}
-                data-tip="Delete all ports"
+                title="Delete all ports"
                 onClick={() => {
                   setDeleteAllType("port")
                   dispatch(
@@ -108,15 +103,13 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                 }}
               >
                 <MdDeleteSweep
-                  color="#d80233"
-                  style={{ width: '20px', height: '20px' }}
-                  className="hover:opacity-50"
+                  className="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors"
                 />
               </button>
               <button
-                className="w-[15%] tooltip tooltip-left hover:cursor-pointer disabled:opacity-40 disabled:hover:cursor-not-allowed"
+                className="p-1.5 rounded-lg hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed group"
                 disabled={selectedProject.simulation?.status === "Completed"}
-                data-tip="Delete all lumped"
+                title="Delete all lumped"
                 onClick={() => {
                   setDeleteAllType("lumped")
                   dispatch(
@@ -129,186 +122,160 @@ export const PhysicsLeftPanelTab: React.FC<PhysicsLeftPanelTabProps> = () => {
                 }}
               >
                 <MdDeleteSweep
-                  color="violet"
-                  style={{ width: '20px', height: '20px' }}
-                  className="hover:opacity-50"
+                  className="w-5 h-5 text-violet-500 group-hover:text-violet-600 transition-colors"
                 />
               </button>
             </div>
           </div>
-          <hr className="border-[1px] border-gray-300 w-full mb-2 mt-1" />
-          <ul className="list-none pl-3 mb-0">
-            {selectedProject.ports &&
-              selectedProject.ports.map((port) => {
-                let portColor = 'orange';
-                if (port.category === 'lumped') {
-                  portColor = 'violet';
-                } else if (port.category === 'port') {
-                  portColor = 'red';
-                }
-                return (
-                  <li
-                    key={port.name}
-                    className={
-                      port.isSelected
-                        ? `mt-[5px] rounded ${theme === 'light' ? 'bg-gray-200 hover:bg-gray-200' : 'bg-bgColorDark hover:bg-bgColorDark'} hover:cursor-pointer hover:rounded`
-                        : `mt-[5px] ${theme === 'light' ? 'hover:bg-gray-200' : 'hover:bg-bgColorDark'} hover:cursor-pointer hover:rounded`
-                    }
-                    onClick={() => {
-                      dispatch(selectPort(port.name));
-                    }}
-                  >
-                    <div className="flex items-center">
-                      <div className="w-[10%]">
-                        <FaReact
-                          color={portColor}
-                          style={{ width: '20px', height: '20px' }}
-                        />
+
+          <div className="max-h-[200px] overflow-y-auto custom-scrollbar p-2">
+            <ul className="space-y-1">
+              {selectedProject.ports &&
+                selectedProject.ports.map((port) => {
+                  let portColor = 'text-orange-500';
+                  if (port.category === 'lumped') {
+                    portColor = 'text-violet-500';
+                  } else if (port.category === 'port') {
+                    portColor = 'text-red-500';
+                  }
+                  return (
+                    <li
+                      key={port.name}
+                      className={`
+                        group flex items-center justify-between p-2 rounded-lg transition-all duration-200 cursor-pointer
+                        ${port.isSelected
+                          ? (theme === 'light' ? 'bg-blue-50 border-blue-100' : 'bg-blue-500/20 border-blue-500/30')
+                          : (theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-white/5')
+                        }
+                        border border-transparent
+                      `}
+                      onClick={() => {
+                        dispatch(selectPort(port.name));
+                      }}
+                    >
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <FaReact className={`w-4 h-4 flex-shrink-0 ${portColor}`} />
+                        <span className={`text-sm truncate ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
+                          {port.name}
+                        </span>
                       </div>
-                      <div className="w-[75%] text-start">
-                        <h5 className="text-[15px] font-normal">{port.name}</h5>
-                      </div>
-                      {port.isSelected &&
-                        !selectedProject.simulation?.results && (
-                          <div className="flex">
-                            <div
-                              className="w-[15%] tooltip mr-5"
-                              data-tip="Rename"
-                            >
-                              <label
-                                htmlFor="modalRename"
-                                onClick={() => setPortRename(port.name)}
-                              >
-                                <BiRename
-                                  color="#464847"
-                                  style={{ width: '20px', height: '20px' }}
-                                />
-                              </label>
-                            </div>
-                            <input
-                              type="checkbox"
-                              id="modalRename"
-                              className="modal-toggle"
-                            />
-                            <div className={`modal`}>
-                              <div className={`modal-box ${theme === 'light' ? '' : 'bg-bgColorDark2 text-textColorDark'}`}>
-                                <h3 className="font-bold text-lg">
-                                  Rename Port
-                                </h3>
-                                <div className="flex justify-center items-center py-5">
-                                  <input
-                                    type="text"
-                                    placeholder="Type here"
-                                    className={`input input-bordered w-full max-w-xs ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'}`}
-                                    value={portRename}
-                                    onChange={(e) =>
-                                      setPortRename(e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="modal-action flex justify-between">
-                                  <label
-                                    htmlFor="modalRename"
-                                    className="btn h-[2rem] min-h-[2rem] bg-red-500 border-red-500"
-                                  >
-                                    Cancel
-                                  </label>
-                                  <label
-                                    htmlFor="modalRename"
-                                    className="btn h-[2rem] min-h-[2rem]"
-                                    onClick={() => {
-                                      if (
-                                        isTerminationNameValid(
-                                          portRename,
-                                          selectedProject.ports,
-                                        )
-                                      ) {
-                                        dispatch(setPortName(portRename));
-                                        let ports = selectedProject.ports.map(
-                                          (p) => {
-                                            if (p.isSelected) {
-                                              return { ...p, name: portRename };
-                                            } else {
-                                              return p;
-                                            }
-                                          },
-                                        );
-                                        savePortsOnS3(
-                                          ports,
-                                          selectedProject,
-                                          dispatch,
-                                          execQuery2,
-                                        );
-                                      } else {
-                                        toast.error(
-                                          'Name already set! Please choose another one',
-                                        );
-                                      }
-                                    }}
-                                  >
-                                    Rename
-                                  </label>
-                                </div>
-                              </div>
-                            </div>
-                            <div
-                              className="w-[15%] tooltip"
-                              data-tip="Delete"
-                              onClick={() => {
-                                dispatch(deletePort(port.name));
-                                let ports = selectedProject.ports.filter(
-                                  (p) => p.name !== port.name,
+
+                      {port.isSelected && !selectedProject.simulation?.results && (
+                        <div className="flex items-center gap-1 opacity-100 transition-opacity">
+                          <label
+                            htmlFor="modalRename"
+                            className={`p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-white/10 cursor-pointer transition-colors`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPortRename(port.name);
+                            }}
+                            title="Rename"
+                          >
+                            <BiRename className={`w-4 h-4 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`} />
+                          </label>
+
+                          <button
+                            className={`p-1.5 rounded-md hover:bg-red-100 dark:hover:bg-red-900/30 cursor-pointer transition-colors`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              dispatch(deletePort(port.name));
+                              let ports = selectedProject.ports.filter(
+                                (p) => p.name !== port.name,
+                              );
+                              if (ports.length > 0) {
+                                savePortsOnS3(
+                                  ports,
+                                  selectedProject,
+                                  dispatch,
+                                  execQuery2,
                                 );
-                                if (ports.length > 0) {
-                                  savePortsOnS3(
-                                    ports,
-                                    selectedProject,
-                                    dispatch,
-                                    execQuery2,
+                              } else {
+                                if (selectedProject.portsS3) {
+                                  deleteFileS3(
+                                    selectedProject.portsS3 as string,
                                   );
-                                } else {
-                                  if(selectedProject.portsS3){
-                                    deleteFileS3(
-                                      selectedProject.portsS3 as string,
-                                    );
-                                  }
-                                  dispatch(setPortsS3(undefined));
-                                  execQuery2(
-                                    createOrUpdateProjectInDynamoDB,
-                                    {
-                                      ...selectedProject,
-                                      portsS3: null,
-                                    },
-                                    dispatch,
-                                  ).then(() => {});
                                 }
-                              }}
-                            >
-                              <IoTrashOutline
-                                color="#d80233"
-                                style={{ width: '20px', height: '20px' }}
-                              />
-                            </div>
-                          </div>
-                        )}
-                    </div>
-                  </li>
-                );
-              })}
-          </ul>
+                                dispatch(setPortsS3(undefined));
+                                execQuery2(
+                                  createOrUpdateProjectInDynamoDB,
+                                  {
+                                    ...selectedProject,
+                                    portsS3: null,
+                                  },
+                                  dispatch,
+                                ).then(() => { });
+                              }
+                            }}
+                            title="Delete"
+                          >
+                            <IoTrashOutline className="w-4 h-4 text-red-500" />
+                          </button>
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+            </ul>
+          </div>
+
+          {/* Rename Modal */}
+          <input type="checkbox" id="modalRename" className="modal-toggle" />
+          <div className="modal backdrop-blur-sm">
+            <div className={`modal-box p-6 rounded-2xl shadow-2xl border ${theme === 'light' ? 'bg-white border-gray-100' : 'bg-gray-900 border-gray-700'}`}>
+              <h3 className={`font-bold text-lg mb-6 ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
+                Rename Port
+              </h3>
+
+              <div className="mb-6">
+                <input
+                  type="text"
+                  placeholder="Enter new name"
+                  className={`w-full p-3 rounded-xl outline-none border transition-all ${theme === 'light'
+                      ? 'bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-gray-800'
+                      : 'bg-black/20 border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                    }`}
+                  value={portRename}
+                  onChange={(e) => setPortRename(e.target.value)}
+                />
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <label
+                  htmlFor="modalRename"
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition-colors ${theme === 'light'
+                      ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                    }`}
+                >
+                  Cancel
+                </label>
+                <label
+                  htmlFor="modalRename"
+                  className="px-4 py-2 rounded-xl text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30 cursor-pointer transition-all"
+                  onClick={() => {
+                    if (isTerminationNameValid(portRename, selectedProject.ports)) {
+                      dispatch(setPortName(portRename));
+                      let ports = selectedProject.ports.map((p) => {
+                        if (p.isSelected) {
+                          return { ...p, name: portRename };
+                        } else {
+                          return p;
+                        }
+                      });
+                      savePortsOnS3(ports, selectedProject, dispatch, execQuery2);
+                    } else {
+                      toast.error('Name already set! Please choose another one');
+                    }
+                  }}
+                >
+                  Rename
+                </label>
+              </div>
+            </div>
+            <label className="modal-backdrop" htmlFor="modalRename">Close</label>
+          </div>
         </div>
       ) : (
-        // <div className="text-center">
-        //   <img
-        //     src={theme === 'light' ? noPhysicsIcon : noPhysicsIconDark}
-        //     className="mx-auto xl:mt-[20px] w-1/4"
-        //     alt="No Physics"
-        //   />
-        //   <h5 className="lg:text-sm xl:text-xl">No Physics applied</h5>
-        //   <p className="mt-[20px] text-sm">
-        //     Add ports or lumpeds and apply them to geometry in the 3D View.
-        //   </p>
-        // </div>
         <></>
       )}
     </>

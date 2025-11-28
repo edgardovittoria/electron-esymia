@@ -7,11 +7,11 @@ import { CgDetailsMore } from 'react-icons/cg';
 import { publishMessage } from '../../../middleware/stompMiddleware';
 import { ThemeSelector } from '../../store/tabsAndMenuItemsSlice';
 
-export interface ServerGUIProps{
+export interface ServerGUIProps {
   index: number
 }
 
-const ServerGUI: React.FC<ServerGUIProps> = ({index}) => {
+const ServerGUI: React.FC<ServerGUIProps> = ({ index }) => {
 
   const [spinnerMesher, setSpinnerMesher] = useState<boolean>(false);
   const [spinnerSolver, setSpinnerSolver] = useState<boolean>(false);
@@ -22,6 +22,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({index}) => {
   const mesherStatus = useSelector(MesherStatusSelector)
   const solverStatus = useSelector(SolverStatusSelector)
   const theme = useSelector(ThemeSelector)
+  const isDark = theme !== 'light';
 
   const dispatch = useDispatch()
 
@@ -37,7 +38,7 @@ const ServerGUI: React.FC<ServerGUIProps> = ({index}) => {
 
   useEffect(() => {
     mesherLogs.forEach(l => {
-      if(l.includes("MESHER READY")){
+      if (l.includes("MESHER READY")) {
         dispatch(setMesherStatus('ready'))
       }
     })
@@ -45,134 +46,156 @@ const ServerGUI: React.FC<ServerGUIProps> = ({index}) => {
 
   useEffect(() => {
     solverLogs.forEach(l => {
-      if(l.includes("SOLVER READY")){
+      if (l.includes("SOLVER READY")) {
         dispatch(setSolverStatus('ready'))
       }
     })
   }, [solverLogs]);
 
+  const StatusIndicator = ({ status }: { status: string }) => (
+    <div className="flex items-center gap-2">
+      <div className={`h-3 w-3 rounded-full shadow-lg shadow-current ${status === 'idle' ? 'bg-gray-400' :
+        status === 'starting' ? 'bg-orange-400 animate-pulse' :
+          'bg-green-500'
+        }`}></div>
+      <span className={`text-xs font-bold tracking-wider ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+        {status.toUpperCase()}
+      </span>
+      {status === 'starting' && <ImSpinner className={`animate-spin w-4 h-4 ${isDark ? 'text-orange-400' : 'text-orange-500'}`} />}
+    </div>
+  );
+
+  const ControlButton = ({ icon: Icon, onClick, disabled, tooltip, colorClass }: any) => (
+    <button
+      className={`p-2 rounded-lg transition-all duration-200 tooltip ${disabled
+        ? 'opacity-50 cursor-not-allowed'
+        : isDark
+          ? 'hover:bg-white/10 text-gray-300 hover:text-white'
+          : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+        } ${colorClass}`}
+      onClick={onClick}
+      disabled={disabled}
+      data-tip={tooltip}
+    >
+      <Icon size={16} />
+    </button>
+  );
+
   return (
-    <>
-      <div className={`flex relative flex-col py-5 px-5 border-2 ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'}`} key={index}>
-        <h5 className={`absolute top-[-16px] ${theme === 'light' ? 'text-secondaryColor bg-white' : 'text-secondaryColorDark bg-bgColorDark2'} left-10 font-bold px-2`}>serverGUI</h5>
-        <div className={`flex flex-col border ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'} py-3 px-5`}>
-          <div className="flex flex-row gap-2 items-center justify-between">
-            <div className="w-2/3 flex flex-row items-center gap-2">
-              <h5>Mesher</h5>
-              <div className={`h-3 w-3 p-[6px] border-2 border-gray-700 rounded-full ${mesherStatus === 'idle' ? 'bg-gray-400': mesherStatus === 'starting' ? 'bg-orange-400' : 'bg-green-500'}`}></div>
-              {mesherStatus === 'idle' && <span>IDLE</span>}
-              {mesherStatus === 'starting' && <span>STARTING</span>}
-              {mesherStatus === 'ready' && <span>READY</span>}
-              {mesherStatus === 'starting' && <ImSpinner className='animate-spin w-4 h-4 z-50' />}
-            </div>
-            <div className="flex flex-row items-center gap-2">
-              <button className='tooltip' data-tip="Start" disabled={mesherStatus !== 'idle'}>
-                <FaPlay size={15}
-                        className={`${mesherStatus !== 'idle' && 'text-gray-400'}`}
-                        onClick={() => {
-                          setMesherLogs([])
-                          setSpinnerMesher(true)
-                          dispatch(setMesherStatus('starting'))
-                          window.electron.ipcRenderer.sendMessage('runMesher', [])
-                        }}
-                />
-              </button>
-              <button className='tooltip' data-tip="Stop">
-                <FaStop size={15}
-                        className={`${mesherStatus === 'idle' && 'text-gray-400'}`}
-                        onClick={() => {
-                          dispatch(publishMessage({
-                            queue: 'management',
-                            body: {
-                              message: 'stop',
-                            }}))
-                          setMesherLogs(["MESHER HALTED"])
-                          dispatch(setMesherStatus('idle'))
-                          window.electron.ipcRenderer.sendMessage('haltMesher', [])
-                        }}
-                />
-              </button>
-              <button className='tooltip' data-tip="Show/Hide Logs">
-                <CgDetailsMore size={17}
-                        onClick={() => {
-                          setMesherLogsVisibility(!mesherLogsVisibility)
-                        }}
-                />
-              </button>
-            </div>
-              {/* <button className='button border border-black hover:bg-gray-400 hover:text-white text-sm'
-                    onClick={() => setMesherLogs([])}
-            >
-              CLEAR
-            </button> */}
-          </div>
-          {mesherLogsVisibility &&
-            <div className={`h-[150px] max-h-[150px] overflow-y-scroll border ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'} p-3 flex flex-col ${spinnerMesher ? 'items-center justify-center bg-gray-100 bg-opacity-30': ''}`}>
-              {spinnerMesher && <ImSpinner className={`animate-spin w-12 h-12 z-50 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />}
-              {mesherLogs.map((ml, index) => <div key={index} className="text-[12px]">{ml}</div>)}
-            </div>
-          }
-        </div>
-        <div className={`flex flex-col border ${theme === 'light' ? 'border-secondaryColor' : 'border-secondaryColorDark'} py-3 px-5`}>
-          <div className="flex flex-row gap-2 items-center justify-between">
-            <div className="w-2/3 flex flex-row items-center gap-2">
-              <h5>Solver</h5>
-              <div className={`h-3 w-3 p-[6px] border-2 border-gray-700 rounded-full ${solverStatus === 'idle' ? 'bg-gray-400': solverStatus === 'starting' ? 'bg-orange-400' : 'bg-green-500'}`}></div>
-              {solverStatus === 'idle' && <span>IDLE</span>}
-              {solverStatus === 'starting' && <span>STARTING</span>}
-              {solverStatus === 'ready' && <span>READY</span>}
-              {solverStatus === 'starting' && <ImSpinner className='animate-spin w-4 h-4 z-50' />}
-            </div>
-            <div className="flex flex-row items-center gap-2">
-              <button className='tooltip' data-tip="Start" disabled={solverStatus !== 'idle'}>
-                <FaPlay size={15}
-                        className={`${solverStatus !== 'idle' && 'text-gray-400'}`}
-                        onClick={() => {
-                          setSolverLogs([])
-                          setSpinnerSolver(true)
-                          dispatch(setSolverStatus('starting'))
-                          window.electron.ipcRenderer.sendMessage('runSolver', [])
-                        }}
-                />
-              </button>
-              <button className='tooltip' data-tip="Stop">
-                <FaStop size={15}
-                        className={`${solverStatus === 'idle' && 'text-gray-400'}`}
-                        onClick={() => {
-                          dispatch(publishMessage({
-                            queue: 'management_solver',
-                            body: {
-                              message: 'stop',
-                            }}))
-                          setSolverLogs(["SOLVER HALTED"])
-                          dispatch(setSolverStatus('idle'))
-                          window.electron.ipcRenderer.sendMessage('haltSolver', [])
-                        }}
-                />
-              </button>
-              <button className='tooltip' data-tip="Show/Hide Logs">
-                <CgDetailsMore size={17}
-                               onClick={() => {
-                                 setSolverLogsVisibility(!solverLogsVisibility)
-                               }}
-                />
-              </button>
-            </div>
-            {/* <button className='button border border-black hover:bg-gray-400 hover:text-white text-sm'
-                    onClick={() => setMesherLogs([])}
-            >
-              CLEAR
-            </button> */}
-          </div>
-          {solverLogsVisibility &&
-            <div className={`h-[150px] max-h-[150px] overflow-y-scroll border ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'} p-3 flex flex-col ${spinnerSolver ? 'items-center justify-center bg-gray-100 bg-opacity-30': ''}`}>
-              {spinnerSolver && <ImSpinner className={`animate-spin w-12 h-12 z-50 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />}
-              {solverLogs.map((ml, index) => <div key={index} className="text-[12px]">{ml}</div>)}
-            </div>
-          }
-        </div>
+    <div className={`flex flex-col rounded-xl overflow-hidden border ${isDark
+      ? 'bg-white/5 border-white/10'
+      : 'bg-white border-gray-200'
+      }`} key={index}>
+      <div className={`px-4 py-2 border-b ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'}`}>
+        <h5 className={`font-bold text-sm ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>Server GUI</h5>
       </div>
-    </>
+
+      {/* Mesher Section */}
+      <div className={`flex flex-col border-b ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
+        <div className="flex flex-row items-center justify-between p-4">
+          <div className="flex flex-row items-center gap-4">
+            <h5 className={`font-medium ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>Mesher</h5>
+            <StatusIndicator status={mesherStatus} />
+          </div>
+          <div className="flex flex-row items-center gap-1">
+            <ControlButton
+              icon={FaPlay}
+              tooltip="Start"
+              disabled={mesherStatus !== 'idle'}
+              colorClass="text-green-500 hover:text-green-400"
+              onClick={() => {
+                setMesherLogs([])
+                setSpinnerMesher(true)
+                dispatch(setMesherStatus('starting'))
+                window.electron.ipcRenderer.sendMessage('runMesher', [])
+              }}
+            />
+            <ControlButton
+              icon={FaStop}
+              tooltip="Stop"
+              colorClass="text-red-500 hover:text-red-400"
+              onClick={() => {
+                dispatch(publishMessage({
+                  queue: 'management',
+                  body: { message: 'stop' }
+                }))
+                setMesherLogs(["MESHER HALTED"])
+                dispatch(setMesherStatus('idle'))
+                window.electron.ipcRenderer.sendMessage('haltMesher', [])
+              }}
+            />
+            <ControlButton
+              icon={CgDetailsMore}
+              tooltip="Show/Hide Logs"
+              onClick={() => setMesherLogsVisibility(!mesherLogsVisibility)}
+            />
+          </div>
+        </div>
+
+        {mesherLogsVisibility && (
+          <div className={`h-[150px] overflow-y-auto p-3 text-xs font-mono border-t ${isDark
+            ? 'bg-black/30 text-gray-300 border-white/10'
+            : 'bg-gray-50 text-gray-700 border-gray-200'
+            } ${spinnerMesher ? 'flex items-center justify-center' : ''}`}>
+            {spinnerMesher && <ImSpinner className={`animate-spin w-8 h-8 ${isDark ? 'text-green-400' : 'text-green-600'}`} />}
+            {!spinnerMesher && mesherLogs.map((ml, index) => <div key={index} className="whitespace-pre-wrap">{ml}</div>)}
+          </div>
+        )}
+      </div>
+
+      {/* Solver Section */}
+      <div className="flex flex-col">
+        <div className="flex flex-row items-center justify-between p-4">
+          <div className="flex flex-row items-center gap-4">
+            <h5 className={`font-medium ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>Solver</h5>
+            <StatusIndicator status={solverStatus} />
+          </div>
+          <div className="flex flex-row items-center gap-1">
+            <ControlButton
+              icon={FaPlay}
+              tooltip="Start"
+              disabled={solverStatus !== 'idle'}
+              colorClass="text-green-500 hover:text-green-400"
+              onClick={() => {
+                setSolverLogs([])
+                setSpinnerSolver(true)
+                dispatch(setSolverStatus('starting'))
+                window.electron.ipcRenderer.sendMessage('runSolver', [])
+              }}
+            />
+            <ControlButton
+              icon={FaStop}
+              tooltip="Stop"
+              colorClass="text-red-500 hover:text-red-400"
+              onClick={() => {
+                dispatch(publishMessage({
+                  queue: 'management_solver',
+                  body: { message: 'stop' }
+                }))
+                setSolverLogs(["SOLVER HALTED"])
+                dispatch(setSolverStatus('idle'))
+                window.electron.ipcRenderer.sendMessage('haltSolver', [])
+              }}
+            />
+            <ControlButton
+              icon={CgDetailsMore}
+              tooltip="Show/Hide Logs"
+              onClick={() => setSolverLogsVisibility(!solverLogsVisibility)}
+            />
+          </div>
+        </div>
+
+        {solverLogsVisibility && (
+          <div className={`h-[150px] overflow-y-auto p-3 text-xs font-mono border-t ${isDark
+            ? 'bg-black/30 text-gray-300 border-white/10'
+            : 'bg-gray-50 text-gray-700 border-gray-200'
+            } ${spinnerSolver ? 'flex items-center justify-center' : ''}`}>
+            {spinnerSolver && <ImSpinner className={`animate-spin w-8 h-8 ${isDark ? 'text-green-400' : 'text-green-600'}`} />}
+            {!spinnerSolver && solverLogs.map((ml, index) => <div key={index} className="whitespace-pre-wrap">{ml}</div>)}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 

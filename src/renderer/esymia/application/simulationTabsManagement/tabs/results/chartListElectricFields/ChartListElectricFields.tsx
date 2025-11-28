@@ -28,9 +28,8 @@ export const ChartListElectricFields: React.FC<
   return (
     <>
       <div
-        className={` ${
-          spinnerSolverResults ? 'opacity-40' : 'opacity-100'
-        } flex flex-col gap-2 mt-5 overflow-scroll max-h-[80vh] px-1`}
+        className={` ${spinnerSolverResults ? 'opacity-40' : 'opacity-100'
+          } flex flex-col gap-2 overflow-scroll max-h-[calc(100vh-300px)] px-1`}
       >
         <fieldset className="fieldset">
           <legend className="fieldset-legend text-xs mb-1">
@@ -50,7 +49,7 @@ export const ChartListElectricFields: React.FC<
               axios
                 .post(
                   'http://127.0.0.1:8001/get_results_electric_fields?file_id=' +
-                    selectedProject?.simulation?.resultS3,
+                  selectedProject?.simulation?.resultS3,
                   {
                     fileId: selectedProject?.simulation?.resultS3,
                     freq_index:

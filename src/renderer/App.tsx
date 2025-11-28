@@ -12,7 +12,7 @@ import {
   activeSimulationsSelector,
 } from './esymia/store/projectSlice';
 import { HiOutlineLogout } from 'react-icons/hi';
-import { FaUser } from 'react-icons/fa';
+import { FaUser, FaHome, FaCube, FaProjectDiagram } from 'react-icons/fa';
 import {
   connectStomp,
   disconnectStomp,
@@ -29,12 +29,7 @@ import {
   MesherStatusSelector,
   SolverStatusSelector,
 } from './esymia/store/pluginsSlice';
-import { useAllowSingleSessionUser } from './useAllowSingleSessionUser';
 import InfoModal from './esymia/application/sharedModals/InfoModal';
-
-// export const client = new Client({
-//   brokerURL: 'ws://localhost:15674/ws'
-// });
 
 export default function App() {
   const dispatch = useDispatch();
@@ -45,15 +40,7 @@ export default function App() {
   const solverStatus = useSelector(SolverStatusSelector);
   const [logout, setLogout] = useState(false);
   const theme = useSelector(ThemeSelector);
-
-  // const [brokerActive, setBrokerActive] = useState<boolean>(false);
-  // const [progressBarValue, setProgressBarValue] = useState<number>(0)
-
-  // Uso del temporizzatore per la versione demo di 30 giorni. Commentare se si vuole disabilitare la modalità demo.
-  //let {allowedUser, remainingDemoDays} = useDemoMode()
-
-  // Permette ad ogni utente di avere un'unica sessione attiva per volta. Commentare per disabilitare questo vincolo.
-  //let {closeUserSessionOnFauna} = useAllowSingleSessionUser()
+  const isDark = theme !== 'light';
 
   useEffect(() => {
     window.electron.ipcRenderer.sendMessage('runBroker', []);
@@ -72,33 +59,19 @@ export default function App() {
     };
     if (response.type === 'status') {
       if (!response.success) {
-        // Controlla il codice di uscita specifico
         if (response.exitCode === 10) {
-          // Se lo script esce con l'errore generico 10
-          // e sai che l'unico errore a quel punto è Docker non installato...
           setDockerInstallationBox(true);
         } else {
-          // Altri errori
           console.error(
             'Errore generico script Docker. Codice:',
             response.exitCode,
           );
         }
       } else {
-        // Successo
         console.log(response.message);
       }
     }
   });
-
-  // window.electron.ipcRenderer.on('runBroker', (arg) => {
-  //   (arg as string).split("\n").filter(s => {
-  //     if (s === 'docker not installed') {
-  //       setDockerInstallationBox(true);
-  //     }
-  //     //console.log(s.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''))
-  //   })
-  // });
 
   if (process.env.APP_MODE !== 'test') {
     window.electron.ipcRenderer.on('checkLogout', (arg) => {
@@ -133,16 +106,6 @@ export default function App() {
     }
   }, [logout]);
 
-  // useEffect(() => {
-  //   if(progressBarValue !== 70){
-  //     setTimeout(() => {
-  //       setProgressBarValue(prev => prev+1)
-  //     }, 100);
-  //   }else if(progressBarValue === 70){
-  //     setBrokerActive(true)
-  //   }
-  // }, [progressBarValue])
-
   const [tabsSelected, setTabsSelected] = useState<string>('home');
   const { user } = useAuth0();
   const [userDropdownVisibility, setUserDropdownVisibility] = useState(false);
@@ -168,219 +131,172 @@ export default function App() {
   const showInfoModal = useSelector(showInfoModalSelector);
 
   return (
-    <div className={theme === 'dark' ? 'bg-bgColorDark' : 'bg-bgColor'}>
-      {/* {dockerInstallationBox && allowedUser && ( */}
+    <div className={`min-h-screen w-full transition-colors duration-500 ${isDark ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white' : 'bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 text-gray-900'}`}>
       {showInfoModal && <InfoModal />}
+
+      {/* Docker Installation Modal */}
       {dockerInstallationBox && (
-        <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
-          <div className="flex flex-col items-center gap-2 p-3 bg-white rounded border border-black">
-            <span className="text-2xl">Docker Needed</span>
-            <hr className="w-full border-[.5px] border-black" />
-            <span>Please install and start Docker and restart the application</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className={`glass-panel ${isDark ? 'glass-panel-dark' : 'glass-panel-light'} p-8 rounded-2xl max-w-md w-full flex flex-col items-center gap-6`}>
+            <h2 className="text-2xl font-bold">Docker Required</h2>
+            <p className="text-center opacity-80">Please install and start Docker, then restart the application.</p>
             <a
               href="https://www.docker.com/get-started/"
               target="_blank"
-              className="font-bold text-blue-600 underline"
+              className="text-blue-500 hover:text-blue-400 underline font-medium"
+              rel="noreferrer"
             >
               Get Started with Docker
             </a>
             <button
-                type="button"
-                className={`button buttonPrimary ${
-                  theme === 'light' ? '' : 'bg-secondaryColorDark'
-                } text-sm w-full hover:opacity-80 disabled:opacity-60 mt-5`}
-                onClick={() => {
-                  window.electron.ipcRenderer.sendMessage('closeApp', []);
-                }}
-              >
-                Close App
-              </button>
-            {/* <progress className="progress w-full mr-4" value={progressBarValue} max={70} /> */}
+              type="button"
+              className={`btn-primary w-full ${isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'}`}
+              onClick={() => {
+                window.electron.ipcRenderer.sendMessage('closeApp', []);
+              }}
+            >
+              Close App
+            </button>
           </div>
         </div>
       )}
-      {/* {!dockerInstallationBox && allowedUser && ( */}
+
       {!dockerInstallationBox && (
         <>
           {!brokerActive ? (
-            <div className="absolute top-1/2 right-1/2 translate-x-1/2 z-100">
-              <div className="flex flex-col items-center gap-2 p-3 bg-white rounded">
-                <span>Starting Services...</span>
-                <ImSpinner
-                  className={`animate-spin w-8 h-8 ${
-                    theme === 'light' ? 'text-textColor' : 'text-textColorDark'
+            <div className="fixed inset-0 flex flex-col items-center justify-center gap-4 z-50">
+              <ImSpinner
+                className={`animate-spin w-12 h-12 ${isDark ? 'text-white' : 'text-black'
                   }`}
-                />
-                {/* <progress className="progress w-full mr-4" value={progressBarValue} max={70} /> */}
-              </div>
+              />
+              <span className="text-lg font-light tracking-wider animate-pulse">Starting Services...</span>
             </div>
           ) : (
-            <div>
-              <div className="flex flex-row items-center justify-center">
-                <div
-                  role="tablist"
-                  className={`tabs tabs-bordered w-full justify-center h-[3vh]`}
-                >
-                  <input
-                    type="radio"
-                    name="dashboard"
-                    role="tab"
-                    className={`tab ${
-                      theme === 'light'
-                        ? 'text-textColor'
-                        : 'text-textColorDark'
-                    } ${
-                      tabsSelected === 'home'
-                        ? theme === 'light'
-                          ? 'border-textColor'
-                          : 'border-white'
-                        : 'border-gray-400 border-opacity-35'
-                    }`}
-                    aria-label="Home"
-                    defaultChecked={tabsSelected === 'home'}
+            <div className="relative h-screen flex flex-col">
+
+              {/* Top Navigation Bar */}
+              <div className={`w-full px-6 py-2 flex items-center justify-between z-40 ${tabsSelected === 'home' ? 'absolute top-0 bg-transparent' : `backdrop-blur-md border-b ${isDark ? 'bg-black/20 border-white/10' : 'bg-white/40 border-black/5'}`}`}>
+
+                {/* Tabs */}
+                <div className={`flex items-center gap-2 p-1 rounded-full ${isDark ? 'bg-white/10 border border-white/5' : 'bg-black/5 border border-black/5'} backdrop-blur-md`}>
+                  <button
                     onClick={() => setTabsSelected('home')}
-                  />
-                  <input
-                    type="radio"
-                    name="cadmia"
-                    role="tab"
-                    className={`tab ${
-                      theme === 'light'
-                        ? 'text-textColor'
-                        : 'text-textColorDark'
-                    } ${
-                      tabsSelected === 'cadmia'
-                        ? theme === 'light'
-                          ? 'border-textColor'
-                          : 'border-white'
-                        : 'border-gray-400 border-opacity-35'
-                    }`}
-                    aria-label="CADmIA"
-                    defaultChecked={tabsSelected === 'cadmia'}
+                    className={`flex items-center gap-2 px-6 py-1 rounded-full transition-all duration-300 ${tabsSelected === 'home'
+                      ? (isDark ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg')
+                      : 'hover:bg-white/10 opacity-70 hover:opacity-100'
+                      }`}
+                  >
+                    <FaHome size={14} />
+                    <span className="text-sm font-medium">Home</span>
+                  </button>
+
+                  <button
+                    onClick={() => user && setTabsSelected('cadmia')}
                     disabled={!user}
-                    onClick={() => setTabsSelected('cadmia')}
-                  />
-                  <input
-                    type="radio"
-                    name="esymia"
-                    role="tab"
-                    className={`tab ${
-                      theme === 'light'
-                        ? 'text-textColor'
-                        : 'text-textColorDark'
-                    } ${
-                      tabsSelected === 'esymia'
-                        ? theme === 'light'
-                          ? 'border-textColor'
-                          : 'border-white'
-                        : 'border-gray-400 border-opacity-35'
-                    }`}
-                    aria-label="ESymIA"
-                    defaultChecked={tabsSelected === 'esymia'}
+                    className={`flex items-center gap-2 px-6 py-1 rounded-full transition-all duration-300 ${tabsSelected === 'cadmia'
+                      ? (isDark ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg')
+                      : (!user ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white/10 opacity-70 hover:opacity-100')
+                      }`}
+                  >
+                    <FaCube size={14} />
+                    <span className="text-sm font-medium">Cadmia</span>
+                  </button>
+
+                  <button
+                    onClick={() => user && setTabsSelected('esymia')}
                     disabled={!user}
-                    onClick={() => setTabsSelected('esymia')}
-                  />
+                    className={`flex items-center gap-2 px-6 py-1 rounded-full transition-all duration-300 ${tabsSelected === 'esymia'
+                      ? (isDark ? 'bg-white text-black shadow-lg' : 'bg-black text-white shadow-lg')
+                      : (!user ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white/10 opacity-70 hover:opacity-100')
+                      }`}
+                  >
+                    <FaProjectDiagram size={14} />
+                    <span className="text-sm font-medium">Esymia</span>
+                  </button>
                 </div>
+
+                {/* User Profile */}
                 {user && (
-                  <div>
-                    {/* <span className='absolute top-0 left-0 text-center p-1 border-b-2 border-r-2 border-secondaryColor rounded-br-xl bg-white font-bold text-sm'>DEMO: {remainingDemoDays} days remaining</span> */}
-                    <FaUser
-                      id="profileIcon"
-                      className={`w-[20px] h-[20px] mr-4 ${
-                        theme === 'light'
-                          ? 'text-textColor'
-                          : 'text-textColorDark'
-                      } hover:opacity-40 hover:cursor-pointer`}
-                      onClick={() => {
-                        setUserDropdownVisibility(!userDropdownVisibility);
-                      }}
-                    />
-                    <ul
-                      style={{
-                        display: !userDropdownVisibility ? 'none' : 'block',
-                      }}
-                      className={`px-4 py-2 ${
-                        theme === 'light'
-                          ? 'bg-white text-textColor'
-                          : 'bg-bgColorDark2 text-textColorDark'
-                      } rounded list-none absolute right-[10px] mt-[20px] w-max shadow z-[10000]`}
+                  <div className="relative">
+                    <button
+                      onClick={() => setUserDropdownVisibility(!userDropdownVisibility)}
+                      className={`flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300 ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
                     >
-                      <li className="font-bold text-lg">{user.nickname}</li>
-                      <hr className="mb-3" />
-                      <label className="flex cursor-pointer gap-2 mb-2">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <circle cx="12" cy="12" r="5" />
-                          <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
-                        </svg>
-                        <input
-                          type="checkbox"
-                          value={theme}
-                          className="toggle toggle-sm theme-controller"
-                          onChange={() => {
-                            if (theme === 'light') {
-                              dispatch(setTheme('dark'));
-                            } else {
-                              dispatch(setTheme('light'));
-                            }
-                          }}
-                        />
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                        </svg>
-                      </label>
-                      <div
-                        className="flex items-center p-[5px] hover:bg-black hover:text-white hover:cursor-pointer"
-                        onClick={() => {
-                          if (process.env.APP_MODE !== 'test') {
-                            //closeUserSessionOnFauna()
-                            window.electron.ipcRenderer.sendMessage(
-                              'checkLogout',
-                            );
-                          }
-                        }}
-                      >
-                        <HiOutlineLogout className="w-[20px] h-[20px] mr-[10px]" />
-                        <li>Logout</li>
+                      <span className="text-sm font-medium hidden md:block">{user.nickname}</span>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDark ? 'bg-white text-black' : 'bg-black text-white'}`}>
+                        <FaUser size={14} />
                       </div>
-                    </ul>
+                    </button>
+
+                    {/* Dropdown */}
+                    {userDropdownVisibility && (
+                      <div className={`absolute right-0 mt-2 w-56 rounded-xl overflow-hidden shadow-2xl border backdrop-blur-xl animate-fade-in-up ${isDark ? 'bg-gray-900/90 border-white/10' : 'bg-white/90 border-black/5'
+                        }`}>
+                        <div className="p-4 border-b border-white/10">
+                          <p className="text-sm font-bold truncate">{user.name}</p>
+                          <p className="text-xs opacity-60 truncate">{user.email}</p>
+                        </div>
+
+                        <div className="p-2">
+                          <label className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}>
+                            <span className="text-sm">Dark Mode</span>
+                            <input
+                              type="checkbox"
+                              checked={isDark}
+                              onChange={() => dispatch(setTheme(isDark ? 'light' : 'dark'))}
+                              className="toggle toggle-sm toggle-primary"
+                            />
+                          </label>
+
+                          <button
+                            onClick={() => {
+                              if (process.env.APP_MODE !== 'test') {
+                                window.electron.ipcRenderer.sendMessage('checkLogout');
+                              }
+                            }}
+                            className={`w-full flex items-center gap-3 p-3 rounded-lg text-red-500 transition-colors ${isDark ? 'hover:bg-red-500/10' : 'hover:bg-red-50'}`}
+                          >
+                            <HiOutlineLogout size={18} />
+                            <span className="text-sm font-medium">Logout</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-              {tabsSelected === 'home' && (
-                <Home setSelectedTab={setTabsSelected} />
-              )}
-              <Cadmia selectedTab={tabsSelected} />
-              <Esymia selectedTab={tabsSelected} />
-              {activeSimulations &&
-                activeSimulations.length > 0 &&
-                !feedbackSimulationVisible && (
+
+              {/* Main Content Area */}
+              <div className="flex-1 overflow-hidden relative">
+                {tabsSelected === 'home' && (
+                  <Home setSelectedTab={setTabsSelected} />
+                )}
+                <Cadmia selectedTab={tabsSelected} />
+                <Esymia selectedTab={tabsSelected} />
+              </div>
+
+              {/* Floating Status Buttons */}
+              <div className="absolute bottom-8 right-8 flex flex-col gap-4">
+                {activeSimulations && activeSimulations.length > 0 && !feedbackSimulationVisible && (
                   <button
-                    className="absolute bottom-24 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor text-sm"
+                    className="w-12 h-12 rounded-full bg-blue-500 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center font-bold text-xs hover:scale-110 transition-transform"
                     onClick={() => setFeedbackSimulationVisible(true)}
                   >
                     SIM
                   </button>
                 )}
+
+                {activeMeshing && activeMeshing.length > 0 && !feedbackMeshingVisible && (
+                  <button
+                    className="w-12 h-12 rounded-full bg-purple-500 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center font-bold text-xs hover:scale-110 transition-transform"
+                    onClick={() => setFeedbackMeshingVisible(true)}
+                  >
+                    MES
+                  </button>
+                )}
+              </div>
+
+              {/* Status Panels */}
               {activeSimulations && activeSimulations.length > 0 && (
                 <SimulationStatus
                   feedbackSimulationVisible={feedbackSimulationVisible}
@@ -388,16 +304,7 @@ export default function App() {
                   activeSimulations={activeSimulations}
                 />
               )}
-              {activeMeshing &&
-                activeMeshing.length > 0 &&
-                !feedbackMeshingVisible && (
-                  <button
-                    className="absolute bottom-24 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor text-sm"
-                    onClick={() => setFeedbackMeshingVisible(true)}
-                  >
-                    MES
-                  </button>
-                )}
+
               {activeMeshing && activeMeshing.length > 0 && (
                 <MeshingStatus
                   feedbackMeshingVisible={feedbackMeshingVisible}

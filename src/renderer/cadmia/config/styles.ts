@@ -1,12 +1,12 @@
 export const toolbarIconsWidth = 'w-[30px]'
 export const toolbarIconsHeight = 'h-[30px]'
 
-export const navbarDropdownItemStyle = 'p-1 flex items-center rounded-lg hover:bg-secondaryColor hover:text-white disabled:opacity-50 disabled:cursor-not-allowed'
-export const navbarShortcutStyle = 'text-base font-medium text-gray-300 mr-3'
-export const navbarDropdownPadding = 'relative grid gap-2 bg-white py-3 px-3'
-export const navbarDropdownStyle = 'absolute z-10 -ml-4 w-screen max-w-sm transform px-2 sm:px-0 lg:left-1/2 lg:ml-0 '
-export const navbarDropdownBoxStyle = 'overflow-hidden rounded-b-lg'
-export const navbarItemStyle = 'group inline-flex items-center border-b-2 border-gray-200 bg-white text-sm text-black font-medium p-1 hover:border-secondaryColor hover:cursor-pointer'
+export const navbarDropdownItemStyle = 'p-2 flex items-center rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors duration-200 text-sm text-gray-700 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed'
+export const navbarShortcutStyle = 'text-xs font-medium text-gray-400 dark:text-gray-500 ml-4'
+export const navbarDropdownPadding = 'relative grid gap-1 p-2 bg-white dark:bg-black backdrop-blur-md rounded-xl border border-white/20 shadow-xl'
+export const navbarDropdownStyle = 'absolute z-50 mt-2 w-screen max-w-xs transform px-2 sm:px-0 lg:left-0 lg:ml-0'
+export const navbarDropdownBoxStyle = 'overflow-hidden rounded-xl ring-1 ring-black ring-opacity-5'
+export const navbarItemStyle = 'group inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/10 rounded-md transition-all duration-200 hover:cursor-pointer'
 
 export const toolbarsHintStyle = 'absolute left-0 top-10 flex flex-col items-center hidden mb-10 group-hover:flex text-[12px]'
 

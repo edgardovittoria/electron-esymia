@@ -15,7 +15,7 @@ import {
 } from '../../../../../config/styles';
 import { resetState } from '../../../../../../cad_library';
 
-interface EditItemProps {}
+interface EditItemProps { }
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -51,28 +51,28 @@ export const EditItem: React.FC<EditItemProps> = () => {
               <div className={navbarDropdownBoxStyle}>
                 <div className={navbarDropdownPadding}>
                   <UndoRedo />
-                  <div
+                  <button
                     onClick={() => {
                       dispatch(resetState());
                       dispatch(ActionCreators.clearHistory());
                     }}
                     className={navbarDropdownItemStyle}
                   >
-                    <div className="flex w-full justify-between">
-                      <div className="flex flex-row items-center">
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex items-center gap-3">
                         <FontAwesomeIcon
                           icon={faTrash}
-                          className="mr-5"
+                          className="h-4 w-4"
                         />
-                        <span className="text-base font-medium">
-                        Clear All
-                      </span>
+                        <span className="font-medium">
+                          Clear All
+                        </span>
                       </div>
-                      <p className={navbarShortcutStyle}>
+                      <span className={navbarShortcutStyle}>
                         Ctrl + Alt + R
-                      </p>
+                      </span>
                     </div>
-                  </div>
+                  </button>
                 </div>
               </div>
             </Popover.Panel>

@@ -112,7 +112,7 @@ export const Results: React.FC<ResultsProps> = ({
         axios
           .post(
             'http://127.0.0.1:8001/get_results_matrix?file_id=' +
-              selectedProject?.simulation?.resultS3,
+            selectedProject?.simulation?.resultS3,
             {
               fileId: selectedProject?.simulation?.resultS3,
               port_index: 0,
@@ -128,7 +128,7 @@ export const Results: React.FC<ResultsProps> = ({
         axios
           .post(
             'http://127.0.0.1:8001/get_results_electric_fields?file_id=' +
-              selectedProject.simulation.resultS3,
+            selectedProject.simulation.resultS3,
             {
               fileId: selectedProject.simulation.resultS3,
               freq_index: 1,
@@ -209,13 +209,16 @@ export const Results: React.FC<ResultsProps> = ({
   }, []);
 
   function randomColours(quan: number) {
+    const mainColors = [
+      '#10B981', // Green
+      '#3B82F6', // Blue
+      '#8B5CF6', // Purple
+      '#EF4444', // Red
+      '#14B8A6', // Teal
+    ];
     let colours = [];
     for (let i = 0; i < quan; i++) {
-      colours.push(
-        `rgb(${Math.round(Math.random() * 255)}, ${Math.round(
-          Math.random() * 255,
-        )}, ${Math.round(Math.random() * 255)})`,
-      );
+      colours.push(mainColors[i % mainColors.length]);
     }
     return colours;
   }
@@ -224,239 +227,163 @@ export const Results: React.FC<ResultsProps> = ({
     <div className="flex">
       <div className="w-[6%]">
         {spinnerSolverResults && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4 bg-black/40 backdrop-blur-md p-6 rounded-2xl shadow-2xl border border-white/10">
             {solverStatus === 'ready' ? (
               <>
-                <span className="text-xl">Loading Results</span>
-                <ImSpinner className={`animate-spin w-10 h-10 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
+                <span className="text-xl font-bold text-white">Loading Results</span>
+                <ImSpinner className="animate-spin w-10 h-10 text-blue-500" />
               </>
             ) : (
-              <span className="text-xl">Start Solver to load results.</span>
+              <span className="text-xl font-bold text-white">Start Solver to load results.</span>
             )}
           </div>
         )}
-        <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
-          <div
-            className={`p-2 tooltip rounded-t tooltip-right ${
-              selectedTabLeftPanel === resultsLeftPanelTitle.first
-                ? `${
-                    theme === 'light'
-                      ? 'text-white bg-primaryColor'
-                      : 'text-textColor bg-secondaryColorDark'
-                  }`
-                : `${
-                    theme === 'light'
-                      ? 'text-primaryColor bg-white'
-                      : 'text-textColorDark bg-bgColorDark2'
-                  }`
-            }`}
-            data-tip="Results"
-            onClick={() => {
-              if (selectedTabLeftPanel === resultsLeftPanelTitle.first) {
-                setSelectedTabLeftPanel(undefined);
-              } else {
-                setSelectedTabLeftPanel(resultsLeftPanelTitle.first);
-                setEmergencyCommand(false);
-              }
-            }}
-          >
-            <AiOutlineBarChart style={{ width: '25px', height: '25px' }} />
-          </div>
-          <button
-            disabled={
-              !selectedProject?.simulation ||
-              selectedProject.simulation.status === 'Running' ||
-              selectedProject.simulation.simulationType === "Electric Fields"
-            }
-            className={`p-2 tooltip tooltip-right relative z-10 disabled:opacity-40 ${
-              theme === 'light'
-                ? 'bg-white text-textColor'
-                : 'bg-bgColorDark2 text-textColorDark'
-            }`}
-            data-tip="Export CSV"
-            onClick={() => {
-              const zip = new JSZip();
-              graphDataToExport.map((chartData) => {
-                const folder = zip.folder(chartData.representedFunction);
-                chartData.data.datasets.forEach((ds) => {
-                  let results = [
-                    ['Frequency', chartData.representedFunction],
-                    ...chartData.data.labels.map((f, index) => [
-                      f,
-                      ds.data[index],
-                    ]),
-                  ]
-                    .map((e) => e.join(','))
-                    .join('\n');
-                  const blob = new Blob([results]);
-                  folder?.file(
-                    ds.label + '_' + chartData.representedFunction + '.csv',
-                    blob,
+        <div className="absolute left-[2%] top-0 flex flex-col items-center">
+          <div className="flex flex-col gap-0 items-center">
+            <div
+              className={`p-3 tooltip tooltip-right rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 cursor-pointer ${selectedTabLeftPanel === resultsLeftPanelTitle.first
+                ? (theme === 'light' ? 'bg-blue-500 text-white shadow-blue-500/30' : 'bg-blue-600 text-white shadow-blue-600/30')
+                : (theme === 'light' ? 'bg-white/80 text-blue-600 hover:bg-white hover:text-blue-500' : 'bg-black/40 text-blue-400 hover:bg-black/60 hover:text-blue-300 border border-white/10')
+                }`}
+              data-tip="Results"
+              onClick={() => {
+                if (selectedTabLeftPanel === resultsLeftPanelTitle.first) {
+                  setSelectedTabLeftPanel(undefined);
+                } else {
+                  setSelectedTabLeftPanel(resultsLeftPanelTitle.first);
+                  setEmergencyCommand(false);
+                }
+              }}
+            >
+              <AiOutlineBarChart size={24} />
+            </div>
+
+            <div className={`flex flex-col gap-2 mt-2`}>
+              <button
+                disabled={
+                  !selectedProject?.simulation ||
+                  selectedProject.simulation.status === 'Running' ||
+                  selectedProject.simulation.simulationType === "Electric Fields"
+                }
+                className={`p-3 rounded-xl transition-all duration-300 ${theme === 'light'
+                  ? 'bg-white/80 text-gray-700 hover:bg-white hover:text-green-600 shadow-sm'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-green-400'
+                  } disabled:opacity-40 disabled:cursor-not-allowed`}
+                data-tip="Export CSV"
+                onClick={() => {
+                  const zip = new JSZip();
+                  graphDataToExport.map((chartData) => {
+                    const folder = zip.folder(chartData.representedFunction);
+                    chartData.data.datasets.forEach((ds) => {
+                      let results = [
+                        ['Frequency', chartData.representedFunction],
+                        ...chartData.data.labels.map((f, index) => [
+                          f,
+                          ds.data[index],
+                        ]),
+                      ]
+                        .map((e) => e.join(','))
+                        .join('\n');
+                      const blob = new Blob([results]);
+                      folder?.file(
+                        ds.label + '_' + chartData.representedFunction + '.csv',
+                        blob,
+                      );
+                    });
+                  });
+                  zip.generateAsync({ type: 'blob' }).then(function (content) {
+                    saveAs(content, 'graphs_data');
+                  });
+                }}
+              >
+                <BsFiletypeCsv size={24} />
+              </button>
+              <button
+                disabled={
+                  !selectedProject?.simulation ||
+                  selectedProject.simulation.status === 'Running' ||
+                  selectedProject.simulation.simulationType === "Electric Fields"
+                }
+                className={`p-3 rounded-xl transition-all duration-300 ${theme === 'light'
+                  ? 'bg-white/80 text-gray-700 hover:bg-white hover:text-purple-600 shadow-sm'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-purple-400'
+                  } disabled:opacity-40 disabled:cursor-not-allowed`}
+                data-tip="Export Touchstone"
+                onClick={() => {
+                  if (selectedProject) {
+                    window.electron.ipcRenderer.sendMessage('exportTouchstone', [
+                      selectedProject.frequencies,
+                      matrixS,
+                      selectedProject.scatteringValue,
+                      selectedProject.ports.filter((p) => p.category === 'port')
+                        .length,
+                      selectedProject.name,
+                    ]);
+                    toast.success(
+                      `file ${selectedProject?.name}.s${selectedProject.ports.filter((p) => p.category === 'port')
+                        .length
+                      }p saved on Downloads folder!`,
+                      { duration: 10000 } as ToastOptions,
+                    );
+                  }
+                }}
+              >
+                <TbFileExport size={24} />
+              </button>
+              <button
+                disabled={
+                  selectedProject &&
+                  selectedProject.simulation &&
+                  selectedProject.simulation.status === 'Running' ||
+                  (process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)
+                }
+                className={`p-3 tooltip tooltip-right rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 relative disabled:opacity-40 disabled:cursor-not-allowed ${theme === 'light'
+                  ? 'bg-white/80 text-gray-700 hover:bg-white hover:text-green-600 hover:shadow-green-500/20'
+                  : 'bg-black/40 text-gray-300 border border-white/10 hover:bg-black/60 hover:text-green-400 hover:border-green-500/30'
+                  }`}
+                data-tip="Clone Project"
+                onClick={() => {
+                  setcloning(true);
+                  cloneProject(
+                    selectedProject as Project,
+                    selectedFolder as Folder,
+                    setcloning,
                   );
-                });
-              });
-              zip.generateAsync({ type: 'blob' }).then(function (content) {
-                saveAs(content, 'graphs_data');
-              });
-            }}
-          >
-            <BsFiletypeCsv style={{ width: '25px', height: '25px' }} />
-          </button>
-          <button
-            disabled={
-              !selectedProject?.simulation ||
-              selectedProject.simulation.status === 'Running' ||
-              selectedProject.simulation.simulationType === "Electric Fields"
-            }
-            className={`p-2 tooltip rounded-b tooltip-right relative z-10 disabled:opacity-40 ${
-              theme === 'light'
-                ? 'bg-white text-textColor'
-                : 'bg-bgColorDark2 text-textColorDark'
-            }`}
-            data-tip="Export Touchstone"
-            onClick={() => {
-              if (selectedProject) {
-                window.electron.ipcRenderer.sendMessage('exportTouchstone', [
-                  selectedProject.frequencies,
-                  matrixS,
-                  selectedProject.scatteringValue,
-                  selectedProject.ports.filter((p) => p.category === 'port')
-                    .length,
-                  selectedProject.name,
-                ]);
-                toast.success(
-                  `file ${selectedProject?.name}.s${
-                    selectedProject.ports.filter((p) => p.category === 'port')
-                      .length
-                  }p saved on Downloads folder!`,
-                  { duration: 10000 } as ToastOptions,
-                );
-              }
-            }}
-          >
-            <TbFileExport style={{ width: '25px', height: '25px' }} />
-          </button>
+                }}
+              >
+                <GrClone size={24} className={`${cloning ? 'opacity-20' : 'opacity-100'}`} />
+                {cloning && (
+                  <ImSpinner className={`absolute inset-0 m-auto animate-spin w-5 h-5 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
+                )}
+              </button>
+            </div>
+          </div>
         </div>
+
         {selectedTabLeftPanel && (
-          <>
-            <div
-              className={`${
-                theme === 'light'
-                  ? 'bg-white text-textColor'
-                  : 'bg-bgColorDark2 text-textColorDark'
-              } p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]`}
-            >
-              {selectedTabLeftPanel === resultsLeftPanelTitle.first && (
-                <ResultsLeftPanelTab
-                  selectedPort={selectedPort ? selectedPort.name : 'undefined'}
-                  setSelectedPort={(portName: string) =>
-                    dispatch(selectPort(portName))
-                  }
-                />
-              )}
-            </div>
-          </>
-        )}
-        {/* {emergencyCommand && (
-          <>
-            <div
-              className={`${
-                theme === 'light'
-                  ? 'bg-white text-textColor'
-                  : 'bg-bgColorDark2 text-textColorDark'
-              } p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[18%]`}
-            >
-              <div className="flex flex-col items-center gap-4">
-                <span>
-                  Use this command only if you are facing some issues with
-                  simulation!
-                </span>
-                <button
-                  className={`button w-full buttonPrimary ${
-                    theme === 'light'
-                      ? ''
-                      : 'bg-secondaryColorDark text-textColor'
-                  } text-center mt-4 mb-4`}
-                  onClick={() =>
-                    setResultsFromS3(selectedProject as Project, dispatch)
-                  }
-                >
-                  Force Retrive results
-                </button>
-              </div>
-            </div>
-          </>
-        )} */}
-        <div
-          className={`absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
-            theme === 'light'
-              ? 'bg-white text-textColor'
-              : 'bg-bgColorDark2 text-textColorDark'
-          }`}
-        >
-          <button
-            disabled={
-              selectedProject &&
-              selectedProject.simulation &&
-              selectedProject.simulation.status === 'Running' ||
-              (process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)
-            }
-            className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
-            data-tip="Clone Project"
-            onClick={() => {
-              setcloning(true);
-              cloneProject(
-                selectedProject as Project,
-                selectedFolder as Folder,
-                setcloning,
-              );
-            }}
+          <div
+            className={`absolute z-50 left-[6%] xl:left-[5%] top-0 w-[300px] rounded-2xl p-4 shadow-2xl backdrop-blur-md border transition-all duration-300 max-h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar ${theme === 'light'
+              ? 'bg-white/90 border-white/40 text-gray-800'
+              : 'bg-black/60 border-white/10 text-gray-200'
+              }`}
           >
-            <GrClone
-              style={{ width: '25px', height: '25px' }}
-              className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
-            />
-            {cloning && (
-              <ImSpinner className={`absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
+            {selectedTabLeftPanel === resultsLeftPanelTitle.first && (
+              <ResultsLeftPanelTab
+                selectedPort={selectedPort ? selectedPort.name : 'undefined'}
+                setSelectedPort={(portName: string) =>
+                  dispatch(selectPort(portName))
+                }
+              />
             )}
-          </button>
-        </div>
-        {/* <div
-          className={`absolute left-[2%] top-[370px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
-            emergencyCommand
-              ? theme === 'light'
-                ? 'bg-primaryColor'
-                : 'bg-secondaryColorDark'
-              : theme === 'light'
-              ? 'bg-white'
-              : 'bg-bgColorDark2'
-          }`}
-        >
-          <button
-            disabled={
-              selectedProject &&
-              selectedProject.simulation &&
-              selectedProject.simulation.status === 'Running'
-            }
-            className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
-            data-tip="Emergency Command"
-            onClick={() => {
-              setEmergencyCommand(!emergencyCommand);
-              setSelectedTabLeftPanel(undefined);
-            }}
-          >
-            <RiAlarmWarningFill
-              style={{ width: '25px', height: '25px' }}
-              color={emergencyCommand ? 'white' : 'red'}
-              className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
-            />
-          </button>
-        </div> */}
+          </div>
+        )}
+
+
       </div>
       <div className="w-[90%]">
         {selectedProject &&
-        selectedProject.simulation &&
-        (resultsView.length > 0 || solverResults.length > 0) ? (
+          selectedProject.simulation &&
+          (resultsView.length > 0 || solverResults.length > 0) ? (
           <>
             {selectedProject.simulation.simulationType === 'Matrix' ? (
               <>

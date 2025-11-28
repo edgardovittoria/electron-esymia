@@ -151,7 +151,7 @@ export const Mesher: React.FC<MesherProps> = ({
       if (selectedProject?.meshData.type === 'Ris') {
         loadMeshData(process.env.MESHER_RIS_MODE === 'backend');
       } else {
-        if(mesherStatus === "ready"){
+        if (mesherStatus === "ready") {
           loadMeshData(true);
         }
       }
@@ -189,8 +189,8 @@ export const Mesher: React.FC<MesherProps> = ({
       setVoxelsPainted(numberOfCells);
       setTotalVoxels(
         (externalGrids as ExternalGridsObject).n_cells.n_cells_x *
-          (externalGrids as ExternalGridsObject).n_cells.n_cells_y *
-          (externalGrids as ExternalGridsObject).n_cells.n_cells_z,
+        (externalGrids as ExternalGridsObject).n_cells.n_cells_y *
+        (externalGrids as ExternalGridsObject).n_cells.n_cells_z,
       );
     }
   }, [externalGrids]);
@@ -251,13 +251,7 @@ export const Mesher: React.FC<MesherProps> = ({
             : undefined
         }
       />
-      <div
-        className={`absolute left-[2%] top-[230px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
-          theme === 'light'
-            ? 'bg-white text-textColor'
-            : 'bg-bgColorDark2 text-textColorDark'
-        }`}
-      >
+      <div className="absolute left-[2%] top-[60px] flex flex-col items-center gap-0">
         <button
           disabled={
             selectedProject &&
@@ -265,7 +259,10 @@ export const Mesher: React.FC<MesherProps> = ({
             selectedProject.simulation.status === 'Running' ||
             (process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)
           }
-          className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40`}
+          className={`p-3 tooltip tooltip-right rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 relative disabled:opacity-40 disabled:cursor-not-allowed ${theme === 'light'
+            ? 'bg-white/80 text-gray-700 hover:bg-white hover:text-green-600 hover:shadow-green-500/20'
+            : 'bg-black/40 text-gray-300 border border-white/10 hover:bg-black/60 hover:text-green-400 hover:border-green-500/30'
+            }`}
           data-tip="Clone Project"
           onClick={() => {
             setcloning(true);
@@ -276,19 +273,18 @@ export const Mesher: React.FC<MesherProps> = ({
             );
           }}
         >
-          <GrClone
-            style={{ width: '25px', height: '25px' }}
-            className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
-          />
+          <GrClone size={24} className={`${cloning ? 'opacity-20' : 'opacity-100'}`} />
           {cloning && (
-            <ImSpinner className={`absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
+            <ImSpinner className={`absolute inset-0 m-auto animate-spin w-5 h-5 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
           )}
         </button>
       </div>
-      <div className="absolute left-1/2 -translate-x-1/2 gap-2 top-[180px] flex flex-row">
+      <div className="absolute left-1/2 -translate-x-1/2 gap-4 top-4 flex flex-row items-center p-2 rounded-2xl backdrop-blur-md border transition-all duration-300 shadow-lg bg-white/10 border-white/20">
         <ResetFocusButton toggleResetFocus={toggleResetFocus} />
+        <div className={`w-px h-8 ${theme === 'light' ? 'bg-gray-300/50' : 'bg-white/10'}`} />
         <OriginaProportionsButton />
         <AlteredProportionsButton threshold={3} />
+        <div className={`w-px h-8 ${theme === 'light' ? 'bg-gray-300/50' : 'bg-white/10'}`} />
         <NormalMeshVisualizationButton />
         <LightMeshVisualizationButton />
       </div>
@@ -316,28 +312,25 @@ const NormalMeshVisualizationButton: FC<{}> = () => {
   const [spinner, setSpinner] = useState<boolean>(false);
   return (
     <div
-      className="tooltip"
+      className="tooltip tooltip-bottom"
       data-tip={
         'Normal mesh visualization. It is the most detaild modality, but it can become heavy for big meshes.'
       }
     >
       <button
-        className={`rounded p-2 ${
-          meshVisualization !== 'normal'
-            ? `${
-                theme === 'light'
-                  ? 'bg-white text-green-300 hover:text-secondaryColor'
-                  : 'bg-bgColorDark2 text-secondaryColorDark'
-              }`
-            : `${
-                theme === 'light'
-                  ? 'bg-green-300 text-secondaryColor'
-                  : 'bg-secondaryColorDark text-secondaryColor'
-              }`
-        }`}
+        className={`p-3 rounded-xl transition-all duration-300 ${meshVisualization !== 'normal'
+          ? `${theme === 'light'
+            ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
+            : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
+          }`
+          : `${theme === 'light'
+            ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
+            : 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+          }`
+          }`}
         onClick={() => dispatch(setMeshVisualization('normal'))}
       >
-        <LiaWeightHangingSolid className="h-5 w-5" />
+        <LiaWeightHangingSolid className="h-6 w-6" />
       </button>
     </div>
   );
@@ -349,28 +342,25 @@ const LightMeshVisualizationButton: FC<{}> = () => {
   const theme = useSelector(ThemeSelector);
   return (
     <div
-      className="tooltip"
+      className="tooltip tooltip-bottom"
       data-tip={
         'Light mesh visualization. It is suggested for very big meshes, in order to keep a seamless navigation.'
       }
     >
       <button
-        className={`rounded p-2 ${
-          meshVisualization !== 'light'
-            ? `${
-                theme === 'light'
-                  ? 'bg-white text-green-300 hover:text-secondaryColor'
-                  : 'bg-bgColorDark2 text-secondaryColorDark'
-              }`
-            : `${
-                theme === 'light'
-                  ? 'bg-green-300 text-secondaryColor'
-                  : 'bg-secondaryColorDark text-secondaryColor'
-              }`
-        }`}
+        className={`p-3 rounded-xl transition-all duration-300 ${meshVisualization !== 'light'
+          ? `${theme === 'light'
+            ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
+            : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
+          }`
+          : `${theme === 'light'
+            ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
+            : 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+          }`
+          }`}
         onClick={() => dispatch(setMeshVisualization('light'))}
       >
-        <LiaFeatherSolid className="h-5 w-5" />
+        <LiaFeatherSolid className="h-6 w-6" />
       </button>
     </div>
   );

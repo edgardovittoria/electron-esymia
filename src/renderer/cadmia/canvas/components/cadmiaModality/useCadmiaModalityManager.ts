@@ -7,6 +7,8 @@ import {
 import {
   multipleSelectionEntitiesKeysSelector,
   toggleEntitySelectionForMultipleSelection,
+  selectAllEntitiesForMultipleSelection,
+  resetMultipleSelectionEntities,
 } from '../miscToolbar/miscToolbarSlice';
 import { useEffect } from 'react';
 import {
@@ -132,18 +134,32 @@ export const useCadmiaModalityManager = () => {
           return multipleSelectionEntityKeys.includes(keyComponent);
         }
       },
+      selectAll: () => {
+        if (modality === 'MultipleSelection') {
+          const keys = components.map((c) => c.keyComponent);
+          dispatch(selectAllEntitiesForMultipleSelection(keys));
+          dispatch(setComponentsOpacity({ keys, opacity: 1 }));
+        }
+      },
+      unselectAll: () => {
+        if (modality === 'MultipleSelection') {
+          dispatch(resetMultipleSelectionEntities());
+          const keys = components.map((c) => c.keyComponent);
+          dispatch(setComponentsOpacity({ keys, opacity: 0.3 }));
+        }
+      },
     },
     deleteButton: {
       messages: (keyComponentToDelete: number) => {
         return modality !== 'MultipleSelection'
           ? {
-              popup: `Sei sicuro di voler eliminare il componente ${components.filter((c) => c.keyComponent === keyComponentToDelete)[0].name} ?`,
-              buttonLabel: `Delete ${components.filter((c) => c.keyComponent === keyComponentToDelete)[0].name}`,
-            }
+            popup: `Sei sicuro di voler eliminare il componente ${components.filter((c) => c.keyComponent === keyComponentToDelete)[0].name} ?`,
+            buttonLabel: `Delete ${components.filter((c) => c.keyComponent === keyComponentToDelete)[0].name}`,
+          }
           : {
-              popup: `Sei sicuro di voler eliminare i componenti selezionati?`,
-              buttonLabel: 'Delete components',
-            };
+            popup: `Sei sicuro di voler eliminare i componenti selezionati?`,
+            buttonLabel: 'Delete components',
+          };
       },
       onClickAction: (keyComponentToDelete: number) => {
         if (modality !== 'MultipleSelection') {
@@ -157,7 +173,7 @@ export const useCadmiaModalityManager = () => {
       },
       visibility: (keyComponent: number) =>
         modality === 'MultipleSelection' &&
-        !multipleSelectionEntityKeys.includes(keyComponent)
+          !multipleSelectionEntityKeys.includes(keyComponent)
           ? false
           : true,
     },
@@ -165,24 +181,24 @@ export const useCadmiaModalityManager = () => {
       setMaterial: (material: Material) =>
         modality !== 'MultipleSelection'
           ? dispatch(
-              setComponentMaterial({
-                key: selectedComponent.keyComponent,
-                material: material,
-              }),
-            )
+            setComponentMaterial({
+              key: selectedComponent.keyComponent,
+              material: material,
+            }),
+          )
           : multipleSelectionEntityKeys.forEach((key) =>
-              dispatch(setComponentMaterial({ key: key, material: material })),
-            ),
+            dispatch(setComponentMaterial({ key: key, material: material })),
+          ),
       unsetMaterial: () =>
         modality !== 'MultipleSelection'
           ? dispatch(
-              removeComponentMaterial({
-                keyComponent: selectedComponent.keyComponent,
-              }),
-            )
+            removeComponentMaterial({
+              keyComponent: selectedComponent.keyComponent,
+            }),
+          )
           : multipleSelectionEntityKeys.forEach((key) =>
-              dispatch(removeComponentMaterial({ keyComponent: key })),
-            ),
+            dispatch(removeComponentMaterial({ keyComponent: key })),
+          ),
     },
   };
 
@@ -198,8 +214,8 @@ export const useCadmiaModalityManager = () => {
       if (modality === 'BinaryOperation' || modality === 'MultipleSelection') {
         dispatch(setComponentsOpacity({ keys: componentKeys, opacity: 0.3 }));
       } else if (modality === 'NormalSelection') {
-        dispatch(setComponentsOpacity({ keys: componentKeys, opacity: 0.3,}));
-        (selectedComponent) && dispatch(setComponentsOpacity({ keys: [selectedComponent.keyComponent], opacity: 1,}));
+        dispatch(setComponentsOpacity({ keys: componentKeys, opacity: 0.3, }));
+        (selectedComponent) && dispatch(setComponentsOpacity({ keys: [selectedComponent.keyComponent], opacity: 1, }));
       }
     }, [modality]);
   };

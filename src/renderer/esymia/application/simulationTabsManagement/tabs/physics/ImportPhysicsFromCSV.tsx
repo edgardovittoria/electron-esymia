@@ -1,9 +1,7 @@
-import { useState, CSSProperties, FC } from 'react';
+import { useState, FC } from 'react';
 
 import {
   useCSVReader,
-  lightenDarkenColor,
-  formatFileSize,
 } from 'react-papaparse';
 import { Vector3 } from 'three';
 import {
@@ -25,91 +23,12 @@ import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 
-const GREY = '#CCC';
-const GREY_LIGHT = 'rgba(255, 255, 255, 0.4)';
-const DEFAULT_REMOVE_HOVER_COLOR = '#A01919';
-const REMOVE_HOVER_COLOR_LIGHT = lightenDarkenColor(
-  DEFAULT_REMOVE_HOVER_COLOR,
-  40,
-);
-const GREY_DIM = '#686868';
-
-const styles = {
-  zone: {
-    alignItems: 'center',
-    borderRadius: 5,
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    justifyContent: 'center',
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 6,
-    paddingBottom: 6,
-    background: 'white',
-  } as CSSProperties,
-  file: {
-    background: 'linear-gradient(to bottom, #EEE, #DDD)',
-    borderRadius: 10,
-    display: 'flex',
-    height: 100,
-    width: '100%',
-    position: 'relative',
-    zIndex: 10,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  } as CSSProperties,
-  info: {
-    alignItems: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-    marginLeft: 10,
-    marginRight: 10,
-  } as CSSProperties,
-  size: {
-    marginBottom: '0.5em',
-    justifyContent: 'center',
-    display: 'flex',
-    fontSize: 12,
-  } as CSSProperties,
-  name: {
-    backgroundColor: GREY_LIGHT,
-    borderRadius: 3,
-    padding: 9,
-    fontSize: 10,
-    marginBottom: '0.5em',
-  } as CSSProperties,
-  progressBar: {
-    bottom: 14,
-    position: 'absolute',
-    width: '100%',
-    paddingLeft: 10,
-    paddingRight: 10,
-  } as CSSProperties,
-  zoneHover: {
-    borderColor: GREY_DIM,
-  } as CSSProperties,
-  default: {
-    borderColor: GREY,
-  } as CSSProperties,
-  remove: {
-    height: 23,
-    position: 'absolute',
-    right: 6,
-    top: 6,
-    width: 23,
-  } as CSSProperties
-};
-
 export const LumpedImportFromCSV: FC = () => {
   const { CSVReader } = useCSVReader();
-  const [zoneHover, setZoneHover] = useState(false);
-  const [removeHoverColor, setRemoveHoverColor] = useState(
-    DEFAULT_REMOVE_HOVER_COLOR,
-  );
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
-  const { execQuery2 } = useDynamoDBQuery()
+  const { execQuery2 } = useDynamoDBQuery();
+  const theme = useSelector(ThemeSelector);
 
   type CSVDataRow = {
     name?: string;
@@ -143,8 +62,6 @@ export const LumpedImportFromCSV: FC = () => {
     return true;
   };
 
-  const theme = useSelector(ThemeSelector)
-
   return (
     <CSVReader
       config={{ header: true }}
@@ -154,7 +71,7 @@ export const LumpedImportFromCSV: FC = () => {
           let ports: (Port | Probe)[] = [...selectedProject.ports]
           data.data.forEach((pdata: CSVDataRow) => {
             console.log(pdata)
-            if(isValidThis(pdata)){
+            if (isValidThis(pdata)) {
               let port = getDefaultLumped(
                 pdata.name !== undefined
                   ? pdata.name
@@ -181,91 +98,36 @@ export const LumpedImportFromCSV: FC = () => {
           });
           savePortsOnS3(ports, selectedProject, dispatch, execQuery2)
         }
-        setZoneHover(false);
-      }}
-      onDragOver={(event: DragEvent) => {
-        event.preventDefault();
-        setZoneHover(true);
-      }}
-      onDragLeave={(event: DragEvent) => {
-        event.preventDefault();
-        setZoneHover(false);
       }}
       noDrag
     >
       {({
         getRootProps,
         acceptedFile,
-        ProgressBar,
-        getRemoveFileProps,
-        Remove,
       }: any) => (
-        <>
-          <div
-            {...getRootProps()}
-            className={`hover:cursor-pointer h-8 border ${theme === 'light' ? 'bg-white text-textColor border-textColor' : 'bg-bgColorDark2 text-textColorDark border-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
-            style={Object.assign(
-              {},
-              styles.zone,
-              zoneHover && styles.zoneHover,
-            )}
-          >
-            {acceptedFile ? (
-              <>
-                {/* <div style={styles.file}>
-                  <div style={styles.info}>
-                    <span style={styles.size}>
-                      {formatFileSize(acceptedFile.size)}
-                    </span>
-                    <span style={styles.name}>{acceptedFile.name}</span>
-                  </div>
-                  <div style={styles.progressBar}>
-                    <ProgressBar />
-                  </div>
-                  <div
-                    {...getRemoveFileProps()}
-                    style={styles.remove}
-                    onMouseOver={(event: Event) => {
-                      event.preventDefault();
-                      setRemoveHoverColor(REMOVE_HOVER_COLOR_LIGHT);
-                    }}
-                    onMouseOut={(event: Event) => {
-                      event.preventDefault();
-                      setRemoveHoverColor(DEFAULT_REMOVE_HOVER_COLOR);
-                    }}
-                  >
-                    <Remove color={removeHoverColor} />
-                  </div>
-                </div> */}
-                <div className='flex flex-row gap-2 items-center'>
-                <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
-                <span className='text-sm'>Import Lumped</span>
-              </div>
-              </>
-            ) : (
-              <div className='flex flex-row gap-2 items-center'>
-                <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
-                <span className='text-sm'>Import Lumped</span>
-              </div>
-
-            )}
-          </div>
-        </>
+        <div
+          {...getRootProps()}
+          className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl border transition-all duration-300 cursor-pointer ${theme === 'light'
+              ? 'bg-white/80 border-gray-200 text-gray-700 hover:bg-white hover:border-blue-500 hover:text-blue-600 hover:shadow-md'
+              : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-blue-400 hover:text-blue-400'
+            } ${selectedProject?.simulation?.resultS3 ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <BsFiletypeCsv size={20} />
+          <span className="text-sm font-medium">
+            {acceptedFile ? acceptedFile.name : 'Import Lumped'}
+          </span>
+        </div>
       )}
     </CSVReader>
   );
 };
 
-
-export const PortImportFromCSV:FC = () => {
+export const PortImportFromCSV: FC = () => {
   const { CSVReader } = useCSVReader();
-  const [zoneHover, setZoneHover] = useState(false);
-  const [removeHoverColor, setRemoveHoverColor] = useState(
-    DEFAULT_REMOVE_HOVER_COLOR,
-  );
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
-  const { execQuery2 } = useDynamoDBQuery()
+  const { execQuery2 } = useDynamoDBQuery();
+  const theme = useSelector(ThemeSelector);
 
   type CSVDataRow = {
     name?: string;
@@ -291,8 +153,6 @@ export const PortImportFromCSV:FC = () => {
     }
     return true;
   };
-
-  const theme = useSelector(ThemeSelector)
 
   return (
     <CSVReader
@@ -322,7 +182,7 @@ export const PortImportFromCSV:FC = () => {
                 parseFloat(pdata.z2),
               ];
               dispatch(addPorts(port));
-              if(pdata.scattering !== undefined && scatteringNotYetSet){
+              if (pdata.scattering !== undefined && scatteringNotYetSet) {
                 dispatch(setScatteringValue(parseFloat(pdata.scattering)))
                 scatteringNotYetSet = false
               }
@@ -331,90 +191,36 @@ export const PortImportFromCSV:FC = () => {
           });
           savePortsOnS3(ports, selectedProject, dispatch, execQuery2)
         }
-        setZoneHover(false);
-      }}
-      onDragOver={(event: DragEvent) => {
-        event.preventDefault();
-        setZoneHover(true);
-      }}
-      onDragLeave={(event: DragEvent) => {
-        event.preventDefault();
-        setZoneHover(false);
       }}
       noDrag
     >
       {({
         getRootProps,
         acceptedFile,
-        ProgressBar,
-        getRemoveFileProps,
-        Remove,
       }: any) => (
-        <>
-          <div
-            {...getRootProps()}
-            className={`hover:cursor-pointer h-8 border ${theme === 'light' ? 'bg-white text-textColor border-textColor' : 'bg-bgColorDark2 text-textColorDark border-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
-            style={Object.assign(
-              {},
-              styles.zone,
-              zoneHover && styles.zoneHover,
-            )}
-          >
-            {acceptedFile ? (
-              <>
-                {/* <div style={styles.file}>
-                  <div style={styles.info}>
-                    <span style={styles.size}>
-                      {formatFileSize(acceptedFile.size)}
-                    </span>
-                    <span style={styles.name}>{acceptedFile.name}</span>
-                  </div>
-                  <div style={styles.progressBar}>
-                    <ProgressBar />
-                  </div>
-                  <div
-                    {...getRemoveFileProps()}
-                    style={styles.remove}
-                    onMouseOver={(event: Event) => {
-                      event.preventDefault();
-                      setRemoveHoverColor(REMOVE_HOVER_COLOR_LIGHT);
-                    }}
-                    onMouseOut={(event: Event) => {
-                      event.preventDefault();
-                      setRemoveHoverColor(DEFAULT_REMOVE_HOVER_COLOR);
-                    }}
-                  >
-                    <Remove color={removeHoverColor} />
-                  </div>
-                </div> */}
-                <div className='flex flex-row gap-2 items-center'>
-              <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
-              <span className='text-sm'>Import Ports</span>
-            </div>
-              </>
-            ) : (
-              <div className='flex flex-row gap-2 items-center'>
-              <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
-              <span className='text-sm'>Import Ports</span>
-            </div>
-            )}
-          </div>
-        </>
+        <div
+          {...getRootProps()}
+          className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl border transition-all duration-300 cursor-pointer ${theme === 'light'
+              ? 'bg-white/80 border-gray-200 text-gray-700 hover:bg-white hover:border-blue-500 hover:text-blue-600 hover:shadow-md'
+              : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-blue-400 hover:text-blue-400'
+            } ${selectedProject?.simulation?.resultS3 ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <BsFiletypeCsv size={20} />
+          <span className="text-sm font-medium">
+            {acceptedFile ? acceptedFile.name : 'Import Ports'}
+          </span>
+        </div>
       )}
     </CSVReader>
   );
 };
 
-
-export const FrequenciesImportFromCSV:FC = () => {
+export const FrequenciesImportFromCSV: FC = () => {
   const { CSVReader } = useCSVReader();
-  const [zoneHover, setZoneHover] = useState(false);
-  const [removeHoverColor, setRemoveHoverColor] = useState(
-    DEFAULT_REMOVE_HOVER_COLOR,
-  );
   const selectedProject = useSelector(selectedProjectSelector);
   const dispatch = useDispatch();
-  const { execQuery2 } = useDynamoDBQuery()
+  const { execQuery2 } = useDynamoDBQuery();
+  const theme = useSelector(ThemeSelector);
 
   type CSVDataRow = {
     Frequencies: string
@@ -429,8 +235,6 @@ export const FrequenciesImportFromCSV:FC = () => {
     return true;
   };
 
-  const theme = useSelector(ThemeSelector)
-
   return (
     <CSVReader
       config={{ header: true }}
@@ -443,7 +247,7 @@ export const FrequenciesImportFromCSV:FC = () => {
               frequencies.push(parseFloat(pdata.Frequencies))
             }
           });
-          if(frequencies.length > 0){
+          if (frequencies.length > 0) {
             dispatch(setFrequencies(frequencies))
             execQuery2(
               createOrUpdateProjectInDynamoDB,
@@ -452,78 +256,28 @@ export const FrequenciesImportFromCSV:FC = () => {
                 frequencies: frequencies
               },
               dispatch,
-            ).then(() => {});
+            ).then(() => { });
           }
         }
-        setZoneHover(false);
-      }}
-      onDragOver={(event: DragEvent) => {
-        event.preventDefault();
-        setZoneHover(true);
-      }}
-      onDragLeave={(event: DragEvent) => {
-        event.preventDefault();
-        setZoneHover(false);
       }}
       noDrag
     >
       {({
         getRootProps,
         acceptedFile,
-        ProgressBar,
-        getRemoveFileProps,
-        Remove,
       }: any) => (
-        <>
-          <div
-            {...getRootProps()}
-            className={`hover:cursor-pointer hover:opacity-85 border h-8 ${theme === 'light' ? 'bg-white text-textColor border-textColor' : 'bg-bgColorDark2 text-textColorDark border-textColorDark'} ${selectedProject?.simulation?.resultS3 && 'opacity-40'}`}
-            style={Object.assign(
-              {},
-              styles.zone,
-              zoneHover && styles.zoneHover,
-            )}
-          >
-            {acceptedFile ? (
-              <>
-                {/* <div style={styles.file}>
-                  <div style={styles.info}>
-                    <span style={styles.size}>
-                      {formatFileSize(acceptedFile.size)}
-                    </span>
-                    <span style={styles.name}>{acceptedFile.name}</span>
-                  </div>
-                  <div style={styles.progressBar}>
-                    <ProgressBar />
-                  </div>
-                  <div
-                    {...getRemoveFileProps()}
-                    style={styles.remove}
-                    onMouseOver={(event: Event) => {
-                      event.preventDefault();
-                      setRemoveHoverColor(REMOVE_HOVER_COLOR_LIGHT);
-                    }}
-                    onMouseOut={(event: Event) => {
-                      event.preventDefault();
-                      setRemoveHoverColor(DEFAULT_REMOVE_HOVER_COLOR);
-                    }}
-                  >
-                    <Remove color={removeHoverColor} />
-                  </div>
-                </div> */}
-                <div className='flex flex-row gap-2 items-center'>
-              <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
-              <span className='text-sm'>Import Frequencies</span>
-            </div>
-              </>
-            ) : (
-              <div className='flex flex-row gap-2 items-center'>
-              <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
-              <span className='text-sm'>Import Frequencies</span>
-            </div>
-            )}
-          </div>
-        </>
+        <div
+          {...getRootProps()}
+          className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl border transition-all duration-300 cursor-pointer ${theme === 'light'
+              ? 'bg-white/80 border-gray-200 text-gray-700 hover:bg-white hover:border-blue-500 hover:text-blue-600 hover:shadow-md'
+              : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-blue-400 hover:text-blue-400'
+            } ${selectedProject?.simulation?.resultS3 ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <BsFiletypeCsv size={20} />
+          <span className="text-sm font-medium">
+            {acceptedFile ? acceptedFile.name : 'Import Frequencies'}
+          </span>
+        </div>
       )}
     </CSVReader>
   );

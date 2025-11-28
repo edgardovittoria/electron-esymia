@@ -5,46 +5,23 @@ import { SphereGeometryAttributes } from "../../../../../../cad_library";
 
 export const SphereGeometryParams: FC<GeometryParamsGeneralProps> = ({ entity, updateParams }) => {
     return (
-        <>
-            <div key="radius" className="flex">
-                    <span className="text-black w-[40%] text-left text-xs">radius</span>
-                    <div className="flex mb-[5px]">
-                        <input key="radius"
-                            type="number"
-                            step="0.1"
-                            className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-xs"
-                            autoComplete="off"
-                            value={(entity.geometryAttributes as SphereGeometryAttributes).radius}
-                            onChange={(e) => updateParams({ ...entity.geometryAttributes, radius: parseFloat(e.target.value) || 0 } as SphereGeometryAttributes)}
-                        />
-                    </div>
-            </div>
-            <div key="width_segments" className="flex">
-                    <span className="text-black w-[40%] text-left text-xs">width segments</span>
-                    <div className="flex mb-[5px]">
-                        <input key="width_segments"
-                            type="number"
-                            step="1"
-                            className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-xs"
-                            autoComplete="off"
-                            value={(entity.geometryAttributes as SphereGeometryAttributes).widthSegments}
-                            onChange={(e) => updateParams({ ...entity.geometryAttributes, widthSegments: parseFloat(e.target.value) || 0 } as SphereGeometryAttributes)}
-                        />
-                    </div>
-            </div>
-            <div key="heigth_segments" className="flex">
-                    <span className="text-black w-[40%] text-left text-xs">heigth segments</span>
-                    <div className="flex mb-[5px]">
-                        <input key="heigth_segments"
-                            type="number"
-                            step="1"
-                            className="border border-black rounded shadow px-1 w-[50%] text-black text-left text-xs"
-                            autoComplete="off"
-                            value={(entity.geometryAttributes as SphereGeometryAttributes).heightSegments}
-                            onChange={(e) => updateParams({ ...entity.geometryAttributes, heightSegments: parseFloat(e.target.value) || 0 } as SphereGeometryAttributes)}
-                        />
-                    </div>
-            </div>
-        </>
+        <div className="flex flex-col gap-2">
+            {[
+                { label: 'Radius', value: (entity.geometryAttributes as SphereGeometryAttributes).radius, key: 'radius', step: 0.1 },
+                { label: 'Width Segments', value: (entity.geometryAttributes as SphereGeometryAttributes).widthSegments, key: 'widthSegments', step: 1 },
+                { label: 'Height Segments', value: (entity.geometryAttributes as SphereGeometryAttributes).heightSegments, key: 'heightSegments', step: 1 },
+            ].map((item) => (
+                <div key={item.key} className="flex items-center justify-between">
+                    <span className="text-xs text-gray-700 dark:text-gray-300">{item.label}</span>
+                    <input
+                        type="number"
+                        step={item.step}
+                        className="w-20 bg-white dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-1 py-0.5 text-xs text-center text-gray-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                        value={item.value}
+                        onChange={(e) => updateParams({ ...entity.geometryAttributes, [item.key]: parseFloat(e.target.value) || 0 } as SphereGeometryAttributes)}
+                    />
+                </div>
+            ))}
+        </div>
     )
 }

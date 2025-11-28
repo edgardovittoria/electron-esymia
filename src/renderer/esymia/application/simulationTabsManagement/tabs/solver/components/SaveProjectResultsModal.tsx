@@ -27,7 +27,7 @@ interface SaveProjectResultsModalProps {
 
 export const SaveProjectResultsModal: React.FC<
   SaveProjectResultsModalProps
-> = ({toggleEditInputsSlider}) => {
+> = ({ toggleEditInputsSlider }) => {
   const dispatch = useDispatch();
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
@@ -41,40 +41,39 @@ export const SaveProjectResultsModal: React.FC<
   const { cloneProjectToSaveResults } = useStorageData();
   const [cloning, setcloning] = useState<boolean>(false);
   const removePreviousResults = (selectedProject: Project, dispatch: Dispatch) => {
-                        dispatch(
-                          deleteSimulation(
-                            selectedProject.id as string,
-                          ),
-                        );
-                        dispatch(unsetSolverResults())
-                        dispatch(
-                          setMeshApproved({
-                            approved: false,
-                            projectToUpdate:
-                              selectedProject?.id as string,
-                          }),
-                        );
-                        deleteFileS3(selectedProject.simulation?.resultS3 as string).then(() => {
-                          execQuery2(
-                            createOrUpdateProjectInDynamoDB,
-                            {
-                              ...selectedProject,
-                              simulation: undefined,
-                              meshData: {
-                                ...selectedProject?.meshData,
-                                meshApproved: false,
-                              },
-                            } as Project,
-                            dispatch,
-                          ).then(() => {dispatch(setShowSaveProjectResultsModal(false))})
-                        })
-                      }
+    dispatch(
+      deleteSimulation(
+        selectedProject.id as string,
+      ),
+    );
+    dispatch(unsetSolverResults())
+    dispatch(
+      setMeshApproved({
+        approved: false,
+        projectToUpdate:
+          selectedProject?.id as string,
+      }),
+    );
+    deleteFileS3(selectedProject.simulation?.resultS3 as string).then(() => {
+      execQuery2(
+        createOrUpdateProjectInDynamoDB,
+        {
+          ...selectedProject,
+          simulation: undefined,
+          meshData: {
+            ...selectedProject?.meshData,
+            meshApproved: false,
+          },
+        } as Project,
+        dispatch,
+      ).then(() => { dispatch(setShowSaveProjectResultsModal(false)) })
+    })
+  }
 
   return (
     <>
-      {/* eslint-disable-next-line react/jsx-no-undef */}
       <Transition appear show={true} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={() => {}}>
+        <Dialog as="div" className="relative z-10" onClose={() => { }}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -84,7 +83,7 @@ export const SaveProjectResultsModal: React.FC<
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
           </Transition.Child>
 
           <div
@@ -102,51 +101,53 @@ export const SaveProjectResultsModal: React.FC<
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel
-                  className={`w-full max-w-md transform overflow-hidden rounded-2xl ${
-                    theme === 'light'
-                      ? 'bg-white text-textColor'
-                      : 'bg-bgColorDark2 text-textColorDark '
-                  } p-6 text-left align-middle shadow-xl transition-all`}
+                  className={`w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-2xl transition-all backdrop-blur-md border ${theme === 'light'
+                      ? 'bg-white/90 border-white/40 text-gray-800'
+                      : 'bg-black/60 border-white/10 text-gray-200'
+                    }`}
                 >
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-medium leading-6 "
+                    className="text-lg font-bold leading-6 mb-4"
                   >
                     Do you want to save previous results?
                   </Dialog.Title>
-                  <hr className="mt-2 mb-3" />
-                  <div className="flex flex-col">
-                    <div className="p-2">
-                      <h6>New project's name</h6>
+
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <h6 className="text-sm font-medium opacity-80 mb-2">New project's name</h6>
                       <input
                         type="text"
                         data-testid="projectName"
-                        className={`formControl ${
-                          theme === 'light'
-                            ? 'bg-gray-100 text-textColor'
-                            : 'bg-bgColorDark text-textColorDark'
-                        }  rounded p-2 w-full mt-3`}
+                        className={`w-full p-3 rounded-xl outline-none transition-all ${theme === 'light'
+                            ? 'bg-gray-100 border border-transparent focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                            : 'bg-white/5 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                          }`}
                         placeholder="Project's Name"
                         value={projectName}
                         onChange={(e) => setProjectName(e.target.value)}
                       />
                     </div>
                   </div>
-                  <div className="mt-4 flex justify-between">
+
+                  <div className="mt-8 flex justify-end gap-3">
                     <button
                       type="button"
-                      className="button bg-gray-500 text-white"
-                      onClick={() =>{
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${theme === 'light'
+                          ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                        }`}
+                      onClick={() => {
                         toggleEditInputsSlider()
                         dispatch(setShowSaveProjectResultsModal(false))
                       }
-                    }
+                      }
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
-                      className="button bg-red-500 text-black"
+                      className="px-4 py-2 rounded-xl text-sm font-semibold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all duration-300"
                       onClick={() => {
                         removePreviousResults(selectedProject as Project, dispatch)
                       }}
@@ -155,11 +156,10 @@ export const SaveProjectResultsModal: React.FC<
                     </button>
                     <button
                       type="button"
-                      className={`button buttonPrimary ${
-                        theme === 'light'
-                          ? ''
-                          : 'bg-secondaryColorDark text-textColor'
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all duration-300 ${theme === 'light'
+                          ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'
+                          : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/30'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
                       disabled={(process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)}
                       onClick={() => {
                         setcloning(true)
@@ -174,7 +174,7 @@ export const SaveProjectResultsModal: React.FC<
                     >
                       <span>Save results</span>
                       {cloning && (
-                        <ImSpinner className={`z-50 top-3 bottom-1/2 animate-spin w-5 h-5 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
+                        <ImSpinner className="animate-spin w-4 h-4" />
                       )}
                     </button>
                   </div>
@@ -185,41 +185,5 @@ export const SaveProjectResultsModal: React.FC<
         </Dialog>
       </Transition>
     </>
-
-    /* <Modal show={true} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>CREATE NEW PROJECT</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <div className="d-grid">
-                    <div className="p-2">
-                        <h6>Insert Project's Name</h6>
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Project's Name"
-                            value={projectName}
-                            onChange={(e) => setProjectName(e.target.value)}/>
-                    </div>
-                    <div className="p-2">
-                        <h6>Insert Project's Description</h6>
-                        <textarea
-                            className="form-control"
-                            placeholder="Project's Description"
-                            value={projectDescription}
-                            onChange={(e) => setProjectDescription(e.target.value)}/>
-                    </div>
-                </div>
-
-            </Modal.Body>
-            <Modal.Footer>
-                <button className="button btn-secondary" onClick={handleClose}>
-                    CLOSE
-                </button>
-                <button className="button buttonPrimary" onClick={handleCreate}>
-                    CREATE
-                </button>
-            </Modal.Footer>
-        </Modal>*/
   );
 };

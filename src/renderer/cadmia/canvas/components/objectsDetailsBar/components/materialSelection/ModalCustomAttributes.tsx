@@ -35,7 +35,7 @@ const ModalCustomAttributes: React.FC<ModalCustomAttributesProps> = ({
 
   return (
     <Transition appear show={showModalCustomAttributes} as={Fragment}>
-      <Dialog as="div" className="relative z-40" onClose={() => {}}>
+      <Dialog as="div" className="relative z-50" onClose={() => { }}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -188,10 +188,10 @@ const ModalCustomAttributes: React.FC<ModalCustomAttributesProps> = ({
                         className="btn w-full mt-5 h-[2rem] min-h-[2rem] hover:cursor-pointer hover:opacity-70"
                         onClick={async () => {
                           let newCustomMateriaAttribute: CustomMaterialAttribute =
-                            {
-                              frequencies: customAttribute.frequencies,
-                              values: customAttribute.values,
-                            };
+                          {
+                            frequencies: customAttribute.frequencies,
+                            values: customAttribute.values,
+                          };
                           let confirm = window.confirm(
                             `Are you sure to save custom ${attribute}?`,
                           );

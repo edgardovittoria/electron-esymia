@@ -1,4 +1,4 @@
-import React, {  } from 'react';
+import React, { } from 'react';
 import { useSelector } from 'react-redux';
 import { Overview } from './tabs/Overview';
 import { Simulations } from './tabs/Simulations';
@@ -11,33 +11,28 @@ interface DashboardTabsContentFactoryProps {
 
 export const DashboardTabsContentFactory: React.FC<
   DashboardTabsContentFactoryProps
-> = ({setLoadingSpinner}) => {
+> = ({ setLoadingSpinner }) => {
 
   const menuItemSelected = useSelector(selectedMenuItemSelector);
-
-
 
   switch (menuItemSelected) {
     case 'Overview':
       return (
-        <div className="w-full px-10 flex mx-auto pt-5">
-          <Overview setLoadingSpinner={setLoadingSpinner}/>
-          {/* <RightPanel /> */}
+        <div className="w-full h-full p-6 overflow-y-auto">
+          <Overview setLoadingSpinner={setLoadingSpinner} />
         </div>
       );
 
     case 'Projects':
       return (
-        <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] overflow-y-scroll h-[85vh]">
-          <Projects setLoadingSpinner={setLoadingSpinner}/>
-          {/* <RightPanel /> */}
+        <div className="w-full h-full p-6 overflow-y-auto">
+          <Projects setLoadingSpinner={setLoadingSpinner} />
         </div>
       );
     case 'Simulations':
       return (
-        <div className="xl:w-[80%] w-full px-10 xl:px-0 flex mx-auto pt-10 bg-[#ececec] lg:h-[60vh] h-[80vh]">
-          <Simulations maxH="max-h-[750px]"/>
-          {/* <RightPanel /> */}
+        <div className="w-full h-full p-6 overflow-y-auto">
+          <Simulations maxH="h-full" />
         </div>
       );
     default:

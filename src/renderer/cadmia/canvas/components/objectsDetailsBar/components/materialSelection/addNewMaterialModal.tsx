@@ -139,14 +139,14 @@ export const AddNewMaterialModal: FC<{
         dispatch,
       ).then(() => {
         toast.success('Material successfully saved!');
-        updateMaterials().then(() => {showModal(false);});
+        updateMaterials().then(() => { showModal(false); });
       });
     }
   }, [saveMaterialFlag]);
 
   return (
     <Transition appear show={true} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={() => {}}>
+      <Dialog as="div" className="relative z-50" onClose={() => { }}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -156,7 +156,7 @@ export const AddNewMaterialModal: FC<{
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -170,195 +170,178 @@ export const AddNewMaterialModal: FC<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <IoCloseCircleOutline
-                  size={30}
-                  className="absolute top-0 right-0 hover:opacity-70 hover:cursor-pointer"
-                  onClick={() => showModal(false)}
-                />
-                <Dialog.Title
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
-                >
-                  Add new material to database
-                </Dialog.Title>
-                <hr className="my-4 border-gray-800" />
-                <MaterialOptionMainStyle label="Name (required)">
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                    }}
-                    className="border z-50 border-black rounded shadow p-1 w-[60%] text-black text-left text-sm"
-                  />
-                </MaterialOptionMainStyle>
-                <MaterialOptionMainStyle label="Color">
-                  <ChromePicker
-                    color={color}
-                    onChangeComplete={(color) => setColor(color.hex)}
-                    disableAlpha={true}
-                  />
-                </MaterialOptionMainStyle>
-                <MaterialOptionMainStyle label="Permeability (required)">
-                  <input
-                    type="number"
-                    step={0.00001}
-                    value={permeability}
-                    required
-                    onChange={(e) => {
-                      setPermeability(
-                        adjustNumberFormatForThis(e.target.value),
-                      );
-                    }}
-                    className="border border-black rounded shadow p-1 w-[60%] text-black text-left text-sm"
-                  />
-                </MaterialOptionMainStyle>
-                <MaterialOptionMainStyle label="Tangent Delta Permeability">
-                  <input
-                    type="number"
-                    step={0.00001}
-                    value={tangentDeltaPermeability}
-                    onChange={(e) => {
-                      setTangentDeltaPermeability(
-                        adjustNumberFormatForThis(e.target.value),
-                      );
-                    }}
-                    className="border border-black rounded shadow p-1 w-[60%] text-black text-left text-sm"
-                  />
-                </MaterialOptionMainStyle>
-                <MaterialOptionMainStyle label="Custom Permeability">
-                  <button
-                    className="btn w-[59%] h-[2rem] min-h-[2rem] hover:cursor-pointer hover:opacity-70"
-                    onClick={() => setShowModalCustomPermeability(true)}
+              <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white/90 dark:bg-black/80 backdrop-blur-md border border-gray-200 dark:border-white/10 p-6 text-left align-middle shadow-xl transition-all">
+                <div className="flex justify-between items-center mb-4">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
                   >
-                    {customPermeability.frequencies.length === 0
-                      ? 'SET'
-                      : 'VIEW'}
-                  </button>
-                </MaterialOptionMainStyle>
+                    Add New Material
+                  </Dialog.Title>
+                  <IoCloseCircleOutline
+                    size={24}
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer transition-colors"
+                    onClick={() => showModal(false)}
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <MaterialOptionMainStyle label="Name (required)">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </MaterialOptionMainStyle>
+
+                  <MaterialOptionMainStyle label="Color">
+                    <div className="mt-1">
+                      <ChromePicker
+                        color={color}
+                        onChangeComplete={(color) => setColor(color.hex)}
+                        disableAlpha={true}
+                        styles={{ default: { picker: { boxShadow: 'none', border: '1px solid #e5e7eb', borderRadius: '0.5rem' } } }}
+                      />
+                    </div>
+                  </MaterialOptionMainStyle>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <MaterialOptionMainStyle label="Permeability (required)">
+                      <input
+                        type="number"
+                        step={0.00001}
+                        value={permeability}
+                        required
+                        onChange={(e) => setPermeability(adjustNumberFormatForThis(e.target.value))}
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </MaterialOptionMainStyle>
+                    <MaterialOptionMainStyle label="Tan δ (Permeability)">
+                      <input
+                        type="number"
+                        step={0.00001}
+                        value={tangentDeltaPermeability}
+                        onChange={(e) => setTangentDeltaPermeability(adjustNumberFormatForThis(e.target.value))}
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </MaterialOptionMainStyle>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                      onClick={() => setShowModalCustomPermeability(true)}
+                    >
+                      {customPermeability.frequencies.length === 0 ? '+ Set Custom Permeability' : 'Edit Custom Permeability'}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <MaterialOptionMainStyle label="Permittivity (required)">
+                      <input
+                        type="number"
+                        step={0.00001}
+                        value={permittivity}
+                        required
+                        onChange={(e) => setPermittivity(adjustNumberFormatForThis(e.target.value))}
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </MaterialOptionMainStyle>
+                    <MaterialOptionMainStyle label="Tan δ (Permittivity)">
+                      <input
+                        type="number"
+                        step={0.00001}
+                        value={tangentDeltaPermittivity}
+                        onChange={(e) => setTangentDeltaPermittivity(adjustNumberFormatForThis(e.target.value))}
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </MaterialOptionMainStyle>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                      onClick={() => setShowModalCustomPermittivity(true)}
+                    >
+                      {customPermittivity.frequencies.length === 0 ? '+ Set Custom Permittivity' : 'Edit Custom Permittivity'}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <MaterialOptionMainStyle label="Conductivity (required)">
+                      <input
+                        type="number"
+                        step={0.00001}
+                        value={conductivity}
+                        required
+                        onChange={(e) => setConductivity(adjustNumberFormatForThis(e.target.value))}
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </MaterialOptionMainStyle>
+                    <MaterialOptionMainStyle label="Tan δ (Conductivity)">
+                      <input
+                        type="number"
+                        step={0.00001}
+                        value={tangentDeltaConductivity}
+                        onChange={(e) => setTangentDeltaConductivity(adjustNumberFormatForThis(e.target.value))}
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </MaterialOptionMainStyle>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                      onClick={() => setShowModalCustomConductivity(true)}
+                    >
+                      {customConductivity.frequencies.length === 0 ? '+ Set Custom Conductivity' : 'Edit Custom Conductivity'}
+                    </button>
+                  </div>
+                </div>
+
                 {showModalCustomPermeability && (
                   <ModalCustomAttributes
                     showModalCustomAttributes={showModalCustomPermeability}
-                    setShowModalCustomAttributes={
-                      setShowModalCustomPermeability
-                    }
+                    setShowModalCustomAttributes={setShowModalCustomPermeability}
                     attribute={'Custom Permeability'}
                     setCustomAttribute={setCustomPermeability}
                     customAttribute={customPermeability}
                   />
                 )}
-                <MaterialOptionMainStyle label="Permittivity (required)">
-                  <input
-                    type="number"
-                    step={0.00001}
-                    value={permittivity}
-                    required
-                    onChange={(e) => {
-                      setPermittivity(
-                        adjustNumberFormatForThis(e.target.value),
-                      );
-                    }}
-                    className="border border-black rounded shadow p-1 w-[60%] text-black text-left text-sm"
-                  />
-                </MaterialOptionMainStyle>
-                <MaterialOptionMainStyle label="Tangent Delta Permittivity">
-                  <input
-                    type="number"
-                    step={0.00001}
-                    value={tangentDeltaPermittivity}
-                    onChange={(e) => {
-                      setTangentDeltaPermittivity(
-                        adjustNumberFormatForThis(e.target.value),
-                      );
-                    }}
-                    className="border border-black rounded shadow p-1 w-[60%] text-black text-left text-sm"
-                  />
-                </MaterialOptionMainStyle>
-                <MaterialOptionMainStyle label="Custom Permittivity">
-                  <button
-                    className="btn w-[59%] h-[2rem] min-h-[2rem] hover:cursor-pointer hover:opacity-70"
-                    onClick={() => setShowModalCustomPermittivity(true)}
-                  >
-                    {customPermittivity.frequencies.length === 0
-                      ? 'SET'
-                      : 'VIEW'}
-                  </button>
-                </MaterialOptionMainStyle>
                 {showModalCustomPermittivity && (
                   <ModalCustomAttributes
                     showModalCustomAttributes={showModalCustomPermittivity}
-                    setShowModalCustomAttributes={
-                      setShowModalCustomPermittivity
-                    }
+                    setShowModalCustomAttributes={setShowModalCustomPermittivity}
                     attribute={'Custom Permittivity'}
                     setCustomAttribute={setCustomPermittivity}
                     customAttribute={customPermittivity}
                   />
                 )}
-                <MaterialOptionMainStyle label="Conductivity (required)">
-                  <input
-                    type="number"
-                    step={0.00001}
-                    value={conductivity}
-                    required
-                    onChange={(e) => {
-                      setConductivity(
-                        adjustNumberFormatForThis(e.target.value),
-                      );
-                    }}
-                    className="border border-black rounded shadow p-1 w-[60%] text-black text-left text-sm"
-                  />
-                </MaterialOptionMainStyle>
-                <MaterialOptionMainStyle label="Tangent Delta Conductivity">
-                  <input
-                    type="number"
-                    step={0.00001}
-                    value={tangentDeltaConductivity}
-                    onChange={(e) => {
-                      setTangentDeltaConductivity(
-                        adjustNumberFormatForThis(e.target.value),
-                      );
-                    }}
-                    className="border border-black rounded shadow p-1 w-[60%] text-black text-left text-sm"
-                  />
-                </MaterialOptionMainStyle>
-                <MaterialOptionMainStyle label="Custom Permeability">
-                  <button
-                    className="btn w-[59%] h-[2rem] min-h-[2rem] hover:cursor-pointer hover:opacity-70"
-                    onClick={() => setShowModalCustomConductivity(true)}
-                  >
-                    {customConductivity.frequencies.length === 0
-                      ? 'SET'
-                      : 'VIEW'}
-                  </button>
-                </MaterialOptionMainStyle>
                 {showModalCustomConductivity && (
                   <ModalCustomAttributes
                     showModalCustomAttributes={showModalCustomConductivity}
-                    setShowModalCustomAttributes={
-                      setShowModalCustomConductivity
-                    }
+                    setShowModalCustomAttributes={setShowModalCustomConductivity}
                     attribute={'Custom Conductivity'}
                     setCustomAttribute={setCustomConductivity}
                     customAttribute={customConductivity}
                   />
                 )}
-                <hr className="my-4 border-gray-800" />
-                <div className="mt-4 flex justify-between">
+
+                <div className="mt-8 flex justify-end gap-3">
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg transition-colors focus:outline-none"
                     onClick={() => showModal(false)}
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-lg shadow-blue-500/30 transition-all focus:outline-none"
                     onClick={() => checkForValueErrors()}
                   >
-                    Add
+                    Add Material
                   </button>
                 </div>
               </Dialog.Panel>
@@ -375,11 +358,9 @@ const MaterialOptionMainStyle: FC<{ label: string; children: ReactNode }> = ({
   children,
 }) => {
   return (
-    <div className="mt-2 z-50">
-      <div className="flex items-center justify-between">
-        <label className="ml-2 text-sm w-[40%]">{label}:</label>
-        {children}
-      </div>
+    <div className="flex flex-col gap-1">
+      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 ml-1">{label}</label>
+      {children}
     </div>
   );
 };

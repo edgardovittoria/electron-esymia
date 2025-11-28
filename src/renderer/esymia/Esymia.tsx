@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  selectMenuItem,
   showCreateNewProjectModalSelector,
-  showInfoModalSelector,
   tabSelectedSelector,
   ThemeSelector,
 } from './store/tabsAndMenuItemsSlice';
@@ -11,15 +11,13 @@ import {
 } from './store/pluginsSlice';
 import { TabsContainer } from './application/TabsContainer';
 import { ImSpinner } from 'react-icons/im';
-import InfoModal from './application/sharedModals/InfoModal';
 import { CreateNewProjectModal } from './application/sharedModals/CreateNewProjectModal';
 import { MenuBar } from './application/MenuBar';
 import { DashboardTabsContentFactory } from './application/dashboardTabsManagement/DashboardTabsContentFactory';
 import { SimulationTabsContentFactory } from './application/simulationTabsManagement/SimulationTabsContentFactory';
-import Plugins from './plugin/Plugins';
 import { usersStateSelector } from '../cad_library';
 import { useStorage } from './hook/useStorage';
-import { publishMessage } from '../middleware/stompMiddleware';
+
 export interface EsymiaProps {
   selectedTab: string;
 }
@@ -32,25 +30,7 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   const { loadFolders } = useStorage();
   const [loginSpinner, setLoginSpinner] = useState(false);
   const theme = useSelector(ThemeSelector);
-  // da scommentare nel caso esymia dovesse essere estrapolata
-  /* const [alert, setAlert] = useState<boolean>(false);
-  const activeSimulations = useSelector(activeSimulationsSelector);
-  const [feedbackSimulationVisible, setFeedbackSimulationVisible] =
-    useState<boolean>(false);
-  useEffect(() => {
-    if (activeSimulations.length > 0) {
-      setFeedbackSimulationVisible(true);
-    }
-  }, [activeSimulations.length]);
-
-  const activeMeshing = useSelector(activeMeshingSelector);
-  const [feedbackMeshingVisible, setFeedbackMeshingVisible] =
-    useState<boolean>(false);
-  useEffect(() => {
-    if (activeMeshing.length > 0) {
-      setFeedbackMeshingVisible(true);
-    }
-  }, [activeMeshing.length]); */
+  const isDark = theme !== 'light';
 
   const activePlugins = useSelector(ActivePluginsSelector);
   const [pluginsVisible, setPluginsVisible] = useState<boolean>(true);
@@ -60,28 +40,9 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
     }
   }, [activePlugins.length]);
 
-  //const showInfoModal = useSelector(showInfoModalSelector);
   const showCreateNewProjectModal = useSelector(
     showCreateNewProjectModalSelector,
   );
-
-  // const mesherStatus = useSelector(MesherStatusSelector);
-  // const solverStatus = useSelector(SolverStatusSelector);
-
-  // useEffect(() => {
-  //   if (user.userName) {
-  //     dispatch(addActivePlugin('serverGUI'));
-  //     if (mesherStatus === 'idle') {
-  //       dispatch(setMesherStatus('starting'));
-  //       window.electron.ipcRenderer.sendMessage('runMesher', []);
-  //     }
-  //     if (solverStatus === 'idle') {
-  //       dispatch(setSolverStatus('starting'));
-  //       window.electron.ipcRenderer.sendMessage('runSolver', []);
-  //     }
-  //   }
-  // }, [user.userName]);
-
 
   // USE EFFECT
   useEffect(() => {
@@ -106,72 +67,33 @@ const Esymia: React.FC<EsymiaProps> = ({ selectedTab }) => {
   return (
     <>
       {selectedTab === 'esymia' && (
-        <div className="lg:h-[97vh] h-screen overflow-x-hidden">
+        <div className="h-full flex flex-col animate-fade-in-up overflow-hidden">
           {loginSpinner && (
-            <ImSpinner className={`animate-spin w-12 h-12 absolute left-1/2 top-1/2 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+              <ImSpinner className={`animate-spin w-12 h-12 ${isDark ? 'text-white' : 'text-black'}`} />
+            </div>
           )}
-          {showCreateNewProjectModal && <CreateNewProjectModal />}
-          <div className={`${loginSpinner && 'opacity-40'}`}>
-            {memoizedTabsContainer}
-            <MenuBar />
 
-            {tabSelected === 'DASHBOARD' ? (
-              <DashboardTabsContentFactory
-                setLoadingSpinner={setLoginSpinner}
-              />
-            ) : (
-              <SimulationTabsContentFactory />
-            )}
-            {/* {activeSimulations &&
-              activeSimulations.length > 0 &&
-              !feedbackSimulationVisible && (
-                <button
-                  className="absolute bottom-24 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor text-sm"
-                  onClick={() => setFeedbackSimulationVisible(true)}
-                >
-                  SIM
-                </button>
+          {showCreateNewProjectModal && <CreateNewProjectModal />}
+
+          <div className={`flex-1 flex flex-col h-full ${loginSpinner ? 'opacity-40 pointer-events-none' : ''}`}>
+
+            {/* Header Area with Tabs and Menu */}
+            <div className="flex flex-col w-full">
+              {memoizedTabsContainer}
+              {tabSelected !== "DASHBOARD" && <MenuBar />}
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1 overflow-auto relative">
+              {tabSelected === 'DASHBOARD' ? (
+                <DashboardTabsContentFactory
+                  setLoadingSpinner={setLoginSpinner}
+                />
+              ) : (
+                <SimulationTabsContentFactory />
               )}
-            {activeSimulations && activeSimulations.length > 0 && (
-              <SimulationStatus
-                feedbackSimulationVisible={feedbackSimulationVisible}
-                setFeedbackSimulationVisible={setFeedbackSimulationVisible}
-                activeSimulations={activeSimulations}
-              />
-            )}
-            {activeMeshing &&
-              activeMeshing.length > 0 &&
-              !feedbackMeshingVisible && (
-                <button
-                  className="absolute bottom-24 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor text-sm"
-                  onClick={() => setFeedbackMeshingVisible(true)}
-                >
-                  MES
-                </button>
-              )}
-            {activeMeshing && activeMeshing.length > 0 && (
-              <MeshingStatus
-                feedbackMeshingVisible={feedbackMeshingVisible}
-                setFeedbackMeshingVisible={setFeedbackMeshingVisible}
-                activeMeshing={activeMeshing}
-                setAlert={setAlert}
-              />
-            )} */}
-            {/* {activePlugins && activePlugins.length > 0 && !pluginsVisible && (
-              <button
-                className="absolute bottom-40 right-0 rounded-tl-full rounded-bl-full p-3 bg-white shadow-2xl font-bold border border-secondaryColor text-secondaryColor"
-                onClick={() => setPluginsVisible(true)}
-              >
-                <BsPlugin size={22} />
-              </button>
-            )} */}
-            {activePlugins && activePlugins.length > 0 && (
-              <Plugins
-                pluginsVisible={pluginsVisible}
-                setPluginsVisible={setPluginsVisible}
-                activePlugins={activePlugins}
-              />
-            )}
+            </div>
           </div>
         </div>
       )}

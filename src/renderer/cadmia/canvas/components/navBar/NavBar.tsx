@@ -21,32 +21,36 @@ export function classNames(...classes: string[]) {
 export const Navbar: React.FC<NavbarProps> = ({ setShowCad }) => {
 
   const dispatch = useDispatch()
+  // Assuming theme selector is available or we default to light/dark support via CSS variables or similar if not passed.
+  // Since this is inside CAD, we might want to use the ThemeSelector if we want explicit control, 
+  // but for now let's use standard tailwind classes that can be augmented with dark: prefix if the parent has 'dark' class.
+  // However, the user didn't explicitly ask for dark mode support in CAD, but we should try to be consistent.
+  // Let's assume the parent app handles the 'dark' class on the body or html.
 
   return (
-    <Popover className='relative bg-white h-[3vh]'>
-      <div className='px-6 flex flex-row items-center justify-between w-full h-full'>
-        <Popover.Group as='nav' className='hidden space-x-1 md:flex'>
+    <div className='relative h-[4vh] z-50 backdrop-blur-md bg-white/70 dark:bg-black/70 border-b border-gray-200/50 dark:border-white/10 transition-colors duration-300'>
+      <div className='px-4 flex flex-row items-center justify-between w-full h-full'>
+        <div className='hidden space-x-1 md:flex'>
           <FileItem />
           <ViewItem />
           <EditItem />
           {/* <Shapes /> */}
-        </Popover.Group>
+        </div>
 
         {/* <span className='text-2xl font-semibold'>CADmIA</span> */}
 
-        <div
-          className='flex flex-row items-center gap-2 px-2 py-1 rounded hover:bg-secondaryColor hover:text-white hover:cursor-pointer'
+        <button
+          className='flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 
+            text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10'
           onClick={() => {
             dispatch(selectModel(undefined))
             setShowCad(false)
           }}
         >
-          <MdDashboard size={20} />
-          <span className='text-sm'>Dashboard</span>
-        </div>
-
-
+          <MdDashboard size={18} />
+          <span>Dashboard</span>
+        </button>
       </div>
-    </Popover>
+    </div>
   );
 };

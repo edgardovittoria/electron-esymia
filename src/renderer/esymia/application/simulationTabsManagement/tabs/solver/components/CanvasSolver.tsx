@@ -146,7 +146,7 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
           {({ store }) => (
             <div className="flex flex-col">
               <Canvas
-                className="w-[100vw] lg:h-[70vh] xl:h-[82vh]"
+                className="w-[100vw] lg:h-[70vh] xl:h-[72vh]"
                 camera={{ position: [0, -3, 0], up: [0, 0, 1], fov: 50, near: 0.1 }}
               >
                 {/* <Perf/> */}
@@ -230,9 +230,9 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
                     ) : (
                       <>
                         {externalGrids &&
-                        selectedProject.meshData.externalGrids !== '' &&
-                        viewMesh &&
-                        selectedProject?.meshData.type === 'Standard' ? (
+                          selectedProject.meshData.externalGrids !== '' &&
+                          viewMesh &&
+                          selectedProject?.meshData.type === 'Standard' ? (
                           <MeshedElement
                             resetFocus={setResetFocus}
                             externalGrids={externalGrids as ExternalGridsObject}
@@ -276,7 +276,7 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
                   )}
 
                   {/*<Screenshot selectedProject={selectedProject}/>*/}
-                  <OrbitControls makeDefault zoomToCursor zoomSpeed={0.2}/>
+                  <OrbitControls makeDefault zoomToCursor zoomSpeed={0.2} />
                   <GizmoHelper
                     alignment="bottom-left"
                     margin={[150, 80]}
@@ -326,9 +326,8 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
       ) : (
         <div className="absolute top-1/2">
           <span
-            className={`${alertMessageStyle} ${
-              theme === 'light' ? '' : 'text-textColorDark'
-            }`}
+            className={`${alertMessageStyle} ${theme === 'light' ? '' : 'text-textColorDark'
+              }`}
           >
             {comeBackToModelerMessage}
           </span>

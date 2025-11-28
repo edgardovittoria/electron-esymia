@@ -3,88 +3,113 @@
 @tailwind utilities;
 
 @layer base {
-  h1{
-    @apply text-5xl
+  h1 {
+    @apply text-5xl font-bold;
   }
-  h2{
-    @apply text-4xl
+
+  h2 {
+    @apply text-4xl font-semibold;
   }
-  h3{
-    @apply text-3xl
+
+  h3 {
+    @apply text-3xl font-medium;
   }
-  h4{
-    @apply text-2xl
+
+  h4 {
+    @apply text-2xl font-medium;
   }
-  h5{
-    @apply text-xl font-[500]
+
+  h5 {
+    @apply text-xl font-medium;
   }
-  input, textarea{
-    @apply focus-visible:outline-none
+
+  input,
+  textarea {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md transition-all duration-200;
+  }
+
+  body {
+    @apply font-sans antialiased;
   }
 }
 
 @layer components {
-  .box {
-    @apply rounded bg-white p-[10px] shadow
+  .glass-panel {
+    @apply backdrop-blur-md border border-white/20 shadow-xl;
   }
-  .container {
-    @apply mt-[30px] max-w-[85.375rem]
+
+  .glass-panel-light {
+    @apply bg-white/60 border-white/40 shadow-gray-200/50;
   }
-  .button {
-    @apply rounded py-2 px-4
+
+  .glass-panel-dark {
+    @apply bg-black/40 border-white/10 shadow-black/50;
   }
-  .buttonPrimary {
-    @apply bg-secondaryColor text-white
-  }
-  .buttonPrimary:hover{
-    @apply opacity-90
-  }
-  .formControl{
-    @apply block focus:drop-shadow-xl focus:border-[1px] focus:border-secondaryColor h-[35px]
+
+  .btn-primary {
+    @apply px-6 py-2 rounded-full font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg;
   }
 }
 
-@layer utilities {
-  .collapse {
-    visibility: visible;
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 
-body{
-  background-color: #ececec;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
-.contexify_item:not(.contexify_item--disabled):hover > .contexify_itemContent,
-.contexify_item:not(.contexify_item--disabled):focus > .contexify_itemContent {
-  background-color: #77FF94 !important;
-  color: black !important;
+.animate-fade-in-down {
+  animation: fadeInDown 0.8s ease-out forwards;
 }
 
-.react-contexify__item:not(.react-contexify__item--disabled):hover > .react-contexify__item__content,
-.react-contexify__item:not(.react-contexify__item--disabled):focus > .react-contexify__item__content {
-  background-color: rgb(187, 247, 208, 1) !important;
-  color: #29686E !important;
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
 }
 
-.react-contexify__item:not(.react-contexify__item--disabled):hover > .react-contexify__submenu {}
+@keyframes gradient-pulse {
 
-.cadmia{
-  background-image: url("../../assets/cadmia.png");
-  background-size: cover;
-  background-repeat: repeat;
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+    filter: blur(10px);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    filter: blur(15px);
+  }
 }
 
-.esymia{
-  background-image: url("../../assets/esymia.png");
-  background-size: cover;
-  background-repeat: no-repeat;
+.animate-gradient-shadow {
+  position: relative;
 }
 
-/* In src/index.css o src/App.css */
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-
-/* Altri stili CSS */
-
-body {
-  font-family: 'Space Grotesk', sans-serif;
+.animate-gradient-shadow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: linear-gradient(to top right, #3b82f6, #a855f7, #10b981);
+  z-index: -1;
+  animation: gradient-pulse 3s ease-in-out infinite;
 }

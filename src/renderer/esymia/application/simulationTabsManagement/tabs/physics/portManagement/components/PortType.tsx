@@ -1,5 +1,5 @@
 import React from "react";
-import { Port, TempLumped } from '../../../../../../model/esymiaModels';
+import { TempLumped } from '../../../../../../model/esymiaModels';
 import portType1 from '../../../../../../../../../assets/portType1.png';
 import portType2 from '../../../../../../../../../assets/portType2.png';
 import portType3 from '../../../../../../../../../assets/portType3.png';
@@ -24,33 +24,42 @@ export const PortType: React.FC<PortTypeProps> = ({
 	selectedPort,
 	disabled,
 }) => {
-  const theme = useSelector(ThemeSelector)
+	const theme = useSelector(ThemeSelector)
 	return (
-		<div className={`p-[10px] text-center border-[1px] mt-2 ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-secondaryColorDark bg-bgColorDark'}`}>
-			<div className="w-100 xl:text-start text-center mb-2">
-				<h6 className="text-[12px] xl:text-base">Port Type</h6>
+		<div className={`mt-4 p-4 rounded-xl border ${theme === 'light' ? 'bg-white/50 border-gray-200' : 'bg-white/5 border-white/10'}`}>
+			<div className="flex flex-col gap-4">
+				<div className="flex flex-row justify-between items-center">
+					<h6 className={`text-sm font-bold ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>Port Type</h6>
+					<button
+						disabled={disabled}
+						className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${theme === 'light'
+								? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'
+								: 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/30'
+							} disabled:opacity-50 disabled:cursor-not-allowed`}
+						onClick={() => setShow(true)}>
+						Choose Type
+					</button>
+				</div>
+
+				<div className={`p-4 rounded-xl flex justify-center items-center ${theme === 'light' ? 'bg-white border border-gray-200' : 'bg-black/20 border border-white/10'
+					}`}>
+					{selectedPort.type === 1 && (
+						<img className="max-h-[150px] object-contain" src={theme === 'light' ? portType1 : portType1Dark} alt="port type 1" />
+					)}
+					{selectedPort.type === 2 && (
+						<img className="max-h-[150px] object-contain" src={theme === 'light' ? portType2 : portType2Dark} alt="port type 2" />
+					)}
+					{selectedPort.type === 3 && (
+						<img className="max-h-[150px] object-contain" src={theme === 'light' ? portType3 : portType3Dark} alt="port type 3" />
+					)}
+					{selectedPort.type === 4 && (
+						<img className="max-h-[150px] object-contain" src={theme === 'light' ? portType4 : portType4Dark} alt="port type 4" />
+					)}
+					{selectedPort.type === 5 && (
+						<img className="max-h-[150px] object-contain" src={theme === 'light' ? portType5 : portType5Dark} alt="port type 5" />
+					)}
+				</div>
 			</div>
-			<button
-				disabled={disabled}
-				className={`${disabled && 'opacity-40'} button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark'} mb-2 w-100 xl:text-base text-[12px]`}
-				onClick={() => setShow(true)}>
-				Choose the port type
-			</button>
-			{selectedPort.type === 1 && (
-				<img className="m-auto" src={theme === 'light' ? portType1 : portType1Dark} alt="port type 1" />
-			)}
-			{selectedPort.type === 2 && (
-				<img className="m-auto" src={theme === 'light' ? portType2 : portType2Dark} alt="port type 2" />
-			)}
-			{selectedPort.type === 3 && (
-				<img className="m-auto" src={theme === 'light' ? portType3 : portType3Dark} alt="port type 3" />
-			)}
-			{selectedPort.type === 4 && (
-				<img className="m-auto" src={theme === 'light' ? portType4 : portType4Dark} alt="port type 4" />
-			)}
-			{selectedPort.type === 5 && (
-				<img className="m-auto" src={theme === 'light' ? portType5 : portType5Dark} alt="port type 5" />
-			)}
 		</div>
 	);
 };

@@ -110,65 +110,68 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
     return (
         <>
             {binaryOperationsToolbarVisible &&
-                <div className="w-[150px] text-center shadow grid grid-cols-5">
-                    <div className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth} p-1 group bg-white hover:bg-gray-300
-             ${binaryOp === "UNION" ? 'bg-gray-400' : 'bg-white'}
+                <div className="flex items-center gap-1 p-1 rounded-xl shadow-lg backdrop-blur-md bg-white/90 border border-gray-200 dark:bg-black/80 dark:border-white/10 transition-all duration-300">
+                    <div className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group
+             ${binaryOp === "UNION" ? 'bg-blue-500 text-white shadow-md' : 'hover:bg-gray-100 dark:hover:bg-white/10'}
             `}
                         onClick={() => {
                             dispatch(setModality('BinaryOperation' as CadmiaModality));
                             dispatch(setBinaryOp("UNION"));
                         }}
                     >
-                        <img src={unionIcon} alt="Union operation" />
+                        <img src={unionIcon} alt="Union operation" className={`w-6 h-6 ${binaryOp === "UNION" ? 'brightness-0 invert' : ''}`} />
                         <div className={toolbarsHintStyle}>
-                            <span className="relative z-10 p-2 leading-none text-white whitespace-no-wrap bg-black shadow-lg rounded-md">UNION</span>
+                            <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">UNION</span>
                         </div>
                     </div>
-                    <div className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth}] p-1 group bg-white hover:bg-gray-300
-             ${binaryOp === "INTERSECTION" ? 'bg-gray-300' : 'bg-white'}
+                    <div className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group
+             ${binaryOp === "INTERSECTION" ? 'bg-blue-500 text-white shadow-md' : 'hover:bg-gray-100 dark:hover:bg-white/10'}
             `}
                         onClick={() => {
                             dispatch(setModality('BinaryOperation' as CadmiaModality));
                             dispatch(setBinaryOp("INTERSECTION"));
                         }}
                     >
-                        <img src={intersectionIcon} alt="Intersection operation" />
+                        <img src={intersectionIcon} alt="Intersection operation" className={`w-6 h-6 ${binaryOp === "INTERSECTION" ? 'brightness-0 invert' : ''}`} />
                         <div className={toolbarsHintStyle}>
-                            <span className="relative z-10 p-2 leading-none text-white whitespace-no-wrap bg-black shadow-lg rounded-md">INTERSECTION</span>
+                            <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">INTERSECTION</span>
                         </div>
                     </div>
-                    <div className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth}] p-1 group bg-white hover:bg-gray-300
-             ${binaryOp === "SUBTRACTION" ? 'bg-gray-300' : 'bg-white'}
+                    <div className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group
+             ${binaryOp === "SUBTRACTION" ? 'bg-blue-500 text-white shadow-md' : 'hover:bg-gray-100 dark:hover:bg-white/10'}
             `}
                         onClick={() => {
                             dispatch(setModality('BinaryOperation' as CadmiaModality));
                             dispatch(setBinaryOp("SUBTRACTION"));
                         }}
                     >
-                        <img src={subtractionIcon} alt="Subtraction operation" />
+                        <img src={subtractionIcon} alt="Subtraction operation" className={`w-6 h-6 ${binaryOp === "SUBTRACTION" ? 'brightness-0 invert' : ''}`} />
                         <div className={toolbarsHintStyle}>
-                            <span className="relative z-10 p-2 leading-none text-white whitespace-no-wrap bg-black shadow-lg rounded-md">SUBTRACTION</span>
+                            <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">SUBTRACTION</span>
                         </div>
                     </div>
+
+                    <div className="w-px h-6 bg-gray-300 dark:bg-white/20 mx-1" />
+
                     <div
-                        className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth}] p-1 group bg-white hover:bg-gray-300`}>
+                        className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group hover:bg-gray-100 dark:hover:bg-white/10`}>
                         {binaryOp === undefined ? (
-                            <XCircleIcon className="text-gray-300 w-8 h-8" />
+                            <XCircleIcon className="text-gray-400 w-6 h-6" />
                         ) : (
-                            <XCircleIcon className="text-red-600 w-8 h-8"
+                            <XCircleIcon className="text-red-500 w-6 h-6 hover:text-red-600 transition-colors"
                                 onClick={() => dispatch(setModality('NormalSelection' as CadmiaModality))}
                             />
                         )}
                         <div className={toolbarsHintStyle}>
-                            <span className="relative z-10 p-2 leading-none text-white whitespace-no-wrap bg-black shadow-lg rounded-md">EXIT</span>
+                            <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">EXIT</span>
                         </div>
                     </div>
                     <div
-                        className={`relative flex flex-col items-center justify-center ${toolbarIconsHeight} ${toolbarIconsWidth}] p-1 group bg-white hover:bg-gray-300`}>
+                        className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group hover:bg-gray-100 dark:hover:bg-white/10`}>
                         {entityKeysForBinaryOperations.length > 1 ? (
-                            <CheckIcon className="text-green-600 w-8 h-8"
+                            <CheckIcon className="text-green-500 w-6 h-6 hover:text-green-600 transition-colors"
                                 onClick={() => {
-                                  dispatch(setLoadingSpinner(true))
+                                    dispatch(setLoadingSpinner(true))
                                     binaryOp &&
                                         makeBinaryOperation(
                                             binaryOp as BinaryOperationType,
@@ -181,10 +184,10 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
                                 }}
                             />
                         ) : (
-                            <CheckIcon className="text-gray-300 w-8 h-8" />
+                            <CheckIcon className="text-gray-400 w-6 h-6" />
                         )}
                         <div className={toolbarsHintStyle}>
-                            <span className="relative z-10 p-2 leading-none text-white whitespace-no-wrap bg-black shadow-lg rounded-md">EXECUTE OPERATION</span>
+                            <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">EXECUTE</span>
                         </div>
                     </div>
                 </div>

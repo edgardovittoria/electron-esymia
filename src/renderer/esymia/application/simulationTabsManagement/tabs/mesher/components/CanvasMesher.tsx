@@ -80,7 +80,7 @@ export const CanvasMesher: React.FC<CanvasMesherProps> = ({
           {({ store }) => (
             <div className="flex flex-col">
               <Canvas
-                className="w-[100vw] lg:h-[70vh] xl:h-[82vh]"
+                className="w-[100vw] lg:h-[70vh] xl:h-[72vh]"
                 camera={{ position: [0, -3, 0], up: [0, 0, 1], fov: 50 }}
               >
                 {/* <Perf/> */}
@@ -117,8 +117,8 @@ export const CanvasMesher: React.FC<CanvasMesherProps> = ({
                     ) : (
                       <>
                         {externalGrids &&
-                        selectedProject.meshData.externalGrids !== '' &&
-                        selectedProject?.meshData.type === 'Standard' ? (
+                          selectedProject.meshData.externalGrids !== '' &&
+                          selectedProject?.meshData.type === 'Standard' ? (
                           <MeshedElement
                             resetFocus={setResetFocus}
                             externalGrids={externalGrids as ExternalGridsObject}
@@ -144,7 +144,7 @@ export const CanvasMesher: React.FC<CanvasMesherProps> = ({
                   </FocusView>
 
                   {/*<Screenshot selectedProject={selectedProject}/>*/}
-                  <OrbitControls makeDefault zoomToCursor zoomSpeed={0.5}/>
+                  <OrbitControls makeDefault zoomToCursor zoomSpeed={0.5} />
                   <GizmoHelper alignment="bottom-left" margin={[150, 80]}>
                     <GizmoViewport
                       axisColors={['red', '#40ff00', 'blue']}
@@ -160,9 +160,8 @@ export const CanvasMesher: React.FC<CanvasMesherProps> = ({
       ) : (
         <div className="absolute top-1/2">
           <span
-            className={`${alertMessageStyle} ${
-              theme === 'light' ? '' : 'text-textColorDark'
-            }`}
+            className={`${alertMessageStyle} ${theme === 'light' ? '' : 'text-textColorDark'
+              }`}
           >
             {comeBackToModelerMessage}
           </span>

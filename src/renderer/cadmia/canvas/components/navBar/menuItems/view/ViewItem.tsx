@@ -31,9 +31,11 @@ import {
 import { resetFocusToScene } from './viewItemSlice';
 import {
   navbarDropdownBoxStyle,
+  navbarDropdownItemStyle,
   navbarDropdownPadding,
   navbarDropdownStyle,
-  navbarItemStyle
+  navbarItemStyle,
+  navbarShortcutStyle
 } from '../../../../../config/styles';
 
 interface ViewItemProps {
@@ -75,147 +77,117 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
             <Popover.Panel className={navbarDropdownStyle}>
               <div className={navbarDropdownBoxStyle}>
                 <div className={navbarDropdownPadding}>
-                  <span className="p-1">
-                      <div className='flex justify-between'>
-                        <span className='text-gray-900 text-base font-medium'>
-                          Object Details
-                        </span>
-                        <p className='text-base font-medium text-gray-300'>
-                          Ctrl + D
-                        </p>
-                        <div>
-                          <Switch
-                            checked={sideBarChecked}
-                            onChange={(checked: boolean) =>
-                              checked
-                                ? dispatch(openObjectsDetails())
-                                : dispatch(closeObjectsDetails())
-                            }
-                            className={`${sideBarChecked ? 'bg-secondaryColor' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
-                          >
-                            <span
-                              aria-hidden='true'
-                              className={`${sideBarChecked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-[15px] w-[15px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
-                            />
-                          </Switch>
-                        </div>
-
+                  <div className={navbarDropdownItemStyle}>
+                    <div className='flex w-full items-center justify-between'>
+                      <span className='font-medium'>Object Details</span>
+                      <div className="flex items-center">
+                        <span className={navbarShortcutStyle}>Ctrl + D</span>
+                        <Switch
+                          checked={sideBarChecked}
+                          onChange={(checked: boolean) =>
+                            checked
+                              ? dispatch(openObjectsDetails())
+                              : dispatch(closeObjectsDetails())
+                          }
+                          className={`${sideBarChecked ? 'bg-secondaryColor' : 'bg-gray-200 dark:bg-gray-700'} ml-3 relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                        >
+                          <span
+                            aria-hidden='true'
+                            className={`${sideBarChecked ? 'translate-x-4' : 'translate-x-0'} pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
+                          />
+                        </Switch>
+                      </div>
                     </div>
-                  </span>
+                  </div>
 
-                  <span className="p-1">
-                      <div className='flex justify-between'>
-                        <span className='text-gray-900 text-base font-medium'>
-                          Binary operations toolbar
-                        </span>
-                        {/* <p className="text-base font-medium text-gray-300">Ctrl + D</p> */}
-                        <div>
-                          <Switch
-                            checked={binaryOperationsToolbarChecked}
-                            onChange={(checked: boolean) =>
-                              checked
-                                ? dispatch(openBinaryOperationsToolbar())
-                                : dispatch(closeBinaryOperationsToolbar())
-                            }
-                            className={`${binaryOperationsToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
-                          >
-                            <span
-                              aria-hidden='true'
-                              className={`${binaryOperationsToolbarChecked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-[15px] w-[15px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
-                            />
-                          </Switch>
-                        </div>
-                      </div>
-
-                  </span>
-
-                  <span className="p-1">
-                      <div className='flex justify-between'>
-                        <span className='text-gray-900 text-base font-medium'>
-                          Misc toolbar
-                        </span>
-                        {/* <p className="text-base font-medium text-gray-300">Ctrl + D</p> */}
-                        <div>
-                          <Switch
-                            checked={miscToolbarChecked}
-                            onChange={(checked: boolean) =>
-                              checked
-                                ? dispatch(openMiscToolbar())
-                                : dispatch(closeMiscToolbar())
-                            }
-                            className={`${miscToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
-                          >
-                            <span
-                              aria-hidden='true'
-                              className={`${miscToolbarChecked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-[15px] w-[15px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
-                            />
-                          </Switch>
-                        </div>
-                      </div>
-                  </span>
-
-                  <span className="p-1">
-                      <div className='flex justify-between'>
-                        <span className='text-gray-900 text-base font-medium'>
-                          Transformations toolbar
-                        </span>
-                        {/* <p className="text-base font-medium text-gray-300">Ctrl + D</p> */}
-                        <div>
-                          <Switch
-                            checked={transformationsToolbarChecked}
-                            onChange={(checked: boolean) =>
-                              checked
-                                ? dispatch(openTransformationsToolbar())
-                                : dispatch(closeTransformationsToolbar())
-                            }
-                            className={`${transformationsToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
-                          >
-                            <span
-                              aria-hidden='true'
-                              className={`${transformationsToolbarChecked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-[15px] w-[15px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
-                            />
-                          </Switch>
-                        </div>
-                      </div>
-                  </span>
-
-                  <span className="p-1">
-                      <div className='flex justify-between'>
-                        <span className='text-gray-900 text-base font-medium'>
-                          Shapes toolbar
-                        </span>
-                        {/* <p className="text-base font-medium text-gray-300">Ctrl + D</p> */}
-                        <div>
-                          <Switch
-                            checked={shapesToolbarChecked}
-                            onChange={(checked: boolean) =>
-                              checked
-                                ? dispatch(openShapesToolbar())
-                                : dispatch(closeShapesToolbar())
-                            }
-                            className={`${shapesToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-400'} relative inline-flex h-[18px] w-[40px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
-                          >
-                            <span
-                              aria-hidden='true'
-                              className={`${shapesToolbarChecked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-[15px] w-[15px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
-                            />
-                          </Switch>
-                        </div>
-                      </div>
-                  </span>
-
-                  <span className="p-1">
-                      <div
-                        className='flex justify-between cursor-pointer'
-                        onClick={() => {
-                          dispatch(resetFocusToScene());
-                        }}
+                  <div className={navbarDropdownItemStyle}>
+                    <div className='flex w-full items-center justify-between'>
+                      <span className='font-medium'>Binary operations toolbar</span>
+                      <Switch
+                        checked={binaryOperationsToolbarChecked}
+                        onChange={(checked: boolean) =>
+                          checked
+                            ? dispatch(openBinaryOperationsToolbar())
+                            : dispatch(closeBinaryOperationsToolbar())
+                        }
+                        className={`${binaryOperationsToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-200 dark:bg-gray-700'} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                       >
-                        <span className='text-gray-900 text-base font-medium'>
-                          Reset Focus To Whole Scene
-                        </span>
-                      </div>
-                  </span>
+                        <span
+                          aria-hidden='true'
+                          className={`${binaryOperationsToolbarChecked ? 'translate-x-4' : 'translate-x-0'} pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
+                        />
+                      </Switch>
+                    </div>
+                  </div>
+
+                  <div className={navbarDropdownItemStyle}>
+                    <div className='flex w-full items-center justify-between'>
+                      <span className='font-medium'>Misc toolbar</span>
+                      <Switch
+                        checked={miscToolbarChecked}
+                        onChange={(checked: boolean) =>
+                          checked
+                            ? dispatch(openMiscToolbar())
+                            : dispatch(closeMiscToolbar())
+                        }
+                        className={`${miscToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-200 dark:bg-gray-700'} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                      >
+                        <span
+                          aria-hidden='true'
+                          className={`${miscToolbarChecked ? 'translate-x-4' : 'translate-x-0'} pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
+                        />
+                      </Switch>
+                    </div>
+                  </div>
+
+                  <div className={navbarDropdownItemStyle}>
+                    <div className='flex w-full items-center justify-between'>
+                      <span className='font-medium'>Transformations toolbar</span>
+                      <Switch
+                        checked={transformationsToolbarChecked}
+                        onChange={(checked: boolean) =>
+                          checked
+                            ? dispatch(openTransformationsToolbar())
+                            : dispatch(closeTransformationsToolbar())
+                        }
+                        className={`${transformationsToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-200 dark:bg-gray-700'} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                      >
+                        <span
+                          aria-hidden='true'
+                          className={`${transformationsToolbarChecked ? 'translate-x-4' : 'translate-x-0'} pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
+                        />
+                      </Switch>
+                    </div>
+                  </div>
+
+                  <div className={navbarDropdownItemStyle}>
+                    <div className='flex w-full items-center justify-between'>
+                      <span className='font-medium'>Shapes toolbar</span>
+                      <Switch
+                        checked={shapesToolbarChecked}
+                        onChange={(checked: boolean) =>
+                          checked
+                            ? dispatch(openShapesToolbar())
+                            : dispatch(closeShapesToolbar())
+                        }
+                        className={`${shapesToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-200 dark:bg-gray-700'} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                      >
+                        <span
+                          aria-hidden='true'
+                          className={`${shapesToolbarChecked ? 'translate-x-4' : 'translate-x-0'} pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
+                        />
+                      </Switch>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`${navbarDropdownItemStyle} cursor-pointer`}
+                    onClick={() => {
+                      dispatch(resetFocusToScene());
+                    }}
+                  >
+                    <span className='font-medium'>Reset Focus To Whole Scene</span>
+                  </div>
                 </div>
               </div>
             </Popover.Panel>

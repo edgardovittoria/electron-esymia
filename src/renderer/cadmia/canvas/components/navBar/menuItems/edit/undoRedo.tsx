@@ -39,50 +39,37 @@ export const UndoRedo: React.FC<UndoRedoProps> = () => {
   const [undoActions, setundoActions] = useState<string[]>([]);
   return (
     <>
-      {pastStateLength > 0 ? (
-        <button
-          onClick={() => {
-            undoFunction(lastActionType, undoActions, setundoActions, dispatch);
-          }}
-          className={navbarDropdownItemStyle}
-          disabled={(process.env.APP_VERSION === 'demo')}
-        >
-          <div className='flex w-full justify-between'>
-            <div className='flex items-center'>
-              <FontAwesomeIcon icon={faUndo} className='mr-5' />
-              <span className='text-base font-medium'>Undo Last Action</span>
-            </div>
-            <p className={navbarShortcutStyle}>Ctrl + Z</p>
-          </div>
-        </button>
-      ) : (
-        <div className={navbarDropdownItemStyle}>
-          <div className='flex w-full justify-between'>
-            <div className='flex items-center'>
-              <FontAwesomeIcon icon={faUndo} className='text-gray-300 mr-5' />
-              <span className='text-gray-300'>Undo Last Action</span>
-            </div>
-            <p className={navbarShortcutStyle}>Ctrl + Z</p>
-          </div>
-        </div>
-      )}
       <button
-          onClick={() => {
-            redoFunction(undoActions, setundoActions, dispatch);
-          }}
-          className={navbarDropdownItemStyle}
-          disabled={(process.env.APP_VERSION === 'demo' || futureStateLength === 0)}
-        >
-          <div className='flex w-full justify-between'>
-            <div className='flex items-center'>
-              <FontAwesomeIcon icon={faRedo} className='mr-5' />
-              <span className='text-base font-medium'>
-              Redo Last Action
-            </span>
-            </div>
-            <p className={navbarShortcutStyle}>Ctrl + X</p>
+        onClick={() => {
+          undoFunction(lastActionType, undoActions, setundoActions, dispatch);
+        }}
+        className={navbarDropdownItemStyle}
+        disabled={(process.env.APP_VERSION === 'demo') || pastStateLength === 0}
+      >
+        <div className='flex w-full items-center justify-between'>
+          <div className='flex items-center gap-3'>
+            <FontAwesomeIcon icon={faUndo} className='h-4 w-4' />
+            <span className='font-medium'>Undo Last Action</span>
           </div>
-        </button>
+          <span className={navbarShortcutStyle}>Ctrl + Z</span>
+        </div>
+      </button>
+
+      <button
+        onClick={() => {
+          redoFunction(undoActions, setundoActions, dispatch);
+        }}
+        className={navbarDropdownItemStyle}
+        disabled={(process.env.APP_VERSION === 'demo' || futureStateLength === 0)}
+      >
+        <div className='flex w-full items-center justify-between'>
+          <div className='flex items-center gap-3'>
+            <FontAwesomeIcon icon={faRedo} className='h-4 w-4' />
+            <span className='font-medium'>Redo Last Action</span>
+          </div>
+          <span className={navbarShortcutStyle}>Ctrl + X</span>
+        </div>
+      </button>
     </>
   );
 };

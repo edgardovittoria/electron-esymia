@@ -5,46 +5,56 @@ import { useSelector } from 'react-redux';
 import { selectedProjectSelector } from '../../../store/projectSlice';
 import { ThemeSelector } from '../../../store/tabsAndMenuItemsSlice';
 
-interface ModelOutlinerProps {}
+interface ModelOutlinerProps { }
 
 export const ModelOutliner: React.FC<ModelOutlinerProps> = () => {
   const selectedProject = useSelector(selectedProjectSelector);
+  const theme = useSelector(ThemeSelector);
 
   return (
-    <div className={`mt-1`}>
-      <div className="flex pl-1 items-center">
-        <div className="w-[10%]">
-          <FaCubes className="w-[20px] h-[20px]" />
-        </div>
-        <div className="w-[80%] text-left">
-          <h5 className="ml-[5px] text-[12px] xl:text-base font-normal">
+    <div className="h-full flex flex-col">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <FaCubes className={`w-5 h-5 ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`} />
+          <h5 className={`font-bold text-lg ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
             Components
           </h5>
         </div>
+        <span className={`text-xs px-2 py-1 rounded-full ${theme === 'light' ? 'bg-gray-100 text-gray-500' : 'bg-white/10 text-gray-400'}`}>
+          {selectedProject?.model?.components.length || 0}
+        </span>
       </div>
-      <div className="flex-col ml-5 mt-1 overflow-y-scroll max-h-[300px] overflow-x-scroll max-w-[200px]">
-        {selectedProject &&
-          selectedProject.model?.components.map((component) => {
-            return (
-              <div className="flex items-center" key={component.keyComponent}>
-                <div className="w-[10%]">
-                  <FaCube
-                    className="w-[15px] h-[15px]"
-                    color={
-                      component.material !== undefined
-                        ? component.material.color
-                        : 'gray'
-                    }
-                  />
+      <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+        <div className="space-y-2">
+          {selectedProject &&
+            selectedProject.model?.components.map((component) => {
+              return (
+                <div
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${theme === 'light'
+                    ? 'bg-gray-50 hover:bg-white hover:shadow-md border border-transparent hover:border-gray-100'
+                    : 'bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10'
+                    }`}
+                  key={component.keyComponent}
+                >
+                  <div className="flex-shrink-0">
+                    <FaCube
+                      className="w-4 h-4"
+                      color={
+                        component.material !== undefined
+                          ? component.material.color
+                          : 'gray'
+                      }
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h6 className={`text-sm font-medium truncate lowercase ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
+                      {component.name}
+                    </h6>
+                  </div>
                 </div>
-                <div className="w-[90%] text-start">
-                  <h6 className="lowercase text-[12px] xl:text-base font-[600]">
-                    {component.name}
-                  </h6>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+        </div>
       </div>
     </div>
   );

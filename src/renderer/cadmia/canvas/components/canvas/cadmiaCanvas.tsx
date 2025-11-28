@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useState,
+  useMemo,
 } from 'react';
 import { Provider, ReactReduxContext, useSelector } from 'react-redux';
 import { Canvas } from '@react-three/fiber';
@@ -16,6 +17,8 @@ import {
   OrbitControls,
   Text,
   useBounds,
+  Environment,
+  ContactShadows,
 } from '@react-three/drei';
 import { CanvasObject } from './components/canvasObject';
 import { Controls } from './components/controls';
@@ -52,18 +55,25 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
       <ReactReduxContext.Consumer>
         {({ store }) => (
           <Canvas
-            className="w-full h-full bg-gradient-to-b from-gray-700 to-gray-100"
+            className="w-full h-full"
             camera={{ position: [0, -50, 0], up: [0, 0, 1], fov: 50, far: 5000, near: 0.1 }}
+            shadows
           >
+            <color attach="background" args={['#f0f0f0']} />
+            <fog attach="fog" args={['#f0f0f0', 10, 500]} />
             <Provider store={store}>
-              <pointLight position={[100, 100, 100]} intensity={1.8} />
-              <pointLight position={[-100, -100, 100]} intensity={1.8} />
-              <hemisphereLight
-                color="#ffffff"
-                groundColor={new THREE.Color('#b9b9b9')}
-                position={[-7, 25, 13]}
-                intensity={1.85}
-              />
+              <Environment preset="city" />
+              <ambientLight intensity={1} />
+              <pointLight position={[10, 10, 10]} intensity={1} />
+              {/* <ContactShadows
+                position={[0, -0.1, 0]}
+                opacity={0.4}
+                scale={50}
+                blur={1.5}
+                far={10}
+                resolution={256}
+                color="#000000"
+              /> */}
               <Bounds fit clip observe>
                 <CommonObjectsActions>
                   {components
@@ -84,6 +94,11 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
                             bordersVisible.filter(
                               (mb) => mb === component.keyComponent,
                             ).length > 0
+                          }
+                          materialColor={
+                            component.material
+                              ? component.material.color
+                              : '#63cbf7'
                           }
                         >
                           <FactoryShapes
@@ -127,15 +142,16 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
                 // minDistance={10}
                 // maxDistance={1000}
                 zoomSpeed={0.5}
-                // target={(orbitTarget) ? new THREE.Vector3(orbitTarget?.position[0], orbitTarget?.position[1], orbitTarget?.position[2]): new THREE.Vector3(0,0,0)}
+              // target={(orbitTarget) ? new THREE.Vector3(orbitTarget?.position[0], orbitTarget?.position[1], orbitTarget?.position[2]): new THREE.Vector3(0,0,0)}
               />
               <GizmoHelper alignment="bottom-right">
                 <GizmoViewport
                   axisColors={['red', 'green', 'blue']}
                   labelColor="white"
                 />
-                <group rotation={[-Math.PI / 2, 0, 0]}/>
+                <group rotation={[-Math.PI / 2, 0, 0]} />
               </GizmoHelper>
+              <SelectedObjectHighlighter />
             </Provider>
           </Canvas>
         )}
@@ -201,7 +217,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
   const calculateGridNumbers = useCallback((axis: 'x' | 'y' | 'z') => {
     const step = gridSize / gridDivisions; // Calcola lo step
     const start = center[axis] - halfGridSize; // Posizione iniziale rispetto al centro
-    return Array.from({ length: gridDivisions/2 + 1 }, (_, i) => start + i * 2* step);
+    return Array.from({ length: gridDivisions / 2 + 1 }, (_, i) => start + i * 2 * step);
   }, [gridSize, gridDivisions, center]);
 
   const xNumbers = calculateGridNumbers('x');
@@ -316,6 +332,47 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
   );
 }
 
+const SelectedObjectHighlighter: FC = () => {
+  const keySelectedComponent = useSelector(keySelectedComponenteSelector);
+  const components = useSelector(componentseSelector);
+  const selectedComponent = components.find(
+    (c) => c.keyComponent === keySelectedComponent
+  );
 
+  const target = useMemo(() => {
+    const t = new THREE.Object3D();
+    if (selectedComponent) {
+      const { position } = selectedComponent.transformationParams;
+      t.position.set(position[0], position[1], position[2]);
+    }
+    return t;
+  }, [selectedComponent]);
 
+  if (!selectedComponent) return null;
 
+  const { position } = selectedComponent.transformationParams;
+  const [x, y, z] = position;
+
+  return (
+    <>
+      <primitive object={target} />
+      <spotLight
+        position={[x + 20, y - 20, z + 20]}
+        angle={0.3}
+        penumbra={1}
+        intensity={2}
+        castShadow
+        target={target}
+      />
+      <spotLight
+        position={[x - 20, y + 20, z + 20]}
+        angle={0.3}
+        penumbra={1}
+        intensity={2}
+        castShadow
+        target={target}
+      />
+      <pointLight position={[x, y, z + 10]} intensity={1.5} distance={50} decay={2} />
+    </>
+  );
+};

@@ -19,29 +19,27 @@ export const Outliner: FC<OutlinerProps> = ({
 }) => {
   const invisibleMeshes = useSelector(invisibleMeshesSelector);
   return (
-    <>
-      <div className="h-fit border-2 border-black rounded p-2 bg-gradient-to-r from-white to-slate-200">
-        <div className="border-2 border-transparent text-black w-1/2 text-left pl-2 text-[11px] font-bold">
-          COMPONENTS
-        </div>
-        <div className='max-h-[150px] overflow-scroll'>
-          {components.map((component) => {
-            return (
-              <OutlinerItem
-                key={component.keyComponent + component.name}
-                keyComponent={component.keyComponent}
-                nameComponent={component.name}
-                isVisible={
-                  invisibleMeshes.filter(
-                    (key) => key === component.keyComponent,
-                  ).length === 0
-                }
-              />
-            );
-          })}
-        </div>
+    <div className="flex flex-col gap-2">
+      <div className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-left pl-2">
+        Components
       </div>
-    </>
+      <div className='max-h-[200px] overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 rounded-lg border border-gray-400 dark:border-white/5'>
+        {components.map((component) => {
+          return (
+            <OutlinerItem
+              key={component.keyComponent + component.name}
+              keyComponent={component.keyComponent}
+              nameComponent={component.name}
+              isVisible={
+                invisibleMeshes.filter(
+                  (key) => key === component.keyComponent,
+                ).length === 0
+              }
+            />
+          );
+        })}
+      </div>
+    </div>
   );
 };
 
@@ -73,38 +71,38 @@ const OutlinerItem: FC<OutlinerItemProps> = ({
 
   return (
     <div
-      className={`flex flex-row items-center ${
-        !isSelelctedComponent
-          ? 'hover:border-2 hover:border-gray-400 text-black'
-          : 'bg-black text-white border-secondaryColor'
-      } hover:cursor-pointer rounded w-full justify-between my-1 py-2`}
+      className={`flex flex-row items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 mb-1
+        ${isSelelctedComponent
+          ? 'bg-blue-500 text-white shadow-md'
+          : 'hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-gray-200'
+        }`}
     >
       {outlinerItemVisibility ? (
         <>
           <div
             key={keyComponent}
-            className="text-[10px] font-bold text-left pl-4 flex w-2/3"
+            className="text-xs font-medium text-left flex items-center gap-2 w-full cursor-pointer truncate"
             onClick={(e) =>
               objectsDetailsOptsBasedOnModality.outliner.onClickItemAction(
                 keyComponent,
               )
             }
           >
-            <CubeIcon className="w-[10px] mr-2" />
-            {nameComponent}
+            <CubeIcon className="w-4 h-4 flex-shrink-0" />
+            <span className="truncate">{nameComponent}</span>
           </div>
-          <div className="flex flex-row gap-2">
-            <div className="tooltip tooltip-left" data-tip="Hide/Show">
+          <div className="flex flex-row gap-1 items-center ml-2">
+            <div className="tooltip tooltip-left" data-tip={isVisible ? "Hide" : "Show"}>
               {isVisible ? (
                 <IoMdEye
-                  className="w-[20px]  hover:cursor-pointer"
+                  className={`w-4 h-4 cursor-pointer ${isSelelctedComponent ? 'text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
                   onClick={() => {
                     meshHidingActionBasedOnModality(keyComponent);
                   }}
                 />
               ) : (
                 <IoMdEyeOff
-                  className="w-[20px] hover:cursor-pointer"
+                  className={`w-4 h-4 cursor-pointer ${isSelelctedComponent ? 'text-white/70' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'}`}
                   onClick={() => {
                     meshUnhidingActionBasedOnModality(keyComponent);
                   }}
@@ -113,7 +111,7 @@ const OutlinerItem: FC<OutlinerItemProps> = ({
             </div>
             <div className="tooltip tooltip-left" data-tip="Rename">
               <BiRename
-                className="w-[17px] "
+                className={`w-4 h-4 cursor-pointer ${isSelelctedComponent ? 'text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
                 onClick={() => {
                   setOutlinerItemVisibility(false);
                 }}
@@ -122,50 +120,55 @@ const OutlinerItem: FC<OutlinerItemProps> = ({
             {objectsDetailsOptsBasedOnModality.deleteButton.visibility(
               keyComponent,
             ) && (
-              <div className="tooltip tooltip-left" data-tip="Delete">
-                <MdDelete
-                  className="w-[20px] pr-1"
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        objectsDetailsOptsBasedOnModality.deleteButton.messages(
+                <div className="tooltip tooltip-left" data-tip="Delete">
+                  <MdDelete
+                    className={`w-4 h-4 cursor-pointer ${isSelelctedComponent ? 'text-white' : 'text-red-500 hover:text-red-600'}`}
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          objectsDetailsOptsBasedOnModality.deleteButton.messages(
+                            keyComponent,
+                          ).popup,
+                        )
+                      ) {
+                        objectsDetailsOptsBasedOnModality.deleteButton.onClickAction(
                           keyComponent,
-                        ).popup,
-                      )
-                    ) {
-                      objectsDetailsOptsBasedOnModality.deleteButton.onClickAction(
-                        keyComponent,
-                      );
-                    }
-                  }}
-                />
-              </div>
-            )}
+                        );
+                      }
+                    }}
+                  />
+                </div>
+              )}
           </div>
         </>
       ) : (
         <>
           <input
             type="text"
-            className="text-black text-[9px] font-bold text-left py-1 pl-4 flex w-2/3"
+            className="bg-transparent border-b border-white/50 text-white text-xs font-medium w-full focus:outline-none focus:border-white px-1"
             defaultValue={nameComponent}
+            autoFocus
             onChange={(e) => setNewName(e.currentTarget.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                dispatch(updateName({ key: keyComponent, name: newName }));
+                setOutlinerItemVisibility(true);
+              }
+            }}
           />
-          <div className="flex flex-row">
-            <div className="tooltip tooltip-left" data-tip="save">
+          <div className="flex flex-row gap-1 ml-2">
+            <div className="tooltip tooltip-left" data-tip="Save">
               <IoMdSave
-                className="text-white"
-                size={20}
+                className="text-white w-4 h-4 cursor-pointer hover:text-white/80"
                 onClick={() => {
                   dispatch(updateName({ key: keyComponent, name: newName }));
                   setOutlinerItemVisibility(true);
                 }}
               />
             </div>
-            <div className="tooltip tooltip-left" data-tip="cancel">
+            <div className="tooltip tooltip-left" data-tip="Cancel">
               <MdOutlineCancel
-                className="text-white"
-                size={20}
+                className="text-white w-4 h-4 cursor-pointer hover:text-white/80"
                 onClick={() => {
                   setOutlinerItemVisibility(true);
                 }}

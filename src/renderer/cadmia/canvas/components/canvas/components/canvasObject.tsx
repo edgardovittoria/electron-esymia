@@ -1,4 +1,4 @@
-import React, {ReactNode, useEffect, useRef} from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setNextTransformationActive,
@@ -15,6 +15,16 @@ export interface ComponentProps {
   keyComponent: number;
   borderVisible: boolean;
   setMeshRef: Function;
+  materialColor?: string;
+}
+
+const getContrastingColor = (hexColor: string) => {
+  const hex = hexColor.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return (yiq >= 128) ? '#000000' : '#ffffff';
 }
 
 export const CanvasObject: React.FC<ComponentProps> = ({
@@ -22,13 +32,14 @@ export const CanvasObject: React.FC<ComponentProps> = ({
   transformationParams,
   keyComponent,
   borderVisible,
-  setMeshRef
+  setMeshRef,
+  materialColor = "#63cbf7"
 }) => {
   const dispatch = useDispatch();
   const selectedComponentKey = useSelector(keySelectedComponenteSelector);
   const mesh = useRef(null);
   const bounds = useBounds()
-  const {canvasObjectOpsBasedOnModality} = useCadmiaModalityManager()
+  const { canvasObjectOpsBasedOnModality } = useCadmiaModalityManager()
 
   useEffect(() => {
     keyComponent === selectedComponentKey &&
@@ -47,10 +58,21 @@ export const CanvasObject: React.FC<ComponentProps> = ({
       position={transformationParams.position}
       rotation={transformationParams.rotation}
       scale={transformationParams.scale}
+      castShadow
+      receiveShadow
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        document.body.style.cursor = 'pointer';
+      }}
+      onPointerOut={(e) => {
+        e.stopPropagation();
+        document.body.style.cursor = 'auto';
+      }}
       onDoubleClick={(e) => {
         e.stopPropagation()
         bounds.refresh(e.object).fit().clip()
-        dispatch(setFocusNotToScene())}
+        dispatch(setFocusNotToScene())
+      }
       }
       /* onContextMenu={(e) => {
         e.stopPropagation();
@@ -62,7 +84,8 @@ export const CanvasObject: React.FC<ComponentProps> = ({
       }}
     >
       {children}
-      {borderVisible && <Edges />}
+      {children}
+      {borderVisible && <Edges color={getContrastingColor(materialColor)} threshold={15} />}
     </mesh>
   );
 };

@@ -21,7 +21,7 @@ interface CreateNewProjectModalProps {
 
 export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
 
-                                                                            }) => {
+}) => {
   const dispatch = useDispatch();
 
   const user = useSelector(usersStateSelector);
@@ -46,7 +46,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         meshData: {
           meshApproved: false,
           meshGenerated: 'Not Generated',
-          quantum: [0,0,0],
+          quantum: [0, 0, 0],
           pathToExternalGridsNotFound: false,
           validTopology: true,
           type: 'Standard',
@@ -77,7 +77,7 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
     <>
       {/* eslint-disable-next-line react/jsx-no-undef */}
       <Transition appear show={true} as={Fragment}>
-        <Dialog as='div' className='relative z-10' onClose={() => {}}>
+        <Dialog as='div' className='relative z-10' onClose={() => { }}>
           <Transition.Child
             as={Fragment}
             enter='ease-out duration-300'
@@ -102,61 +102,81 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                 leaveTo='opacity-0 scale-95'
               >
                 <Dialog.Panel
-                  className={`w-full max-w-md transform overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark '} p-6 text-left align-middle shadow-xl transition-all`}>
+                  className={`w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-2xl transition-all backdrop-blur-md ${theme === 'light'
+                    ? 'bg-white/90 border border-white/40'
+                    : 'bg-black/80 border border-white/10'
+                    }`}>
                   <Dialog.Title
                     as='h3'
-                    className='text-lg font-medium leading-6 '
+                    className={`text-lg font-bold mb-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}
                   >
-                    CREATE NEW PROJECT
+                    Create New Project
                   </Dialog.Title>
-                  <hr className='mt-2 mb-3' />
+
                   {user.email ?
-                    <div className='flex flex-col'>
-                      <div className='p-2'>
-                        <h6>Insert Project's Name</h6>
+                    <div className='flex flex-col gap-6'>
+                      <div className='flex flex-col gap-2'>
+                        <span className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
+                          Project Name
+                        </span>
                         <input
                           type='text'
                           data-testid="projectName"
-                          className={`formControl ${theme === 'light' ? 'bg-gray-100 text-textColor' : 'bg-bgColorDark text-textColorDark'}  rounded p-2 w-full mt-3`}
-                          placeholder="Project's Name"
+                          className={`w-full rounded-xl px-4 py-3 outline-none transition-all duration-200 ${theme === 'light'
+                            ? 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-100 placeholder-gray-400'
+                            : 'bg-black/40 border border-white/10 text-white focus:border-green-500/50 focus:bg-black/60 placeholder-gray-500'
+                            }`}
+                          placeholder="Enter project name"
                           value={projectName}
                           onChange={(e) => setProjectName(e.target.value)}
+                          autoFocus
                         />
                       </div>
-                      <div className='p-2'>
-                        <h6>Insert Project's Description</h6>
+                      <div className='flex flex-col gap-2'>
+                        <span className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
+                          Description
+                        </span>
                         <textarea
-                          className={`formControl h-[100px] ${theme === 'light' ? 'bg-gray-100 text-textColor' : 'bg-bgColorDark text-textColorDark'}  rounded p-2 w-full mt-3`}
+                          className={`w-full h-32 rounded-xl px-4 py-3 outline-none transition-all duration-200 resize-none ${theme === 'light'
+                            ? 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-100 placeholder-gray-400'
+                            : 'bg-black/40 border border-white/10 text-white focus:border-green-500/50 focus:bg-black/60 placeholder-gray-500'
+                            }`}
                           data-testid="projectDescription"
-                          placeholder="Project's Description"
+                          placeholder="Enter project description (optional)"
                           value={projectDescription}
                           onChange={(e) => setProjectDescription(e.target.value)}
                         />
                       </div>
                     </div>
                     :
-                    <div className='flex flex-col'>
-                      <div className='p-2'>
-                        <h6>Please login first in order to create a new project.</h6>
-                      </div>
+                    <div className='flex flex-col items-center justify-center py-8 text-center'>
+                      <p className={`text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}>
+                        Please login first in order to create a new project.
+                      </p>
                     </div>
                   }
 
-                  <div className='mt-4 flex justify-between'>
+                  <div className='mt-8 flex justify-end gap-3'>
                     <button
                       type='button'
-                      className='button bg-red-500 text-white'
+                      className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${theme === 'light'
+                        ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900'
+                        : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white'
+                        }`}
                       onClick={() => dispatch(setShowCreateNewProjectModal(false))}
                     >
-                      CANCEL
+                      Cancel
                     </button>
                     {user.email &&
                       <button
                         type='button'
-                        className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark text-textColor'}`}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 shadow-lg ${theme === 'light'
+                          ? 'bg-green-500 text-white hover:bg-green-600 hover:shadow-green-500/30'
+                          : 'bg-green-600 text-white hover:bg-green-500 hover:shadow-green-500/20'
+                          }`}
                         onClick={handleCreate}
                       >
-                        CREATE
+                        Create Project
                       </button>
                     }
                   </div>
@@ -167,41 +187,5 @@ export const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
         </Dialog>
       </Transition>
     </>
-
-    /* <Modal show={true} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>CREATE NEW PROJECT</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <div className="d-grid">
-                    <div className="p-2">
-                        <h6>Insert Project's Name</h6>
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Project's Name"
-                            value={projectName}
-                            onChange={(e) => setProjectName(e.target.value)}/>
-                    </div>
-                    <div className="p-2">
-                        <h6>Insert Project's Description</h6>
-                        <textarea
-                            className="form-control"
-                            placeholder="Project's Description"
-                            value={projectDescription}
-                            onChange={(e) => setProjectDescription(e.target.value)}/>
-                    </div>
-                </div>
-
-            </Modal.Body>
-            <Modal.Footer>
-                <button className="button btn-secondary" onClick={handleClose}>
-                    CLOSE
-                </button>
-                <button className="button buttonPrimary" onClick={handleCreate}>
-                    CREATE
-                </button>
-            </Modal.Footer>
-        </Modal>*/
   );
 };

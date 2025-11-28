@@ -142,6 +142,7 @@
     "react-screen-capture": "^1.1.1",
     "react-statusbar": "^0.0.4",
     "react-use-websocket": "^3.0.0",
+    "recharts": "^3.5.1",
     "redux-persist": "^6.0.0",
     "redux-undo": "^1.0.1",
     "three": "^0.162.0",
@@ -328,10 +329,6 @@
   },
   "collective": {
     "url": "https://opencollective.com/electron-react-boilerplate-594"
-  },
-  "devEngines": {
-    "node": ">=14.x",
-    "npm": ">=7.x"
   },
   "electronmon": {
     "patterns": [

@@ -33,7 +33,7 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
 
   return (
     <Transition appear show={show} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={() => setShow(false)}>
+      <Dialog as="div" className="relative z-50" onClose={() => setShow(false)}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -43,11 +43,11 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -57,82 +57,62 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className={`w-full max-w-[800px] h-[450px] mt-14 transform overflow-hidden rounded-2xl ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} p-6 text-left align-middle shadow-xl transition-all`}>
+              <Dialog.Panel className={`w-full max-w-[800px] transform overflow-hidden rounded-2xl p-8 text-left align-middle shadow-2xl transition-all border ${theme === 'light'
+                  ? 'bg-white/90 border-white/20 text-gray-800'
+                  : 'bg-gray-900/90 border-white/10 text-white'
+                } backdrop-blur-xl`}>
                 <Dialog.Title
                   as="h3"
-                  className={`text-lg font-medium leading-6`}
+                  className={`text-xl font-bold leading-6 mb-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}
                 >
-                  SELECT PORT TYPE
+                  Select Port Type
                 </Dialog.Title>
-                <hr className="mt-2 mb-3" />
-                <div className="flex">
-                  <div
-                    className={`w-1/3 text-center ${theme === 'light' ? 'hover:ng-green-100' : 'hover:bg-bgColorDark'}`}
-                    onClick={() => {
-                      dispatch(
-                        setPortType({ name: selectedPort.name, type: 1 }),
-                      );
-                      setSavedPortParameters(false);
-                      setShow(false);
-                    }}
-                  >
-                    <img src={theme === 'light' ? portType1 : portType1Dark} className="mx-auto" alt="img" />
-                    <div>Type 1</div>
-                  </div>
-                  <div
-                    className={`w-1/3 text-center ${theme === 'light' ? 'hover:ng-green-100' : 'hover:bg-bgColorDark'}`}
-                    onClick={() => {
-                      dispatch(
-                        setPortType({ name: selectedPort.name, type: 2 }),
-                      );
-                      setSavedPortParameters(false);
-                      setShow(false);
-                    }}
-                  >
-                    <img src={theme === 'light' ? portType2 : portType2Dark} className="mx-auto" alt="img" />
-                    <div>Type 2</div>
-                  </div>
-                  <div
-                    className={`w-1/3 text-center ${theme === 'light' ? 'hover:ng-green-100' : 'hover:bg-bgColorDark'}`}
-                    onClick={() => {
-                      dispatch(
-                        setPortType({ name: selectedPort.name, type: 3 }),
-                      );
-                      setSavedPortParameters(false);
-                      setShow(false);
-                    }}
-                  >
-                    <img src={theme === 'light' ? portType3 : portType3Dark} className="mx-auto" alt="img" />
-                    <div>Type 3</div>
-                  </div>
+
+                <div className="grid grid-cols-3 gap-6 mb-6">
+                  {[
+                    { type: 1, img: theme === 'light' ? portType1 : portType1Dark, label: 'Type 1' },
+                    { type: 2, img: theme === 'light' ? portType2 : portType2Dark, label: 'Type 2' },
+                    { type: 3, img: theme === 'light' ? portType3 : portType3Dark, label: 'Type 3' },
+                  ].map((item) => (
+                    <div
+                      key={item.type}
+                      className={`flex flex-col items-center justify-center p-4 rounded-xl cursor-pointer transition-all duration-200 border ${theme === 'light'
+                          ? 'hover:bg-blue-50 border-transparent hover:border-blue-200 hover:shadow-md'
+                          : 'hover:bg-white/10 border-transparent hover:border-white/20 hover:shadow-lg hover:shadow-white/5'
+                        }`}
+                      onClick={() => {
+                        dispatch(setPortType({ name: selectedPort.name, type: item.type }));
+                        setSavedPortParameters(false);
+                        setShow(false);
+                      }}
+                    >
+                      <img src={item.img} className="h-32 object-contain mb-3" alt={item.label} />
+                      <div className="font-medium">{item.label}</div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-baseline">
-                  <div
-                    className={`w-1/2 text-center ${theme === 'light' ? 'hover:ng-green-100' : 'hover:bg-bgColorDark'}`}
-                    onClick={() => {
-                      dispatch(
-                        setPortType({ name: selectedPort.name, type: 4 }),
-                      );
-                      setSavedPortParameters(false);
-                      setShow(false);
-                    }}
-                  >
-                    <img src={theme === 'light' ? portType4 : portType4Dark} className="mx-auto" alt="img" />
-                    <div>Type 4</div>
-                  </div>
-                  <div
-                    className={`w-1/2 text-center ${theme === 'light' ? 'hover:ng-green-100' : 'hover:bg-bgColorDark'}`}
-                    onClick={() => {
-                      dispatch(
-                        setPortType({ name: selectedPort.name, type: 5 }),
-                      );
-                      setSavedPortParameters(false);
-                      setShow(false);
-                    }}
-                  >
-                    <img src={theme === 'light' ? portType5 : portType5Dark} className="mx-auto" alt="img" />
-                    <div>Type 5</div>
-                  </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  {[
+                    { type: 4, img: theme === 'light' ? portType4 : portType4Dark, label: 'Type 4' },
+                    { type: 5, img: theme === 'light' ? portType5 : portType5Dark, label: 'Type 5' },
+                  ].map((item) => (
+                    <div
+                      key={item.type}
+                      className={`flex flex-col items-center justify-center p-4 rounded-xl cursor-pointer transition-all duration-200 border ${theme === 'light'
+                          ? 'hover:bg-blue-50 border-transparent hover:border-blue-200 hover:shadow-md'
+                          : 'hover:bg-white/10 border-transparent hover:border-white/20 hover:shadow-lg hover:shadow-white/5'
+                        }`}
+                      onClick={() => {
+                        dispatch(setPortType({ name: selectedPort.name, type: item.type }));
+                        setSavedPortParameters(false);
+                        setShow(false);
+                      }}
+                    >
+                      <img src={item.img} className="h-32 object-contain mb-3" alt={item.label} />
+                      <div className="font-medium">{item.label}</div>
+                    </div>
+                  ))}
                 </div>
               </Dialog.Panel>
             </Transition.Child>
@@ -140,13 +120,5 @@ export const ModalSelectPortType: React.FC<ModalSelectPortTypeProps> = ({
         </div>
       </Dialog>
     </Transition>
-    /* <Modal show={show} onHide={() => setShow(false)} size="lg" >
-            <Modal.Header closeButton>
-                <Modal.Title>SELECT PORT TYPE</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-
-            </Modal.Body>
-        </Modal> */
   );
 };

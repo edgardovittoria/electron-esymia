@@ -49,7 +49,8 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
   const mainFolder = useSelector(mainFolderSelector);
   const projects = useSelector(projectsSelector);
   const projectsTabs = useSelector(projectsTabsSelector);
-  const theme = useSelector(ThemeSelector)
+  const theme = useSelector(ThemeSelector);
+  const isDark = theme !== 'light';
 
   function getAllSimulation(folder: Folder) {
     let sim: Simulation[] = [];
@@ -66,113 +67,51 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
   const [order, setOrder] = useState('Started Date');
 
   useEffect(() => {
-    //console.log(mainFolder)
     setSimulations(getAllSimulation(mainFolder));
   }, [mainFolder]);
-
-  /* function showResultsIcon(id: string) {
-    document.getElementById(id)?.setAttribute('style', 'visibility: visible');
-  }
-
-  function hideResultsIcon(id: string) {
-    document.getElementById(id)?.setAttribute('style', 'visibility: hidden');
-  } */
 
   function factoryStatusIcon(status: string) {
     switch (status) {
       case 'Completed':
-        return <FaCheck color="#1aa33c" />;
+        return <FaCheck className="text-green-500" />;
       case 'Failed':
-        return <TiDelete color="#ec0c0c" />;
+        return <TiDelete className="text-red-500" size={20} />;
       case 'Running':
-        return <ImSpinner className="w-6 h-6 animate-spin text-green-400" />;
+        return <ImSpinner className="w-5 h-5 animate-spin text-green-400" />;
       case 'Queued':
-        return <MdWatchLater color="#ffcc00" />;
+        return <MdWatchLater className="text-yellow-400" />;
       default:
         return <></>;
     }
   }
 
   return (
-    <div className={`text-center p-[20px] box w-full flex flex-col h-fit ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'}`}>
-      <div className="flex flex-row justify-between w-full items-center">
-        <h5 className="text-left text-base p-2">Simulations</h5>
-        <div className="tooltip" data-tip="Order By">
-          <div className="dropdown dropdown-left">
-            <div tabIndex={0} role="button">
-              <FaSortAlphaDown
-                size={22}
-                className="hover:opacity-50 hover:cursor-pointer"
-              />
-            </div>
-            <ul
-              tabIndex={0}
-              className={`dropdown-content menu ${theme === 'light' ? 'bg-white hover:bg-white text-textColor' : 'bg-bgColorDark text-textColorDark'} rounded-box z-[1] mt-2 w-52 p-2 shadow`}
-            >
-              <li
-                className="flex flex-row items-center gap-4"
-                onClick={() => {
-                  setOrder('Name');
-                  setSimulations((prev) => {
-                    const simToSort = [...prev];
-                    simToSort.sort((sim1, sim2) => {
-                      if (sim1.name < sim2.name) {
-                        return -1;
-                      } else if (sim1.name > sim2.name) {
-                        return 1;
-                      }
-                      return 0;
-                    });
-                    return simToSort;
-                  });
-                }}
-              >
-                <div className="flex flex-row items-center gap-4">
-                  <a>Name</a>
-                  {order === 'Name' && (
-                    <IoCheckmark size={15} className="text-green-600" />
-                  )}
-                </div>
-              </li>
-              <li
-                onClick={() => {
-                  setOrder('Started Date');
-                  setSimulations((prev) => {
-                    const simToSort = [...prev];
-                    simToSort.sort((sim1, sim2) => {
-                      if (parseInt(sim1.started) < parseInt(sim2.started)) {
-                        return -1;
-                      } else if (
-                        parseInt(sim1.started) > parseInt(sim2.started)
-                      ) {
-                        return 1;
-                      }
-                      return 0;
-                    });
-                    return simToSort;
-                  });
-                }}
-              >
+    <div className={`glass-panel ${isDark ? 'glass-panel-dark' : 'glass-panel-light'} rounded-2xl p-6 flex flex-col h-full w-full`}>
+      <div className="flex flex-row justify-between w-full items-center mb-6">
+        <h5 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Simulations</h5>
 
-                <div className="flex flex-row items-center gap-4">
-                  <a>Started Date</a>
-                  {order === 'Started Date' && (
-                    <IoCheckmark size={15} className="text-green-600" />
-                  )}
-                </div>
-              </li>
-              <li
+        <div className="relative group">
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${isDark ? 'bg-white/5 hover:bg-white/10 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>
+            <span className="text-sm">Sort by: {order}</span>
+            <FaSortAlphaDown />
+          </button>
+
+          <div className={`absolute right-0 mt-2 w-48 py-2 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-100'}`}>
+            {['Name', 'Started Date', 'Simulation Time'].map((item) => (
+              <div
+                key={item}
+                className={`px-4 py-2 text-sm cursor-pointer flex items-center justify-between ${isDark ? 'hover:bg-white/5 text-gray-300' : 'hover:bg-gray-50 text-gray-700'}`}
                 onClick={() => {
-                  setOrder('Simulation Time');
+                  setOrder(item);
                   setSimulations((prev) => {
                     const simToSort = [...prev];
                     simToSort.sort((sim1, sim2) => {
-                      if (parseInt(sim1.ended)-parseInt(sim1.started) < parseInt(sim2.ended)-parseInt(sim2.started)) {
-                        return -1;
-                      } else if (
-                        parseInt(sim1.ended)-parseInt(sim1.started) > parseInt(sim2.ended)-parseInt(sim2.started)
-                      ) {
-                        return 1;
+                      if (item === 'Name') return sim1.name.localeCompare(sim2.name);
+                      if (item === 'Started Date') return parseInt(sim1.started) - parseInt(sim2.started);
+                      if (item === 'Simulation Time') {
+                        const time1 = parseInt(sim1.ended) - parseInt(sim1.started);
+                        const time2 = parseInt(sim2.ended) - parseInt(sim2.started);
+                        return time1 - time2;
                       }
                       return 0;
                     });
@@ -180,99 +119,66 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
                   });
                 }}
               >
-
-                <div className="flex flex-row items-center gap-4">
-                  <a>Simulation Time</a>
-                  {order === 'Simulation Time' && (
-                    <IoCheckmark size={15} className="text-green-600" />
-                  )}
-                </div>
-              </li>
-            </ul>
+                {item}
+                {order === item && <IoCheckmark className="text-green-500" />}
+              </div>
+            ))}
           </div>
         </div>
       </div>
+
       {simulations.length > 0 ? (
-        <div className={`overflow-scroll h-full ${maxH} w-full`}>
-          <table className="table mt-4 w-full">
-            <thead className={`sticky top-0 ${theme === 'light' ? 'bg-[#f4f4f4]' : 'bg-bgColorDark text-secondaryColorDark'}`}>
+        <div className={`overflow-auto flex-1 w-full ${maxH}`}>
+          <table className="w-full text-left border-collapse">
+            <thead className={`sticky top-0 z-10 ${isDark ? 'bg-gray-800/90 text-gray-400' : 'bg-gray-50/90 text-gray-500'} backdrop-blur-sm`}>
               <tr>
-                <th className="py-4" scope="col" />
-                <th className="py-4" scope="col">
-                  Project - Name
-                </th>
-                <th className="py-4" scope="col">
-                  Started
-                </th>
-                <th className="py-4" scope="col">
-                  Ended
-                </th>
-                <th className="py-4" scope="col">
-                  Simulation Time
-                </th>
-                <th className="py-4" scope="col">
-                  Status
-                </th>
-                <th className="py-4" scope="col" />
+                <th className="py-3 px-4 font-medium text-sm rounded-l-lg">Status</th>
+                <th className="py-3 px-4 font-medium text-sm">Project - Name</th>
+                <th className="py-3 px-4 font-medium text-sm">Started</th>
+                <th className="py-3 px-4 font-medium text-sm">Ended</th>
+                <th className="py-3 px-4 font-medium text-sm">Duration</th>
+                <th className="py-3 px-4 font-medium text-sm">Status Text</th>
+                <th className="py-3 px-4 font-medium text-sm rounded-r-lg">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-200/10">
               {simulations.map((simulation, index) => {
-                const statusIcon: JSX.Element = factoryStatusIcon(
-                  simulation.status,
-                );
+                const statusIcon = factoryStatusIcon(simulation.status);
                 const started = new Date(parseInt(simulation.started));
                 const ended = new Date(parseInt(simulation.ended));
                 return (
                   <tr
                     key={`${simulation.name}_${index}`}
-                    className={`${theme === 'light' ? 'hover:bg-[#f1f1f1]' : 'hover:bg-bgColorDark'}`}
+                    className={`group transition-colors duration-200 ${isDark ? 'hover:bg-white/5' : 'hover:bg-gray-50'}`}
                   >
-                    <td scope="row" className="pl-8">
-                      {statusIcon}
-                    </td>
-                    <td className="fw-bold py-4">{simulation.name}</td>
-                    <td className="py-4">{`${started.toLocaleString()}`}</td>
-                    <td className="py-4">{`${ended.toLocaleString()}`}</td>
-                    <td className="py-4">
-                      {msToTime(ended.getTime() - started.getTime())}
-                    </td>
-                    <td className="py-4">{simulation.status}</td>
-                    <td
-                      id={index.toString()}
-                      className="py-4 hover:cursor-pointer"
-                    >
-                      <AiOutlineBarChart
-                        color="#00ae52"
-                        style={{ width: '30px', height: '30px' }}
+                    <td className="py-3 px-4 pl-6">{statusIcon}</td>
+                    <td className={`py-3 px-4 font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>{simulation.name}</td>
+                    <td className={`py-3 px-4 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{started.toLocaleString()}</td>
+                    <td className={`py-3 px-4 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{ended.toLocaleString()}</td>
+                    <td className={`py-3 px-4 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{msToTime(ended.getTime() - started.getTime())}</td>
+                    <td className={`py-3 px-4 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{simulation.status}</td>
+                    <td className="py-3 px-4">
+                      <button
+                        className={`p-2 rounded-lg transition-all duration-200 ${isDark ? 'hover:bg-white/10 text-green-400' : 'hover:bg-green-50 text-green-600'}`}
                         onClick={() => {
-                          const proj = findProjectByFaunaID(
-                            projects,
-                            simulation.associatedProject,
-                          );
+                          const proj = findProjectByFaunaID(projects, simulation.associatedProject);
                           if (proj?.portsS3 && proj.ports.length === 0) {
                             setPortsFromS3(proj, dispatch);
                           }
                           if (proj) {
-                            if (
-                              projectsTabs.filter(
-                                (p) =>
-                                  p.id === proj?.id,
-                              ).length > 0
-                            ) {
-                              dispatch(
-                                selectTab(proj.id as string),
-                              );
+                            if (projectsTabs.some((p) => p.id === proj.id)) {
+                              dispatch(selectTab(proj.id as string));
                             } else {
                               dispatch(addProjectTab(proj));
                             }
-                            dispatch(
-                              selectProject(simulation.associatedProject),
-                            );
+                            dispatch(selectProject(simulation.associatedProject));
                             dispatch(selectMenuItem('Results'));
                           }
                         }}
-                      />
+                        title="View Results"
+                      >
+                        <AiOutlineBarChart size={20} />
+                      </button>
                     </td>
                   </tr>
                 );
@@ -281,13 +187,12 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
           </table>
         </div>
       ) : (
-        <div>
+        <div className="flex flex-col items-center justify-center flex-1">
           <img
-            src={theme === 'light' ? noresultfound : noresultfoundDark}
-            className="my-[46px] mx-auto"
-            alt="No Results Icon"
+            src={theme === 'light' ? noresultfound : noresultfound}
+            className="w-1/4 mb-4"
+            alt="No Results"
           />
-          <p>No results found</p>
         </div>
       )}
     </div>

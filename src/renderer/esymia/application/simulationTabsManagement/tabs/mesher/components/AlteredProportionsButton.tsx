@@ -15,19 +15,19 @@ export const AlteredProportionsButton: FC<{
   const theme = useSelector(ThemeSelector)
 
   const calculateScalingViewParams = (selectedProject: Project) => {
-    let scalingFactors = {x:1, y:1, z:1}
+    let scalingFactors = { x: 1, y: 1, z: 1 }
     let dims = calculateModelBoundingBox(selectedProject).getSize(new THREE.Vector3());
-    if(dims.x >= dims.y && dims.x >= dims.z){
-      scalingFactors.y = (dims.x/dims.y) > threshold ? (dims.x/dims.y)/threshold : 1 // threshold è un valore scelto a caso per fissare una soglia che le dimensioni devono essere in rapporto minore o uguale a threshold.
-      scalingFactors.z = (dims.x/dims.z) > threshold ? (dims.x/dims.z)/threshold : 1
+    if (dims.x >= dims.y && dims.x >= dims.z) {
+      scalingFactors.y = (dims.x / dims.y) > threshold ? (dims.x / dims.y) / threshold : 1 // threshold è un valore scelto a caso per fissare una soglia che le dimensioni devono essere in rapporto minore o uguale a threshold.
+      scalingFactors.z = (dims.x / dims.z) > threshold ? (dims.x / dims.z) / threshold : 1
     }
-    else if(dims.y >= dims.x && dims.y >= dims.z){
-      scalingFactors.x = (dims.y/dims.x) > threshold ? (dims.y/dims.x)/threshold : 1
-      scalingFactors.z = (dims.y/dims.z) > threshold ? (dims.y/dims.z)/threshold : 1
+    else if (dims.y >= dims.x && dims.y >= dims.z) {
+      scalingFactors.x = (dims.y / dims.x) > threshold ? (dims.y / dims.x) / threshold : 1
+      scalingFactors.z = (dims.y / dims.z) > threshold ? (dims.y / dims.z) / threshold : 1
     }
     else {
-      scalingFactors.x = (dims.z/dims.x) > threshold ? (dims.z/dims.x)/threshold : 1
-      scalingFactors.y = (dims.z/dims.y) > threshold ? (dims.z/dims.y)/threshold : 1
+      scalingFactors.x = (dims.z / dims.x) > threshold ? (dims.z / dims.x) / threshold : 1
+      scalingFactors.y = (dims.z / dims.y) > threshold ? (dims.z / dims.y) / threshold : 1
     }
     return scalingFactors
   }
@@ -37,18 +37,21 @@ export const AlteredProportionsButton: FC<{
 
   return (
     <div
-      className='tooltip'
+      className='tooltip tooltip-bottom'
       data-tip={
         'Set view with altered scaling factor along axis, to better visualize bricks. It works only if dimensions differ of a factor greather than set threshold.'
       }
     >
       <button
-        className={`${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} rounded p-2`}
+        className={`p-3 rounded-xl transition-all duration-300 ${theme === 'light'
+          ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
+          : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
+          }`}
         onClick={() => {
           dispatch(setScalingViewParamsOfMesh(alteredParams))
         }}
       >
-      <TbAxisX className='h-5 w-5 text-green-300 hover:text-secondaryColor' />
+        <TbAxisX className='h-6 w-6' />
       </button>
     </div>
   );

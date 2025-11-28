@@ -32,18 +32,18 @@ const CAD: React.FC<CanvasProps> = ({ setShowCad }) => {
   const loadingSpinner = useSelector(LoadingSpinnerSelector)
   const theme = useSelector(ThemeSelector);
   return (
-    <div className="m-0 h-[97vh] relative">
+    <div className="relative w-full h-[calc(100%-4vh)]">
       {loadingSpinner &&
-          <ImSpinner className={`animate-spin w-10 h-10 absolute top-1/2 left-1/2 z-50 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
+        <ImSpinner className={`animate-spin w-10 h-10 absolute top-1/2 left-1/2 z-50 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`} />
       }
-      <div className={`${loadingSpinner ? 'opacity-40' : 'opacity-100'}`}>
+      <div className={`h-full w-full transition-opacity duration-300 ${loadingSpinner ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
         <SetUserInfo />
         <Navbar setShowCad={setShowCad} />
         <KeyboardEventMapper />
-        <div className="w-full p-0 relative">
-          <CadmiaCanvas triggerUpdate={triggerUpdate}/>
-          <div className="absolute left-[15px] top-[10px] flex gap-4 items-start justify-center">
-            <MiscToolbar adaptGridsToScene={handleUpdateGrid}/>
+        <div className="relative w-full h-[calc(100%-3vh)]">
+          <CadmiaCanvas triggerUpdate={triggerUpdate} />
+          <div className="absolute left-4 top-4 flex gap-2 items-start z-10">
+            <MiscToolbar adaptGridsToScene={handleUpdateGrid} />
             <BinaryOpsToolbar />
             <ShapesToolbar />
             <TransformationsToolBar />

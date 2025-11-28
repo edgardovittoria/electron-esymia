@@ -123,7 +123,7 @@ export const Physics: React.FC<PhysicsProps> = ({
           createOrUpdateProjectInDynamoDB,
           selectedProject,
           dispatch,
-        ).then(() => {});
+        ).then(() => { });
       }
     }
   }, [savedPhysicsParameters]);
@@ -150,7 +150,7 @@ export const Physics: React.FC<PhysicsProps> = ({
         setSavedPortParameters={setSavedPhysicsParameters}
         setSurfaceAdvices={setSurfaceAdvices}
       />
-      <div className="absolute lg:left-[32%] left-[28%] gap-2 top-[180px] flex flex-col items-center">
+      <div className="absolute lg:left-[32%] left-[28%] gap-2 top-0 flex flex-col items-center">
         <div className="gap-2 flex flex-row">
           {selectedProject?.model.components && (
             <>
@@ -165,11 +165,10 @@ export const Physics: React.FC<PhysicsProps> = ({
               <ResetFocusButton toggleResetFocus={toggleResetFocus} />
               <div className="">
                 <div
-                  className={`tooltip rounded tooltip-right ${
-                    theme === 'light'
-                      ? 'bg-white text-blue-500'
-                      : 'bg-bgColorDark2 text-blue-300'
-                  } p-2`}
+                  className={`tooltip rounded tooltip-right ${theme === 'light'
+                    ? 'bg-white text-blue-500'
+                    : 'bg-bgColorDark2 text-blue-300'
+                    } p-2`}
                   data-tip="Port Positioning Info"
                   onClick={() => setShowAdvices(!showAdvices)}
                 >
@@ -211,11 +210,10 @@ export const Physics: React.FC<PhysicsProps> = ({
         setSelectedTabLeftPanel={setSelectedTabLeftPanel}
       />
       <div
-        className={`absolute left-[2%] top-[420px] rounded max-h-[500px] flex flex-col items-center gap-0 ${
-          theme === 'light'
-            ? 'bg-white text-textColor'
-            : 'bg-bgColorDark2 text-textColorDark'
-        }`}
+        className={`absolute left-[2%] top-[400px] rounded max-h-[500px] flex flex-col items-center gap-0 ${theme === 'light'
+          ? 'bg-white text-textColor'
+          : 'bg-bgColorDark2 text-textColorDark'
+          }`}
       >
         <button
           disabled={
@@ -252,11 +250,10 @@ const PositioningPortsInfo: FC = () => {
   const theme = useSelector(ThemeSelector);
   return (
     <div
-      className={`fixed bottom-20 right-5 flex flex-col ${
-        theme === 'light'
-          ? 'bg-white text-textColor'
-          : 'bg-bgColorDark2 text-textColorDark'
-      } shadow-2xl text-sm text-start p-[10px] max-w-[300px] max-h-[300px] overflow-y-scroll`}
+      className={`fixed bottom-20 right-5 flex flex-col ${theme === 'light'
+        ? 'bg-white text-textColor'
+        : 'bg-bgColorDark2 text-textColorDark'
+        } shadow-2xl text-sm text-start p-[10px] max-w-[300px] max-h-[300px] overflow-y-scroll`}
     >
       <span className="font-semibold">
         Once you have added a new termination, you can place it in the following
@@ -302,11 +299,10 @@ const SurfaceAdvicesButton: FC<{
       }
     >
       <button
-        className={`${
-          theme === 'light'
-            ? 'bg-white text-textColor'
-            : 'bg-bgColorDark2 text-textColorDark'
-        } rounded p-2 disabled:opacity-40`}
+        className={`${theme === 'light'
+          ? 'bg-white text-textColor'
+          : 'bg-bgColorDark2 text-textColorDark'
+          } rounded p-2 disabled:opacity-40`}
         onClick={() => setSurfaceAdvices(!surfaceAdvices)}
         disabled={
           selectedProject && selectedProject?.simulation?.resultS3
@@ -333,7 +329,7 @@ const PhysicsLeftPanel: FC<{
       tabs={['Mesher']}
       selectedTab={selectedTabLeftPanel}
       setSelectedTab={setSelectedTabLeftPanel}
-      className="absolute left-[2%] top-[180px] md:w-1/4 xl:w-1/6"
+      className="absolute left-[2%] top-0 md:w-1/4 xl:w-1/6"
     >
       <PhysicsLeftPanelTab />
     </MyPanel>
@@ -351,92 +347,91 @@ const PhysicsRightPanel: FC<{
   savedPhysicsParameters,
   setSavedPhysicsParameters,
 }) => {
-  const selectedProject = useSelector(selectedProjectSelector);
-  const selectedPort = findSelectedPort(selectedProject);
-  const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
-  const theme = useSelector(ThemeSelector);
-  return (
-    <MyPanel
-      tabs={[physicsRightPanelTitle.first, physicsRightPanelTitle.second]}
-      selectedTab={selectedTabRightPanel}
-      setSelectedTab={setSelectedTabRightPanel}
-      className="absolute right-[2%] top-[180px] w-1/4 max-h-[500px]"
-    >
-      {selectedTabRightPanel === physicsRightPanelTitle.first ? (
-        <>
-          {selectedPort?.category === 'lumped' ? (
-            <PortManagement selectedPort={selectedPort}>
-              <PortType
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setShow={setShowModalSelectPortType}
-                selectedPort={selectedPort as TempLumped}
-              />
-              <RLCParamsComponent
-                selectedPort={selectedPort as TempLumped}
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-              <PortPosition
-                selectedPort={selectedPort as Port | TempLumped}
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-              {selectedProject?.simulation?.status !== 'Completed' && (
-                <ModalSelectPortType
-                  show={showModalSelectPortType}
+    const selectedProject = useSelector(selectedProjectSelector);
+    const selectedPort = findSelectedPort(selectedProject);
+    const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
+    const theme = useSelector(ThemeSelector);
+    return (
+      <MyPanel
+        tabs={[physicsRightPanelTitle.first, physicsRightPanelTitle.second]}
+        selectedTab={selectedTabRightPanel}
+        setSelectedTab={setSelectedTabRightPanel}
+        className="absolute right-[2%] top-0 w-1/4 max-h-[500px]"
+      >
+        {selectedTabRightPanel === physicsRightPanelTitle.first ? (
+          <>
+            {selectedPort?.category === 'lumped' ? (
+              <PortManagement selectedPort={selectedPort}>
+                <PortType
+                  disabled={selectedProject?.simulation?.status === 'Completed'}
                   setShow={setShowModalSelectPortType}
                   selectedPort={selectedPort as TempLumped}
+                />
+                <RLCParamsComponent
+                  selectedPort={selectedPort as TempLumped}
+                  disabled={selectedProject?.simulation?.status === 'Completed'}
                   setSavedPortParameters={setSavedPhysicsParameters}
                 />
-              )}
-            </PortManagement>
-          ) : (
-            <PortManagement selectedPort={selectedPort}>
-              <ScatteringParameter
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-              <PortPosition
-                selectedPort={selectedPort as Port | TempLumped}
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPortParameters={setSavedPhysicsParameters}
-              />
-            </PortManagement>
-          )}
-        </>
-      ) : (
-        <div className="flex-col px-[20px] pb-[5px] overflow-x-hidden">
-          <FrequenciesDef
-            disabled={selectedProject?.simulation?.status === 'Completed'}
-            setSavedPhysicsParameters={setSavedPhysicsParameters}
-          />
-          {/* <InputSignal
+                <PortPosition
+                  selectedPort={selectedPort as Port | TempLumped}
+                  disabled={selectedProject?.simulation?.status === 'Completed'}
+                  setSavedPortParameters={setSavedPhysicsParameters}
+                />
+                {selectedProject?.simulation?.status !== 'Completed' && (
+                  <ModalSelectPortType
+                    show={showModalSelectPortType}
+                    setShow={setShowModalSelectPortType}
+                    selectedPort={selectedPort as TempLumped}
+                    setSavedPortParameters={setSavedPhysicsParameters}
+                  />
+                )}
+              </PortManagement>
+            ) : (
+              <PortManagement selectedPort={selectedPort}>
+                <ScatteringParameter
+                  setSavedPortParameters={setSavedPhysicsParameters}
+                />
+                <PortPosition
+                  selectedPort={selectedPort as Port | TempLumped}
+                  disabled={selectedProject?.simulation?.status === 'Completed'}
+                  setSavedPortParameters={setSavedPhysicsParameters}
+                />
+              </PortManagement>
+            )}
+          </>
+        ) : (
+          <div className="flex-col px-[20px] pb-[5px] overflow-x-hidden">
+            <FrequenciesDef
+              disabled={selectedProject?.simulation?.status === 'Completed'}
+              setSavedPhysicsParameters={setSavedPhysicsParameters}
+            />
+            {/* <InputSignal
             disabled={selectedProject?.simulation?.status === 'Completed'}
             selectedProject={selectedProject as Project}
           /> */}
+          </div>
+        )}
+        <div className={`flex px-[20px] mt-2 flex-row gap-2 items-center`}>
+          <button
+            data-testid="savePhysics"
+            type="button"
+            className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark'
+              } w-full hover:opacity-80 disabled:opacity-60`}
+            onClick={() => setSavedPhysicsParameters(true)}
+            disabled={savedPhysicsParameters}
+          >
+            SAVE ON DB
+          </button>
+          <div
+            className="tooltip tooltip-left"
+            data-tip="Saving parameters on server now is not necessary in order to launch a simulation. Use this button if you are not intended to launch a simulation now."
+          >
+            <IoMdInformationCircleOutline size={20} />
+          </div>
         </div>
-      )}
-      <div className={`flex px-[20px] mt-2 flex-row gap-2 items-center`}>
-        <button
-          data-testid="savePhysics"
-          type="button"
-          className={`button buttonPrimary ${
-            theme === 'light' ? '' : 'bg-secondaryColorDark'
-          } w-full hover:opacity-80 disabled:opacity-60`}
-          onClick={() => setSavedPhysicsParameters(true)}
-          disabled={savedPhysicsParameters}
-        >
-          SAVE ON DB
-        </button>
-        <div
-          className="tooltip tooltip-left"
-          data-tip="Saving parameters on server now is not necessary in order to launch a simulation. Use this button if you are not intended to launch a simulation now."
-        >
-          <IoMdInformationCircleOutline size={20} />
-        </div>
-      </div>
-    </MyPanel>
-  );
-};
+      </MyPanel>
+    );
+  };
 
 export const PhysicsSettingsOld: FC<{
   selectedTabRightPanel: string | undefined;
@@ -453,226 +448,213 @@ export const PhysicsSettingsOld: FC<{
   selectedTabLeftPanel,
   setSelectedTabLeftPanel,
 }) => {
-  const selectedProject = useSelector(selectedProjectSelector);
-  const selectedPort = findSelectedPort(selectedProject);
-  const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
-  const theme = useSelector(ThemeSelector);
-  const [planeWaweModalOpen, setplaneWaweModalOpen] = useState(false)
-  const [radialFieldModalOpen, setradialFieldModalOpen] = useState(false)
-  return (
-    <>
-      {/* <PhysicsLeftPanelTab /> */}
-      <div
-        className={`absolute left-[2%] top-[210px] rounded max-h-[500px] flex flex-col items-center gap-0`}
-      >
+    const selectedProject = useSelector(selectedProjectSelector);
+    const selectedPort = findSelectedPort(selectedProject);
+    const [showModalSelectPortType, setShowModalSelectPortType] = useState(false);
+    const theme = useSelector(ThemeSelector);
+    const [planeWaweModalOpen, setplaneWaweModalOpen] = useState(false)
+    const [radialFieldModalOpen, setradialFieldModalOpen] = useState(false)
+    return (
+      <>
+        {/* <PhysicsLeftPanelTab /> */}
         <div
-          className={`p-2 tooltip rounded-t tooltip-right ${
-            selectedTabLeftPanel === 'Termination List'
-              ? `${
-                  theme === 'light'
-                    ? 'text-white bg-primaryColor'
-                    : 'text-textColor bg-secondaryColorDark'
-                }`
-              : `${
-                  theme === 'light'
-                    ? 'text-primaryColor bg-white'
-                    : 'text-textColorDark bg-bgColorDark2'
-                }`
-          }`}
-          data-tip="Terminations List"
-          onClick={() => {
-            if (selectedTabLeftPanel === 'Termination List') {
+          className={`absolute left-[2%] top-[210px] rounded max-h-[500px] flex flex-col items-center gap-0`}
+        >
+          <div
+            className={`p-2 tooltip rounded-t tooltip-right ${selectedTabLeftPanel === 'Termination List'
+              ? `${theme === 'light'
+                ? 'text-white bg-primaryColor'
+                : 'text-textColor bg-secondaryColorDark'
+              }`
+              : `${theme === 'light'
+                ? 'text-primaryColor bg-white'
+                : 'text-textColorDark bg-bgColorDark2'
+              }`
+              }`}
+            data-tip="Terminations List"
+            onClick={() => {
+              if (selectedTabLeftPanel === 'Termination List') {
+                setSelectedTabLeftPanel(undefined);
+              } else {
+                setSelectedTabLeftPanel('Termination List');
+              }
+              setSelectedTabRightPanel(undefined);
+            }}
+          >
+            <RiListIndefinite style={{ width: '25px', height: '25px' }} />
+          </div>
+          <div
+            className={`p-2 tooltip tooltip-right ${selectedTabRightPanel === physicsRightPanelTitle.first
+              ? `${theme === 'light'
+                ? 'text-white bg-primaryColor'
+                : 'text-textColor bg-secondaryColorDark'
+              }`
+              : `${theme === 'light'
+                ? 'text-primaryColor bg-white'
+                : 'text-textColorDark bg-bgColorDark2'
+              }`
+              }`}
+            data-testid="terminationSettings"
+            data-tip="Terminations Settings"
+            onClick={() => {
+              if (selectedTabRightPanel === physicsRightPanelTitle.first) {
+                setSelectedTabRightPanel(undefined);
+              } else {
+                setSelectedTabRightPanel(physicsRightPanelTitle.first);
+              }
               setSelectedTabLeftPanel(undefined);
-            } else {
-              setSelectedTabLeftPanel('Termination List');
-            }
-            setSelectedTabRightPanel(undefined);
-          }}
-        >
-          <RiListIndefinite style={{ width: '25px', height: '25px' }} />
+            }}
+          >
+            <GiAtom style={{ width: '25px', height: '25px' }} />
+          </div>
+          <div
+            className={`p-2 tooltip rounded-b tooltip-right ${selectedTabRightPanel === physicsRightPanelTitle.second
+              ? `${theme === 'light'
+                ? 'text-white bg-primaryColor'
+                : 'text-textColor bg-secondaryColorDark'
+              }`
+              : `${theme === 'light'
+                ? 'text-primaryColor bg-white'
+                : 'text-textColorDark bg-bgColorDark2'
+              }`
+              }`}
+            data-testid="frequenciesSettings"
+            data-tip="Frequencies"
+            onClick={() => {
+              if (selectedTabRightPanel === physicsRightPanelTitle.second) {
+                setSelectedTabRightPanel(undefined);
+              } else {
+                setSelectedTabRightPanel(physicsRightPanelTitle.second);
+              }
+              setSelectedTabLeftPanel(undefined);
+            }}
+          >
+            <SiAzurefunctions style={{ width: '25px', height: '25px' }} />
+          </div>
         </div>
         <div
-          className={`p-2 tooltip tooltip-right ${
-            selectedTabRightPanel === physicsRightPanelTitle.first
-              ? `${
-                  theme === 'light'
-                    ? 'text-white bg-primaryColor'
-                    : 'text-textColor bg-secondaryColorDark'
-                }`
-              : `${
-                  theme === 'light'
-                    ? 'text-primaryColor bg-white'
-                    : 'text-textColorDark bg-bgColorDark2'
-                }`
-          }`}
-          data-testid="terminationSettings"
-          data-tip="Terminations Settings"
-          onClick={() => {
-            if (selectedTabRightPanel === physicsRightPanelTitle.first) {
-              setSelectedTabRightPanel(undefined);
-            } else {
-              setSelectedTabRightPanel(physicsRightPanelTitle.first);
-            }
-            setSelectedTabLeftPanel(undefined);
-          }}
+          className={`absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0`}
         >
-          <GiAtom style={{ width: '25px', height: '25px' }} />
-        </div>
-        <div
-          className={`p-2 tooltip rounded-b tooltip-right ${
-            selectedTabRightPanel === physicsRightPanelTitle.second
-              ? `${
-                  theme === 'light'
-                    ? 'text-white bg-primaryColor'
-                    : 'text-textColor bg-secondaryColorDark'
-                }`
-              : `${
-                  theme === 'light'
-                    ? 'text-primaryColor bg-white'
-                    : 'text-textColorDark bg-bgColorDark2'
-                }`
-          }`}
-          data-testid="frequenciesSettings"
-          data-tip="Frequencies"
-          onClick={() => {
-            if (selectedTabRightPanel === physicsRightPanelTitle.second) {
-              setSelectedTabRightPanel(undefined);
-            } else {
-              setSelectedTabRightPanel(physicsRightPanelTitle.second);
-            }
-            setSelectedTabLeftPanel(undefined);
-          }}
-        >
-          <SiAzurefunctions style={{ width: '25px', height: '25px' }} />
-        </div>
-      </div>
-      <div
-        className={`absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0`}
-      >
-        <div
-          className={`p-2 tooltip rounded-t hover:cursor-pointer hover:opacity-80 tooltip-right ${
-            theme === 'light'
+          <div
+            className={`p-2 tooltip rounded-t hover:cursor-pointer hover:opacity-80 tooltip-right ${theme === 'light'
               ? 'text-primaryColor bg-white'
               : 'text-textColorDark bg-bgColorDark2'
-          }`}
-          data-tip="Plane Wave"
-          onClick={() => setplaneWaweModalOpen(true)}
-        >
-          <TbWavesElectricity style={{ width: '25px', height: '25px' }} />
-        </div>
-        <div
-          className={`p-2 tooltip rounded-b hover:cursor-pointer hover:opacity-80 tooltip-right ${
-            theme === 'light'
+              }`}
+            data-tip="Plane Wave"
+            onClick={() => setplaneWaweModalOpen(true)}
+          >
+            <TbWavesElectricity style={{ width: '25px', height: '25px' }} />
+          </div>
+          <div
+            className={`p-2 tooltip rounded-b hover:cursor-pointer hover:opacity-80 tooltip-right ${theme === 'light'
               ? 'text-primaryColor bg-white'
               : 'text-textColorDark bg-bgColorDark2'
-          }`}
-          data-tip="Radiation Diagram"
-          onClick={() => setradialFieldModalOpen(true)}
-        >
-          <GiRadialBalance style={{ width: '25px', height: '25px' }} />
+              }`}
+            data-tip="Radiation Diagram"
+            onClick={() => setradialFieldModalOpen(true)}
+          >
+            <GiRadialBalance style={{ width: '25px', height: '25px' }} />
+          </div>
         </div>
-      </div>
-      {/* {planeWaweModalOpen && <PlaneWaveSettingsModal setModalOpen={setplaneWaweModalOpen}/>}
+        {/* {planeWaweModalOpen && <PlaneWaveSettingsModal setModalOpen={setplaneWaweModalOpen}/>}
       {radialFieldModalOpen && <RadialFieldSettingsModal setModalOpen={setradialFieldModalOpen}/>} */}
-      {(selectedTabRightPanel || selectedTabLeftPanel) && (
-        <div
-          className={`${
-            theme === 'light'
+        {(selectedTabRightPanel || selectedTabLeftPanel) && (
+          <div
+            className={`${theme === 'light'
               ? 'bg-white text-textColor'
               : 'bg-bgColorDark2 text-textColorDark'
-          } p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded w-1/5`}
-        >
-          {selectedTabLeftPanel === 'Termination List' && (
-            <PhysicsLeftPanelTab />
-          )}
-          {selectedTabRightPanel === physicsRightPanelTitle.first && (
-            <>
-              {selectedPort?.category === 'lumped' ? (
-                <PortManagement selectedPort={selectedPort}>
-                  <PortType
-                    disabled={
-                      selectedProject?.simulation?.status === 'Completed'
-                    }
-                    setShow={setShowModalSelectPortType}
-                    selectedPort={selectedPort as TempLumped}
-                  />
-                  <RLCParamsComponent
-                    selectedPort={selectedPort as TempLumped}
-                    disabled={
-                      selectedProject?.simulation?.status === 'Completed'
-                    }
-                    setSavedPortParameters={setSavedPhysicsParameters}
-                  />
-                  <PortPosition
-                    selectedPort={selectedPort as Port | TempLumped}
-                    disabled={
-                      selectedProject?.simulation?.status === 'Completed'
-                    }
-                    setSavedPortParameters={setSavedPhysicsParameters}
-                  />
-                  {selectedProject?.simulation?.status !== 'Completed' && (
-                    <ModalSelectPortType
-                      show={showModalSelectPortType}
+              } p-3 absolute xl:left-[5%] left-[6%] top-0 rounded w-1/5`}
+          >
+            {selectedTabLeftPanel === 'Termination List' && (
+              <PhysicsLeftPanelTab />
+            )}
+            {selectedTabRightPanel === physicsRightPanelTitle.first && (
+              <>
+                {selectedPort?.category === 'lumped' ? (
+                  <PortManagement selectedPort={selectedPort}>
+                    <PortType
+                      disabled={
+                        selectedProject?.simulation?.status === 'Completed'
+                      }
                       setShow={setShowModalSelectPortType}
                       selectedPort={selectedPort as TempLumped}
+                    />
+                    <RLCParamsComponent
+                      selectedPort={selectedPort as TempLumped}
+                      disabled={
+                        selectedProject?.simulation?.status === 'Completed'
+                      }
                       setSavedPortParameters={setSavedPhysicsParameters}
                     />
-                  )}
-                </PortManagement>
-              ) : (
-                <PortManagement selectedPort={selectedPort}>
-                  <ScatteringParameter
-                    setSavedPortParameters={setSavedPhysicsParameters}
-                  />
-                  <PortPosition
-                    selectedPort={selectedPort as Port | TempLumped}
-                    disabled={
-                      selectedProject?.simulation?.status === 'Completed'
-                    }
-                    setSavedPortParameters={setSavedPhysicsParameters}
-                  />
-                </PortManagement>
-              )}
-            </>
-          )}
-          {selectedTabRightPanel === physicsRightPanelTitle.second && (
-            <div className="flex-col px-[20px] pb-[5px] overflow-x-hidden max-w-[350px]">
-              <span className="font-bold">Frequencies Definition</span>
-              <FrequenciesDef
-                disabled={selectedProject?.simulation?.status === 'Completed'}
-                setSavedPhysicsParameters={setSavedPhysicsParameters}
-              />
-              {/* <InputSignal
+                    <PortPosition
+                      selectedPort={selectedPort as Port | TempLumped}
+                      disabled={
+                        selectedProject?.simulation?.status === 'Completed'
+                      }
+                      setSavedPortParameters={setSavedPhysicsParameters}
+                    />
+                    {selectedProject?.simulation?.status !== 'Completed' && (
+                      <ModalSelectPortType
+                        show={showModalSelectPortType}
+                        setShow={setShowModalSelectPortType}
+                        selectedPort={selectedPort as TempLumped}
+                        setSavedPortParameters={setSavedPhysicsParameters}
+                      />
+                    )}
+                  </PortManagement>
+                ) : (
+                  <PortManagement selectedPort={selectedPort}>
+                    <ScatteringParameter
+                      setSavedPortParameters={setSavedPhysicsParameters}
+                    />
+                    <PortPosition
+                      selectedPort={selectedPort as Port | TempLumped}
+                      disabled={
+                        selectedProject?.simulation?.status === 'Completed'
+                      }
+                      setSavedPortParameters={setSavedPhysicsParameters}
+                    />
+                  </PortManagement>
+                )}
+              </>
+            )}
+            {selectedTabRightPanel === physicsRightPanelTitle.second && (
+              <div className="flex-col px-[20px] pb-[5px] overflow-x-hidden max-w-[350px]">
+                <span className="font-bold">Frequencies Definition</span>
+                <FrequenciesDef
+                  disabled={selectedProject?.simulation?.status === 'Completed'}
+                  setSavedPhysicsParameters={setSavedPhysicsParameters}
+                />
+                {/* <InputSignal
                 disabled={selectedProject?.simulation?.status === 'Completed'}
                 selectedProject={selectedProject as Project}
               /> */}
-            </div>
-          )}
-          {(selectedTabRightPanel === physicsRightPanelTitle.second ||
-            (selectedTabRightPanel === physicsRightPanelTitle.first &&
-              selectedPort)) && (
-            <div className={`flex px-[20px] mt-2 flex-row gap-2 items-center`}>
-              <button
-                data-testid="savePhysics"
-                type="button"
-                className={`button buttonPrimary ${
-                  theme === 'light' ? '' : 'bg-secondaryColorDark'
-                } text-sm w-full hover:opacity-80 disabled:opacity-60`}
-                onClick={() => setSavedPhysicsParameters(true)}
-                disabled={savedPhysicsParameters}
-              >
-                SAVE ON DB
-              </button>
-              <div
-                className="tooltip tooltip-left"
-                data-tip="Saving parameters on server now is not necessary in order to launch a simulation. Use this button if you are not intended to launch a simulation now."
-              >
-                <IoMdInformationCircleOutline size={15} />
               </div>
-            </div>
-          )}
-        </div>
-      )}
-    </>
-  );
-};
+            )}
+            {(selectedTabRightPanel === physicsRightPanelTitle.second ||
+              (selectedTabRightPanel === physicsRightPanelTitle.first &&
+                selectedPort)) && (
+                <div className={`flex px-[20px] mt-2 flex-row gap-2 items-center`}>
+                  <button
+                    data-testid="savePhysics"
+                    type="button"
+                    className={`button buttonPrimary ${theme === 'light' ? '' : 'bg-secondaryColorDark'
+                      } text-sm w-full hover:opacity-80 disabled:opacity-60`}
+                    onClick={() => setSavedPhysicsParameters(true)}
+                    disabled={savedPhysicsParameters}
+                  >
+                    SAVE ON DB
+                  </button>
+                  <div
+                    className="tooltip tooltip-left"
+                    data-tip="Saving parameters on server now is not necessary in order to launch a simulation. Use this button if you are not intended to launch a simulation now."
+                  >
+                    <IoMdInformationCircleOutline size={15} />
+                  </div>
+                </div>
+              )}
+          </div>
+        )}
+      </>
+    );
+  };

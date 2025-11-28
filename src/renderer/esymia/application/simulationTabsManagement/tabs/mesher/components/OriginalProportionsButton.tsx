@@ -8,16 +8,19 @@ export const OriginaProportionsButton: FC<{}> = () => {
   const theme = useSelector(ThemeSelector)
   return (
     <div
-      className='tooltip'
+      className='tooltip tooltip-bottom'
       data-tip={
         'Set view with original scaling factor along axis'
       }
     >
       <button
-        className={`${theme === 'light' ? 'bg-white' : 'bg-bgColorDark2'} rounded p-2`}
+        className={`p-3 rounded-xl transition-all duration-300 ${theme === 'light'
+          ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
+          : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
+          }`}
         onClick={() => dispatch(resetScalingViewParamsOfMesh())}
       >
-      <LuAxis3D className='h-5 w-5 text-green-300 hover:text-secondaryColor' />
+        <LuAxis3D className='h-6 w-6' />
       </button>
     </div>
   );

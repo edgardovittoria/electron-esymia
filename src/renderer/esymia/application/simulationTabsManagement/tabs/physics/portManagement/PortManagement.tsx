@@ -13,11 +13,11 @@ export const PortManagement: React.FC<PortManagementProps> = ({
   children,
   selectedPort
 }) => {
-  let portColor = 'yellow';
+  let portColor = 'text-yellow-500';
   if (selectedPort && selectedPort.category === 'lumped') {
-    portColor = 'violet';
+    portColor = 'text-violet-500';
   } else if (selectedPort && selectedPort.category === 'port') {
-    portColor = 'red';
+    portColor = 'text-red-500';
   }
 
   const theme = useSelector(ThemeSelector);
@@ -58,30 +58,24 @@ export const PortManagement: React.FC<PortManagementProps> = ({
   return (
     <>
       {selectedPort ? (
-        <div className={`w-full mt-3 border rounded ${theme === 'light' ? 'border-secondaryColor bg-[#f6f6f6]' : 'border-white bg-bgColorDark'} bg-white px-2 py-5`}>
+        <div className={`w-full mt-4 rounded-xl border ${theme === 'light' ? 'bg-white/50 border-gray-200' : 'bg-white/5 border-white/10'}`}>
           {/* Header con icona e nome */}
-          <div className="flex items-center gap-2 px-[5px] mb-4">
-            <div className="col-1 pe-0 ps-0">
-              <FaReact
-                color={portColor}
-                style={{ width: '25px', height: '25px' }}
-              />
-            </div>
-            <div className="col-6 text-start">
-              <h5 className="mb-0 text-sm font-bold">{selectedPort.name}</h5>
-            </div>
+          <div className="flex items-center gap-3 p-4 border-b border-gray-200/50 dark:border-white/10">
+            <FaReact
+              className={`w-6 h-6 ${portColor}`}
+            />
+            <h5 className={`text-sm font-bold ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>{selectedPort.name}</h5>
           </div>
 
           {/* Navigation tabs */}
-          <div className="flex border-b mb-4 px-[5px]">
+          <div className="flex px-4 pt-2 border-b border-gray-200/50 dark:border-white/10 overflow-x-auto">
             {tabs.map((tab, index) => (
               <button
                 key={tab.label}
-                className={`px-4 py-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === index
-                    ? `border-b-2 ${theme === 'light' ? 'border-blue-600 text-blue-600' : 'border-blue-400 text-blue-400'}`
-                    : `${theme === 'light' ? 'text-gray-600 hover:text-gray-800' : 'text-gray-400 hover:text-gray-200'}`
-                }`}
+                className={`px-4 py-3 font-medium text-sm transition-all duration-200 border-b-2 ${activeTab === index
+                    ? `border-blue-500 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`
+                    : `border-transparent ${theme === 'light' ? 'text-gray-500 hover:text-gray-700 hover:border-gray-300' : 'text-gray-400 hover:text-gray-200 hover:border-gray-600'}`
+                  }`}
                 onClick={() => setActiveTab(index)}
               >
                 {tab.label}
@@ -90,7 +84,7 @@ export const PortManagement: React.FC<PortManagementProps> = ({
           </div>
 
           {/* Tab content */}
-          <div className="px-[20px] pb-[20px]">
+          <div className="p-4">
             {tabs[activeTab]?.content}
           </div>
         </div>

@@ -55,15 +55,14 @@ export const Modeler: React.FC<ModelerProps> = ({
 
   return (
     <div>
-      <CanvasModeler setShowModalLoadFromDB={setShowModalLoadFromDB} resetFocus={resetFocus}/>
+      <CanvasModeler setShowModalLoadFromDB={setShowModalLoadFromDB} resetFocus={resetFocus} />
       <StatusBar />
-      <div className="absolute left-[2%] top-[180px] rounded max-h-[500px] flex flex-col items-center gap-0">
+      <div className="absolute left-[2%] top-4 flex flex-col items-center gap-2">
         <div
-          className={`p-2 tooltip rounded-t tooltip-right ${
-            selectedTabLeftPanel === modelerLeftPanelTitle.first
-              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
-              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
-          }`}
+          className={`p-3 rounded-xl transition-all duration-300 cursor-pointer shadow-lg backdrop-blur-md ${selectedTabLeftPanel === modelerLeftPanelTitle.first
+            ? (theme === 'light' ? 'bg-blue-500 text-white shadow-blue-500/30' : 'bg-blue-600 text-white shadow-blue-600/30')
+            : (theme === 'light' ? 'bg-white/80 text-gray-600 hover:bg-white hover:text-blue-500' : 'bg-black/40 text-gray-400 hover:bg-black/60 hover:text-blue-400 border border-white/10')
+            }`}
           data-tip="Modeler"
           onClick={() => {
             if (selectedTabLeftPanel === modelerLeftPanelTitle.first) {
@@ -73,14 +72,13 @@ export const Modeler: React.FC<ModelerProps> = ({
             }
           }}
         >
-          <GiCubeforce style={{ width: '25px', height: '25px' }} />
+          <GiCubeforce size={24} />
         </div>
         <div
-          className={`p-2 tooltip rounded-b tooltip-right ${
-            selectedTabLeftPanel === modelerLeftPanelTitle.second
-              ? `${theme === 'light' ? 'text-white bg-primaryColor' : 'text-textColor bg-secondaryColorDark'}`
-              : `${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`
-          }`}
+          className={`p-3 rounded-xl transition-all duration-300 cursor-pointer shadow-lg backdrop-blur-md ${selectedTabLeftPanel === modelerLeftPanelTitle.second
+            ? (theme === 'light' ? 'bg-purple-500 text-white shadow-purple-500/30' : 'bg-purple-600 text-white shadow-purple-600/30')
+            : (theme === 'light' ? 'bg-white/80 text-gray-600 hover:bg-white hover:text-purple-500' : 'bg-black/40 text-gray-400 hover:bg-black/60 hover:text-purple-400 border border-white/10')
+            }`}
           data-tip="Materials"
           onClick={() => {
             if (selectedTabLeftPanel === modelerLeftPanelTitle.second) {
@@ -90,12 +88,58 @@ export const Modeler: React.FC<ModelerProps> = ({
             }
           }}
         >
-          <GiAtomicSlashes style={{ width: '25px', height: '25px' }} />
+          <GiAtomicSlashes size={24} />
         </div>
+        <button
+          disabled={
+            selectedProject &&
+            (typeof (selectedProject.portsS3) === "string" || typeof (selectedProject.meshData.mesh) === "string")
+          }
+          className={`p-3 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed ${theme === 'light'
+            ? 'bg-white/80 text-gray-700 hover:bg-white hover:text-blue-600 hover:shadow-blue-500/20'
+            : 'bg-black/40 text-gray-300 border border-white/10 hover:bg-black/60 hover:text-blue-400 hover:border-blue-500/30'
+            }`}
+          data-tip="Change Model"
+          onClick={() => {
+            setShowModalLoadFromDB(true)
+          }}
+        >
+          <FiEdit size={24} className={`${cloning ? 'opacity-20' : 'opacity-100'}`} />
+        </button>
+
+        <button
+          disabled={
+            (selectedProject &&
+              selectedProject.simulation &&
+              selectedProject.simulation.status === 'Running') ||
+            (process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)
+          }
+          className={`p-3 tooltip tooltip-right rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 relative disabled:opacity-40 disabled:cursor-not-allowed ${theme === 'light'
+            ? 'bg-white/80 text-gray-700 hover:bg-white hover:text-green-600 hover:shadow-green-500/20'
+            : 'bg-black/40 text-gray-300 border border-white/10 hover:bg-black/60 hover:text-green-400 hover:border-green-500/30'
+            }`}
+          data-tip="Clone Project"
+          onClick={() => {
+            setcloning(true);
+            cloneProject(
+              selectedProject as Project,
+              selectedFolder as Folder,
+              setcloning,
+            );
+          }}
+        >
+          <GrClone size={24} className={`${cloning ? 'opacity-20' : 'opacity-100'}`} />
+          {cloning && (
+            <ImSpinner className={`absolute inset-0 m-auto animate-spin w-5 h-5 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
+          )}
+        </button>
       </div>
       {selectedTabLeftPanel && (
         <>
-          <div className={`${theme === 'light' ? 'text-textColor bg-white' : 'text-textColorDark bg-bgColorDark2'} p-3 absolute xl:left-[5%] left-[6%] top-[180px] rounded md:w-1/4 xl:w-[15%]`}>
+          <div className={`absolute left-[6%] max-h-[calc(100vh-600px)] xl:left-[5%] top-4 bottom-4 p-4 rounded-2xl shadow-2xl backdrop-blur-md border transition-all duration-300 md:w-1/4 xl:w-[15%] overflow-hidden flex flex-col ${theme === 'light'
+            ? 'bg-white/90 border-white/40'
+            : 'bg-black/60 border-white/10 text-gray-200'
+            }`}>
             {selectedTabLeftPanel === modelerLeftPanelTitle.first && (
               <Models>
                 <ModelOutliner />
@@ -107,52 +151,6 @@ export const Modeler: React.FC<ModelerProps> = ({
           </div>
         </>
       )}
-      <div className="absolute left-[2%] top-[270px] rounded max-h-[500px] flex flex-col items-center gap-0">
-        <button
-          disabled={
-            selectedProject &&
-            (typeof(selectedProject.portsS3) === "string" || typeof(selectedProject.meshData.mesh) === "string")
-          }
-          className={`p-2 tooltip rounded-t tooltip-right relative z-10 disabled:opacity-40 ${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`}
-          data-tip="Change Model"
-          onClick={() => {
-            setShowModalLoadFromDB(true)
-          }}
-        >
-          <FiEdit
-            style={{ width: '25px', height: '25px' }}
-            className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
-          />
-        </button>
-      </div>
-      <div className="absolute left-[2%] top-[320px] rounded max-h-[500px] flex flex-col items-center gap-0">
-        <button
-          disabled={
-            (selectedProject &&
-            selectedProject.simulation &&
-            selectedProject.simulation.status === 'Running') ||
-            (process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)
-          }
-          className={`p-2 tooltip rounded tooltip-right relative z-10 disabled:opacity-40 ${theme === 'light' ? 'text-primaryColor bg-white' : 'text-textColorDark bg-bgColorDark2'}`}
-          data-tip="Clone Project"
-          onClick={() => {
-            setcloning(true);
-            cloneProject(
-              selectedProject as Project,
-              selectedFolder as Folder,
-              setcloning,
-            );
-          }}
-        >
-          <GrClone
-            style={{ width: '25px', height: '25px' }}
-            className={`${cloning ? 'opacity-20' : 'opacity-100'}`}
-          />
-          {cloning && (
-            <ImSpinner className={`absolute z-50 top-3 bottom-1/2 animate-spin w-5 h-5 ${theme === 'light' ? 'text-textColor' : 'text-textColorDark'}`} />
-          )}
-        </button>
-      </div>
       {showModalLoadFromDB && (
         <ImportModelFromDBModal
           bucket={process.env.REACT_APP_AWS_BUCKET_NAME as string}
@@ -163,15 +161,15 @@ export const Modeler: React.FC<ModelerProps> = ({
             dispatch(setModelS3(importActionParamsObject.modelS3 as string))
             dispatch(setBricksS3(importActionParamsObject.bricks as string))
             execQuery2(
-                    createOrUpdateProjectInDynamoDB,
-                    {
-                      ...selectedProject,
-                      modelS3: importActionParamsObject.modelS3,
-                      bricks: importActionParamsObject.bricks,
-                      modelUnit: importActionParamsObject.unit,
-                    } as Project,
-                    dispatch,
-                  ).then(() => {});
+              createOrUpdateProjectInDynamoDB,
+              {
+                ...selectedProject,
+                modelS3: importActionParamsObject.modelS3,
+                bricks: importActionParamsObject.bricks,
+                modelUnit: importActionParamsObject.unit,
+              } as Project,
+              dispatch,
+            ).then(() => { });
           }}
           importActionParams={
             {
@@ -187,7 +185,7 @@ export const Modeler: React.FC<ModelerProps> = ({
           }
         />
       )}
-      <div className="absolute lg:left-[48%] left-[38%] gap-2 top-[180px] flex flex-row">
+      <div className="absolute lg:left-[48%] left-[38%] gap-2 top-0 flex flex-row">
         <ResetFocusButton toggleResetFocus={toggleResetFocus} />
       </div>
     </div>

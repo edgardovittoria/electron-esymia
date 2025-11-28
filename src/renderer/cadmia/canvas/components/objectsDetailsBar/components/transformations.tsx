@@ -15,92 +15,75 @@ export const Transformations: FC<{
     useState<boolean>(false);
 
   return (
-    <>
-      <div className="flex mt-2">
-        <div className="flex justify-center mx-[10px] ml-[70px] w-full">
-          <div className="text-black w-1/3 text-center font-bold mb-1 text-[10px]">
-            X
-          </div>
-          <div className="text-black w-1/3 text-center font-bold mb-1 text-[10px]">
-            Y
-          </div>
-          <div className="text-black w-1/3 text-center font-bold mb-1 text-[10px]">
-            Z
-          </div>
-        </div>
+    <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-4 gap-2 text-center text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <div className="text-left pl-1">Axis</div>
+        <div>X</div>
+        <div>Y</div>
+        <div>Z</div>
       </div>
-      <div key="position" className="flex justify-between">
-        <span className="text-black w-[15%] text-[12px]">Position</span>
-        <div className="flex mb-[5px] justify-between pr-[15px] w-[83%]">
-          {transformationParams.position.map((paramValue, index) => (
-            <input
-              key={index}
-              disabled
-              type="number"
-              step="0.1"
-              className="border border-black rounded shadow w-[30%] text-black text-[12px] px-1 font-semibold"
-              autoComplete="off"
-              value={paramValue}
-              onChange={(e) => {
-                let newPosition: TransformationParamDetails = [
-                  ...transformationParams.position,
-                ];
-                newPosition[index] = parseFloat(e.target.value);
-                dispatch(
-                  updateTransformationParams({
-                    ...transformationParams,
-                    position: newPosition,
-                  }),
-                );
-              }}
-            />
-          ))}
-        </div>
+
+      <div className="grid grid-cols-4 gap-2 items-center">
+        <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-left pl-1">Position</span>
+        {transformationParams.position.map((paramValue, index) => (
+          <input
+            key={`pos-${index}`}
+            disabled
+            type="number"
+            step="0.1"
+            className="w-full bg-white dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-1 py-0.5 text-xs text-center text-gray-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+            autoComplete="off"
+            value={paramValue.toFixed(2)}
+            onChange={(e) => {
+              let newPosition: TransformationParamDetails = [
+                ...transformationParams.position,
+              ];
+              newPosition[index] = parseFloat(e.target.value);
+              dispatch(
+                updateTransformationParams({
+                  ...transformationParams,
+                  position: newPosition,
+                }),
+              );
+            }}
+          />
+        ))}
       </div>
-      <div key="rotation" className="flex justify-between">
-        <span className="text-black w-[15%] text-[12px]">Rotation</span>
-        <div className="flex mb-[5px] justify-between pr-[15px] w-[83%]">
-          {transformationParams.rotation.map((paramValue, index) => (
-            <div
-              key={index}
-              className="flex flex-col justify-center items-center w-[30%]"
-            >
-              <input
-                disabled
-                type="number"
-                step="1"
-                min={-180}
-                max={180}
-                className="border border-black rounded shadow w-full text-black text-[12px] px-1 font-semibold"
-                autoComplete="off"
-                value={(paramValue * 180) / Math.PI}
-                onChange={(e) => {
-                  let newRotation: TransformationParamDetails = [
-                    ...transformationParams.rotation,
-                  ];
-                  newRotation[index] =
-                    (parseFloat(e.target.value) * Math.PI) / 180;
-                  dispatch(
-                    updateTransformationParams({
-                      ...transformationParams,
-                      rotation: newRotation,
-                    }),
-                  );
-                }}
-              />
-              {/* <span className="text-black w-full text-[10px]">
-                [-180°/180°]
-              </span> */}
-            </div>
-          ))}
-        </div>
+
+      <div className="grid grid-cols-4 gap-2 items-center">
+        <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-left pl-1">Rotation</span>
+        {transformationParams.rotation.map((paramValue, index) => (
+          <input
+            key={`rot-${index}`}
+            disabled
+            type="number"
+            step="1"
+            className="w-full bg-white dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-1 py-0.5 text-xs text-center text-gray-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+            autoComplete="off"
+            value={((paramValue * 180) / Math.PI).toFixed(0)}
+            onChange={(e) => {
+              let newRotation: TransformationParamDetails = [
+                ...transformationParams.rotation,
+              ];
+              newRotation[index] =
+                (parseFloat(e.target.value) * Math.PI) / 180;
+              dispatch(
+                updateTransformationParams({
+                  ...transformationParams,
+                  rotation: newRotation,
+                }),
+              );
+            }}
+          />
+        ))}
       </div>
+
       <button
         type="button"
-        className="rounded bg-black hover:opacity-75 hover:cursor-pointer text-sm capitalize shadow p-2 mt-5 w-full"
+        className="mt-2 w-full py-1.5 px-3 bg-gray-900 hover:bg-gray-800 dark:bg-white/10 dark:hover:bg-white/20 text-white text-xs font-medium rounded-lg shadow-sm transition-all duration-200"
         onClick={() => setShowTransformationModal(true)}
       >
-        Change Transformation Params
+        Edit Transformations
       </button>
       {showTransformationModal && (
         <SetTransformationParamsModal
@@ -108,26 +91,7 @@ export const Transformations: FC<{
           transformationParams={transformationParams}
         />
       )}
-      {/* <div key='scale' className="flex justify-between">
-              <span className="text-black w-[15%] text-[10px]">scale</span>
-              <div className="flex mb-[5px] justify-between pr-[15px] w-[83%]">
-                  {transformationParams.scale.map((paramValue, index) =>
-                      <input key={index}
-                              type="number"
-                              step="0.1"
-                              className="border border-black rounded shadow w-[30%] text-black text-[10px] px-1"
-                              autoComplete="off"
-                              value={paramValue}
-                              onChange={(e) => {
-                                let newScale: TransformationParamDetails = [...transformationParams.scale]
-                                newScale[index] = parseFloat(e.target.value)
-                                dispatch(updateTransformationParams({...transformationParams, scale: newScale}))
-                              }}
-                      />
-                  )}
-              </div>
-            </div> */}
-    </>
+    </div>
   );
 };
 
@@ -196,7 +160,7 @@ export const SetTransformationParamsModal: FC<{
     <Transition appear show as={Fragment}>
       <Dialog
         as="div"
-        className="relative z-10"
+        className="relative z-50"
         onClose={() => showTransformationModal(false)}
       >
         <TransitionChild
@@ -208,7 +172,7 @@ export const SetTransformationParamsModal: FC<{
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
         </TransitionChild>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -222,106 +186,60 @@ export const SetTransformationParamsModal: FC<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white/90 dark:bg-black/80 backdrop-blur-md border border-gray-200 dark:border-white/10 p-6 text-left align-middle shadow-xl transition-all">
                 <DialogTitle
                   as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
+                  className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
                 >
-                  Set new transformation params
+                  Set Transformation Parameters
                 </DialogTitle>
-                <div className="mt-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <label className="ml-2">position x:</label>
-                      <input
-                        type="text"
-                        value={newPosition[0]}
-                        required
-                        onChange={(e) =>
-                          updateNewPositionCoord(0, e.target.value)
-                        }
-                        className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
-                      />
+                <div className="mt-6 space-y-4">
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Position</h4>
+                    <div className="flex gap-2">
+                      {['X', 'Y', 'Z'].map((axis, i) => (
+                        <div key={`pos-input-${i}`} className="flex-1">
+                          <label className="block text-[10px] font-bold text-gray-400 mb-1 ml-1">{axis}</label>
+                          <input
+                            type="text"
+                            value={newPosition[i]}
+                            onChange={(e) => updateNewPositionCoord(i, e.target.value)}
+                            className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                      ))}
                     </div>
-                    <div>
-                      <label className="ml-2">position y:</label>
-                      <input
-                        type="text"
-                        value={newPosition[1]}
-                        onChange={(e) =>
-                          updateNewPositionCoord(1, e.target.value)
-                        }
-                        className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
-                      />
-                    </div>
-                    <div>
-                      <label className="ml-2">position z:</label>
-                      <input
-                        type="text"
-                        value={newPosition[2]}
-                        required
-                        onChange={(e) =>
-                          updateNewPositionCoord(2, e.target.value)
-                        }
-                        className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
-                      />
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Rotation (Degrees)</h4>
+                    <div className="flex gap-2">
+                      {['X', 'Y', 'Z'].map((axis, i) => (
+                        <div key={`rot-input-${i}`} className="flex-1">
+                          <label className="block text-[10px] font-bold text-gray-400 mb-1 ml-1">{axis}</label>
+                          <input
+                            type="text"
+                            value={newRotation[i]}
+                            onChange={(e) => updateNewRotation(i, e.target.value)}
+                            className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
-                <div className="mt-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <label className="ml-2">rotation x:</label>
-                      <input
-                        type="text"
-                        value={newRotation[0]}
-                        required
-                        onChange={(e) => updateNewRotation(0, e.target.value)}
-                        className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
-                      />
-                      <span className="text-black w-full text-[10px]">
-                        [-180°/180°]
-                      </span>
-                    </div>
-                    <div>
-                      <label className="ml-2">rotation y:</label>
-                      <input
-                        type="text"
-                        value={newRotation[1]}
-                        required
-                        onChange={(e) => updateNewRotation(1, e.target.value)}
-                        className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
-                      />
-                      <span className="text-black w-full text-[10px]">
-                        [-180°/180°]
-                      </span>
-                    </div>
-                    <div>
-                      <label className="ml-2">rotation z:</label>
-                      <input
-                        type="text"
-                        value={newRotation[2]}
-                        required
-                        onChange={(e) => updateNewRotation(2, e.target.value)}
-                        className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
-                      />
-                      <span className="text-black w-full text-[10px]">
-                        [-180°/180°]
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 flex justify-between">
+
+                <div className="mt-8 flex justify-end gap-3">
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg transition-colors focus:outline-none"
                     onClick={() => showTransformationModal(false)}
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-lg shadow-blue-500/30 transition-all focus:outline-none"
                     onClick={() => {
                       let newPos: TransformationParamDetails = newPosition.map(
                         (p) => (isNaN(parseFloat(p)) ? '0' : parseFloat(p)),
@@ -345,7 +263,7 @@ export const SetTransformationParamsModal: FC<{
                       showTransformationModal(false);
                     }}
                   >
-                    Save
+                    Save Changes
                   </button>
                 </div>
               </DialogPanel>

@@ -3,6 +3,9 @@ export interface Dataset {
   data: number[];
   borderColor: string;
   backgroundColor: string;
+  borderWidth?: number;
+  pointRadius?: number;
+  pointHoverRadius?: number;
 }
 
 export interface GraphsData {

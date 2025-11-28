@@ -19,7 +19,7 @@ export type InputGraphData = {
 }
 
 type ShowInputGraphModalProps = {
-    setGraphData: Function
+  setGraphData: Function
 } & InputGraphData
 
 export const ShowInputGraphModal: React.FC<ShowInputGraphModalProps> = ({
@@ -33,7 +33,7 @@ export const ShowInputGraphModal: React.FC<ShowInputGraphModalProps> = ({
   const theme = useSelector(ThemeSelector);
   return (
     <Transition appear show={true} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={() => {setGraphData(undefined)}}>
+      <Dialog as="div" className="relative z-10" onClose={() => { setGraphData(undefined) }}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -43,7 +43,7 @@ export const ShowInputGraphModal: React.FC<ShowInputGraphModalProps> = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto" data-testid="alert">
@@ -58,57 +58,88 @@ export const ShowInputGraphModal: React.FC<ShowInputGraphModalProps> = ({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
-                className={`w-full max-w-5xl transform overflow-hidden rounded-2xl ${
-                  theme === 'light'
-                    ? 'bg-white text-textColor'
-                    : 'bg-bgColorDark2 text-textColorDark '
-                } p-6 text-left align-middle shadow-xl transition-all relative`}
+                className={`w-full max-w-5xl transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-2xl transition-all backdrop-blur-md border ${theme === 'light'
+                    ? 'bg-white/90 border-white/40 text-gray-800'
+                    : 'bg-black/60 border-white/10 text-gray-200'
+                  }`}
               >
-                <Dialog.Title as="h3" className="text-lg font-medium leading-6">
-                  INPUT SIGNAL GRAPH
-                </Dialog.Title>
-                <IoCloseCircleOutline size={25} className='absolute top-1 right-1 cursor-pointer' onClick={() => setGraphData(undefined)}/>
-                <hr className="mt-2 mb-3" />
-                <Line
-                  options={{
-                    scales: {
-                      x: {
-                        title: {
-                          display: true,
-                          text: labelX,
-                          font: {
-                            size: 15,
-                            weight: 'bold',
-                            lineHeight: 1.2,
+                <div className="flex justify-between items-center mb-4">
+                  <Dialog.Title as="h3" className="text-lg font-bold leading-6">
+                    INPUT SIGNAL GRAPH
+                  </Dialog.Title>
+                  <button
+                    onClick={() => setGraphData(undefined)}
+                    className={`p-1 rounded-full transition-colors ${theme === 'light'
+                        ? 'hover:bg-gray-200 text-gray-500'
+                        : 'hover:bg-white/10 text-gray-400'
+                      }`}
+                  >
+                    <IoCloseCircleOutline size={28} />
+                  </button>
+                </div>
+
+                <div className={`p-4 rounded-xl ${theme === 'light' ? 'bg-white/50' : 'bg-white/5'}`}>
+                  <Line
+                    options={{
+                      responsive: true,
+                      scales: {
+                        x: {
+                          title: {
+                            display: true,
+                            text: labelX,
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            },
+                            color: theme === 'light' ? '#374151' : '#9ca3af',
                           },
-                          padding: { top: 2, bottom: 0 },
+                          grid: {
+                            color: theme === 'light' ? '#e5e7eb' : '#374151',
+                          },
+                          ticks: {
+                            color: theme === 'light' ? '#374151' : '#9ca3af',
+                          }
+                        },
+                        y: {
+                          title: {
+                            display: true,
+                            text: labelY,
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            },
+                            color: theme === 'light' ? '#374151' : '#9ca3af',
+                          },
+                          grid: {
+                            color: theme === 'light' ? '#e5e7eb' : '#374151',
+                          },
+                          ticks: {
+                            color: theme === 'light' ? '#374151' : '#9ca3af',
+                          }
                         },
                       },
-                      y: {
-                        title: {
-                          display: true,
-                          text: labelY,
-                          font: {
-                            size: 15,
-                            weight: 'bold',
-                            lineHeight: 1.2,
-                          },
-                          padding: { top: 2, bottom: 0 },
+                      plugins: {
+                        legend: {
+                          labels: {
+                            color: theme === 'light' ? '#374151' : '#9ca3af',
+                          }
+                        }
+                      }
+                    }}
+                    data={{
+                      labels: dataX,
+                      datasets: [
+                        {
+                          label: signalName,
+                          data: dataY,
+                          borderColor: theme === 'light' ? '#3b82f6' : '#60a5fa',
+                          backgroundColor: theme === 'light' ? 'rgba(59, 130, 246, 0.5)' : 'rgba(96, 165, 250, 0.5)',
+                          tension: 0.4,
                         },
-                      },
-                    },
-                  }}
-                  data={{
-                    labels: dataX,
-                    datasets: [
-                      {
-                        label: signalName,
-                        data: dataY,
-                        borderColor: '#000',
-                      },
-                    ],
-                  }}
-                />
+                      ],
+                    }}
+                  />
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
