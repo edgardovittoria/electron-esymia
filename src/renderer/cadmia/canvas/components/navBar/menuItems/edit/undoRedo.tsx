@@ -6,6 +6,7 @@ import { faRedo, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { Dispatch } from '@reduxjs/toolkit';
 import { navbarDropdownItemStyle, navbarShortcutStyle } from '../../../../../config/styles';
 import { lastActionTypeSelector, lengthFutureStateSelector, lengthPastStateSelector } from '../../../../../../cad_library';
+import { ThemeSelector } from '../../../../../../esymia/store/tabsAndMenuItemsSlice';
 
 interface UndoRedoProps {
 }
@@ -37,13 +38,15 @@ export const UndoRedo: React.FC<UndoRedoProps> = () => {
   const futureStateLength = useSelector(lengthFutureStateSelector);
   const lastActionType = useSelector(lastActionTypeSelector);
   const [undoActions, setundoActions] = useState<string[]>([]);
+  const theme = useSelector(ThemeSelector);
+
   return (
     <>
       <button
         onClick={() => {
           undoFunction(lastActionType, undoActions, setundoActions, dispatch);
         }}
-        className={navbarDropdownItemStyle}
+        className={`p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}
         disabled={(process.env.APP_VERSION === 'demo') || pastStateLength === 0}
       >
         <div className='flex w-full items-center justify-between'>
@@ -59,7 +62,7 @@ export const UndoRedo: React.FC<UndoRedoProps> = () => {
         onClick={() => {
           redoFunction(undoActions, setundoActions, dispatch);
         }}
-        className={navbarDropdownItemStyle}
+        className={`p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}
         disabled={(process.env.APP_VERSION === 'demo' || futureStateLength === 0)}
       >
         <div className='flex w-full items-center justify-between'>

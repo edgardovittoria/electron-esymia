@@ -1,11 +1,12 @@
 import { FC, Fragment, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   TransformationParamDetails,
   TransformationParams,
   updateTransformationParams,
 } from '../../../../../cad_library';
 import { Transition, Dialog, TransitionChild, DialogPanel, DialogTitle } from '@headlessui/react';
+import { ThemeSelector } from '../../../../../esymia/store/tabsAndMenuItemsSlice';
 
 export const Transformations: FC<{
   transformationParams: TransformationParams;
@@ -13,10 +14,11 @@ export const Transformations: FC<{
   const dispatch = useDispatch();
   const [showTransformationModal, setShowTransformationModal] =
     useState<boolean>(false);
+  const theme = useSelector(ThemeSelector);
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="grid grid-cols-4 gap-2 text-center text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      <div className={`grid grid-cols-4 gap-2 text-center text-[10px] font-bold uppercase tracking-wider ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
         <div className="text-left pl-1">Axis</div>
         <div>X</div>
         <div>Y</div>
@@ -24,14 +26,14 @@ export const Transformations: FC<{
       </div>
 
       <div className="grid grid-cols-4 gap-2 items-center">
-        <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-left pl-1">Position</span>
+        <span className={`text-xs font-medium text-left pl-1 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Position</span>
         {transformationParams.position.map((paramValue, index) => (
           <input
             key={`pos-${index}`}
             disabled
             type="number"
             step="0.1"
-            className="w-full bg-white dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-1 py-0.5 text-xs text-center text-gray-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+            className={`w-full border rounded px-1 py-0.5 text-xs text-center focus:outline-none focus:border-blue-500 transition-colors ${theme === 'light' ? 'bg-white border-gray-200 text-gray-700' : 'bg-black/20 border-white/10 text-gray-200'}`}
             autoComplete="off"
             value={paramValue.toFixed(2)}
             onChange={(e) => {
@@ -51,14 +53,14 @@ export const Transformations: FC<{
       </div>
 
       <div className="grid grid-cols-4 gap-2 items-center">
-        <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-left pl-1">Rotation</span>
+        <span className={`text-xs font-medium text-left pl-1 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Rotation</span>
         {transformationParams.rotation.map((paramValue, index) => (
           <input
             key={`rot-${index}`}
             disabled
             type="number"
             step="1"
-            className="w-full bg-white dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-1 py-0.5 text-xs text-center text-gray-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+            className={`w-full border rounded px-1 py-0.5 text-xs text-center focus:outline-none focus:border-blue-500 transition-colors ${theme === 'light' ? 'bg-white border-gray-200 text-gray-700' : 'bg-black/20 border-white/10 text-gray-200'}`}
             autoComplete="off"
             value={((paramValue * 180) / Math.PI).toFixed(0)}
             onChange={(e) => {
@@ -80,7 +82,7 @@ export const Transformations: FC<{
 
       <button
         type="button"
-        className="mt-2 w-full py-1.5 px-3 bg-gray-900 hover:bg-gray-800 dark:bg-white/10 dark:hover:bg-white/20 text-white text-xs font-medium rounded-lg shadow-sm transition-all duration-200"
+        className={`mt-2 w-full py-1.5 px-3 text-white text-xs font-medium rounded-lg shadow-sm transition-all duration-200 ${theme === 'light' ? 'bg-gray-900 hover:bg-gray-800' : 'bg-white/10 hover:bg-white/20'}`}
         onClick={() => setShowTransformationModal(true)}
       >
         Edit Transformations
@@ -106,6 +108,7 @@ export const SetTransformationParamsModal: FC<{
     transformationParams.rotation.map((r) => r.toFixed(6)),
   );
   const dispatch = useDispatch();
+  const theme = useSelector(ThemeSelector);
 
   const updateNewPositionCoord = (index: number, value: string) => {
     const numericValue = value.replace(/[^0-9.-]/g, '');
@@ -186,16 +189,16 @@ export const SetTransformationParamsModal: FC<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white/90 dark:bg-black/80 backdrop-blur-md border border-gray-200 dark:border-white/10 p-6 text-left align-middle shadow-xl transition-all">
+              <DialogPanel className={`w-full max-w-md transform overflow-hidden rounded-2xl backdrop-blur-md border p-6 text-left align-middle shadow-xl transition-all ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-black/80 border-white/10'}`}>
                 <DialogTitle
                   as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
+                  className={`text-lg font-medium leading-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}
                 >
                   Set Transformation Parameters
                 </DialogTitle>
                 <div className="mt-6 space-y-4">
                   <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Position</h4>
+                    <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>Position</h4>
                     <div className="flex gap-2">
                       {['X', 'Y', 'Z'].map((axis, i) => (
                         <div key={`pos-input-${i}`} className="flex-1">
@@ -204,7 +207,7 @@ export const SetTransformationParamsModal: FC<{
                             type="text"
                             value={newPosition[i]}
                             onChange={(e) => updateNewPositionCoord(i, e.target.value)}
-                            className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'}`}
                           />
                         </div>
                       ))}
@@ -212,7 +215,7 @@ export const SetTransformationParamsModal: FC<{
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Rotation (Degrees)</h4>
+                    <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>Rotation (Degrees)</h4>
                     <div className="flex gap-2">
                       {['X', 'Y', 'Z'].map((axis, i) => (
                         <div key={`rot-input-${i}`} className="flex-1">
@@ -221,7 +224,7 @@ export const SetTransformationParamsModal: FC<{
                             type="text"
                             value={newRotation[i]}
                             onChange={(e) => updateNewRotation(i, e.target.value)}
-                            className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'}`}
                           />
                         </div>
                       ))}
@@ -232,7 +235,7 @@ export const SetTransformationParamsModal: FC<{
                 <div className="mt-8 flex justify-end gap-3">
                   <button
                     type="button"
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg transition-colors focus:outline-none"
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors focus:outline-none ${theme === 'light' ? 'text-gray-700 bg-gray-100 hover:bg-gray-200' : 'text-gray-300 bg-white/10 hover:bg-white/20'}`}
                     onClick={() => showTransformationModal(false)}
                   >
                     Cancel

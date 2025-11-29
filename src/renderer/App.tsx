@@ -21,6 +21,8 @@ import {
 import { ImSpinner } from 'react-icons/im';
 import {
   brokerConnectedSelector,
+  setMessageInfoModal,
+  setShowInfoModal,
   setTheme,
   showInfoModalSelector,
   ThemeSelector,
@@ -133,7 +135,6 @@ export default function App() {
   return (
     <div className={`min-h-screen w-full transition-colors duration-500 ${isDark ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white' : 'bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 text-gray-900'}`}>
       {showInfoModal && <InfoModal />}
-
       {/* Docker Installation Modal */}
       {dockerInstallationBox && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">

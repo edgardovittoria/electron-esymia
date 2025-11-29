@@ -57,18 +57,18 @@ const geometryFrom = (entity: ComponentEntity) => {
             let positionVertices = new Float32Array(Object.values((entity.geometryAttributes as any).positionVertices))
             let normalVertices = new Float32Array(Object.values((entity.geometryAttributes as any).normalVertices))
             let bufferGeometryAttributes: BufferGeometryAttributes = {
-            positionVertices: positionVertices,
-            normalVertices: normalVertices,
-            uvVertices: undefined
-          }
+                positionVertices: positionVertices,
+                normalVertices: normalVertices,
+                uvVertices: undefined
+            }
             let geometry = new THREE.BufferGeometry()
             geometry.setAttribute('position', new THREE.BufferAttribute(bufferGeometryAttributes.positionVertices, 3))
             geometry.setAttribute('normal', new THREE.BufferAttribute(bufferGeometryAttributes.normalVertices, 3))
             return geometry
         case "CYLINDER":
             let cylinderGeometryAttributes = entity.geometryAttributes as CylinderGeometryAttributes
-            return new THREE.CylinderGeometry(cylinderGeometryAttributes.topRadius, cylinderGeometryAttributes.bottomRadius, cylinderGeometryAttributes.height, 
-                cylinderGeometryAttributes.radialSegments, cylinderGeometryAttributes.heightSegments, cylinderGeometryAttributes.openEnded, 
+            return new THREE.CylinderGeometry(cylinderGeometryAttributes.topRadius, cylinderGeometryAttributes.bottomRadius, cylinderGeometryAttributes.height,
+                cylinderGeometryAttributes.radialSegments, cylinderGeometryAttributes.heightSegments, cylinderGeometryAttributes.openEnded,
                 cylinderGeometryAttributes.thetaStart, cylinderGeometryAttributes.thetaLength)
         case "TORUS":
             let torusGeometryAttributes = entity.geometryAttributes as TorusGeometryAttributes

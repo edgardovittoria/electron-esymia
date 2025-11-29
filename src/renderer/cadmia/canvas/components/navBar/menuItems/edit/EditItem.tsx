@@ -14,6 +14,8 @@ import {
   navbarShortcutStyle
 } from '../../../../../config/styles';
 import { resetState } from '../../../../../../cad_library';
+import { ThemeSelector } from '../../../../../../esymia/store/tabsAndMenuItemsSlice';
+import { useSelector } from 'react-redux';
 
 interface EditItemProps { }
 
@@ -24,12 +26,14 @@ function classNames(...classes: string[]) {
 export const EditItem: React.FC<EditItemProps> = () => {
   const dispatch = useDispatch();
 
+  const theme = useSelector(ThemeSelector);
+
   return (
     <Popover className="relative">
       {({ open }) => (
         <>
           <Popover.Button
-            className={navbarItemStyle}
+            className={`group inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 hover:cursor-pointer ${theme === 'light' ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-200 hover:bg-white/10'}`}
           >
             <span>Edit</span>
             <ChevronDownIcon
@@ -49,14 +53,14 @@ export const EditItem: React.FC<EditItemProps> = () => {
           >
             <Popover.Panel className={navbarDropdownStyle}>
               <div className={navbarDropdownBoxStyle}>
-                <div className={navbarDropdownPadding}>
+                <div className={`relative grid gap-1 p-2 backdrop-blur-md rounded-xl border shadow-xl ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-black border-white/10'}`}>
                   <UndoRedo />
                   <button
                     onClick={() => {
                       dispatch(resetState());
                       dispatch(ActionCreators.clearHistory());
                     }}
-                    className={navbarDropdownItemStyle}
+                    className={`p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}
                   >
                     <div className="flex w-full items-center justify-between">
                       <div className="flex items-center gap-3">

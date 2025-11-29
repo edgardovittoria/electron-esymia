@@ -5,17 +5,18 @@ import {
     binaryOpSelector,
     binaryOpToolbarVisibilitySelector,
     setBinaryOp,
+    attachModeSelector,
+    toggleAttachMode
 } from "./binaryOperationsToolbarSlice";
 import { CadmiaModality } from "../cadmiaModality/cadmiaModalityType";
-import unionIcon from "./style/unionIcon.png";
-import intersectionIcon from "./style/intersectionIcon.png";
-import subtractionIcon from "./style/subtractionIcon.png";
+import { TbLayersIntersect, TbLayersSubtract, TbLayersUnion, TbMagnet } from "react-icons/tb";
 import { Dispatch } from "@reduxjs/toolkit";
 import { CheckIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { setModality } from "../cadmiaModality/cadmiaModalitySlice";
-import { toolbarIconsHeight, toolbarIconsWidth, toolbarsHintStyle } from '../../../config/styles';
+import { toolbarsHintStyle } from '../../../config/styles';
 import { setLoadingSpinner } from "../../../store/modelSlice";
 import { binaryOperation, BinaryOperationType, canvasStateSelector, ComponentEntity, ComponentTypes, CompositeEntity, findComponentByKey, GeometryAttributes, getNewKeys, CanvasState } from "../../../../cad_library";
+import { ThemeSelector } from "../../../../esymia/store/tabsAndMenuItemsSlice";
 
 interface BinaryOpsToolbarProps {
 }
@@ -23,6 +24,7 @@ interface BinaryOpsToolbarProps {
 export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
     const dispatch = useDispatch();
     const binaryOp = useSelector(binaryOpSelector);
+    const attachMode = useSelector(attachModeSelector);
     const binaryOperationsToolbarVisible = useSelector(binaryOpToolbarVisibilitySelector)
     const entityKeysForBinaryOperations = useSelector(
         binaryOpEntitiesKeysSelector
@@ -107,54 +109,69 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
     // }, [entityKeysForBinaryOperations]);
 
 
+    const theme = useSelector(ThemeSelector);
+
     return (
         <>
             {binaryOperationsToolbarVisible &&
-                <div className="flex items-center gap-1 p-1 rounded-xl shadow-lg backdrop-blur-md bg-white/90 border border-gray-200 dark:bg-black/80 dark:border-white/10 transition-all duration-300">
+                <div className={`flex items-center gap-1 p-1 rounded-xl shadow-lg backdrop-blur-md border transition-all duration-300 ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-black/80 border-white/10'}`}>
                     <div className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group
-             ${binaryOp === "UNION" ? 'bg-blue-500 text-white shadow-md' : 'hover:bg-gray-100 dark:hover:bg-white/10'}
+             ${binaryOp === "UNION" ? 'bg-blue-500 text-white shadow-md' : `${theme === 'light' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-white/10 text-gray-200'}`}
             `}
                         onClick={() => {
                             dispatch(setModality('BinaryOperation' as CadmiaModality));
                             dispatch(setBinaryOp("UNION"));
                         }}
                     >
-                        <img src={unionIcon} alt="Union operation" className={`w-6 h-6 ${binaryOp === "UNION" ? 'brightness-0 invert' : ''}`} />
+                        <TbLayersUnion className="w-6 h-6" />
                         <div className={toolbarsHintStyle}>
                             <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">UNION</span>
                         </div>
                     </div>
                     <div className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group
-             ${binaryOp === "INTERSECTION" ? 'bg-blue-500 text-white shadow-md' : 'hover:bg-gray-100 dark:hover:bg-white/10'}
+             ${binaryOp === "INTERSECTION" ? 'bg-blue-500 text-white shadow-md' : `${theme === 'light' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-white/10 text-gray-200'}`}
             `}
                         onClick={() => {
                             dispatch(setModality('BinaryOperation' as CadmiaModality));
                             dispatch(setBinaryOp("INTERSECTION"));
                         }}
                     >
-                        <img src={intersectionIcon} alt="Intersection operation" className={`w-6 h-6 ${binaryOp === "INTERSECTION" ? 'brightness-0 invert' : ''}`} />
+                        <TbLayersIntersect className="w-6 h-6" />
                         <div className={toolbarsHintStyle}>
                             <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">INTERSECTION</span>
                         </div>
                     </div>
                     <div className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group
-             ${binaryOp === "SUBTRACTION" ? 'bg-blue-500 text-white shadow-md' : 'hover:bg-gray-100 dark:hover:bg-white/10'}
+             ${binaryOp === "SUBTRACTION" ? 'bg-blue-500 text-white shadow-md' : `${theme === 'light' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-white/10 text-gray-200'}`}
             `}
                         onClick={() => {
                             dispatch(setModality('BinaryOperation' as CadmiaModality));
                             dispatch(setBinaryOp("SUBTRACTION"));
                         }}
                     >
-                        <img src={subtractionIcon} alt="Subtraction operation" className={`w-6 h-6 ${binaryOp === "SUBTRACTION" ? 'brightness-0 invert' : ''}`} />
+                        <TbLayersSubtract className="w-6 h-6" />
                         <div className={toolbarsHintStyle}>
                             <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">SUBTRACTION</span>
                         </div>
                     </div>
 
-                    <div className="w-px h-6 bg-gray-300 dark:bg-white/20 mx-1" />
+                    <div className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group
+             ${attachMode ? 'bg-blue-500 text-white shadow-md' : `${theme === 'light' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-white/10 text-gray-200'}`}
+            `}
+                        onClick={() => {
+                            dispatch(toggleAttachMode());
+                        }}
+                    >
+                        <TbMagnet className="w-6 h-6" />
+                        <div className={toolbarsHintStyle}>
+                            <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">ATTACH</span>
+                        </div>
+                    </div>
+
+                    <div className={`w-px h-6 mx-1 ${theme === 'light' ? 'bg-gray-300' : 'bg-white/20'}`} />
 
                     <div
-                        className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group hover:bg-gray-100 dark:hover:bg-white/10`}>
+                        className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10'}`}>
                         {binaryOp === undefined ? (
                             <XCircleIcon className="text-gray-400 w-6 h-6" />
                         ) : (
@@ -167,7 +184,7 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
                         </div>
                     </div>
                     <div
-                        className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group hover:bg-gray-100 dark:hover:bg-white/10`}>
+                        className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10'}`}>
                         {entityKeysForBinaryOperations.length > 1 ? (
                             <CheckIcon className="text-green-500 w-6 h-6 hover:text-green-600 transition-colors"
                                 onClick={() => {

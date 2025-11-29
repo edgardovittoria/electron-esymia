@@ -4,9 +4,11 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useSelector } from 'react-redux';
 import { ThemeSelector } from '../esymia/store/tabsAndMenuItemsSlice';
 import cadmia_logo from '../../../assets/cadmia_logo.png';
+import cadmia_logo_light from '../../../assets/cadmia_logo_light.png';
 import teema_logo from '../../../assets/logo_teema_dark.png';
 import teema_logo_light from '../../../assets/logo_teema_light.png';
 import esimia_logo from '../../../assets/esimia_logo.png';
+import esimia_logo_light from '../../../assets/esimia_logo_light.png';
 
 export interface HomeProps {
   setSelectedTab: (v: string) => void;
@@ -54,7 +56,7 @@ const Home: React.FC<HomeProps> = ({ setSelectedTab }) => {
               } ${isDark ? 'bg-white/5 border-white shadow-black/50' : 'bg-white/40 border-black shadow-gray-300/50'}`}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-transparent to-blue-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <img src={cadmia_logo} alt="Cadmia" className="w-3/4 md:w-2/3 object-contain z-10 drop-shadow-lg group-hover:scale-105 transition-transform duration-500" />
+            <img src={isDark ? cadmia_logo_light : cadmia_logo} alt="Cadmia" className="w-3/4 md:w-2/3 object-contain z-10 drop-shadow-lg group-hover:scale-105 transition-transform duration-500" />
             <div className={`mt-6 text-lg font-medium tracking-wide opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
               Launch Cadmia
             </div>
@@ -67,7 +69,7 @@ const Home: React.FC<HomeProps> = ({ setSelectedTab }) => {
               } ${isDark ? 'bg-white/5 border-white shadow-black/50' : 'bg-white/40 border-black shadow-gray-300/50'}`}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-transparent to-purple-500/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <img src={esimia_logo} alt="Esymia" className="w-3/4 md:w-2/3 object-contain z-10 drop-shadow-lg group-hover:scale-105 transition-transform duration-500" />
+            <img src={isDark ? esimia_logo_light : esimia_logo} alt="Esymia" className="w-3/4 md:w-2/3 object-contain z-10 drop-shadow-lg group-hover:scale-105 transition-transform duration-500" />
             <div className={`mt-6 text-lg font-medium tracking-wide opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
               Launch Esymia
             </div>

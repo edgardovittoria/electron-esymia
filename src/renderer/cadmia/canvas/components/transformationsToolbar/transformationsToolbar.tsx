@@ -6,6 +6,7 @@ import RotationIcon from './style/rotationIcon.png'
 import ScaleIcon from './style/scaleIcon.png'
 import { TransformationType } from './transformationsTypes';
 import { toolbarIconsHeight, toolbarIconsWidth, toolbarsHintStyle } from '../../../config/styles';
+import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
 
 
 interface TransformationsToolBarProps {
@@ -27,20 +28,22 @@ export const TransformationsToolBar: React.FC<TransformationsToolBarProps> = () 
     const transformations = useSelector(transformationsSelector)
     const dispatch = useDispatch();
     const transformationsToolbarVisible = useSelector(transformationsToolbarVisibilitySelector)
+    const theme = useSelector(ThemeSelector);
+
     return (
         <>
             {transformationsToolbarVisible &&
-                <div className="flex items-center gap-1 p-1 rounded-xl shadow-lg backdrop-blur-md bg-white/90 border border-gray-200 dark:bg-black/80 dark:border-white/10 transition-all duration-300">
+                <div className={`flex items-center gap-1 p-1 rounded-xl shadow-lg backdrop-blur-md border transition-all duration-300 ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-black/80 border-white/10'}`}>
                     {transformations.map((transformation, index) => {
                         return (
                             <div key={index} className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group
                              ${transformation.active
                                     ? 'bg-blue-500 text-white shadow-md'
-                                    : 'hover:bg-gray-100 dark:hover:bg-white/10'}`}
+                                    : `${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10'}`}`}
                                 onClick={() => dispatch(setTransformationActive(transformation.type))}
                             >
                                 <img src={getIconFor(transformation.type)} alt={transformation.type}
-                                    className={`w-6 h-6 transition-all duration-200 ${transformation.active ? 'brightness-0 invert' : ''}`}
+                                    className={`w-6 h-6 transition-all duration-200 ${transformation.active || theme !== 'light' ? 'brightness-0 invert' : ''}`}
                                 />
                                 <div className={toolbarsHintStyle}>
                                     <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">

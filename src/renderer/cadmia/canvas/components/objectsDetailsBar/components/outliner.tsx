@@ -7,6 +7,7 @@ import { IoMdEye, IoMdEyeOff, IoMdSave } from 'react-icons/io';
 import { BiRename } from 'react-icons/bi';
 import { MdDelete, MdOutlineCancel } from 'react-icons/md';
 import { ComponentEntity, updateName } from '../../../../../cad_library';
+import { ThemeSelector } from '../../../../../esymia/store/tabsAndMenuItemsSlice';
 
 interface OutlinerProps {
   components: ComponentEntity[];
@@ -18,12 +19,14 @@ export const Outliner: FC<OutlinerProps> = ({
   selectedComponent,
 }) => {
   const invisibleMeshes = useSelector(invisibleMeshesSelector);
+  const theme = useSelector(ThemeSelector);
+
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 text-left pl-2">
+      <div className={`text-xs font-bold uppercase tracking-wider text-left pl-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
         Components
       </div>
-      <div className='max-h-[200px] overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 rounded-lg border border-gray-400 dark:border-white/5'>
+      <div className={`max-h-[200px] overflow-y-auto p-2 scrollbar-thin rounded-lg border ${theme === 'light' ? 'scrollbar-thumb-gray-300 border-gray-400' : 'scrollbar-thumb-gray-600 border-white/5'}`}>
         {components.map((component) => {
           return (
             <OutlinerItem
@@ -64,6 +67,7 @@ const OutlinerItem: FC<OutlinerItemProps> = ({
   const isSelelctedComponent =
     objectsDetailsOptsBasedOnModality.outliner.isItemSelected(keyComponent);
   const [newName, setNewName] = useState(nameComponent);
+  const theme = useSelector(ThemeSelector);
 
   useEffect(() => {
     !isSelelctedComponent && setOutlinerItemVisibility(true);
@@ -74,7 +78,7 @@ const OutlinerItem: FC<OutlinerItemProps> = ({
       className={`flex flex-row items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 mb-1
         ${isSelelctedComponent
           ? 'bg-blue-500 text-white shadow-md'
-          : 'hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-gray-200'
+          : `${theme === 'light' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-white/10 text-gray-200'}`
         }`}
     >
       {outlinerItemVisibility ? (
@@ -95,14 +99,14 @@ const OutlinerItem: FC<OutlinerItemProps> = ({
             <div className="tooltip tooltip-left" data-tip={isVisible ? "Hide" : "Show"}>
               {isVisible ? (
                 <IoMdEye
-                  className={`w-4 h-4 cursor-pointer ${isSelelctedComponent ? 'text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                  className={`w-4 h-4 cursor-pointer ${isSelelctedComponent ? 'text-white' : `${theme === 'light' ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 hover:text-gray-200'}`}`}
                   onClick={() => {
                     meshHidingActionBasedOnModality(keyComponent);
                   }}
                 />
               ) : (
                 <IoMdEyeOff
-                  className={`w-4 h-4 cursor-pointer ${isSelelctedComponent ? 'text-white/70' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'}`}
+                  className={`w-4 h-4 cursor-pointer ${isSelelctedComponent ? 'text-white/70' : `${theme === 'light' ? 'text-gray-400 hover:text-gray-600' : 'text-gray-500 hover:text-gray-300'}`}`}
                   onClick={() => {
                     meshUnhidingActionBasedOnModality(keyComponent);
                   }}
@@ -111,7 +115,7 @@ const OutlinerItem: FC<OutlinerItemProps> = ({
             </div>
             <div className="tooltip tooltip-left" data-tip="Rename">
               <BiRename
-                className={`w-4 h-4 cursor-pointer ${isSelelctedComponent ? 'text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                className={`w-4 h-4 cursor-pointer ${isSelelctedComponent ? 'text-white' : `${theme === 'light' ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 hover:text-gray-200'}`}`}
                 onClick={() => {
                   setOutlinerItemVisibility(false);
                 }}

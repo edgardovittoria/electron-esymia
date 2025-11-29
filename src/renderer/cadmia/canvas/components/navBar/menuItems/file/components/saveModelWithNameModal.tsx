@@ -6,7 +6,7 @@ import { Transition, Dialog } from '@headlessui/react';
 import { unitSelector } from '../../../../statusBar/statusBarSlice';
 import { uploadFileS3 } from '../../../../../../aws/crud';
 import { addModel, setLoadingSpinner } from '../../../../../../store/modelSlice';
-import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal } from '../../../../../../../esymia/store/tabsAndMenuItemsSlice';
+import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal, ThemeSelector } from '../../../../../../../esymia/store/tabsAndMenuItemsSlice';
 import { useFaunaQuery } from '../../../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { Client, fql, QuerySuccess } from 'fauna';
 import { canvasStateSelector, FaunaCadModel } from '../../../../../../../cad_library';
@@ -75,6 +75,8 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
     });
   };
 
+  const theme = useSelector(ThemeSelector);
+
   return (
     <Transition appear show as={Fragment}>
       <Dialog
@@ -105,10 +107,10 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className={`w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all backdrop-blur-xl border ${theme === 'light' ? 'bg-white/90 border-gray-200 text-gray-900' : 'bg-black/80 border-white/10 text-gray-200'}`}>
                 <Dialog.Title
                   as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
+                  className={`text-lg font-medium leading-6 ${theme === 'light' ? 'text-gray-900' : 'text-gray-200'}`}
                 >
                   Save Model to database
                 </Dialog.Title>
@@ -122,7 +124,7 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
                       onChange={(e) => {
                         setName(e.target.value);
                       }}
-                      className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
+                      className={`border rounded shadow p-1 w-[80%] text-left ${theme === 'light' ? 'border-black text-black' : 'border-gray-600 bg-gray-700 text-white'}`}
                     />
                   </div>
                 </div>
@@ -130,25 +132,25 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
                 <div className="mt-4 flex justify-between">
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className={`inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${theme === 'light' ? 'bg-blue-100 text-blue-900 hover:bg-blue-200 focus-visible:ring-blue-500' : 'bg-gray-700 text-gray-200 hover:bg-gray-600 focus-visible:ring-gray-500'}`}
                     onClick={() => showModalSave(false)}
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className={`inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${theme === 'light' ? 'bg-blue-100 text-blue-900 hover:bg-blue-200 focus-visible:ring-blue-500' : 'bg-blue-900 text-blue-100 hover:bg-blue-800 focus-visible:ring-blue-500'}`}
                     onClick={
                       name === ''
                         ? () => {
-                            toast.error(
-                              'You must insert a valid name for the model.',
-                            );
-                          }
+                          toast.error(
+                            'You must insert a valid name for the model.',
+                          );
+                        }
                         : () => {
-                            showModalSave(false);
-                            saveModel();
-                          }
+                          showModalSave(false);
+                          saveModel();
+                        }
                     }
                   >
                     Save

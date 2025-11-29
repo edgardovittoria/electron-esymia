@@ -30,6 +30,7 @@ import {
   setIsAlertInfoModal,
   setMessageInfoModal,
   setShowInfoModal,
+  ThemeSelector,
 } from '../../../../../../esymia/store/tabsAndMenuItemsSlice';
 import { ModelsSelector } from '../../../../../store/modelSlice';
 import { s3 } from '../../../../../aws/s3Config';
@@ -69,6 +70,7 @@ export const ManageMaterialModal: FC<{
 }) => {
     const models = useSelector(ModelsSelector);
     const dispatch = useDispatch();
+    const theme = useSelector(ThemeSelector);
 
     async function isMaterialUsed(
       models: DynamoDBCadModel[],
@@ -147,36 +149,36 @@ export const ManageMaterialModal: FC<{
                   leaveFrom="opacity-100 scale-100"
                   leaveTo="opacity-0 scale-95"
                 >
-                  <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white/90 dark:bg-black/80 backdrop-blur-md border border-gray-200 dark:border-white/10 p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Panel className={`w-full max-w-xl transform overflow-hidden rounded-2xl backdrop-blur-md border p-6 text-left align-middle shadow-xl transition-all ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-black/80 border-white/10'}`}>
                     <div className="flex justify-between items-center mb-4">
                       <Dialog.Title
                         as="h3"
-                        className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
+                        className={`text-lg font-medium leading-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}
                       >
                         Manage Materials
                       </Dialog.Title>
                       <IoCloseCircleOutline
                         size={24}
-                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer transition-colors"
+                        className={`cursor-pointer transition-colors ${theme === 'light' ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 hover:text-gray-200'}`}
                         onClick={() => showModal(false)}
                       />
                     </div>
 
-                    <div className="max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 space-y-2">
+                    <div className={`max-h-[300px] overflow-y-auto pr-2 scrollbar-thin space-y-2 ${theme === 'light' ? 'scrollbar-thumb-gray-300' : 'scrollbar-thumb-gray-600'}`}>
                       {availableMaterials.map((m, index) => {
                         return (
                           <div
                             key={m.id}
-                            className="flex flex-row items-center justify-between p-3 rounded-lg bg-white/50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors border border-gray-100 dark:border-white/5"
+                            className={`flex flex-row items-center justify-between p-3 rounded-lg transition-colors border ${theme === 'light' ? 'bg-white/50 hover:bg-gray-100 border-gray-100' : 'bg-white/5 hover:bg-white/10 border-white/5'}`}
                           >
                             <div className="flex flex-row gap-3 items-center">
                               <MdCircle color={m.color} className="w-4 h-4 shadow-sm rounded-full" />
-                              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{m.name}</span>
+                              <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>{m.name}</span>
                             </div>
                             <div className="flex flex-row items-center gap-3">
                               <div className="tooltip tooltip-left" data-tip="Details">
                                 <TbInfoSquareRounded
-                                  className="w-5 h-5 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 cursor-pointer transition-colors"
+                                  className={`w-5 h-5 cursor-pointer transition-colors ${theme === 'light' ? 'text-gray-500 hover:text-blue-500' : 'text-gray-400 hover:text-blue-400'}`}
                                   onClick={() => {
                                     setShowDetails(!showDetails);
                                   }}
@@ -184,7 +186,7 @@ export const ManageMaterialModal: FC<{
                               </div>
                               <div className="tooltip tooltip-left" data-tip="Delete">
                                 <PiTrash
-                                  className="w-5 h-5 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 cursor-pointer transition-colors"
+                                  className={`w-5 h-5 cursor-pointer transition-colors ${theme === 'light' ? 'text-gray-500 hover:text-red-500' : 'text-gray-400 hover:text-red-400'}`}
                                   onClick={async () => {
                                     let materialUsed = await isMaterialUsed(models, m, s3)
                                     if (!materialUsed) {

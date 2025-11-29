@@ -7,7 +7,7 @@ import React, {
   useMemo,
 } from 'react';
 import { Provider, ReactReduxContext, useSelector } from 'react-redux';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   Bounds,
@@ -27,13 +27,21 @@ import {
   meshesWithBordersVisibleSelector,
 } from '../objectsDetailsBar/objectsDetailsSlice';
 import { focusToSceneSelector } from '../navBar/menuItems/view/viewItemSlice';
+import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
+import { MeasurementHandler } from '../measurement/MeasurementHandler';
 import {
   ComponentEntity,
   componentseSelector,
   FactoryShapes,
   keySelectedComponenteSelector,
   meshFrom,
+  TransformationParams,
+  updateTransformationParams,
+  selectComponent,
 } from '../../../../cad_library';
+import { alignObjectsByFaces, getAllMeshes } from '../../../../cad_library/components/auxiliaryFunctionsUsingThree/snapLogic';
+import { useDispatch } from 'react-redux';
+import { addSelectedFace, attachModeSelector, selectedFacesSelector, toggleAttachMode } from '../binaryOperationsToolbar/binaryOperationsToolbarSlice';
 
 interface CadmiaCanvasProps {
   triggerUpdate: React.MutableRefObject<(() => void) | null>;
@@ -50,6 +58,8 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
     undefined,
   );
 
+  const theme = useSelector(ThemeSelector);
+
   return (
     <div className="h-[91vh]">
       <ReactReduxContext.Consumer>
@@ -59,8 +69,8 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
             camera={{ position: [0, -50, 0], up: [0, 0, 1], fov: 50, far: 5000, near: 0.1 }}
             shadows
           >
-            <color attach="background" args={['#f0f0f0']} />
-            <fog attach="fog" args={['#f0f0f0', 10, 500]} />
+            <color attach="background" args={[theme === 'light' ? '#f0f0f0' : '#111827']} />
+            <fog attach="fog" args={[theme === 'light' ? '#f0f0f0' : '#111827', 10, 500]} />
             <Provider store={store}>
               <Environment preset="city" />
               <ambientLight intensity={1} />
@@ -147,11 +157,14 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
               <GizmoHelper alignment="bottom-right">
                 <GizmoViewport
                   axisColors={['red', 'green', 'blue']}
-                  labelColor="white"
+                  labelColor={theme === 'light' ? 'black' : 'white'}
                 />
                 <group rotation={[-Math.PI / 2, 0, 0]} />
               </GizmoHelper>
               <SelectedObjectHighlighter />
+              <FaceSelectionHandler />
+              <SelectedFacesHighlighter />
+              <MeasurementHandler />
             </Provider>
           </Canvas>
         )}
@@ -224,16 +237,21 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
   const yNumbers = calculateGridNumbers('y');
   const zNumbers = calculateGridNumbers('z');
 
+  const theme = useSelector(ThemeSelector);
+
   useEffect(() => {
     // Aggiorna le griglie al montaggio iniziale
     updateGrid();
   }, []); // se mettiamo updateGrid come dipendenza, allora le griglie si aggiornano in automatico ad ogni cambiamento della bounding box.
 
+  const gridColor = theme === 'light' ? 'gray' : '#4b5563';
+  const textColor = theme === 'light' ? 'black' : 'white';
+
   return (
     <>
       {/* Griglia sul piano XZ */}
       <gridHelper
-        args={[gridSize, gridDivisions, "yellow", "gray"]}
+        args={[gridSize, gridDivisions, "yellow", gridColor]}
         position={[center.x, center.y + halfGridSize, center.z]}
       />
       {xNumbers.map((value, index) => (
@@ -241,7 +259,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
           key={`xz-x-${index}`}
           position={[value, center.y + halfGridSize, center.z - halfGridSize]}
           fontSize={gridSize / gridDivisions / 3}
-          color="black"
+          color={textColor}
           anchorX="center"
           anchorY="middle"
           rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
@@ -254,7 +272,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
           key={`xz-z-${index}`}
           position={[center.x - halfGridSize, center.y + halfGridSize, value]}
           fontSize={gridSize / gridDivisions / 3}
-          color="black"
+          color={textColor}
           anchorX="center"
           anchorY="middle"
           rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
@@ -265,7 +283,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
 
       {/* Griglia sul piano XY */}
       <gridHelper
-        args={[gridSize, gridDivisions, "yellow", "gray"]}
+        args={[gridSize, gridDivisions, "yellow", gridColor]}
         rotation={[Math.PI / 2, 0, 0]}
         position={[center.x, center.y, center.z - halfGridSize]}
       />
@@ -274,7 +292,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
           key={`xy-x-${index}`}
           position={[value, center.y + halfGridSize, center.z - halfGridSize]}
           fontSize={gridSize / gridDivisions / 3}
-          color="black"
+          color={textColor}
           anchorX="center"
           anchorY="middle"
           rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
@@ -287,7 +305,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
           key={`xy-y-${index}`}
           position={[center.x - halfGridSize, value, center.z - halfGridSize]}
           fontSize={gridSize / gridDivisions / 3}
-          color="black"
+          color={textColor}
           anchorX="center"
           anchorY="middle"
           rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
@@ -298,7 +316,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
 
       {/* Griglia sul piano YZ */}
       <gridHelper
-        args={[gridSize, gridDivisions, "yellow", "gray"]}
+        args={[gridSize, gridDivisions, "yellow", gridColor]}
         rotation={[0, 0, Math.PI / 2]}
         position={[center.x - halfGridSize, center.y, center.z]}
       />
@@ -307,7 +325,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
           key={`yz-y-${index}`}
           position={[center.x - halfGridSize, value, center.z - halfGridSize]}
           fontSize={gridSize / gridDivisions / 3}
-          color="black"
+          color={textColor}
           anchorX="center"
           anchorY="middle"
           rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
@@ -320,7 +338,7 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
           key={`yz-z-${index}`}
           position={[center.x - halfGridSize, center.y + halfGridSize, value]}
           fontSize={gridSize / gridDivisions / 3}
-          color="black"
+          color={textColor}
           anchorX="center"
           anchorY="middle"
           rotation={[Math.PI / 2, 0, 0]} // Rotazione per allineare al piano XZ
@@ -376,3 +394,259 @@ const SelectedObjectHighlighter: FC = () => {
     </>
   );
 };
+
+const getCoplanarFacesVertices = (mesh: THREE.Mesh, face: THREE.Face): number[][] => {
+  const geometry = mesh.geometry;
+  const positionAttribute = geometry.attributes.position;
+  const indexAttribute = geometry.index;
+  const matrixWorld = mesh.matrixWorld;
+
+  const vertices: number[][] = [];
+
+  const vA = new THREE.Vector3();
+  const vB = new THREE.Vector3();
+  const vC = new THREE.Vector3();
+
+  const getVertex = (i: number, target: THREE.Vector3) => {
+    target.fromBufferAttribute(positionAttribute, i);
+  };
+
+  // Calculate reference normal from the clicked face
+  getVertex(face.a, vA);
+  getVertex(face.b, vB);
+  getVertex(face.c, vC);
+
+  const cb = new THREE.Vector3();
+  const ab = new THREE.Vector3();
+  cb.subVectors(vC, vB);
+  ab.subVectors(vA, vB);
+  cb.cross(ab).normalize();
+  const referenceNormal = cb.clone();
+
+  const faceCount = indexAttribute ? indexAttribute.count / 3 : positionAttribute.count / 3;
+
+  for (let i = 0; i < faceCount; i++) {
+    let a, b, c;
+    if (indexAttribute) {
+      a = indexAttribute.getX(i * 3);
+      b = indexAttribute.getX(i * 3 + 1);
+      c = indexAttribute.getX(i * 3 + 2);
+    } else {
+      a = i * 3;
+      b = i * 3 + 1;
+      c = i * 3 + 2;
+    }
+
+    getVertex(a, vA);
+    getVertex(b, vB);
+    getVertex(c, vC);
+
+    cb.subVectors(vC, vB);
+    ab.subVectors(vA, vB);
+    cb.cross(ab).normalize();
+
+    // Check if coplanar (normals are parallel)
+    if (cb.dot(referenceNormal) > 0.999) {
+      // Transform to world space
+      const wA = vA.clone().applyMatrix4(matrixWorld);
+      const wB = vB.clone().applyMatrix4(matrixWorld);
+      const wC = vC.clone().applyMatrix4(matrixWorld);
+
+      vertices.push([wA.x, wA.y, wA.z]);
+      vertices.push([wB.x, wB.y, wB.z]);
+      vertices.push([wC.x, wC.y, wC.z]);
+    }
+  }
+
+  return vertices;
+};
+
+const FaceHighlighterMesh: FC<{ vertices: number[][], color: string, opacity: number }> = ({ vertices, color, opacity }) => {
+  const geometry = useMemo(() => {
+    const flattenVertices = new Float32Array(vertices.flat());
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.BufferAttribute(flattenVertices, 3));
+    // Compute normals for correct lighting/rendering if needed, though BasicMaterial doesn't need it much
+    geom.computeVertexNormals();
+    return geom;
+  }, [vertices]);
+
+  return (
+    <mesh geometry={geometry}>
+      <meshBasicMaterial color={color} side={THREE.DoubleSide} depthTest={false} transparent opacity={opacity} />
+      <Edges color="white" threshold={1} />
+    </mesh>
+  );
+};
+
+const FaceSelectionHandler: FC = () => {
+  const { camera, scene, gl } = useThree();
+  const dispatch = useDispatch();
+  const attachMode = useSelector(attachModeSelector);
+  const selectedFaces = useSelector(selectedFacesSelector);
+
+  const [hoveredFaceVertices, setHoveredFaceVertices] = useState<number[][] | null>(null);
+
+  useEffect(() => {
+    if (!attachMode) {
+      setHoveredFaceVertices(null);
+      return;
+    }
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    const getIntersects = (event: MouseEvent) => {
+      const rect = gl.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const meshes = getAllMeshes(scene);
+      return raycaster.intersectObjects(meshes, false);
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const intersects = getIntersects(event);
+      if (intersects.length > 0) {
+        const intersection = intersects[0];
+        if (intersection.face && intersection.object instanceof THREE.Mesh) {
+          const vertices = getCoplanarFacesVertices(intersection.object, intersection.face);
+          setHoveredFaceVertices(vertices);
+        } else {
+          setHoveredFaceVertices(null);
+        }
+      } else {
+        setHoveredFaceVertices(null);
+      }
+    };
+
+    const handleClick = (event: MouseEvent) => {
+      const intersects = getIntersects(event);
+
+      if (intersects.length > 0) {
+        const intersection = intersects[0];
+        if (intersection.face && intersection.object instanceof THREE.Mesh) {
+          let mesh = intersection.object;
+          const face = intersection.face;
+          const point = intersection.point;
+
+          // Traverse up to find the component root (CanvasObject) which has the key as name
+          let rootMesh = mesh;
+          while (rootMesh.parent && (rootMesh.name === "" || isNaN(parseInt(rootMesh.name)))) {
+            if (rootMesh.parent instanceof THREE.Mesh) {
+              rootMesh = rootMesh.parent;
+            } else {
+              if (rootMesh.parent.type === 'Group' || rootMesh.parent.type === 'Object3D') {
+                rootMesh = rootMesh.parent as unknown as THREE.Mesh;
+              } else {
+                break;
+              }
+            }
+          }
+
+          if (!rootMesh || isNaN(parseInt(rootMesh.name))) {
+            console.warn("Could not find component root for mesh", mesh);
+            return;
+          }
+
+          const normalMatrix = new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld);
+          const worldNormal = face.normal.clone().applyMatrix3(normalMatrix).normalize();
+          const vertices = getCoplanarFacesVertices(mesh, face);
+
+          dispatch(addSelectedFace({
+            objectUUID: rootMesh.uuid,
+            faceIndex: face.a,
+            normal: [worldNormal.x, worldNormal.y, worldNormal.z],
+            point: [point.x, point.y, point.z],
+            vertices: vertices
+          }));
+        }
+      }
+    };
+
+    gl.domElement.addEventListener('click', handleClick);
+    gl.domElement.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      gl.domElement.removeEventListener('click', handleClick);
+      gl.domElement.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [attachMode, camera, scene, gl, dispatch]);
+
+  useEffect(() => {
+    if (selectedFaces.length === 2) {
+      // Perform alignment
+      const [face1Data, face2Data] = selectedFaces;
+
+      const meshes = getAllMeshes(scene);
+      const mesh1 = meshes.find(m => m.uuid === face1Data.objectUUID);
+      const mesh2 = meshes.find(m => m.uuid === face2Data.objectUUID);
+
+      if (mesh1 && mesh2) {
+        const getCenter = (vertices: number[][]) => {
+          if (!vertices || vertices.length === 0) return null;
+          const box = new THREE.Box3();
+          vertices.forEach(v => box.expandByPoint(new THREE.Vector3(...v)));
+          return box.getCenter(new THREE.Vector3());
+        };
+
+        const center1 = getCenter(face1Data.vertices);
+        const center2 = getCenter(face2Data.vertices);
+
+        const faceA = {
+          normal: new THREE.Vector3(...face1Data.normal),
+          point: center1 || new THREE.Vector3(...face1Data.point)
+        };
+        const faceB = {
+          normal: new THREE.Vector3(...face2Data.normal),
+          point: center2 || new THREE.Vector3(...face2Data.point)
+        };
+
+        // Align mesh1 to mesh2
+        // mesh1 is the root mesh now, so we can move it directly
+        const result = alignObjectsByFaces(mesh1, faceA, mesh2, faceB);
+
+        const keyComponent = parseInt(mesh1.name);
+
+        if (!isNaN(keyComponent)) {
+          dispatch(selectComponent(keyComponent));
+
+          const transformationParams: TransformationParams = {
+            position: [result.position.x, result.position.y, result.position.z] as [number, number, number],
+            rotation: [result.rotation.x, result.rotation.y, result.rotation.z] as [number, number, number],
+            scale: [mesh1.scale.x, mesh1.scale.y, mesh1.scale.z] as [number, number, number]
+          };
+
+          dispatch(updateTransformationParams(transformationParams));
+          dispatch(toggleAttachMode());
+        }
+      }
+    }
+  }, [selectedFaces, scene, dispatch]);
+
+  if (!hoveredFaceVertices) return null;
+
+  return <FaceHighlighterMesh vertices={hoveredFaceVertices} color="yellow" opacity={0.5} />;
+};
+
+const SelectedFacesHighlighter: FC = () => {
+  const selectedFaces = useSelector(selectedFacesSelector);
+
+  if (selectedFaces.length === 0) return null;
+
+  return (
+    <group>
+      {selectedFaces.map((face, index) => {
+        if (!face.vertices) return null; // Handle legacy state if any
+        return (
+          <FaceHighlighterMesh
+            key={index}
+            vertices={face.vertices}
+            color={index === 0 ? "blue" : "green"}
+            opacity={0.8}
+          />
+        )
+      })}
+    </group>
+  );
+}

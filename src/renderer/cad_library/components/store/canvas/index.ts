@@ -1,4 +1,4 @@
-export type {CanvasState} from "./canvasSlice"
+export type { CanvasState } from "./canvasSlice"
 export {
     CanvasSlice,
     addComponent,
@@ -7,9 +7,9 @@ export {
     updateEntityGeometryParams,
     selectComponent,
     incrementNumberOfGeneratedKey,
-    setComponentMaterial, 
+    setComponentMaterial,
     removeComponentMaterial,
-    updateName, 
+    updateName,
     importStateCanvas,
     binaryOperation,
     setComponentsOpacity,
@@ -27,5 +27,5 @@ export {
     lengthPastStateSelector,
     lastActionTypeSelector,
     numberOfGeneratedKeySelector,
-    findComponentByKey 
+    findComponentByKey
 } from "./canvasSlice"

@@ -22,7 +22,7 @@ export const Models: React.FC<ModelsProps> = ({ children }) => {
                     {children}
                 </div>
                 : <div className="h-full flex flex-col items-center justify-center text-center p-6">
-                    <img src={theme === 'light' ? noModelsIcon : noModelsIconDark} className="w-full mb-6" alt='No Models' />
+                    <img src={theme === 'light' ? noModelsIcon : noModelsIcon} className="w-full mb-6" alt='No Models' />
                     <p className={`text-sm max-w-[200px] ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
                         Use the icon from the Tool Bar to import a 3D CAD File.
                     </p>

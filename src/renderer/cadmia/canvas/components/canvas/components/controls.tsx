@@ -5,34 +5,44 @@ import { useDispatch, useSelector } from "react-redux";
 import * as THREE from "three"
 import { activeTransformationSelector } from "../../transformationsToolbar/toolbarTransformationSlice";
 import { TransformationParams, updateTransformationParams } from "../../../../../cad_library";
+import { attachModeSelector } from "../../binaryOperationsToolbar/binaryOperationsToolbarSlice";
 
 export const Controls: FC<{
-    keySelectedComponent: number;
-    mesh: THREE.Mesh | undefined;
-  }> = ({ keySelectedComponent, mesh }) => {
-    const { camera } = useThree();
-    const transformation = useRef(null);
-    const dispatch = useDispatch();
-    const activeTransformation = useSelector(activeTransformationSelector)
-    // const orbitTarget = useSelector(orbitTargetSelector)
+  keySelectedComponent: number;
+  mesh: THREE.Mesh | undefined;
+}> = ({ keySelectedComponent, mesh }) => {
+  const { camera, scene } = useThree();
+  const transformation = useRef(null);
+  const dispatch = useDispatch();
+  const activeTransformation = useSelector(activeTransformationSelector)
+  const attachMode = useSelector(attachModeSelector);
+  // const orbitTarget = useSelector(orbitTargetSelector)
 
-    useEffect(() => {
-      if (transformation.current) {
-        const controls: Object3DNode<any, any> = transformation.current;
-        controls.addEventListener("dragging-changed", onChangeHandler);
-        return () =>
-          controls.removeEventListener("dragging-changed", onChangeHandler);
+  useEffect(() => {
+    if (transformation.current) {
+      const controls: Object3DNode<any, any> = transformation.current;
+      controls.addEventListener("dragging-changed", onChangeHandler);
+      return () =>
+        controls.removeEventListener("dragging-changed", onChangeHandler);
+    }
+  });
+
+  function onChangeHandler(event: any) {
+    if (transformation.current) {
+      const controls: Object3DNode<any, any> = transformation.current;
+
+      if (attachMode && event.value) { // While dragging
+        // Logic to show preview or snap indicator could go here
       }
-    });
 
-    function onChangeHandler(event: any) {
-      if (!event.value && transformation.current) {
-        const controls: Object3DNode<any, any> = transformation.current;
+      if (!event.value) { // Drag end
+        let newPosition = new THREE.Vector3(controls.worldPosition.x, controls.worldPosition.y, controls.worldPosition.z);
+
         let transformationParmas: TransformationParams = {
           position: [
-            controls.worldPosition.x,
-            controls.worldPosition.y,
-            controls.worldPosition.z,
+            newPosition.x,
+            newPosition.y,
+            newPosition.z,
           ],
           rotation: [
             controls.object.rotation._x,
@@ -48,18 +58,19 @@ export const Controls: FC<{
         dispatch(updateTransformationParams(transformationParmas));
       }
     }
-    return (
-      <>
-        {(keySelectedComponent !== 0 && mesh !== undefined) && (
-          <TransformControls
-            camera={camera}
-            ref={transformation}
-            children={<></>}
-            object={mesh}
-            mode={activeTransformation.type}
+  }
+  return (
+    <>
+      {(keySelectedComponent !== 0 && mesh !== undefined) && (
+        <TransformControls
+          camera={camera}
+          ref={transformation}
+          children={<></>}
+          object={mesh}
+          mode={activeTransformation.type}
 
-          />
-        )}
-      </>
-    );
-  };
+        />
+      )}
+    </>
+  );
+};

@@ -8,6 +8,7 @@ import * as THREE from "three";
 import { useCadmiaModalityManager } from "../../cadmiaModality/useCadmiaModalityManager";
 import { setFocusNotToScene } from "../../navBar/menuItems/view/viewItemSlice";
 import { keySelectedComponenteSelector, TransformationParams } from "../../../../../cad_library";
+import { attachModeSelector } from "../../binaryOperationsToolbar/binaryOperationsToolbarSlice";
 
 export interface ComponentProps {
   children: ReactNode;
@@ -37,6 +38,7 @@ export const CanvasObject: React.FC<ComponentProps> = ({
 }) => {
   const dispatch = useDispatch();
   const selectedComponentKey = useSelector(keySelectedComponenteSelector);
+  const attachMode = useSelector(attachModeSelector);
   const mesh = useRef(null);
   const bounds = useBounds()
   const { canvasObjectOpsBasedOnModality } = useCadmiaModalityManager()
@@ -83,9 +85,25 @@ export const CanvasObject: React.FC<ComponentProps> = ({
         canvasObjectOpsBasedOnModality.onClickAction(keyComponent)
       }}
     >
-      {children}
-      {children}
-      {borderVisible && <Edges color={getContrastingColor(materialColor)} threshold={15} />}
+      {/* Clone children to inject opacity prop if they are valid React elements */}
+      {React.Children.map(children, child => {
+        if (React.isValidElement(child)) {
+          // We assume the child (FactoryShapes) accepts an entity prop which has opacity
+          // We create a new entity object with modified opacity if attachMode is true
+          const originalEntity = child.props.entity;
+          if (originalEntity) {
+            return React.cloneElement(child, {
+              entity: {
+                ...originalEntity,
+                opacity: attachMode ? 0.5 : (originalEntity.opacity ?? 1)
+              }
+            } as any);
+          }
+          return child;
+        }
+        return child;
+      })}
+      {(borderVisible || attachMode) && <Edges color={getContrastingColor(materialColor)} threshold={15} />}
     </mesh>
   );
 };

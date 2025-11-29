@@ -59,7 +59,7 @@ export const Materials: React.FC<MaterialsProps> = () => {
       ) : (
         <div className="h-full flex flex-col items-center justify-center text-center p-6">
           <img
-            src={theme === 'light' ? noMaterialsIcon : noMaterialsIconDark}
+            src={theme === 'light' ? noMaterialsIcon : noMaterialsIcon}
             className="w-full mb-6"
             alt="No Materials"
           />

@@ -55,6 +55,7 @@ import { GizmoArrowViewport } from './planeWave/components/GizmoArrowViewport';
 import { PortControls } from '../../physics/portManagement/PortControls';
 import { ProbeControls } from '../../physics/portManagement/ProbeControls';
 import { calculateModelBoundingBox } from '../../../sharedElements/utilityFunctions';
+import { MdOutlineKeyboardReturn } from 'react-icons/md';
 
 interface CanvasSolverProps {
   externalGrids: ExternalGridsObject | ExternalGridsRisObject | undefined;
@@ -324,13 +325,25 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
           )}
         </ReactReduxContext.Consumer>
       ) : (
-        <div className="absolute top-1/2">
-          <span
-            className={`${alertMessageStyle} ${theme === 'light' ? '' : 'text-textColorDark'
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div
+            className={`flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border shadow-2xl backdrop-blur-xl ${theme === 'light'
+              ? 'bg-white/60 border-white/40 text-gray-600'
+              : 'bg-black/40 border-white/10 text-gray-300'
               }`}
           >
-            {comeBackToModelerMessage}
-          </span>
+            <div
+              className={`p-4 rounded-full ${theme === 'light'
+                ? 'bg-blue-50 text-blue-500'
+                : 'bg-white/5 text-blue-400'
+                }`}
+            >
+              <MdOutlineKeyboardReturn size={32} />
+            </div>
+            <span className="text-lg font-medium text-center max-w-xs">
+              {comeBackToModelerMessage}
+            </span>
+          </div>
         </div>
       )}
     </div>

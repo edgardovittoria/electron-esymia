@@ -29,6 +29,7 @@ import {
   shapesToolbarVisibilitySelector
 } from '../shapes/shapesToolbarSlice';
 import { resetFocusToScene } from './viewItemSlice';
+import { ThemeSelector } from '../../../../../../esymia/store/tabsAndMenuItemsSlice';
 import {
   navbarDropdownBoxStyle,
   navbarDropdownItemStyle,
@@ -52,12 +53,15 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
   );
   const miscToolbarChecked = useSelector(miscToolbarVisibilitySelector);
   const shapesToolbarChecked = useSelector(shapesToolbarVisibilitySelector);
+
+  const theme = useSelector(ThemeSelector);
+
   return (
     <Popover className='relative'>
       {({ open }) => (
         <>
           <Popover.Button
-            className={navbarItemStyle}>
+            className={`group inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 hover:cursor-pointer ${theme === 'light' ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-200 hover:bg-white/10'}`}>
             <span>View</span>
             <ChevronDownIcon
               className='ml-2 h-5 w-5'
@@ -76,8 +80,8 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
           >
             <Popover.Panel className={navbarDropdownStyle}>
               <div className={navbarDropdownBoxStyle}>
-                <div className={navbarDropdownPadding}>
-                  <div className={navbarDropdownItemStyle}>
+                <div className={`relative grid gap-1 p-2 backdrop-blur-md rounded-xl border shadow-xl ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-black border-white/10'}`}>
+                  <div className={`p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}>
                     <div className='flex w-full items-center justify-between'>
                       <span className='font-medium'>Object Details</span>
                       <div className="flex items-center">
@@ -89,7 +93,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                               ? dispatch(openObjectsDetails())
                               : dispatch(closeObjectsDetails())
                           }
-                          className={`${sideBarChecked ? 'bg-secondaryColor' : 'bg-gray-200 dark:bg-gray-700'} ml-3 relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                          className={`${sideBarChecked ? 'bg-secondaryColor' : (theme === 'light' ? 'bg-gray-200' : 'bg-gray-700')} ml-3 relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                         >
                           <span
                             aria-hidden='true'
@@ -100,7 +104,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                     </div>
                   </div>
 
-                  <div className={navbarDropdownItemStyle}>
+                  <div className={`p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}>
                     <div className='flex w-full items-center justify-between'>
                       <span className='font-medium'>Binary operations toolbar</span>
                       <Switch
@@ -110,7 +114,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                             ? dispatch(openBinaryOperationsToolbar())
                             : dispatch(closeBinaryOperationsToolbar())
                         }
-                        className={`${binaryOperationsToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-200 dark:bg-gray-700'} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                        className={`${binaryOperationsToolbarChecked ? 'bg-secondaryColor' : (theme === 'light' ? 'bg-gray-200' : 'bg-gray-700')} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                       >
                         <span
                           aria-hidden='true'
@@ -120,7 +124,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                     </div>
                   </div>
 
-                  <div className={navbarDropdownItemStyle}>
+                  <div className={`p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}>
                     <div className='flex w-full items-center justify-between'>
                       <span className='font-medium'>Misc toolbar</span>
                       <Switch
@@ -130,7 +134,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                             ? dispatch(openMiscToolbar())
                             : dispatch(closeMiscToolbar())
                         }
-                        className={`${miscToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-200 dark:bg-gray-700'} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                        className={`${miscToolbarChecked ? 'bg-secondaryColor' : (theme === 'light' ? 'bg-gray-200' : 'bg-gray-700')} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                       >
                         <span
                           aria-hidden='true'
@@ -140,7 +144,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                     </div>
                   </div>
 
-                  <div className={navbarDropdownItemStyle}>
+                  <div className={`p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}>
                     <div className='flex w-full items-center justify-between'>
                       <span className='font-medium'>Transformations toolbar</span>
                       <Switch
@@ -150,7 +154,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                             ? dispatch(openTransformationsToolbar())
                             : dispatch(closeTransformationsToolbar())
                         }
-                        className={`${transformationsToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-200 dark:bg-gray-700'} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                        className={`${transformationsToolbarChecked ? 'bg-secondaryColor' : (theme === 'light' ? 'bg-gray-200' : 'bg-gray-700')} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                       >
                         <span
                           aria-hidden='true'
@@ -160,7 +164,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                     </div>
                   </div>
 
-                  <div className={navbarDropdownItemStyle}>
+                  <div className={`p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}>
                     <div className='flex w-full items-center justify-between'>
                       <span className='font-medium'>Shapes toolbar</span>
                       <Switch
@@ -170,7 +174,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                             ? dispatch(openShapesToolbar())
                             : dispatch(closeShapesToolbar())
                         }
-                        className={`${shapesToolbarChecked ? 'bg-secondaryColor' : 'bg-gray-200 dark:bg-gray-700'} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                        className={`${shapesToolbarChecked ? 'bg-secondaryColor' : (theme === 'light' ? 'bg-gray-200' : 'bg-gray-700')} relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
                       >
                         <span
                           aria-hidden='true'
@@ -181,7 +185,7 @@ export const ViewItem: React.FC<ViewItemProps> = () => {
                   </div>
 
                   <div
-                    className={`${navbarDropdownItemStyle} cursor-pointer`}
+                    className={`cursor-pointer p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}
                     onClick={() => {
                       dispatch(resetFocusToScene());
                     }}

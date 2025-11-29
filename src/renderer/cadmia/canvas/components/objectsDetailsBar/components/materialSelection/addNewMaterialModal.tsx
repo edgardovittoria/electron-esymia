@@ -9,9 +9,10 @@ import { useFaunaQuery } from '../../../../../../esymia/faunadb/hook/useFaunaQue
 import { Client, fql } from 'fauna';
 import { useDynamoDBQuery } from '../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateMaterialDynamoDB } from '../../../../../../dynamoDB/MaterialsApis';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAuth0 } from '@auth0/auth0-react';
 import { IoCloseCircleOutline } from 'react-icons/io5';
+import { ThemeSelector } from '../../../../../../esymia/store/tabsAndMenuItemsSlice';
 
 export type MaterialDynamoDB = {
   id: string;
@@ -72,6 +73,7 @@ export const AddNewMaterialModal: FC<{
     useState(false);
   const [showModalCustomConductivity, setShowModalCustomConductivity] =
     useState(false);
+  const theme = useSelector(ThemeSelector);
 
   const checkForValueErrors = () => {
     let error = undefined;
@@ -170,17 +172,17 @@ export const AddNewMaterialModal: FC<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white/90 dark:bg-black/80 backdrop-blur-md border border-gray-200 dark:border-white/10 p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className={`w-full max-w-xl transform overflow-hidden rounded-2xl backdrop-blur-md border p-6 text-left align-middle shadow-xl transition-all ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-black/80 border-white/10'}`}>
                 <div className="flex justify-between items-center mb-4">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
+                    className={`text-lg font-medium leading-6 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}
                   >
                     Add New Material
                   </Dialog.Title>
                   <IoCloseCircleOutline
                     size={24}
-                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer transition-colors"
+                    className={`cursor-pointer transition-colors ${theme === 'light' ? 'text-gray-500 hover:text-gray-700' : 'text-gray-400 hover:text-gray-200'}`}
                     onClick={() => showModal(false)}
                   />
                 </div>
@@ -191,7 +193,7 @@ export const AddNewMaterialModal: FC<{
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'}`}
                     />
                   </MaterialOptionMainStyle>
 
@@ -214,7 +216,7 @@ export const AddNewMaterialModal: FC<{
                         value={permeability}
                         required
                         onChange={(e) => setPermeability(adjustNumberFormatForThis(e.target.value))}
-                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'}`}
                       />
                     </MaterialOptionMainStyle>
                     <MaterialOptionMainStyle label="Tan δ (Permeability)">
@@ -223,14 +225,14 @@ export const AddNewMaterialModal: FC<{
                         step={0.00001}
                         value={tangentDeltaPermeability}
                         onChange={(e) => setTangentDeltaPermeability(adjustNumberFormatForThis(e.target.value))}
-                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'}`}
                       />
                     </MaterialOptionMainStyle>
                   </div>
 
                   <div className="flex justify-end">
                     <button
-                      className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                      className={`text-xs font-medium ${theme === 'light' ? 'text-blue-600 hover:text-blue-800' : 'text-blue-400 hover:text-blue-300'}`}
                       onClick={() => setShowModalCustomPermeability(true)}
                     >
                       {customPermeability.frequencies.length === 0 ? '+ Set Custom Permeability' : 'Edit Custom Permeability'}
@@ -245,7 +247,7 @@ export const AddNewMaterialModal: FC<{
                         value={permittivity}
                         required
                         onChange={(e) => setPermittivity(adjustNumberFormatForThis(e.target.value))}
-                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'}`}
                       />
                     </MaterialOptionMainStyle>
                     <MaterialOptionMainStyle label="Tan δ (Permittivity)">
@@ -254,14 +256,14 @@ export const AddNewMaterialModal: FC<{
                         step={0.00001}
                         value={tangentDeltaPermittivity}
                         onChange={(e) => setTangentDeltaPermittivity(adjustNumberFormatForThis(e.target.value))}
-                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'}`}
                       />
                     </MaterialOptionMainStyle>
                   </div>
 
                   <div className="flex justify-end">
                     <button
-                      className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                      className={`text-xs font-medium ${theme === 'light' ? 'text-blue-600 hover:text-blue-800' : 'text-blue-400 hover:text-blue-300'}`}
                       onClick={() => setShowModalCustomPermittivity(true)}
                     >
                       {customPermittivity.frequencies.length === 0 ? '+ Set Custom Permittivity' : 'Edit Custom Permittivity'}
@@ -276,7 +278,7 @@ export const AddNewMaterialModal: FC<{
                         value={conductivity}
                         required
                         onChange={(e) => setConductivity(adjustNumberFormatForThis(e.target.value))}
-                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'}`}
                       />
                     </MaterialOptionMainStyle>
                     <MaterialOptionMainStyle label="Tan δ (Conductivity)">
@@ -285,14 +287,14 @@ export const AddNewMaterialModal: FC<{
                         step={0.00001}
                         value={tangentDeltaConductivity}
                         onChange={(e) => setTangentDeltaConductivity(adjustNumberFormatForThis(e.target.value))}
-                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white'}`}
                       />
                     </MaterialOptionMainStyle>
                   </div>
 
                   <div className="flex justify-end">
                     <button
-                      className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                      className={`text-xs font-medium ${theme === 'light' ? 'text-blue-600 hover:text-blue-800' : 'text-blue-400 hover:text-blue-300'}`}
                       onClick={() => setShowModalCustomConductivity(true)}
                     >
                       {customConductivity.frequencies.length === 0 ? '+ Set Custom Conductivity' : 'Edit Custom Conductivity'}
@@ -331,7 +333,7 @@ export const AddNewMaterialModal: FC<{
                 <div className="mt-8 flex justify-end gap-3">
                   <button
                     type="button"
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg transition-colors focus:outline-none"
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors focus:outline-none ${theme === 'light' ? 'text-gray-700 bg-gray-100 hover:bg-gray-200' : 'text-gray-300 bg-white/10 hover:bg-white/20'}`}
                     onClick={() => showModal(false)}
                   >
                     Cancel
@@ -357,9 +359,10 @@ const MaterialOptionMainStyle: FC<{ label: string; children: ReactNode }> = ({
   label,
   children,
 }) => {
+  const theme = useSelector(ThemeSelector);
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 ml-1">{label}</label>
+      <label className={`text-xs font-medium ml-1 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>{label}</label>
       {children}
     </div>
   );

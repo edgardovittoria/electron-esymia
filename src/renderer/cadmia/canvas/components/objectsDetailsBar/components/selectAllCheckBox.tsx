@@ -4,12 +4,14 @@ import { useSelector } from "react-redux";
 import { componentseSelector } from "../../../../../cad_library";
 import { multipleSelectionEntitiesKeysSelector } from "../../miscToolbar/miscToolbarSlice";
 import { useCadmiaModalityManager } from "../../cadmiaModality/useCadmiaModalityManager";
+import { ThemeSelector } from "../../../../../esymia/store/tabsAndMenuItemsSlice";
 
 export const SelectAllCheckBox: FC<CheckboxProps> = ({ label }) => {
 
   const components = useSelector(componentseSelector);
   const selectedComponents = useSelector(multipleSelectionEntitiesKeysSelector);
   const { objectsDetailsOptsBasedOnModality } = useCadmiaModalityManager();
+  const theme = useSelector(ThemeSelector);
 
   const areAllSelected = components.length > 0 && components.length === selectedComponents.length;
 
@@ -27,7 +29,7 @@ export const SelectAllCheckBox: FC<CheckboxProps> = ({ label }) => {
         onClick={toggleSelection}
         className={`group flex items-center justify-center w-4 h-4 rounded border cursor-pointer transition-colors ${areAllSelected
           ? "bg-blue-500 border-blue-500"
-          : "bg-white dark:bg-white/5 border-gray-300 dark:border-gray-600"
+          : `${theme === 'light' ? 'bg-white border-gray-300' : 'bg-white/5 border-gray-600'}`
           }`}
       >
         <svg
@@ -45,7 +47,7 @@ export const SelectAllCheckBox: FC<CheckboxProps> = ({ label }) => {
         </svg>
       </div>
       <label
-        className="text-xs font-medium text-gray-600 dark:text-gray-300 cursor-pointer select-none"
+        className={`text-xs font-medium cursor-pointer select-none ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}
         onClick={toggleSelection}
       >
         Select All

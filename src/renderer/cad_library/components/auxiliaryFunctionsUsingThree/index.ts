@@ -10,3 +10,4 @@ export {
     meshesCollidingWithTargetMeshBasedOnBoundingBox,
     meshesCollidingWithTargetMesh
 } from "./auxiliaryFunctionsUsingThree"
+export { alignObjectsByFaces, getAllMeshes } from "./snapLogic"

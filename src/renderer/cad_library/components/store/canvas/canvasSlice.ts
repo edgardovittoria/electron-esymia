@@ -64,12 +64,12 @@ export const CanvasSlice = createSlice({
             let component = findComponentByKey(state.components, action.payload.keyComponent);
             component.material = undefined;
         },
-        setComponentsOpacity(state: CanvasState, action: PayloadAction<{keys: number[], opacity: number}>){
+        setComponentsOpacity(state: CanvasState, action: PayloadAction<{ keys: number[], opacity: number }>) {
             setLastActionType(state, action.type)
             let componentsToChange = state.components.filter(component => action.payload.keys.includes(component.keyComponent))
             componentsToChange.map(component => component.opacity = action.payload.opacity)
         },
-        setComponentsTransparency(state: CanvasState, action: PayloadAction<{keys: number[], transparency: boolean}>){
+        setComponentsTransparency(state: CanvasState, action: PayloadAction<{ keys: number[], transparency: boolean }>) {
             setLastActionType(state, action.type)
             let componentsToChange = state.components.filter(component => action.payload.keys.includes(component.keyComponent))
             componentsToChange.map(component => component.transparency = action.payload.transparency)
@@ -127,4 +127,4 @@ export const numberOfGeneratedKeySelector = (state: { canvas: StateWithHistory<C
 export const findComponentByKey = (components: ComponentEntity[], key: number) => components.filter(component => component.keyComponent === key)[0]
 const setSelectedComponent = (state: CanvasState, keyComponentToSelect: number) => state.selectedComponentKey = keyComponentToSelect
 const setLastActionType = (state: CanvasState, actionType: string) => state.lastActionType = actionType
-const maximumKeyComponentAmong = (components: ComponentEntity[]) => components.reduce((max, component) => max = (component.keyComponent > max) ? component.keyComponent : max,0)
+const maximumKeyComponentAmong = (components: ComponentEntity[]) => components.reduce((max, component) => max = (component.keyComponent > max) ? component.keyComponent : max, 0)

@@ -11,14 +11,10 @@ import { StatusBarSlice } from '../canvas/components/statusBar/statusBarSlice';
 import { MiscToolbarSlice } from '../canvas/components/miscToolbar/miscToolbarSlice';
 import { ShapesToolbarSlice } from '../canvas/components/navBar/menuItems/shapes/shapesToolbarSlice';
 import { ViewItemSlice } from '../canvas/components/navBar/menuItems/view/viewItemSlice';
+import { MeasurementSlice } from '../canvas/components/measurement/measurementSlice';
+import { CanvasSlice } from '../../cad_library/components/store/canvas/canvasSlice';
+import { UsersSlice } from '../../cad_library/components/store/users/usersSlice';
 import { ModelSlice } from './modelSlice';
-import { CanvasSlice, UsersSlice } from '../../cad_library';
-
-const persistConfig = {
-  key: 'root',
-  storage: localforage,
-  blacklist: ['modelSlice'],
-};
 
 const rootReducer = combineReducers({
   canvas: undoable(CanvasSlice.reducer, {
@@ -37,6 +33,7 @@ const rootReducer = combineReducers({
   shapesToolbar: ShapesToolbarSlice.reducer,
   viewItemState: ViewItemSlice.reducer,
   modelSlice: ModelSlice.reducer,
+  measurement: MeasurementSlice.reducer,
 });
 
 //const persistedReducer = persistReducer(persistConfig, rootReducer);

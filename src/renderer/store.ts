@@ -1,4 +1,4 @@
-import {combineReducers, configureStore} from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { ProjectSlice } from './esymia/store/projectSlice';
 import { SolverSlice } from './esymia/store/solverSlice';
 import { TabsAndMenuItemsSlice } from './esymia/store/tabsAndMenuItemsSlice';
@@ -19,8 +19,7 @@ import { ModelSlice } from './cadmia/store/modelSlice';
 import { ObjectsDetailsSlice } from './cadmia/canvas/components/objectsDetailsBar/objectsDetailsSlice';
 import { stompMiddleware } from './middleware/stompMiddleware';
 import { CanvasSlice, UsersSlice } from './cad_library';
-
-
+import { MeasurementSlice } from './cadmia/canvas/components/measurement/measurementSlice';
 
 const rootReducer = combineReducers({
   projects: ProjectSlice.reducer,
@@ -43,6 +42,7 @@ const rootReducer = combineReducers({
   shapesToolbar: ShapesToolbarSlice.reducer,
   viewItemState: ViewItemSlice.reducer,
   modelSlice: ModelSlice.reducer,
+  measurement: MeasurementSlice.reducer,
 });
 
 

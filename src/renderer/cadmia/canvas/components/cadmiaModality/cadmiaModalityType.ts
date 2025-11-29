@@ -1,1 +1,1 @@
-export type CadmiaModality = 'NormalSelection' | 'MultipleSelection' | 'BinaryOperation'
+export type CadmiaModality = 'NormalSelection' | 'MultipleSelection' | 'BinaryOperation' | 'Measurement';
