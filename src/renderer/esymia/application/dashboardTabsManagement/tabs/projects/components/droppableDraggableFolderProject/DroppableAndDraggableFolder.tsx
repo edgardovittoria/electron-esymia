@@ -200,7 +200,7 @@ export const DroppableAndDraggableFolder: React.FC<
                   return (
                     <div key={f.id}>
                       <Item
-                        data-testid={f.id}
+                        data-testid={`subItem-${f.name}`}
                         onClick={(p) => {
                           p.event.stopPropagation();
                           dispatch(

@@ -42,6 +42,8 @@ import {
 import { alignObjectsByFaces, getAllMeshes } from '../../../../cad_library/components/auxiliaryFunctionsUsingThree/snapLogic';
 import { useDispatch } from 'react-redux';
 import { addSelectedFace, attachModeSelector, selectedFacesSelector, toggleAttachMode } from '../binaryOperationsToolbar/binaryOperationsToolbarSlice';
+import { addNode } from '../../../store/historySlice';
+import uniqid from 'uniqid';
 
 interface CadmiaCanvasProps {
   triggerUpdate: React.MutableRefObject<(() => void) | null>;
@@ -61,16 +63,17 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
   const theme = useSelector(ThemeSelector);
 
   return (
-    <div className="h-[91vh]">
+    <div className={`h-[91vh] ${theme === 'light' ? 'bg-gradient-to-b from-gray-50 to-gray-200' : 'bg-gradient-to-b from-gray-800 to-gray-950'}`}>
       <ReactReduxContext.Consumer>
         {({ store }) => (
           <Canvas
             className="w-full h-full"
             camera={{ position: [0, -50, 0], up: [0, 0, 1], fov: 50, far: 5000, near: 0.1 }}
             shadows
+            gl={{ alpha: true }}
           >
-            <color attach="background" args={[theme === 'light' ? '#f0f0f0' : '#111827']} />
-            <fog attach="fog" args={[theme === 'light' ? '#f0f0f0' : '#111827', 10, 500]} />
+            {/* <color attach="background" args={[theme === 'light' ? '#f0f0f0' : '#111827']} /> */}
+            {/* <fog attach="fog" args={[theme === 'light' ? '#f0f0f0' : '#111827', 10, 500]} /> */}
             <Provider store={store}>
               <Environment preset="city" />
               <ambientLight intensity={1} />
@@ -116,7 +119,12 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
                             color={
                               component.material
                                 ? component.material.color
-                                : '#63cbf7'
+                                : undefined
+                            }
+                            borderVisible={
+                              bordersVisible.filter(
+                                (mb) => mb === component.keyComponent,
+                              ).length > 0
                             }
                           />
                         </CanvasObject>
@@ -177,7 +185,9 @@ const CommonObjectsActions: FC<{ children: ReactNode }> = ({ children }) => {
   const bounds = useBounds();
   const focusToScene = useSelector(focusToSceneSelector);
   useEffect(() => {
-    focusToScene && bounds.refresh().clip().fit();
+    if (focusToScene > 0) {
+      bounds.refresh().clip().fit();
+    }
   }, [focusToScene]);
 
   return <group>{children}</group>;
@@ -208,9 +218,16 @@ function DynamicGrid({ triggerUpdate }: DynamicGridProps) {
 
   const updateGrid = useCallback(() => {
     const newBoundingBox = new THREE.Box3();
-    components.forEach((c) =>
-      newBoundingBox.union(new THREE.Box3().setFromObject(meshFrom(c))),
-    );
+    components.forEach((c) => {
+      console.log(c);
+      if (c.type === "GROUP") {
+        (c as any).children.forEach((child: any) => {
+          newBoundingBox.union(new THREE.Box3().setFromObject(meshFrom(child)));
+        });
+      } else {
+        newBoundingBox.union(new THREE.Box3().setFromObject(meshFrom(c)));
+      }
+    });
     if (newBoundingBox.isEmpty()) {
       setBoundingBox(new THREE.Box3(new THREE.Vector3(-20, -20, -20), new THREE.Vector3(20, 20, 20)));
     } else {
@@ -618,6 +635,16 @@ const FaceSelectionHandler: FC = () => {
           };
 
           dispatch(updateTransformationParams(transformationParams));
+          dispatch(addNode({
+            id: uniqid(),
+            name: `Attach ${mesh1.name} to ${mesh2.name}`,
+            type: 'ATTACH',
+            params: transformationParams,
+            timestamp: Date.now(),
+            outputKey: keyComponent,
+            inputKeys: [keyComponent],
+            suppressed: false
+          }));
           dispatch(toggleAttachMode());
         }
       }

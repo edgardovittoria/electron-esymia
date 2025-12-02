@@ -12,29 +12,21 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { Vector3 } from 'three';
 import { Dispatch } from '@reduxjs/toolkit';
-import toast from 'react-hot-toast';
 import { SaveModelWithNameModal } from './components/saveModelWithNameModal';
 import { setUnit, unitSelector } from '../../../statusBar/statusBarSlice';
-import { s3 } from '../../../../../aws/s3Config';
 import {
-  addModel,
   ModelsSelector,
   SelectedModelSelector,
-  selectModel,
   setLoadingSpinner,
-  updateModel,
 } from '../../../../../store/modelSlice';
-import { deleteFileS3, uploadFileS3 } from '../../../../../aws/crud';
-import { updateModelInFauna } from '../../../../../faunaDB/functions';
 import {
   navbarDropdownBoxStyle,
-  navbarDropdownItemStyle,
-  navbarDropdownPadding, navbarDropdownStyle, navbarItemStyle,
+  navbarDropdownStyle, 
   navbarShortcutStyle
 } from '../../../../../config/styles';
 import { setModality } from '../../../cadmiaModality/cadmiaModalitySlice';
 import { useFaunaQuery } from '../../../../../../esymia/faunadb/hook/useFaunaQuery';
-import { addComponent, BufferGeometryAttributes, canvasStateSelector, ComponentEntity, componentseSelector, exportToSTL, FaunaCadModel, getNewKeys, ImportActionParamsObject, ImportCadProjectButton, ImportModelFromDBModal, importStateCanvas, numberOfGeneratedKeySelector, TRANSF_PARAMS_DEFAULTS, CanvasState } from '../../../../../../cad_library';
+import { addComponent, BufferGeometryAttributes, canvasStateSelector, ComponentEntity, componentseSelector, exportToSTL, getNewKeys, ImportActionParamsObject, ImportCadProjectButton, ImportModelFromDBModal, importStateCanvas, numberOfGeneratedKeySelector, TRANSF_PARAMS_DEFAULTS, CanvasState } from '../../../../../../cad_library';
 import { importRisGeometry } from '../../../../../../cad_library/components/importFunctions/importFunctions';
 import { SaveRisModelWithNameModal } from './components/saveRisModelWithNameModal';
 import { ThemeSelector } from '../../../../../../esymia/store/tabsAndMenuItemsSlice';

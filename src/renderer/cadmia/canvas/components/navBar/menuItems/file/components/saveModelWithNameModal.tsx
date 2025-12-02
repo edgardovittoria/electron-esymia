@@ -9,9 +9,11 @@ import { addModel, setLoadingSpinner } from '../../../../../../store/modelSlice'
 import { setMessageInfoModal, setIsAlertInfoModal, setShowInfoModal, ThemeSelector } from '../../../../../../../esymia/store/tabsAndMenuItemsSlice';
 import { useFaunaQuery } from '../../../../../../../esymia/faunadb/hook/useFaunaQuery';
 import { Client, fql, QuerySuccess } from 'fauna';
-import { canvasStateSelector, FaunaCadModel } from '../../../../../../../cad_library';
+import { canvasStateSelector } from '../../../../../../../cad_library';
 import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateModelInDynamoDB } from '../../../../../../../dynamoDB/modelsApis';
+import { DynamoDBCadModel } from '../../../../../../../cad_library/components/dynamodb/api/modelsAPIs';
+import { ComponentEntity } from '../../../../../../../cad_library';
 
 export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
   showModalSave,
@@ -26,7 +28,7 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
   const saveModelInFauna = async (
     faunaClient: Client,
     faunaQuery: typeof fql,
-    modelToSave: FaunaCadModel,
+    modelToSave: DynamoDBCadModel,
   ) => {
     const response = await faunaClient
       .query(
@@ -50,8 +52,21 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
     return (response as QuerySuccess<any>).data;
   };
 
+  const flattenComponents = (components: ComponentEntity[]): ComponentEntity[] => {
+    let flatList: ComponentEntity[] = [];
+    components.forEach((component) => {
+      if (component.type === 'GROUP' && component.children) {
+        flatList = [...flatList, ...flattenComponents(component.children)];
+      } else {
+        flatList.push(component);
+      }
+    });
+    return flatList;
+  };
+
   const saveModel = async () => {
-    const model = JSON.stringify({ components: canvas.components, unit });
+    const componentsToSave = flattenComponents(canvas.components);
+    const model = JSON.stringify({ components: componentsToSave, unit });
     const blobFile = new Blob([model]);
     const modelFile = new File([blobFile], `${name}_model_cadmia.json`, {
       type: 'application/json',
@@ -65,7 +80,7 @@ export const SaveModelWithNameModal: FC<{ showModalSave: Function }> = ({
           components: res.key,
           owner_id: user?.sub,
           owner: user?.name,
-        } as FaunaCadModel;
+        } as DynamoDBCadModel;
         execQuery2(createOrUpdateModelInDynamoDB, newModel, dispatch).then(() => {
           dispatch(addModel(newModel));
           toast.success('Model has been saved!');

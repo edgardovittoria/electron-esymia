@@ -34,7 +34,7 @@ import {
 } from '../../../../../../esymia/store/tabsAndMenuItemsSlice';
 import { ModelsSelector } from '../../../../../store/modelSlice';
 import { s3 } from '../../../../../aws/s3Config';
-import { DynamoDBCadModel } from '../../../../../../cad_library/components/faunadb/api/modelsAPIs';
+import { DynamoDBCadModel } from '../../../../../../cad_library/components/dynamodb/api/modelsAPIs';
 import { S3 } from 'aws-sdk';
 
 export type MaterialDynamoDB = {

@@ -18,3 +18,36 @@ import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+Cypress.on('window:before:load', (win) => {
+    // @ts-ignore
+    win.electron = win.electron || {};
+
+    // @ts-ignore
+    if (!win.electron.ipcRenderer) {
+        // @ts-ignore
+        win.electron.ipcRenderer = {
+            sendMessage: (channel: string, args: any[]) => {
+                console.log(`[Mock IPC] sendMessage: ${channel}`, args);
+            },
+            on: (channel: string, func: any) => {
+                console.log(`[Mock IPC] on: ${channel}`);
+                return () => { }; // Return a cleanup function
+            },
+            once: (channel: string, func: any) => {
+                console.log(`[Mock IPC] once: ${channel}`);
+            },
+            invoke: async (channel: string, ...args: any[]) => {
+                console.log(`[Mock IPC] invoke: ${channel}`, args);
+                // Return default values based on channel if needed
+                if (channel === 'getMac') {
+                    return '00:00:00:00:00:00';
+                }
+                return Promise.resolve(null);
+            },
+            removeAllListeners: (channel: string) => {
+                console.log(`[Mock IPC] removeAllListeners: ${channel}`);
+            },
+        };
+    }
+});

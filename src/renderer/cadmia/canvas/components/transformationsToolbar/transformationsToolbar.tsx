@@ -7,6 +7,7 @@ import ScaleIcon from './style/scaleIcon.png'
 import { TransformationType } from './transformationsTypes';
 import { toolbarIconsHeight, toolbarIconsWidth, toolbarsHintStyle } from '../../../config/styles';
 import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
+import { cadmiaModalitySelector } from '../cadmiaModality/cadmiaModalitySlice';
 
 
 interface TransformationsToolBarProps {
@@ -29,11 +30,12 @@ export const TransformationsToolBar: React.FC<TransformationsToolBarProps> = () 
     const dispatch = useDispatch();
     const transformationsToolbarVisible = useSelector(transformationsToolbarVisibilitySelector)
     const theme = useSelector(ThemeSelector);
+    const modality = useSelector(cadmiaModalitySelector);
 
     return (
         <>
             {transformationsToolbarVisible &&
-                <div className={`flex items-center gap-1 p-1 rounded-xl shadow-lg backdrop-blur-md border transition-all duration-300 ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-black/80 border-white/10'}`}>
+                <div className={`flex items-center gap-1 p-1 rounded-xl shadow-lg backdrop-blur-md border transition-all duration-300 ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-black/80 border-white/10'} ${modality === 'Grouping' ? 'opacity-50 pointer-events-none' : ''}`}>
                     {transformations.map((transformation, index) => {
                         return (
                             <div key={index} className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group

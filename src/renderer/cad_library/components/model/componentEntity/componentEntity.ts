@@ -9,10 +9,10 @@ export type TransformationParams = {
     scale: TransformationParamDetails
 }
 
-export const TRANSF_PARAMS_DEFAULTS : TransformationParams = {
-    position: [0,0,0],
-    rotation: [0,0,0],
-    scale: [1,1,1]
+export const TRANSF_PARAMS_DEFAULTS: TransformationParams = {
+    position: [0, 0, 0],
+    rotation: [0, 0, 0],
+    scale: [1, 1, 1]
 }
 
 export const areEquals = (firstTransfParams: TransformationParams, secondTransfParams: TransformationParams) => {
@@ -31,16 +31,18 @@ export type ComponentEntity = {
     transformationParams: TransformationParams
     previousTransformationParams: TransformationParams
     material?: Material,
-    opacity? : number,
+    opacity?: number,
     transparency?: boolean,
-    keyComponent: number, 
+    keyComponent: number,
     geometryAttributes: GeometryAttributes,
-    previousGeometryAttributes?: GeometryAttributes
+    previousGeometryAttributes?: GeometryAttributes,
+    children?: ComponentEntity[],
+    historyId?: string, // UUID of the HistoryNode that generated this entity
 }
 
 export type CustomMaterialAttribute = {
     frequencies: number[],
-    values: {Re: number, Im: number}[]
+    values: { Re: number, Im: number }[]
 }
 
 export type Material = {
@@ -91,6 +93,10 @@ export type SphereGeometryAttributes = {
 
 export type CompositeEntity = {
     baseElements: { elementA: ComponentEntity, elementB: ComponentEntity }
+} & ComponentEntity
+
+export type GroupEntity = {
+    children: ComponentEntity[]
 } & ComponentEntity
 
 export type BufferGeometryAttributes = {

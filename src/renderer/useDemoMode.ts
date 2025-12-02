@@ -60,11 +60,11 @@ export const useDemoMode = () => {
   };
 
   const checkDemoPeriod = () => {
-    if(process.env.APP_MODE !== 'test'){
+    if (window.electron && window.electron.ipcRenderer) {
       window.electron.ipcRenderer.invoke('getMac').then((res) => {
         execQuery2(getItemByMacAddressDynamoBD, res, dispatch).then((resDynamo) => {
-          let item:any[] = []
-          if(resDynamo.Item){
+          let item: any[] = []
+          if (resDynamo.Item) {
             item.push(convertFromDynamoDBFormat(resDynamo.Item))
           }
           if (item.length !== 0) {

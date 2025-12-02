@@ -8,15 +8,18 @@ import {
     attachModeSelector,
     toggleAttachMode
 } from "./binaryOperationsToolbarSlice";
+import { addNode } from "../../../store/historySlice";
+import uniqid from "uniqid";
 import { CadmiaModality } from "../cadmiaModality/cadmiaModalityType";
 import { TbLayersIntersect, TbLayersSubtract, TbLayersUnion, TbMagnet } from "react-icons/tb";
 import { Dispatch } from "@reduxjs/toolkit";
 import { CheckIcon, XCircleIcon } from "@heroicons/react/20/solid";
-import { setModality } from "../cadmiaModality/cadmiaModalitySlice";
+import { setModality, cadmiaModalitySelector } from "../cadmiaModality/cadmiaModalitySlice";
 import { toolbarsHintStyle } from '../../../config/styles';
 import { setLoadingSpinner } from "../../../store/modelSlice";
 import { binaryOperation, BinaryOperationType, canvasStateSelector, ComponentEntity, ComponentTypes, CompositeEntity, findComponentByKey, GeometryAttributes, getNewKeys, CanvasState } from "../../../../cad_library";
 import { ThemeSelector } from "../../../../esymia/store/tabsAndMenuItemsSlice";
+import { PiIntersect, PiSubtract, PiUnite } from "react-icons/pi";
 
 interface BinaryOpsToolbarProps {
 }
@@ -63,12 +66,27 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
                 elementsToRemove = entityKeys;
                 break;
         }
+        let historyId = uniqid();
+        result.historyId = historyId;
+
         dispatch(
             binaryOperation({
                 elementsToRemove: elementsToRemove,
                 newEntity: result,
             })
         );
+
+        dispatch(addNode({
+            id: historyId,
+            name: `${operation} Operation`,
+            type: operation as any,
+            params: {},
+            timestamp: Date.now(),
+            outputKey: result.keyComponent,
+            inputKeys: entityKeys,
+            suppressed: false
+        }));
+
         return "operation completed";
     };
 
@@ -110,11 +128,12 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
 
 
     const theme = useSelector(ThemeSelector);
+    const modality = useSelector(cadmiaModalitySelector);
 
     return (
         <>
             {binaryOperationsToolbarVisible &&
-                <div className={`flex items-center gap-1 p-1 rounded-xl shadow-lg backdrop-blur-md border transition-all duration-300 ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-black/80 border-white/10'}`}>
+                <div className={`flex items-center gap-1 p-1 rounded-xl shadow-lg backdrop-blur-md border transition-all duration-300 ${theme === 'light' ? 'bg-white/90 border-gray-200' : 'bg-black/80 border-white/10'} ${modality === 'Grouping' ? 'opacity-50 pointer-events-none' : ''}`}>
                     <div className={`relative flex flex-col items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 cursor-pointer group
              ${binaryOp === "UNION" ? 'bg-blue-500 text-white shadow-md' : `${theme === 'light' ? 'hover:bg-gray-100 text-gray-700' : 'hover:bg-white/10 text-gray-200'}`}
             `}
@@ -123,7 +142,8 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
                             dispatch(setBinaryOp("UNION"));
                         }}
                     >
-                        <TbLayersUnion className="w-6 h-6" />
+                        {/* <TbLayersUnion className="w-6 h-6" /> */}
+                        <PiUnite className="w-6 h-6" />
                         <div className={toolbarsHintStyle}>
                             <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">UNION</span>
                         </div>
@@ -136,7 +156,7 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
                             dispatch(setBinaryOp("INTERSECTION"));
                         }}
                     >
-                        <TbLayersIntersect className="w-6 h-6" />
+                        <PiIntersect className="w-6 h-6" />
                         <div className={toolbarsHintStyle}>
                             <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">INTERSECTION</span>
                         </div>
@@ -149,7 +169,8 @@ export const BinaryOpsToolbar: React.FC<BinaryOpsToolbarProps> = () => {
                             dispatch(setBinaryOp("SUBTRACTION"));
                         }}
                     >
-                        <TbLayersSubtract className="w-6 h-6" />
+                        <PiSubtract className="w-6 h-6" />
+                        {/* <TbLayersSubtract className="w-6 h-6" /> */}
                         <div className={toolbarsHintStyle}>
                             <span className="relative z-10 px-2 py-1 text-xs font-medium text-white bg-black/80 backdrop-blur-sm shadow-lg rounded-md whitespace-nowrap">SUBTRACTION</span>
                         </div>

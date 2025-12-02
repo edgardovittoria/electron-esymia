@@ -71,16 +71,10 @@ export const importRisGeometry = (
       });
       dispatch(setFocusNotToScene());
     }
-    else{
+    else {
       window.alert(message);
     }
   });
 };
 
-export type ImportActionParamsObject = {
-  canvas: CanvasState;
-  id: string | undefined;
-  unit: string;
-  modelS3?: string;
-  bricks?: string;
-};
+import { ImportActionParamsObject } from './importTypes';

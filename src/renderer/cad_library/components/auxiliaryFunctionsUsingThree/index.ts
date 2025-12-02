@@ -8,6 +8,7 @@ export {
     thereIsCollisionBetweenMeshes,
     getObjectsFromSceneByType,
     meshesCollidingWithTargetMeshBasedOnBoundingBox,
-    meshesCollidingWithTargetMesh
+    meshesCollidingWithTargetMesh,
+    ungroupEntity
 } from "./auxiliaryFunctionsUsingThree"
 export { alignObjectsByFaces, getAllMeshes } from "./snapLogic"

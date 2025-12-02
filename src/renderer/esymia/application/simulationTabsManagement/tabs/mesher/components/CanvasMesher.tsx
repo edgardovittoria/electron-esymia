@@ -108,8 +108,7 @@ export const CanvasMesher: React.FC<CanvasMesherProps> = ({
                               scale={component.transformationParams.scale}
                               rotation={component.transformationParams.rotation}
                             >
-                              <FactoryShapesEsymia entity={component} />
-                              <Edges />
+                              <FactoryShapesEsymia entity={component} borderVisible />
                             </mesh>
                           );
                         },
@@ -161,14 +160,14 @@ export const CanvasMesher: React.FC<CanvasMesherProps> = ({
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <div
             className={`flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border shadow-2xl backdrop-blur-xl ${theme === 'light'
-                ? 'bg-white/60 border-white/40 text-gray-600'
-                : 'bg-black/40 border-white/10 text-gray-300'
+              ? 'bg-white/60 border-white/40 text-gray-600'
+              : 'bg-black/40 border-white/10 text-gray-300'
               }`}
           >
             <div
               className={`p-4 rounded-full ${theme === 'light'
-                  ? 'bg-blue-50 text-blue-500'
-                  : 'bg-white/5 text-blue-400'
+                ? 'bg-blue-50 text-blue-500'
+                : 'bg-white/5 text-blue-400'
                 }`}
             >
               <MdOutlineKeyboardReturn size={32} />

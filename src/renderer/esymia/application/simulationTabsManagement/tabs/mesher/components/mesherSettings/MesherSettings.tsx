@@ -252,6 +252,7 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
                 <span className="text-sm font-medium opacity-80">Max Frequency</span>
                 <input
                   type="number"
+                  data-testid="maxFrequencyInput"
                   min={10}
                   disabled={
                     (selectedProject?.simulation?.resultS3 ? true : false) ||
@@ -268,7 +269,7 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
                 />
               </div>
               <button
-                data-testid="generateMeshButton"
+                data-testid="setMaxFrequencyButton"
                 className={`w-full py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${maxFreq && !selectedProject?.simulation?.resultS3
                   ? (theme === 'light'
                     ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'

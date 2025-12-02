@@ -12,11 +12,12 @@ import {
   removeModel,
   resetModel,
 } from '../store/modelSlice';
-import { FaunaCadModel, resetState } from '../../cad_library';
+import { resetState } from '../../cad_library';
 import { ThemeSelector } from '../../esymia/store/tabsAndMenuItemsSlice';
 import { useDynamoDBQuery } from '../../dynamoDB/hook/useDynamoDBQuery';
 import { getModelsByOwnerDynamoDB } from '../../dynamoDB/modelsApis';
 import { convertFromDynamoDBFormat } from '../../dynamoDB/utility/formatDynamoDBData';
+import { DynamoDBCadModel } from '../../cad_library/components/dynamodb/api/modelsAPIs';
 
 export interface DashboardProps {
   showCad: boolean;
@@ -31,7 +32,7 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
   const isDark = theme !== 'light';
   const dispatch = useDispatch();
 
-  const deleteModel = (model: FaunaCadModel) => {
+  const deleteModel = (model: DynamoDBCadModel) => {
     if (model.id) {
       dispatch(removeModel(model.id));
     }
@@ -67,8 +68,8 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
               {/* New Project Button */}
               <button
                 className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed transition-all duration-300 hover:shadow-xl ${isDark
-                    ? 'border-gray-600 hover:border-blue-500 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-blue-400'
-                    : 'border-gray-300 hover:border-blue-500 bg-white/40 hover:bg-white/60 text-gray-500 hover:text-blue-600'
+                  ? 'border-gray-600 hover:border-blue-500 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-blue-400'
+                  : 'border-gray-300 hover:border-blue-500 bg-white/40 hover:bg-white/60 text-gray-500 hover:text-blue-600'
                   } ${models.length === 3 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 onClick={() => {
                   dispatch(resetState());

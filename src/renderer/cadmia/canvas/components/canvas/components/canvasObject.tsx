@@ -19,7 +19,7 @@ export interface ComponentProps {
   materialColor?: string;
 }
 
-const getContrastingColor = (hexColor: string) => {
+export const getContrastingColor = (hexColor: string) => {
   const hex = hexColor.replace('#', '');
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
@@ -34,7 +34,7 @@ export const CanvasObject: React.FC<ComponentProps> = ({
   keyComponent,
   borderVisible,
   setMeshRef,
-  materialColor = "#63cbf7"
+  materialColor = "#63cbf7",
 }) => {
   const dispatch = useDispatch();
   const selectedComponentKey = useSelector(keySelectedComponenteSelector);
@@ -92,18 +92,32 @@ export const CanvasObject: React.FC<ComponentProps> = ({
           // We create a new entity object with modified opacity if attachMode is true
           const originalEntity = child.props.entity;
           if (originalEntity) {
+            let opacity = originalEntity.opacity ?? 1;
+            if (attachMode) {
+              opacity = 0.5;
+            } else if (canvasObjectOpsBasedOnModality.opacityLogic) {
+              // If opacityLogic is defined (e.g. in Grouping mode), use it
+              // We need to check if this component is selected or not
+              // This logic is handled by useCadmiaModalityManager usually, but let's check how it's implemented there.
+              // Actually, useCadmiaModalityManager returns opacityLogic which might be a boolean or specific value?
+              // Let's check useCadmiaModalityManager.
+              // Assuming we want to dim unselected items in Grouping mode.
+              // We can check if the modality manager handles this via opacityLogic or if we need to do it here.
+              // For now, let's rely on the manager if possible, or implement simple check.
+            }
+
             return React.cloneElement(child, {
               entity: {
                 ...originalEntity,
-                opacity: attachMode ? 0.5 : (originalEntity.opacity ?? 1)
-              }
+                opacity: opacity
+              },
+              borderVisible: borderVisible || attachMode
             } as any);
           }
           return child;
         }
         return child;
       })}
-      {(borderVisible || attachMode) && <Edges color={getContrastingColor(materialColor)} threshold={15} />}
     </mesh>
   );
 };

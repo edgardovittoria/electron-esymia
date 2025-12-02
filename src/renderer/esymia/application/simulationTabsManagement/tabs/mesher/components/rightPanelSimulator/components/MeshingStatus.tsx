@@ -87,7 +87,7 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
   >([]);
 
   useEffect(() => {
-    if (process.env.APP_MODE !== 'test') {
+    if (window.electron && window.electron.ipcRenderer) {
       window.electron.ipcRenderer.sendMessage('meshingComputation', [true]);
       return () => {
         window.electron.ipcRenderer.sendMessage('meshingComputation', [false]);
@@ -541,8 +541,8 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
             <span className="font-semibold">{selectedProject.name}</span>
             <div className="flex items-center gap-3">
               <div className={`flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold border ${isDark
-                  ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                  : 'bg-green-100 text-green-700 border-green-200'
+                ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                : 'bg-green-100 text-green-700 border-green-200'
                 }`}>
                 <ImSpinner className="animate-spin" />
                 <span>Generating</span>
@@ -698,8 +698,8 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
                 </div>
                 <button
                   className={`w-full py-2 rounded-lg text-sm font-semibold shadow-md transition-all duration-200 transform active:scale-95 mt-2 ${isDark
-                      ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
-                      : 'bg-red-100 text-red-600 border border-red-200 hover:bg-red-200'
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
+                    : 'bg-red-100 text-red-600 border border-red-200 hover:bg-red-200'
                     }`}
                   onClick={() => {
                     dispatch(
@@ -754,13 +754,13 @@ const QueuedMeshingStatusItem: React.FC<QueuedMeshingStatusItemProps> = ({
 
   return (
     <div className={`flex w-full justify-between items-center rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200 ${isDark
-        ? 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
-        : 'border-gray-200 bg-white/50 text-gray-700 hover:bg-white/80'
+      ? 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
+      : 'border-gray-200 bg-white/50 text-gray-700 hover:bg-white/80'
       }`}>
       <span className="font-semibold">{project.selectedProject.name}</span>
       <div className={`flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold border ${isDark
-          ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-          : 'bg-amber-100 text-amber-700 border-amber-200'
+        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+        : 'bg-amber-100 text-amber-700 border-amber-200'
         }`}>
         <PiClockCountdownBold className="w-3.5 h-3.5" />
         <span>Queued</span>

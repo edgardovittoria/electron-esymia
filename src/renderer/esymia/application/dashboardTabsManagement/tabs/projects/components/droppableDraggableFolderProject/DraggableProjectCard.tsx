@@ -95,7 +95,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
     <>
       {cloning && <ImSpinner className={`animate-spin w-8 h-8 absolute top-1/2 right-1/2 z-100 ${isDark ? 'text-white' : 'text-gray-900'}`} />}
       <div
-        className={`relative group rounded-2xl transition-all duration-300 hover:cursor-pointer hover:shadow-xl hover:-translate-y-1 p-[2px] bg-gradient-to-tr from-blue-500 via-purple-500 to-emerald-500 ${isDark
+        className={`relative group rounded-2xl transition-all duration-300 hover:cursor-pointer hover:shadow-xl hover:-translate-y-1 p-[2px] border border-gray-200 ${isDark
           ? 'shadow-green-900/20'
           : 'shadow-green-500/20'
           }`}
@@ -133,15 +133,13 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
           </div>
 
           <div className={`p-3 border-t ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-white'}`}>
-            <div className="tooltip tooltip-bottom w-full" data-tip={project.name}>
-              <h5
-                className={`text-center font-semibold truncate text-sm ${isDark ? 'text-gray-200' : 'text-gray-700'}`}
-                role="Handle"
-                ref={dragPreview}
-              >
-                {project.name}
-              </h5>
-            </div>
+            <h5
+              className={`text-center font-semibold truncate text-sm ${isDark ? 'text-gray-200' : 'text-gray-700'}`}
+              role="Handle"
+              ref={dragPreview}
+            >
+              {project.name}
+            </h5>
           </div>
         </div>
       </div>
@@ -174,7 +172,7 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
                 return (
                   <div key={f.id}>
                     <Item
-                      data-testid={f.id}
+                      data-testid={`subItem-${f.name}`}
                       onClick={(p) => {
                         p.event.stopPropagation();
                         dispatch(

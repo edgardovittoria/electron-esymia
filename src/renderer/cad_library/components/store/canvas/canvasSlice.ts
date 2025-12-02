@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { StateWithHistory } from 'redux-undo';
-import { ComponentEntity, GeometryAttributes, getNewKeys, TransformationParams } from '../..';
-import { ImportActionParamsObject } from '../../importFunctions/importFunctions';
+import { ComponentEntity, GeometryAttributes, TransformationParams } from '../../model/componentEntity/componentEntity';
+
+import { ImportActionParamsObject } from '../../importFunctions/importTypes';
 import { Material } from '../../model/componentEntity/componentEntity';
 
 export type CanvasState = {
@@ -57,17 +57,23 @@ export const CanvasSlice = createSlice({
         setComponentMaterial(state: CanvasState, action: PayloadAction<{ key: number, material: Material }>) {
             setLastActionType(state, action.type)
             let component = findComponentByKey(state.components, action.payload.key);
-            component.material = action.payload.material
+            setMaterialRecursively(component, action.payload.material);
         },
         removeComponentMaterial(state: CanvasState, action: PayloadAction<{ keyComponent: number }>) {
             setLastActionType(state, action.type)
             let component = findComponentByKey(state.components, action.payload.keyComponent);
-            component.material = undefined;
+            removeMaterialRecursively(component);
         },
         setComponentsOpacity(state: CanvasState, action: PayloadAction<{ keys: number[], opacity: number }>) {
             setLastActionType(state, action.type)
             let componentsToChange = state.components.filter(component => action.payload.keys.includes(component.keyComponent))
-            componentsToChange.map(component => component.opacity = action.payload.opacity)
+            componentsToChange.map(component => {
+                if (component.type === "GROUP" && component.children) {
+                    component.children.map(child => child.opacity = action.payload.opacity)
+                } else {
+                    component.opacity = action.payload.opacity
+                }
+            })
         },
         setComponentsTransparency(state: CanvasState, action: PayloadAction<{ keys: number[], transparency: boolean }>) {
             setLastActionType(state, action.type)
@@ -83,8 +89,7 @@ export const CanvasSlice = createSlice({
             setLastActionType(state, action.type)
             state.components = state.components.concat(
                 action.payload.canvas.components.map(component => {
-                    component.keyComponent += state.numberOfGeneratedKey
-                    return component
+                    return updateKeysRecursively(component, state.numberOfGeneratedKey)
                 })
             )
             state.numberOfGeneratedKey = maximumKeyComponentAmong(state.components)
@@ -95,12 +100,24 @@ export const CanvasSlice = createSlice({
             state.components.push(action.payload.newEntity)
             setSelectedComponent(state, action.payload.newEntity.keyComponent)
         },
+        replaceComponentWithMultipleEntities(state: CanvasState, action: PayloadAction<{ keyToRemove: number, newEntities: ComponentEntity[] }>) {
+            setLastActionType(state, action.type)
+            state.components = state.components.filter(component => component.keyComponent !== action.payload.keyToRemove)
+            state.components.push(...action.payload.newEntities)
+            setSelectedComponent(state, 0)
+        },
         resetState(state: CanvasState) {
             state.components = initialState.components
             state.selectedComponentKey = initialState.selectedComponentKey
             state.lastActionType = initialState.lastActionType
             state.numberOfGeneratedKey = initialState.numberOfGeneratedKey
         },
+        setCanvasState(state: CanvasState, action: PayloadAction<CanvasState>) {
+            state.components = action.payload.components;
+            state.numberOfGeneratedKey = action.payload.numberOfGeneratedKey;
+            state.selectedComponentKey = action.payload.selectedComponentKey;
+            state.lastActionType = action.payload.lastActionType;
+        }
     },
     // extraReducers: {
     //     //qui inseriamo i metodi : PENDING, FULLFILLED, REJECT utili per la gestione delle richieste asincrone
@@ -111,20 +128,47 @@ export const CanvasSlice = createSlice({
 export const {
     //qui vanno inserite tutte le azioni che vogliamo esporatare
     addComponent, removeComponent, updateTransformationParams, updateEntityGeometryParams, selectComponent, incrementNumberOfGeneratedKey,
-    setComponentMaterial, removeComponentMaterial, updateName, importStateCanvas, binaryOperation, resetState, setComponentsOpacity, setComponentsTransparency
+    setComponentMaterial, removeComponentMaterial, updateName, importStateCanvas, binaryOperation, resetState, setComponentsOpacity, setComponentsTransparency,
+    replaceComponentWithMultipleEntities, setCanvasState
 } = CanvasSlice.actions
 
-export const canvasStateSelector = (state: { canvas: StateWithHistory<CanvasState> }) => state.canvas.present;
-export const canvasAllStateSelector = (state: { canvas: StateWithHistory<CanvasState> }) => state.canvas;
-export const componentseSelector = (state: { canvas: StateWithHistory<CanvasState> }) => state.canvas.present.components;
-export const keySelectedComponenteSelector = (state: { canvas: StateWithHistory<CanvasState> }) => state.canvas.present.selectedComponentKey;
-export const selectedComponentSelector = (state: { canvas: StateWithHistory<CanvasState> }) => findComponentByKey(state.canvas.present.components, state.canvas.present.selectedComponentKey)
-export const lengthPastStateSelector = (state: { canvas: StateWithHistory<CanvasState> }) => state.canvas.past.length
-export const lengthFutureStateSelector = (state: { canvas: StateWithHistory<CanvasState> }) => state.canvas.future.length
-export const lastActionTypeSelector = (state: { canvas: StateWithHistory<CanvasState> }) => state.canvas.present.lastActionType;
-export const numberOfGeneratedKeySelector = (state: { canvas: StateWithHistory<CanvasState> }) => state.canvas.present.numberOfGeneratedKey;
+export const canvasStateSelector = (state: { canvas: CanvasState }) => state.canvas;
+export const canvasAllStateSelector = (state: { canvas: CanvasState }) => state.canvas;
+export const componentseSelector = (state: { canvas: CanvasState }) => state.canvas.components;
+export const keySelectedComponenteSelector = (state: { canvas: CanvasState }) => state.canvas.selectedComponentKey;
+export const selectedComponentSelector = (state: { canvas: CanvasState }) => findComponentByKey(state.canvas.components, state.canvas.selectedComponentKey)
+export const lengthPastStateSelector = (state: { canvas: CanvasState }) => 0 // Mocked, use historySlice instead
+export const lengthFutureStateSelector = (state: { canvas: CanvasState }) => 0 // Mocked, use historySlice instead
+export const lastActionTypeSelector = (state: { canvas: CanvasState }) => state.canvas.lastActionType;
+export const numberOfGeneratedKeySelector = (state: { canvas: CanvasState }) => state.canvas.numberOfGeneratedKey;
 
 export const findComponentByKey = (components: ComponentEntity[], key: number) => components.filter(component => component.keyComponent === key)[0]
 const setSelectedComponent = (state: CanvasState, keyComponentToSelect: number) => state.selectedComponentKey = keyComponentToSelect
 const setLastActionType = (state: CanvasState, actionType: string) => state.lastActionType = actionType
 const maximumKeyComponentAmong = (components: ComponentEntity[]) => components.reduce((max, component) => max = (component.keyComponent > max) ? component.keyComponent : max, 0)
+
+const updateKeysRecursively = (component: ComponentEntity, offset: number): ComponentEntity => {
+    component.keyComponent += offset;
+    if (component.children) {
+        component.children.forEach(child => updateKeysRecursively(child, offset));
+    }
+    return component;
+}
+
+const setMaterialRecursively = (component: ComponentEntity, material: Material) => {
+    if (component.type === 'GROUP' && component.children) {
+        component.material = material;
+        component.children.forEach(child => setMaterialRecursively(child, material));
+    } else {
+        component.material = material;
+    }
+}
+
+const removeMaterialRecursively = (component: ComponentEntity) => {
+    if (component.type === 'GROUP' && component.children) {
+        component.material = undefined;
+        component.children.forEach(child => removeMaterialRecursively(child));
+    } else {
+        component.material = undefined;
+    }
+}

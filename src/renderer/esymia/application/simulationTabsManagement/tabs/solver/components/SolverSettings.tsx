@@ -958,7 +958,7 @@ const SimulationSuggestions: React.FC<SimulationSuggestionsProps> = ({
   return (
     <div className="flex flex-col gap-2 mt-2">
       {solverStatus !== 'ready' && (
-        <div className={`flex items-center gap-3 p-3 rounded-xl border ${theme === 'light'
+        <div className={`flex items-center gap-3 p-3 mb-2 rounded-xl border ${theme === 'light'
           ? 'bg-red-50 border-red-200 text-red-700'
           : 'bg-red-500/10 border-red-500/20 text-red-400'
           }`}>
@@ -967,7 +967,7 @@ const SimulationSuggestions: React.FC<SimulationSuggestionsProps> = ({
         </div>
       )}
       {selectedProject?.frequencies?.length === 0 && (
-        <div className={`flex items-center gap-3 p-3 rounded-xl border ${theme === 'light'
+        <div className={`flex items-center gap-3  mb-2 p-3 rounded-xl border ${theme === 'light'
           ? 'bg-amber-50 border-amber-200 text-amber-700'
           : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
           }`}>
@@ -976,7 +976,7 @@ const SimulationSuggestions: React.FC<SimulationSuggestionsProps> = ({
         </div>
       )}
       {simulationType === 'Matrix' && !selectedProject?.portsS3 && (
-        <div className={`flex items-center gap-3 p-3 rounded-xl border ${theme === 'light'
+        <div className={`flex items-center gap-3 mb-2 p-3 rounded-xl border ${theme === 'light'
           ? 'bg-amber-50 border-amber-200 text-amber-700'
           : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
           }`}>
@@ -986,7 +986,7 @@ const SimulationSuggestions: React.FC<SimulationSuggestionsProps> = ({
       )}
       {simulationType === 'Electric Fields' &&
         !selectedProject?.planeWaveParameters && (
-          <div className={`flex items-center gap-3 p-3 rounded-xl border ${theme === 'light'
+          <div className={`flex items-center gap-3  mb-2 p-3 rounded-xl border ${theme === 'light'
             ? 'bg-amber-50 border-amber-200 text-amber-700'
             : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
             }`}>

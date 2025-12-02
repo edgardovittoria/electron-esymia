@@ -3,7 +3,6 @@ import { Popover } from '@headlessui/react';
 import { MdDashboard, MdViewInAr } from 'react-icons/md';
 import { FileItem } from './menuItems/file/FileItem';
 import { ViewItem } from './menuItems/view/ViewItem';
-import { EditItem } from './menuItems/edit/EditItem';
 import { Shapes } from './menuItems/shapes/shapes';
 import { LoginLogout } from './menuItems/loginLogout';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -53,7 +52,6 @@ export const Navbar: React.FC<NavbarProps> = ({ setShowCad }) => {
           <div className='hidden md:flex items-center gap-1 pl-4 border-l border-gray-200 dark:border-white/10'>
             <FileItem />
             <ViewItem />
-            <EditItem />
             {/* <Shapes /> */}
           </div>
         </div>

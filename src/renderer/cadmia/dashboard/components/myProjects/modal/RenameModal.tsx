@@ -1,21 +1,22 @@
 import { FC, Fragment, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Dialog, Transition } from '@headlessui/react';
+import { ThemeSelector } from '../../../../../esymia/store/tabsAndMenuItemsSlice';
 import toast from 'react-hot-toast';
-import { updateModelInFauna } from '../../../../faunaDB/functions';
 import { updateModel } from '../../../../store/modelSlice';
-import { useFaunaQuery } from '../../../../../esymia/faunadb/hook/useFaunaQuery';
-import { FaunaCadModel } from '../../../../../cad_library';
+import { DynamoDBCadModel } from '../../../../../cad_library/components/dynamodb/api/modelsAPIs';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateModelInDynamoDB } from '../../../../../dynamoDB/modelsApis';
 
 const RenameModal: FC<{
   setRenameModalShow: Function;
-  model: FaunaCadModel;
+  model: DynamoDBCadModel;
 }> = ({ setRenameModalShow, model }) => {
   const [name, setName] = useState('');
   const { execQuery2 } = useDynamoDBQuery();
   const dispatch = useDispatch();
+  const theme = useSelector(ThemeSelector);
+  const isDark = theme !== 'light';
 
   return (
     <Transition appear show as={Fragment}>
@@ -33,7 +34,7 @@ const RenameModal: FC<{
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -47,16 +48,16 @@ const RenameModal: FC<{
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className={`w-full max-w-md transform overflow-hidden rounded-2xl p-8 text-left align-middle shadow-2xl transition-all border backdrop-blur-xl ${isDark ? 'bg-gray-900/90 border-white/10' : 'bg-white/90 border-white/40'}`}>
                 <Dialog.Title
                   as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
+                  className={`text-xl font-bold leading-6 ${isDark ? 'text-white' : 'text-gray-900'}`}
                 >
-                  Rename Model
+                  Rename Project
                 </Dialog.Title>
-                <div className="mt-4">
-                  <div className="flex items-center justify-between">
-                    <label className="ml-2">Name:</label>
+                <div className="mt-6">
+                  <div className="flex flex-col gap-2">
+                    <label className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Project Name</label>
                     <input
                       type="text"
                       value={name}
@@ -64,48 +65,59 @@ const RenameModal: FC<{
                       onChange={(e) => {
                         setName(e.target.value);
                       }}
-                      className="border border-black rounded shadow p-1 w-[80%] text-black text-left"
+                      className={`w-full px-4 py-3 rounded-xl border outline-none transition-all duration-200 ${isDark
+                        ? 'bg-black/20 border-white/10 text-white focus:border-blue-500/50 focus:bg-black/40'
+                        : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500/50 focus:bg-white'
+                        }`}
+                      placeholder="Enter new name..."
+                      autoFocus
                     />
                   </div>
                 </div>
 
-                <div className="mt-4 flex justify-between">
+                <div className="mt-8 flex justify-end gap-3">
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200 ${isDark
+                      ? 'text-gray-300 hover:bg-white/10'
+                      : 'text-gray-600 hover:bg-gray-100'
+                      }`}
                     onClick={() => setRenameModalShow(false)}
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className={`px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 ${isDark
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-blue-500/20'
+                      : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-blue-500/20'
+                      }`}
                     onClick={
                       name === ''
                         ? () => {
-                            toast.error(
-                              'You must insert a valid name for the model.',
-                            );
-                          }
+                          toast.error(
+                            'You must insert a valid name for the model.',
+                          );
+                        }
                         : () => {
-                            setRenameModalShow(false);
-                            const newModel: FaunaCadModel = {
-                              ...model,
-                              name,
-                            };
-                            execQuery2(createOrUpdateModelInDynamoDB, newModel, dispatch)
-                              .then(() => {
-                                dispatch(updateModel(newModel));
-                                toast.success('Model Name Updated!');
-                              })
-                              .catch((err) => {
-                                console.log(err);
-                                toast.error('Model Name Not Updated!');
-                              });
-                          }
+                          setRenameModalShow(false);
+                          const newModel: DynamoDBCadModel = {
+                            ...model,
+                            name,
+                          };
+                          execQuery2(createOrUpdateModelInDynamoDB, newModel, dispatch)
+                            .then(() => {
+                              dispatch(updateModel(newModel));
+                              toast.success('Model Name Updated!');
+                            })
+                            .catch((err) => {
+                              console.log(err);
+                              toast.error('Model Name Not Updated!');
+                            });
+                        }
                     }
                   >
-                    Save
+                    Save Changes
                   </button>
                 </div>
               </Dialog.Panel>

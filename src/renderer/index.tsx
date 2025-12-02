@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import App from './App';
 import { store } from './store';
+import ErrorBoundary from './errorBoundary/ErrorBoundary';
 
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
@@ -19,10 +20,12 @@ root.render(
     }}
   >
     <Provider store={store}>
-      <div>
-        <Toaster position="top-center" />
-      </div>
-      <App />
+      <ErrorBoundary>
+        <div>
+          <Toaster position="top-center" />
+        </div>
+        <App />
+      </ErrorBoundary>
     </Provider>
   </Auth0Provider>,
 );

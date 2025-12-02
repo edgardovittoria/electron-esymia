@@ -44,7 +44,20 @@ const materialPhongFrom = (entity: ComponentEntity) => {
 }
 
 const geometryFrom = (entity: ComponentEntity) => {
+    console.log("geometryFrom called with entity:", entity);
     switch (entity.type) {
+        case "GROUP":
+            let groupEntity = entity as any;
+            let groupBox = new THREE.Box3();
+            if (groupEntity.children && groupEntity.children.length > 0) {
+                groupEntity.children.forEach((child: ComponentEntity) => {
+                    let childMesh = meshFrom(child);
+                    groupBox.expandByObject(childMesh);
+                });
+            }
+            let size = new THREE.Vector3();
+            groupBox.getSize(size);
+            return new THREE.BoxGeometry(size.x, size.y, size.z);
         case "CUBE":
             let cubeGeometryAttributes = entity.geometryAttributes as CubeGeometryAttributes
             return new THREE.BoxGeometry(cubeGeometryAttributes.width, cubeGeometryAttributes.height, cubeGeometryAttributes.depth, cubeGeometryAttributes.widthSegments, cubeGeometryAttributes.heigthSegments, cubeGeometryAttributes.depthSegments)
@@ -80,8 +93,13 @@ const geometryFrom = (entity: ComponentEntity) => {
                 coneGeometryAttributes.heightSegments, coneGeometryAttributes.openEnded, coneGeometryAttributes.thetaStart, coneGeometryAttributes.thetaLength)
         default:
             let compositeEntity = entity as CompositeEntity
-            let [elementA, elementB] = [meshFrom(compositeEntity.baseElements.elementA), meshFrom(compositeEntity.baseElements.elementB)]
-            return meshFromOperationBetweenTwoMeshes(entity.type, elementA, elementB).geometry
+            if (compositeEntity.baseElements) {
+                let [elementA, elementB] = [meshFrom(compositeEntity.baseElements.elementA), meshFrom(compositeEntity.baseElements.elementB)]
+                return meshFromOperationBetweenTwoMeshes(entity.type, elementA, elementB).geometry
+            } else {
+                console.warn("geometryFrom: Unknown entity type or missing baseElements", entity);
+                return new THREE.BoxGeometry(1, 1, 1);
+            }
     }
 }
 
@@ -133,4 +151,43 @@ export const meshesCollidingWithTargetMesh = (targetMesh: THREE.Mesh, meshesToCh
         }
     }
     return collisions
+}
+
+export const ungroupEntity = (groupEntity: ComponentEntity): ComponentEntity[] => {
+    if (groupEntity.type !== 'GROUP') return [];
+
+    const groupMesh = meshFrom(groupEntity);
+    groupMesh.updateMatrixWorld(true);
+
+    const childrenEntities = (groupEntity as any).children as ComponentEntity[];
+
+    return childrenEntities.map(child => {
+        const childMesh = meshFrom(child);
+
+        // Parent the child mesh to the group mesh to simulate the hierarchy
+        groupMesh.add(childMesh);
+
+        // Update world matrix of the child based on the new hierarchy
+        childMesh.updateMatrixWorld(true);
+
+        // Extract world position, rotation, and scale
+        const worldPosition = new THREE.Vector3();
+        const worldQuaternion = new THREE.Quaternion();
+        const worldScale = new THREE.Vector3();
+
+        childMesh.getWorldPosition(worldPosition);
+        childMesh.getWorldQuaternion(worldQuaternion);
+        childMesh.getWorldScale(worldScale);
+
+        const worldRotation = new THREE.Euler().setFromQuaternion(worldQuaternion);
+
+        return {
+            ...child,
+            transformationParams: {
+                position: [worldPosition.x, worldPosition.y, worldPosition.z],
+                rotation: [worldRotation.x, worldRotation.y, worldRotation.z],
+                scale: [worldScale.x, worldScale.y, worldScale.z]
+            }
+        };
+    });
 }

@@ -30,8 +30,8 @@ export const useAllowSingleSessionUser = () => {
   useEffectNotOnMount(() => {
     console.log("isAlertConfirmed -> ", isAlertConfirmed)
     console.log("openAlert -> ", openAlert)
-    if(openAlert){
-      if(isAlertConfirmed){
+    if (openAlert) {
+      if (isAlertConfirmed) {
         // execQuery(updateUserSessionInfo, {
         //   ...loggedUser,
         //   userSessionInfo: {
@@ -42,8 +42,8 @@ export const useAllowSingleSessionUser = () => {
         //   setOpenAlert(false)
         // });
         setOpenAlert(false)
-      }else{
-        if(process.env.APP_MODE !== 'test'){
+      } else {
+        if (window.electron && window.electron.ipcRenderer) {
           window.electron.ipcRenderer.sendMessage('logout', [
             process.env.REACT_APP_AUTH0_DOMAIN,
           ]);
@@ -57,8 +57,8 @@ export const useAllowSingleSessionUser = () => {
   useEffect(() => {
     if (user) {
       execQuery2(getUserSessionInfoDynamoDB, user.email as string, dispatch).then((res) => {
-        let item:any = []
-        if(res.Item){
+        let item: any = []
+        if (res.Item) {
           item.push(convertFromDynamoDBFormat(res.Item))
         }
         if (item) {
@@ -76,9 +76,9 @@ export const useAllowSingleSessionUser = () => {
               } as DynamoUserSessionInfo);
             })
           } else {
-            if(process.env.APP_MODE !== 'test'){
+            if (window.electron && window.electron.ipcRenderer) {
               window.electron.ipcRenderer.invoke('getMac').then((res) => {
-                if(res !== item[0].mac){
+                if (res !== item[0].mac) {
                   dispatch(
                     setMessageInfoModal(
                       'You are already logged in to another device. Close that connection in order to start a new one. If not possible, you can manually terminate active session using confirm button. This may cause errors if within the active session there were pending operations, so use it carefully!',
@@ -92,7 +92,7 @@ export const useAllowSingleSessionUser = () => {
             }
           }
         } else {
-          if(process.env.APP_MODE !== 'test'){
+          if (window.electron && window.electron.ipcRenderer) {
             window.electron.ipcRenderer.invoke('getMac').then((res) => {
               let newUserSessionInfo = {
                 email: user.email as string,
@@ -124,5 +124,5 @@ export const useAllowSingleSessionUser = () => {
     setLoggedUser(undefined)
   };
 
-  return {closeUserSessionOnFauna}
+  return { closeUserSessionOnFauna }
 };

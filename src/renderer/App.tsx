@@ -18,11 +18,8 @@ import {
   disconnectStomp,
   publishMessage,
 } from './middleware/stompMiddleware';
-import { ImSpinner } from 'react-icons/im';
 import {
   brokerConnectedSelector,
-  setMessageInfoModal,
-  setShowInfoModal,
   setTheme,
   showInfoModalSelector,
   ThemeSelector,
@@ -32,6 +29,7 @@ import {
   SolverStatusSelector,
 } from './esymia/store/pluginsSlice';
 import InfoModal from './esymia/application/sharedModals/InfoModal';
+import LoadingSpinner from './shared/LoadingSpinner';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -45,37 +43,43 @@ export default function App() {
   const isDark = theme !== 'light';
 
   useEffect(() => {
-    window.electron.ipcRenderer.sendMessage('runBroker', []);
+
+    if (window.electron && window.electron.ipcRenderer) {
+      window.electron.ipcRenderer.sendMessage('runBroker', []);
+    }
+
     dispatch(connectStomp());
     return () => {
       dispatch(disconnectStomp());
     };
   }, []);
 
-  window.electron.ipcRenderer.on('runBroker', (arg) => {
-    const response = arg as {
-      type: string;
-      message?: string;
-      success?: boolean;
-      exitCode?: number;
-    };
-    if (response.type === 'status') {
-      if (!response.success) {
-        if (response.exitCode === 10) {
-          setDockerInstallationBox(true);
+  if (window.electron && window.electron.ipcRenderer) {
+    window.electron.ipcRenderer.on('runBroker', (arg) => {
+      const response = arg as {
+        type: string;
+        message?: string;
+        success?: boolean;
+        exitCode?: number;
+      };
+      if (response.type === 'status') {
+        if (!response.success) {
+          if (response.exitCode === 10) {
+            setDockerInstallationBox(true);
+          } else {
+            console.error(
+              'Errore generico script Docker. Codice:',
+              response.exitCode,
+            );
+          }
         } else {
-          console.error(
-            'Errore generico script Docker. Codice:',
-            response.exitCode,
-          );
+          console.log(response.message);
         }
-      } else {
-        console.log(response.message);
       }
-    }
-  });
+    });
+  }
 
-  if (process.env.APP_MODE !== 'test') {
+  if (window.electron && window.electron.ipcRenderer) {
     window.electron.ipcRenderer.on('checkLogout', (arg) => {
       if ((arg as string) == 'allowed') {
         if (mesherStatus != 'idle') {
@@ -100,7 +104,7 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (logout && process.env.APP_MODE !== 'test') {
+    if (logout && window.electron && window.electron.ipcRenderer) {
       window.electron.ipcRenderer.sendMessage('logout', [
         process.env.REACT_APP_AUTH0_DOMAIN,
       ]);
@@ -153,7 +157,9 @@ export default function App() {
               type="button"
               className={`btn-primary w-full ${isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'}`}
               onClick={() => {
-                window.electron.ipcRenderer.sendMessage('closeApp', []);
+                if (window.electron && window.electron.ipcRenderer) {
+                  window.electron.ipcRenderer.sendMessage('closeApp', []);
+                }
               }}
             >
               Close App
@@ -166,11 +172,7 @@ export default function App() {
         <>
           {!brokerActive ? (
             <div className="fixed inset-0 flex flex-col items-center justify-center gap-4 z-50">
-              <ImSpinner
-                className={`animate-spin w-12 h-12 ${isDark ? 'text-white' : 'text-black'
-                  }`}
-              />
-              <span className="text-lg font-light tracking-wider animate-pulse">Starting Services...</span>
+              <LoadingSpinner text="Starting Services..." />
             </div>
           ) : (
             <div className="relative h-screen flex flex-col">
@@ -251,7 +253,7 @@ export default function App() {
 
                           <button
                             onClick={() => {
-                              if (process.env.APP_MODE !== 'test') {
+                              if (window.electron && window.electron.ipcRenderer) {
                                 window.electron.ipcRenderer.sendMessage('checkLogout');
                               }
                             }}

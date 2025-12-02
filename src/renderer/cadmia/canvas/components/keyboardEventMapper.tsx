@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { redoFunction, undoFunction } from './navBar/menuItems/edit/undoRedo';
 import { exportJSONProject } from './navBar/menuItems/file/FileItem';
 import { toggleObjectsDetails } from './objectsDetailsBar/objectsDetailsSlice';
 import {
@@ -9,17 +8,27 @@ import {
   exportToSTL,
   keySelectedComponenteSelector,
   lastActionTypeSelector,
-  lengthFutureStateSelector,
-  lengthPastStateSelector,
+  removeComponent,
   resetState,
 } from '../../../cad_library';
 
-interface KeyboardEventMapperProps {}
+interface KeyboardEventMapperProps { }
+
+import { historyNodesSelector, activeNodeIdSelector, addNode, undo, redo, rebuildHistory } from '../../store/historySlice';
+import uniqid from 'uniqid';
+
+// ...
 
 export const KeyboardEventMapper: React.FC<KeyboardEventMapperProps> = () => {
   const dispatch = useDispatch();
-  const pastStateLength = useSelector(lengthPastStateSelector);
-  const futureStateLength = useSelector(lengthFutureStateSelector);
+  // const pastStateLength = useSelector(lengthPastStateSelector); // Legacy
+  // const futureStateLength = useSelector(lengthFutureStateSelector); // Legacy
+  const nodes = useSelector(historyNodesSelector);
+  const activeNodeId = useSelector(activeNodeIdSelector);
+
+  const canUndo = activeNodeId !== null;
+  const canRedo = nodes.length > 0 && (activeNodeId === null ? nodes.length > 0 : nodes.findIndex(n => n.id === activeNodeId) < nodes.length - 1);
+
   const lastActionType = useSelector(lastActionTypeSelector);
   const [undoActions, setundoActions] = useState<string[]>([]);
 
@@ -29,6 +38,7 @@ export const KeyboardEventMapper: React.FC<KeyboardEventMapperProps> = () => {
   const components = useSelector(componentseSelector);
 
   function KeyPress(e: KeyboardEvent) {
+    // ... existing text input logic ...
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     const ctrlOrCmd = e.ctrlKey || (isMac && e.metaKey); // Ctrl su Win/Linux, Cmd su Mac
     const target = e.target as HTMLElement;
@@ -43,28 +53,23 @@ export const KeyboardEventMapper: React.FC<KeyboardEventMapperProps> = () => {
     // NUOVA LOGICA: Gestione delle scorciatoie di modifica del testo
     // =================================================================
     if (ctrlOrCmd && isTextInput) {
-      // Se è un input, preveniamo l'azione predefinita per controllarla
+      // ... existing text input logic ...
       e.preventDefault();
 
       switch (e.key.toLowerCase()) {
         case 'c': // Copia (Ctrl/Cmd + C)
-          // Usiamo execCommand, che è deprecato ma supportato per queste azioni
-          // O usiamo l'API Clipboard (solo se l'execCommand fallisce o è bloccato)
           document.execCommand('copy');
           return;
-          
+
         case 'v': // Incolla (Ctrl/Cmd + V)
           document.execCommand('paste');
           return;
 
         case 'x': // Taglia (Ctrl/Cmd + X)
-          // Se usi Ctrl+X per redo, devi decidere se vuoi che 'Taglia' funzioni.
-          // Se sì:
           document.execCommand('cut');
           return;
 
         case 'a': // Seleziona Tutto (Ctrl/Cmd + A)
-          // Questa funzione funziona sull'elemento con focus
           if (
             target instanceof HTMLInputElement ||
             target instanceof HTMLTextAreaElement
@@ -72,7 +77,6 @@ export const KeyboardEventMapper: React.FC<KeyboardEventMapperProps> = () => {
             target.select();
             return;
           }
-          // Se non è un input/textarea, esegue l'azione sul documento intero (comportamento nativo)
           document.execCommand('selectAll');
           return;
       }
@@ -82,21 +86,25 @@ export const KeyboardEventMapper: React.FC<KeyboardEventMapperProps> = () => {
     if (
       e.ctrlKey &&
       e.key === 'z' &&
-      pastStateLength > 0 &&
+      canUndo &&
       process.env.APP_VERSION !== 'demo'
     ) {
       e.preventDefault();
-      undoFunction(lastActionType, undoActions, setundoActions, dispatch);
+      dispatch(undo());
+      // @ts-ignore
+      dispatch(rebuildHistory());
     }
     // redo last action
     if (
       e.ctrlKey &&
       e.key === 'x' &&
-      futureStateLength > 0 &&
+      canRedo &&
       process.env.APP_VERSION !== 'demo'
     ) {
       e.preventDefault();
-      redoFunction(undoActions, setundoActions, dispatch);
+      dispatch(redo());
+      // @ts-ignore
+      dispatch(rebuildHistory());
     }
     //delete all components from canvas
     if (e.ctrlKey && e.altKey && e.key === 'r') {
@@ -104,10 +112,23 @@ export const KeyboardEventMapper: React.FC<KeyboardEventMapperProps> = () => {
       dispatch(resetState());
     }
     //delete selected component
-    /* if(e.key === 'Delete' && selectedComponentKey !== 0){
-            e.preventDefault()
-            dispatch(removeComponent(selectedComponentKey))
-        } */
+    if (e.key === 'Delete' && selectedComponentKey !== 0) {
+      e.preventDefault();
+      const componentToDelete = components.find(c => c.keyComponent === selectedComponentKey);
+      dispatch(removeComponent(selectedComponentKey));
+      if (componentToDelete) {
+        dispatch(addNode({
+          id: uniqid(),
+          name: `Delete ${componentToDelete.name}`,
+          type: 'DELETE',
+          params: {},
+          timestamp: Date.now(),
+          outputKey: 0,
+          inputKeys: [selectedComponentKey],
+          suppressed: false
+        }));
+      }
+    }
     //set sidebar visibility
     if (e.ctrlKey && e.key === 'd') {
       e.preventDefault();

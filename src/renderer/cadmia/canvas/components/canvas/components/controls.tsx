@@ -6,6 +6,8 @@ import * as THREE from "three"
 import { activeTransformationSelector } from "../../transformationsToolbar/toolbarTransformationSlice";
 import { TransformationParams, updateTransformationParams } from "../../../../../cad_library";
 import { attachModeSelector } from "../../binaryOperationsToolbar/binaryOperationsToolbarSlice";
+import { addNode } from "../../../../store/historySlice";
+import uniqid from "uniqid";
 
 export const Controls: FC<{
   keySelectedComponent: number;
@@ -56,6 +58,17 @@ export const Controls: FC<{
           ],
         };
         dispatch(updateTransformationParams(transformationParmas));
+
+        dispatch(addNode({
+          id: uniqid(),
+          name: `Transform ${activeTransformation.type}`,
+          type: 'TRANSFORM',
+          params: transformationParmas,
+          timestamp: Date.now(),
+          outputKey: keySelectedComponent,
+          inputKeys: [keySelectedComponent],
+          suppressed: false
+        }));
       }
     }
   }

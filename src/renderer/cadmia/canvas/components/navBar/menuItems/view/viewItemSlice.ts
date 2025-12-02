@@ -2,24 +2,24 @@ import { createSlice } from '@reduxjs/toolkit'
 
 
 export type ViewItemSlice = {
-    focusToScene: boolean
+  focusToScene: number
 }
 
 export const ViewItemSlice = createSlice({
   name: 'viewItemState',
-  initialState:{
-    focusToScene: true
+  initialState: {
+    focusToScene: 0
   } as ViewItemSlice,
   reducers: {
-    resetFocusToScene(state: ViewItemSlice){
-        state.focusToScene = true
-    }, 
-    setFocusNotToScene(state: ViewItemSlice){
-        state.focusToScene = false
+    resetFocusToScene(state: ViewItemSlice) {
+      state.focusToScene += 1
+    },
+    setFocusNotToScene(state: ViewItemSlice) {
+      // No-op: focus is now triggered by incrementing the counter
     }
   }
 });
 
-export const {resetFocusToScene, setFocusNotToScene} = ViewItemSlice.actions
+export const { resetFocusToScene, setFocusNotToScene } = ViewItemSlice.actions
 
-export const focusToSceneSelector = (state: { viewItemState: ViewItemSlice}) => state.viewItemState.focusToScene
+export const focusToSceneSelector = (state: { viewItemState: ViewItemSlice }) => state.viewItemState.focusToScene

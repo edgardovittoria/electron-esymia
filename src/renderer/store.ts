@@ -3,7 +3,6 @@ import { ProjectSlice } from './esymia/store/projectSlice';
 import { SolverSlice } from './esymia/store/solverSlice';
 import { TabsAndMenuItemsSlice } from './esymia/store/tabsAndMenuItemsSlice';
 import { PluginsSlice } from './esymia/store/pluginsSlice';
-import undoable, { excludeAction } from 'redux-undo';
 import {
   TransformationsToolbarSlice
 } from './cadmia/canvas/components/transformationsToolbar/toolbarTransformationSlice';
@@ -20,6 +19,7 @@ import { ObjectsDetailsSlice } from './cadmia/canvas/components/objectsDetailsBa
 import { stompMiddleware } from './middleware/stompMiddleware';
 import { CanvasSlice, UsersSlice } from './cad_library';
 import { MeasurementSlice } from './cadmia/canvas/components/measurement/measurementSlice';
+import { HistorySlice } from './cadmia/store/historySlice';
 
 const rootReducer = combineReducers({
   projects: ProjectSlice.reducer,
@@ -27,12 +27,7 @@ const rootReducer = combineReducers({
   user: UsersSlice.reducer,
   tabsAndMenuItems: TabsAndMenuItemsSlice.reducer,
   plugins: PluginsSlice.reducer,
-  canvas: undoable(CanvasSlice.reducer, {
-    limit: 20,
-    filter: excludeAction(
-      CanvasSlice.actions.incrementNumberOfGeneratedKey.type,
-    ),
-  }),
+  canvas: CanvasSlice.reducer,
   transformationsToolbar: TransformationsToolbarSlice.reducer,
   binaryOperationsToolbar: BinaryOperationsToolbarSlice.reducer,
   cadmiaModality: CadmiaModalitySlice.reducer,
@@ -43,6 +38,7 @@ const rootReducer = combineReducers({
   viewItemState: ViewItemSlice.reducer,
   modelSlice: ModelSlice.reducer,
   measurement: MeasurementSlice.reducer,
+  history: HistorySlice.reducer,
 });
 
 

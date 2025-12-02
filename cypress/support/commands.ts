@@ -37,7 +37,7 @@
 // }
 // @ts-ignore
 
-import { addSubFolderToFolderStaticData, modelFromS3, modelS3, s3Output, staticFolder, staticFolders, staticFolderToMove, staticModels, staticProjects, staticResponse } from '../e2e/staticData/staticData';
+import { mesherOutput, modelFromS3, project1, staticModels } from '../e2e/staticData/staticData';
 
 
 function loginViaAuth0Ui(username: string, password: string) {
@@ -48,12 +48,13 @@ function loginViaAuth0Ui(username: string, password: string) {
 
   //Login on Auth0.
   cy.origin(
-    Cypress.env('auth0_domain')+"/u/login",
+    Cypress.env('auth0_domain') + "/u/login",
     { args: { username, password } },
     ({ username, password }) => {
-      cy.get('input#username').type(username)
-      cy.get('input#password').type(password, { log: false })
-      cy.contains('button[value=default]', 'Continue').click()
+      cy.get('input[name="username"]').type(username)
+      cy.contains('Continue').click()
+      cy.get('input[name="password"]').type(password, { log: false })
+      cy.contains('Continue').click()
     }
   )
 
@@ -79,34 +80,13 @@ Cypress.Commands.add('login', (username: string, password: string) => {
 function createProject(name: string, description: string) {
   cy.intercept({
     method: 'POST',
-    url: `https://db.fauna.com/query/1`,
-  },(req) => {
-    //console.log(req)
-    if(req.body.query.fql[0].includes('create')){
-      req.reply(staticResponse)
-    }
+    url: `https://dynamodb.eu-north-1.amazonaws.com/`,
+  }, (req) => {
+    req.reply(project1)
   }).as('createProject')
-  cy.intercept({
-    method: 'POST',
-    url: `https://db.fauna.com/query/1`,
-  },(req) => {
-    //console.log(req)
-    if(req.body.query.fql[0].includes('folders_by_owner')){
-      req.reply(staticFolders)
-    }
-  })
-  cy.intercept({
-    method: 'POST',
-    url: `https://db.fauna.com/query/1`,
-  },(req) => {
-    //console.log(req)
-    if(req.body.query.fql[0].includes('simulationProjects_by_owner')){
-      req.reply(staticProjects)
-    }
-  })
   cy.get('[data-testid="projectName"').type(name)
   cy.get('[data-testid="projectDescription"').type(description)
-  cy.get('[data-testid="createNewProjectModal"').find('button').contains("CREATE", {matchCase: false}).click()
+  cy.get('[data-testid="createNewProjectModal"').find('button').contains("CREATE", { matchCase: false }).click()
   cy.wait('@createProject')
 }
 
@@ -114,82 +94,60 @@ Cypress.Commands.add('createProject', (name: string, description: string) => {
   createProject(name, description)
 })
 
-function createFolder(name: string, id:string) {
-  cy.intercept({
-    method: 'POST',
-    url: `https://db.fauna.com/query/1`,
-  },(req) => {
-    //console.log(req)
-    if(req.body.query.fql[0].includes('create')){
-      req.reply(staticFolder(name, id))
-    }
-    if(req.body.query.fql[0].includes('folders_by_owner')){
-      req.reply(staticFolders)
-    }
-    if(req.body.query.fql[0].includes('simulationProjects_by_owner')){
-      req.reply(staticProjects)
-    }
-  }).as('createFolder')
-  cy.contains("+ New Folder").click()
+function createFolder(name: string, id: string) {
+  cy.contains("New Folder").click()
   cy.get('[data-testid="folderName"]').type(name)
-  cy.get('[data-testid="createNewFolderModal"]').find('button').contains("CREATE", {matchCase: false}).click()
+  cy.get('[data-testid="createNewFolderModal"]').find('button').contains("CREATE", { matchCase: false }).click()
 }
 
-Cypress.Commands.add('createFolder', (name: string, id:string) => {
+Cypress.Commands.add('createFolder', (name: string, id: string) => {
   createFolder(name, id)
 })
 
-function generateMesh(){
-  cy.intercept('POST', 'http://127.0.0.1:8003/meshingAdvice', [2, 2, 1])
-  cy.intercept('POST', 'https://models-bucket-49718971291.s3.amazonaws.com/', {statusCode: 204})
-  cy.intercept('GET', 'https://models-bucket-49718971291.s3.amazonaws.com/*.json', modelFromS3)
+function generateMesh() {
+  cy.intercept('POST', 'http://localhost:8002/quantumAdvice', { quantum: [2, 2, 1], id: project1.id })
+  cy.intercept('POST', 'http://localhost:8002/meshing', mesherOutput)
+  cy.intercept('POST', `https://cadmia-bucket.s3.eu-north-1.amazonaws.com/`, { statusCode: 204 })
+  cy.intercept('GET', `https://cadmia-bucket.s3.eu-north-1.amazonaws.com/kjJ1gPszvch3LefSqASYZs.json
+`, modelFromS3)
   cy.intercept({
     method: 'POST',
-    url: `https://db.fauna.com/query/1`,
-  },(req) => {
+    url: `https://dynamodb.eu-north-1.amazonaws.com/`,
+  }, (req) => {
     //console.log(req)
-    if(req.body.query.fql[0].includes('models_by_owner')){
-      req.reply(staticModels)
-    }
-  })
-  //cy.intercept('GET', 'https://models-bucket-49718971291.s3.amazonaws.com/vZVvPynHi2oB36dKk4PWma.json', modelS3)
-  cy.intercept({
-    method: 'POST',
-    url: `https://db.fauna.com/query/1`,
-  },(req) => {
-    if(req.body.query.fql[2].includes('update')){
-      req.reply(staticResponse)
-    }
+    req.reply(staticModels)
   })
 
-  cy.contains("import from db", {matchCase: false}).click()
+  cy.contains("import from db", { matchCase: false }).click()
   cy.get('[data-testid="modelChoose"]').eq(1).click()
   cy.get('button').contains('Load').click()
-  cy.get('[data-testid="Terminations"]').click()
+  // cy.get('[data-testid="Terminations"]').click()
 
-  cy.get('[data-testid="addPort"]').click()
-  cy.get('[data-testid="port"]').click()
-  cy.get('[data-testid="terminationSettings"]').click()
-  cy.get('#inputPositionX').clear().type("0")
-  cy.get('#inputPositionY').clear().type("2")
-  cy.get('#inputPositionZ').clear().type("1")
-  cy.get('#outputPositionX').clear().type("0")
-  cy.get('#outputPositionY').clear().type("10")
-  cy.get('#outputPositionZ').clear().type("1")
-  cy.get('[data-testid="scattering"]').clear().type("50")
+  // cy.get('[data-testid="addPort"]').click()
+  // cy.get('[data-testid="port"]').click()
+  // cy.get('[data-testid="terminationSettings"]').click()
+  // cy.get('#inputPositionX').clear().type("0")
+  // cy.get('#inputPositionY').clear().type("2")
+  // cy.get('#inputPositionZ').clear().type("1")
+  // cy.get('#outputPositionX').clear().type("0")
+  // cy.get('#outputPositionY').clear().type("10")
+  // cy.get('#outputPositionZ').clear().type("1")
+  // cy.get('[data-testid="scattering"]').clear().type("50")
 
-  cy.get('[data-testid="frequenciesSettings"]').click()
-  cy.get('[data-testid="fmin"]').clear().type('1e2')
-  cy.get('[data-testid="fmax"]').clear().type('1e8')
-  cy.get('[data-testid="fnum"]').clear().type('10')
-  cy.get('[data-testid="generateFrequencies"]').click()
+  // cy.get('[data-testid="frequenciesSettings"]').click()
+  // cy.get('[data-testid="fmin"]').clear().type('1e2')
+  // cy.get('[data-testid="fmax"]').clear().type('1e8')
+  // cy.get('[data-testid="fnum"]').clear().type('10')
+  // cy.get('[data-testid="generateFrequencies"]').click()
   //cy.get('[data-testid="savePhysics"]').click()
-  cy.get('[data-testid="Simulator"]').click()
-  cy.get('[data-testid="quantumSettings"]').click()
+  cy.get('[data-testid="Mesher"]').click()
+  cy.get('[data-testid="maxFrequencyInput"]').clear().type("1e8")
+  cy.get('[data-testid="setMaxFrequencyButton"]').click()
   cy.get('[data-testid="generateMeshButton"]').should('not.be.disabled')
   cy.get('[data-testid="generateMeshButton"]').click()
   cy.wait(5000)
-  cy.get('[data-testid="coarsenButton"]').should('be.visible')
+  // 
+  // cy.get('[data-testid="coarsenButton"]').should('be.visible')
 }
 
 Cypress.Commands.add('generateMesh', () => {

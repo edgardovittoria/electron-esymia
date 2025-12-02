@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { DynamoDBCadModel } from '../../cad_library/components/faunadb/api/modelsAPIs';
+import { DynamoDBCadModel } from '../../cad_library/components/dynamodb/api/modelsAPIs';
 
 export interface ModelState {
   models: DynamoDBCadModel[];
@@ -37,7 +37,7 @@ export const ModelSlice = createSlice({
     setSharedModel(state: ModelState, action: PayloadAction<DynamoDBCadModel[]>) {
       state.sharedModels = action.payload
     },
-    setLoadingSpinner(state: ModelState, action: PayloadAction<boolean>){
+    setLoadingSpinner(state: ModelState, action: PayloadAction<boolean>) {
       state.loadingSpinner = action.payload
     }
   },

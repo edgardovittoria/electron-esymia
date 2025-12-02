@@ -32,7 +32,7 @@ const CAD: React.FC<CanvasProps> = ({ setShowCad }) => {
   const loadingSpinner = useSelector(LoadingSpinnerSelector)
   const theme = useSelector(ThemeSelector);
   return (
-    <div className="relative w-full h-[calc(100%-4vh)]">
+    <div className="relative w-full h-[calc(100%-5vh)]">
       {loadingSpinner &&
         <ImSpinner className={`animate-spin w-10 h-10 absolute top-1/2 left-1/2 z-50 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`} />
       }

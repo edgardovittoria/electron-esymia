@@ -15,7 +15,8 @@ export {
     setComponentsOpacity,
     setComponentsTransparency,
     resetState,
-
+    replaceComponentWithMultipleEntities,
+    setCanvasState
 } from "./canvasSlice"
 export {
     canvasStateSelector,

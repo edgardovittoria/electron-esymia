@@ -26,15 +26,18 @@ const ServerGUI: React.FC<ServerGUIProps> = ({ index }) => {
 
   const dispatch = useDispatch()
 
-  window.electron.ipcRenderer.on('runMesher', (arg) => {
-    setSpinnerMesher(false)
-    setMesherLogs([...mesherLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
-  });
+  if (window.electron && window.electron.ipcRenderer) {
+    window.electron.ipcRenderer.on('runMesher', (arg) => {
+      setSpinnerMesher(false)
+      setMesherLogs([...mesherLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
+    });
 
-  window.electron.ipcRenderer.on('runSolver', (arg) => {
-    setSpinnerSolver(false)
-    setSolverLogs([...solverLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
-  });
+    window.electron.ipcRenderer.on('runSolver', (arg) => {
+      setSpinnerSolver(false)
+      setSolverLogs([...solverLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
+    });
+  }
+
 
   useEffect(() => {
     mesherLogs.forEach(l => {

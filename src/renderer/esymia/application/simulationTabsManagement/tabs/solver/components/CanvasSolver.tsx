@@ -222,8 +222,7 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
                                 }
                               }}
                             >
-                              <FactoryShapesEsymia entity={component} />
-                              <Edges />
+                              <FactoryShapesEsymia entity={component} borderVisible={true} />
                             </mesh>
                           );
                         },

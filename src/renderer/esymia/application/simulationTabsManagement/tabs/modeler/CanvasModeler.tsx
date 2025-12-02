@@ -91,8 +91,8 @@ export const CanvasModeler: React.FC<CanvasModelerProps> = ({
                             rotation={component.transformationParams.rotation}
                             key={index}
                           >
-                            <FactoryShapesEsymia entity={component} />
-                            <Edges />
+                            <FactoryShapesEsymia entity={component} borderVisible />
+
                           </mesh>
                         );
                       },

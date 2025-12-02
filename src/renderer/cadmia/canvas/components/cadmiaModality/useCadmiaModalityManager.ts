@@ -13,10 +13,11 @@ import {
 import { useEffect } from 'react';
 import {
   invisibleMeshesSelector,
-  setMeshInvisible,
-  setMeshVisible,
+  toggleVisibilityAction,
 } from '../objectsDetailsBar/objectsDetailsSlice';
 import { componentseSelector, Material, removeComponent, removeComponentMaterial, selectComponent, selectedComponentSelector, setComponentMaterial, setComponentsOpacity } from '../../../../cad_library';
+import { addNode } from '../../../store/historySlice';
+import uniqid from 'uniqid';
 
 export const useCadmiaModalityManager = () => {
   const modality = useSelector(cadmiaModalitySelector);
@@ -72,36 +73,49 @@ export const useCadmiaModalityManager = () => {
           }),
         );
       }
+    } else if (modality === 'Grouping') {
+      if (!invisibleMeshes.includes(keyComponent)) {
+        let componentWillBeSelected =
+          !multipleSelectionEntityKeys.includes(keyComponent);
+        dispatch(toggleEntitySelectionForMultipleSelection(keyComponent));
+        dispatch(
+          setComponentsOpacity({
+            keys: [keyComponent],
+            opacity: componentWillBeSelected ? 1 : 0.3,
+          }),
+        );
+      }
     }
   };
 
   const canvasObjectOpsBasedOnModality = {
     onClickAction: clickActions,
+    opacityLogic: modality === 'Grouping' || modality === 'MultipleSelection' || modality === 'BinaryOperation'
   };
 
   const meshHidingActionBasedOnModality = (keyComponent: number) => {
     if (modality === 'NormalSelection') {
-      dispatch(setMeshInvisible(keyComponent));
+      dispatch(toggleVisibilityAction(keyComponent, false));
     } else if (modality === 'BinaryOperation') {
       binaryOpsEntityKeys.includes(keyComponent) &&
         dispatch(toggleEntitySelectionForBinaryOp(keyComponent));
-      dispatch(setMeshInvisible(keyComponent));
+      dispatch(toggleVisibilityAction(keyComponent, false));
     } else if (modality === 'MultipleSelection') {
       multipleSelectionEntityKeys.includes(keyComponent) &&
         dispatch(toggleEntitySelectionForMultipleSelection(keyComponent));
-      dispatch(setMeshInvisible(keyComponent));
+      dispatch(toggleVisibilityAction(keyComponent, false));
     }
   };
 
   const meshUnhidingActionBasedOnModality = (keyComponent: number) => {
     if (modality === 'NormalSelection') {
-      dispatch(setMeshVisible(keyComponent));
+      dispatch(toggleVisibilityAction(keyComponent, true));
     } else if (modality === 'BinaryOperation') {
       dispatch(setComponentsOpacity({ keys: [keyComponent], opacity: 0.3 }));
-      dispatch(setMeshVisible(keyComponent));
+      dispatch(toggleVisibilityAction(keyComponent, true));
     } else if (modality === 'MultipleSelection') {
       dispatch(setComponentsOpacity({ keys: [keyComponent], opacity: 0.3 }));
-      dispatch(setMeshVisible(keyComponent));
+      dispatch(toggleVisibilityAction(keyComponent, true));
     }
   };
 
@@ -163,11 +177,33 @@ export const useCadmiaModalityManager = () => {
       },
       onClickAction: (keyComponentToDelete: number) => {
         if (modality !== 'MultipleSelection') {
-          selectedComponent && dispatch(removeComponent(keyComponentToDelete));
+          if (selectedComponent) {
+            dispatch(removeComponent(keyComponentToDelete));
+            dispatch(addNode({
+              id: uniqid(),
+              name: `Delete ${selectedComponent.name}`,
+              type: 'DELETE',
+              params: {},
+              timestamp: Date.now(),
+              outputKey: 0,
+              inputKeys: [keyComponentToDelete],
+              suppressed: false
+            }));
+          }
         } else {
           multipleSelectionEntityKeys.forEach((key) =>
             dispatch(removeComponent(key)),
           );
+          dispatch(addNode({
+            id: uniqid(),
+            name: `Delete ${multipleSelectionEntityKeys.length} items`,
+            type: 'DELETE',
+            params: {},
+            timestamp: Date.now(),
+            outputKey: 0,
+            inputKeys: [...multipleSelectionEntityKeys],
+            suppressed: false
+          }));
         }
         dispatch(setModality('NormalSelection'));
       },
@@ -211,7 +247,7 @@ export const useCadmiaModalityManager = () => {
         keys.push(component.keyComponent);
         return keys;
       }, []);
-      if (modality === 'BinaryOperation' || modality === 'MultipleSelection') {
+      if (modality === 'BinaryOperation' || modality === 'MultipleSelection' || modality === 'Grouping') {
         dispatch(setComponentsOpacity({ keys: componentKeys, opacity: 0.3 }));
       } else if (modality === 'NormalSelection') {
         dispatch(setComponentsOpacity({ keys: componentKeys, opacity: 0.3, }));

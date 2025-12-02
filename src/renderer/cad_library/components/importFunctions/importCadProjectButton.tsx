@@ -1,6 +1,7 @@
 import { FC, ReactNode, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { ImportActionParamsObject, importFromCadProject } from "./importFunctions";
+import { importFromCadProject } from "./importFunctions";
+import { ImportActionParamsObject } from "./importTypes";
 
 interface ImportCadProjectButtonProps {
     importAction: (params: ImportActionParamsObject) => any,
@@ -9,7 +10,7 @@ interface ImportCadProjectButtonProps {
     children: ReactNode
 }
 
-export const ImportCadProjectButton: FC<ImportCadProjectButtonProps> = ({importAction, actionParams, className, children}) => {
+export const ImportCadProjectButton: FC<ImportCadProjectButtonProps> = ({ importAction, actionParams, className, children }) => {
 
     const inputRefProject = useRef(null)
     const dispatch = useDispatch()
@@ -23,7 +24,7 @@ export const ImportCadProjectButton: FC<ImportCadProjectButtonProps> = ({importA
     };
 
     return (
-        <button className={(className)? className : "btn-success"} onClick={onImportProjectClick}>
+        <button className={(className) ? className : "btn-success"} onClick={onImportProjectClick}>
             {children}
             <input
                 type="file"
