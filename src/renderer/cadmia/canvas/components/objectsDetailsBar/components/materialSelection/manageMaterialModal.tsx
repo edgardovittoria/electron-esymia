@@ -109,6 +109,7 @@ export const ManageMaterialModal: FC<{
 
       // 3. Controlla se almeno uno dei risultati è TRUE
       const isMaterialUsed = results.some((isUsed) => isUsed === true);
+      console.log(isMaterialUsed);
 
       // A questo punto puoi eseguire la logica di cancellazione
       if (isMaterialUsed) {

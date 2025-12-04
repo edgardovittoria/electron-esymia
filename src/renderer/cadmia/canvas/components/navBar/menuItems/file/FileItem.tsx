@@ -21,7 +21,7 @@ import {
 } from '../../../../../store/modelSlice';
 import {
   navbarDropdownBoxStyle,
-  navbarDropdownStyle, 
+  navbarDropdownStyle,
   navbarShortcutStyle
 } from '../../../../../config/styles';
 import { setModality } from '../../../cadmiaModality/cadmiaModalitySlice';
@@ -30,6 +30,7 @@ import { addComponent, BufferGeometryAttributes, canvasStateSelector, ComponentE
 import { importRisGeometry } from '../../../../../../cad_library/components/importFunctions/importFunctions';
 import { SaveRisModelWithNameModal } from './components/saveRisModelWithNameModal';
 import { ThemeSelector } from '../../../../../../esymia/store/tabsAndMenuItemsSlice';
+import { v4 as uuidv4 } from 'uuid';
 
 interface FileItemProps { }
 
@@ -118,6 +119,24 @@ export const FileItem: React.FC<FileItemProps> = () => {
         opacity: 1,
       };
       dispatch(addComponent(entity));
+
+      // Add history node for STL import
+      const { addNode } = require('../../../../../store/historySlice');
+      dispatch(addNode({
+        id: uuidv4(),
+        name: `Import STL: ${STLFile.name}`,
+        type: 'IMPORT_STL',
+        params: {
+          fileName: STLFile.name,
+          geometryAttributes: entity.geometryAttributes,
+          transformationParams: entity.transformationParams
+        },
+        timestamp: Date.now(),
+        outputKey: entity.keyComponent,
+        inputKeys: [],
+        suppressed: false
+      }));
+
       dispatch(setLoadingSpinner(false))
     });
   };

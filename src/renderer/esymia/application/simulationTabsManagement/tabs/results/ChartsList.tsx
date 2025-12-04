@@ -10,7 +10,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Line, Scatter } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import { Port, Project, Simulation } from '../../../../model/esymiaModels';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectedProjectSelector } from '../../../../store/projectSlice';
@@ -255,41 +255,88 @@ export const ChartsList: React.FC<ChartsListProps> = ({
     if (graphTitle === 'S_dB') yAxisTitle = 'dB';
     return {
       ...options,
+      interaction: {
+        mode: 'index' as const,
+        intersect: false,
+      },
       plugins: {
-        // changin the lagend colour
         legend: {
-          position: 'top' as const,
+          position: 'bottom' as const,
           labels: {
-            color: theme === 'light' ? 'black' : 'white',
+            color: theme === 'light' ? '#374151' : '#E5E7EB',
+            font: {
+              size: 12,
+              weight: '500' as const,
+              family: "'Inter', 'system-ui', sans-serif",
+            },
+            padding: 15,
+            usePointStyle: true,
+            pointStyle: 'circle',
           },
         },
         title: {
           display: true,
           text: graphTitle,
-          color: theme === 'light' ? 'black' : 'white',
+          color: theme === 'light' ? '#111827' : '#F9FAFB',
+          font: {
+            size: 16,
+            weight: 'bold' as const,
+            family: "'Inter', 'system-ui', sans-serif",
+          },
+          padding: {
+            top: 10,
+            bottom: 20,
+          },
         },
-        // zoom: {
-        //   pan: {
-        //     enabled: true
-        //   },
-        //   zoom: {
-        //     wheel: {
-        //       enabled: true,
-        //     },
-        //     pinch: {
-        //       enabled: true
-        //     },
-        //     mode: 'xy',
-        //   }
-        // }
+        tooltip: {
+          enabled: true,
+          backgroundColor: theme === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(17, 24, 39, 0.95)',
+          titleColor: theme === 'light' ? '#111827' : '#F9FAFB',
+          bodyColor: theme === 'light' ? '#374151' : '#E5E7EB',
+          borderColor: theme === 'light' ? '#E5E7EB' : '#374151',
+          borderWidth: 1,
+          padding: 12,
+          boxPadding: 6,
+          usePointStyle: true,
+          titleFont: {
+            size: 13,
+            weight: '600' as const,
+            family: "'Inter', 'system-ui', sans-serif",
+          },
+          bodyFont: {
+            size: 12,
+            family: "'Inter', 'system-ui', sans-serif",
+          },
+          callbacks: {
+            label: function (context: any) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.y !== null) {
+                label += context.parsed.y.toExponential(3);
+              }
+              return label;
+            }
+          }
+        },
       },
       type: type,
       scales: {
         x: {
           ...options.scale.x,
           type: scaleMode.xaxis === 'logarithmic' ? 'logarithmic' : 'linear',
+          grid: {
+            display: true,
+            color: theme === 'light' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)',
+            lineWidth: 1,
+          },
           ticks: {
-            color: theme === 'light' ? 'black' : 'white',
+            color: theme === 'light' ? '#6B7280' : '#9CA3AF',
+            font: {
+              size: 11,
+              family: "'Inter', 'system-ui', sans-serif",
+            },
             callback: (val: number) =>
               scaleMode.xnotation === 'exponential'
                 ? val.toExponential()
@@ -300,19 +347,30 @@ export const ChartsList: React.FC<ChartsListProps> = ({
           title: {
             display: true,
             text: 'Hz',
+            color: theme === 'light' ? '#374151' : '#D1D5DB',
             font: {
-              size: 15,
-              weight: 'bold',
+              size: 13,
+              weight: '600' as const,
               lineHeight: 1.2,
+              family: "'Inter', 'system-ui', sans-serif",
             },
-            padding: { top: 2, left: 0, right: 0, bottom: 0 },
+            padding: { top: 8, left: 0, right: 0, bottom: 0 },
           },
         },
         y: {
           ...options.scale.y,
           type: scaleMode.yaxis === 'logarithmic' ? 'logarithmic' : 'linear',
+          grid: {
+            display: true,
+            color: theme === 'light' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.08)',
+            lineWidth: 1,
+          },
           ticks: {
-            color: theme === 'light' ? 'black' : 'white',
+            color: theme === 'light' ? '#6B7280' : '#9CA3AF',
+            font: {
+              size: 11,
+              family: "'Inter', 'system-ui', sans-serif",
+            },
             callback: (val: number) =>
               scaleMode.ynotation === 'exponential'
                 ? val.toExponential()
@@ -323,12 +381,14 @@ export const ChartsList: React.FC<ChartsListProps> = ({
           title: {
             display: true,
             text: yAxisTitle,
+            color: theme === 'light' ? '#374151' : '#D1D5DB',
             font: {
-              size: 15,
-              weight: 'bold',
+              size: 13,
+              weight: '600' as const,
               lineHeight: 1.2,
+              family: "'Inter', 'system-ui', sans-serif",
             },
-            padding: { top: 0, left: 0, right: 0, bottom: 0 },
+            padding: { top: 0, left: 0, right: 0, bottom: 8 },
           },
         },
       },
@@ -340,18 +400,18 @@ export const ChartsList: React.FC<ChartsListProps> = ({
       {chartsDataToVisualize.map((chartData, index) => {
         return (
           <div
-            className={`w-full rounded-2xl p-4 shadow-lg backdrop-blur-md border transition-all duration-300 ${theme === 'light'
-              ? 'bg-white/50 border-gray-200/50'
-              : 'bg-black/40 border-white/10'
+            className={`w-full mt-4 rounded-2xl p-6 shadow-xl backdrop-blur-md border transition-all duration-300 hover:shadow-2xl ${theme === 'light'
+              ? 'bg-white/70 border-gray-200/70 hover:bg-white/80'
+              : 'bg-black/50 border-white/10 hover:bg-black/60'
               }`}
             key={index}
           >
-            <div className="flex flex-row justify-between items-center mb-2">
+            <div className="flex flex-row justify-between items-center mb-3">
               {ChartVisualizationMode === 'full' && (
                 <button
-                  className={`p-2 rounded-lg transition-all duration-200 ${theme === 'light'
-                    ? 'hover:bg-green-100 text-green-600'
-                    : 'hover:bg-green-900/30 text-green-400'
+                  className={`p-2.5 rounded-xl transition-all duration-200 ${theme === 'light'
+                    ? 'hover:bg-blue-50 text-blue-600 hover:shadow-md'
+                    : 'hover:bg-blue-900/30 text-blue-400 hover:shadow-lg hover:shadow-blue-500/10'
                     }`}
                   onClick={() => {
                     let shows = [...showGraphsSettings];
@@ -359,7 +419,7 @@ export const ChartsList: React.FC<ChartsListProps> = ({
                     setShowGraphsSettings(shows);
                   }}
                 >
-                  <VscSettings size={18} />
+                  <VscSettings size={20} />
                 </button>
               )}
             </div>
@@ -372,30 +432,42 @@ export const ChartsList: React.FC<ChartsListProps> = ({
             )}
             {selectedProject?.simulation &&
               selectedProject.simulation.status === 'Completed' ? (
-              <div className={`${spinnerSolverResults ? 'opacity-40' : 'opacity-100'}`}>
+              <div className={`transition-opacity duration-300 ${spinnerSolverResults ? 'opacity-40' : 'opacity-100'}`}>
                 {ChartVisualizationMode === 'full' ? (
                   <Line
-                    options={optionsWithScaleMode(
-                      chartData.options,
-                      scaleMode[index],
-                      'line',
-                      graphsTitle[index],
-                    )}
+                    options={{
+                      ...optionsWithScaleMode(
+                        chartData.options,
+                        scaleMode[index],
+                        'line',
+                        graphsTitle[index],
+                      ),
+                      animation: {
+                        duration: 750,
+                        easing: 'easeInOutQuart' as const,
+                      },
+                    }}
                     data={chartData.data}
                   />
                 ) : (
                   <Line
-                    options={optionsWithScaleMode(
-                      chartData.options,
-                      {
-                        xaxis: 'logarithmic',
-                        yaxis: 'linear',
-                        xnotation: 'exponential',
-                        ynotation: 'decimal',
+                    options={{
+                      ...optionsWithScaleMode(
+                        chartData.options,
+                        {
+                          xaxis: 'logarithmic',
+                          yaxis: 'linear',
+                          xnotation: 'exponential',
+                          ynotation: 'decimal',
+                        },
+                        'line',
+                        graphsTitle[index],
+                      ),
+                      animation: {
+                        duration: 750,
+                        easing: 'easeInOutQuart' as const,
                       },
-                      'line',
-                      graphsTitle[index],
-                    )}
+                    }}
                     data={chartData.data}
                   />
                 )}
@@ -582,35 +654,56 @@ const chartsDataOptionsFactory = (
     }
     let datasets: Dataset[] = [];
     if (ports.length > 0) {
-      matrices.forEach((mat) => {
+      matrices.forEach((mat, datasetIndex) => {
+        const baseColor = colorArray[mat[0].portIndex];
         datasets.push({
-          label: `${labels[mat[0].portIndex][0]} - ${labels[mat[0].portIndex][1]
-            }`,
+          label: `${labels[mat[0].portIndex][0]} - ${labels[mat[0].portIndex][1]}`,
           data: mat.map((m1) => m1.value),
-          borderColor: colorArray[mat[0].portIndex],
-          backgroundColor: 'white',
+          borderColor: baseColor,
+          backgroundColor: baseColor,
+          fill: false,
+          tension: 0.4,
+          borderWidth: 2.5,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: theme === 'light' ? '#FFFFFF' : '#1F2937',
+          pointHoverBorderColor: baseColor,
+          pointHoverBorderWidth: 2.5,
+          segment: {
+            borderColor: (ctx: any) => {
+              // Add subtle gradient effect along the line
+              const gradient = ctx.p0.skip || ctx.p1.skip ? baseColor : baseColor;
+              return gradient;
+            },
+          },
         });
       });
     }
 
     let options = {
       responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 2,
       elements: {
         line: {
-          borderWidth: 3,
+          borderWidth: 2.5,
           tension: 0.4,
           capBezierPoints: true,
+          borderCapStyle: 'round' as const,
+          borderJoinStyle: 'round' as const,
         },
         point: {
           radius: 0,
           hitRadius: 30,
-          hoverRadius: 6,
-          hoverBorderWidth: 2,
+          hoverRadius: 5,
+          hoverBorderWidth: 2.5,
+          hoverBackgroundColor: theme === 'light' ? '#FFFFFF' : '#1F2937',
         },
       },
       layout: {
         padding: {
           right: 20,
+          top: 10,
         },
       },
       plugins: {

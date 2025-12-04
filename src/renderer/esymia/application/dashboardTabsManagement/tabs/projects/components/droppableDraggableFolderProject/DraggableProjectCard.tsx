@@ -4,7 +4,6 @@ import { useDrag } from 'react-dnd';
 import {
   Item,
   Menu,
-  Separator,
   Submenu,
   useContextMenu,
 } from 'react-contexify';
@@ -16,27 +15,21 @@ import {
   moveProject,
   SelectedFolderSelector,
 } from '../../../../../../store/projectSlice';
-import {
-  moveProjectInFauna,
-} from '../../../../../../faunadb/projectsFolderAPIs';
 import { RenameProject } from './RenameProject';
 import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
 import {
   addProjectTab,
   ThemeSelector,
 } from '../../../../../../store/tabsAndMenuItemsSlice';
-import { Folder, MeshData, Port, Probe, Project, sharingInfoUser, TempLumped } from '../../../../../../model/esymiaModels';
+import { Folder, Project } from '../../../../../../model/esymiaModels';
 import { setModelInfoFromS3 } from '../../../shared/utilFunctions';
-import noResultsIconForProject from '../../../../../../../../../assets/noResultsIconForProject.png';
-import noResultsIconForProjectDark from '../../../../../../../../../assets/noResultsIconForProjectDark.png';
 import projectIcon from '../../../../../../../../../assets/projectIcon.png';
 import {
   useStorageData
 } from '../../../../../simulationTabsManagement/tabs/mesher/components/rightPanelSimulator/hook/useStorageData';
 import { GrClone } from 'react-icons/gr';
 import { ImSpinner } from 'react-icons/im';
-import { useFaunaQuery } from '../../../../../../faunadb/hook/useFaunaQuery';
-import { CanvasState, UsersState, usersStateSelector } from '../../../../../../../cad_library';
+import { usersStateSelector } from '../../../../../../../cad_library';
 import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { moveProjectInDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
 

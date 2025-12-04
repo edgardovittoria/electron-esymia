@@ -3,11 +3,12 @@ import { Fragment, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ThemeSelector } from '../../../../../esymia/store/tabsAndMenuItemsSlice';
 import { IoCloseCircleOutline } from 'react-icons/io5';
-import { addComponent, ComponentEntity, componentseSelector, incrementNumberOfGeneratedKey, numberOfGeneratedKeySelector, selectedComponentSelector } from '../../../../../cad_library';
 import { generateLinearArray } from '../../../../../cad_library/components/auxiliaryFunctionsUsingThree/patterningUtilities';
 import { multipleSelectionEntitiesKeysSelector } from '../miscToolbarSlice';
 import { addNode } from '../../../../store/historySlice';
 import uniqid from 'uniqid';
+import { ComponentEntity } from '../../../../../cad_library';
+import { selectedComponentSelector, componentseSelector, numberOfGeneratedKeySelector, addComponent, incrementNumberOfGeneratedKey } from '../../../../../cad_library/components/store/canvas/canvasSlice';
 
 interface LinearArrayModalProps {
     isOpen: boolean;

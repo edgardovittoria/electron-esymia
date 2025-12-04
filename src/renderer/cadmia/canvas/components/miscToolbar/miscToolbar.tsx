@@ -16,7 +16,7 @@ import { cadmiaModalitySelector } from '../cadmiaModality/cadmiaModalitySlice';
 import { toolbarIconsHeight, toolbarIconsWidth, toolbarsHintStyle } from '../../../config/styles';
 import { resetFocusToScene } from '../navBar/menuItems/view/viewItemSlice';
 import { TbZoomReset, TbRuler, TbGridDots, TbCircleDotted, TbLayersDifference, TbLayersUnion, TbLayersSubtract } from 'react-icons/tb';
-import { addComponent, binaryOperation, ComponentEntity, componentseSelector, getNewKeys, numberOfGeneratedKeySelector, selectedComponentSelector, TransformationParams, updateTransformationParams, replaceComponentWithMultipleEntities, ungroupEntity } from '../../../../cad_library';
+import { addComponent, binaryOperation, ComponentEntity, componentseSelector, getNewKeys, numberOfGeneratedKeySelector, selectedComponentSelector, TransformationParams, updateTransformationParams, replaceComponentWithMultipleEntities, ungroupEntity, updateOpacityRecursively } from '../../../../cad_library';
 import { IoGridSharp } from 'react-icons/io5';
 import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
 import { LinearArrayModal } from './modals/LinearArrayModal';
@@ -283,10 +283,11 @@ export const MiscToolbar: React.FC<MiscToolbarProps> = ({ adaptGridsToScene }) =
                     opacity: 1,
                     children: entitiesToGroup.map(entity => {
                       const currentPos = entity.transformationParams.position;
+                      const updatedEntity = updateOpacityRecursively(entity, 1);
                       return {
-                        ...entity,
+                        ...updatedEntity,
                         transformationParams: {
-                          ...entity.transformationParams,
+                          ...updatedEntity.transformationParams,
                           position: [
                             currentPos[0] - center.x,
                             currentPos[1] - center.y,

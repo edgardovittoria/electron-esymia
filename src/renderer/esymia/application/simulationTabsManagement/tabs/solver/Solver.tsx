@@ -289,6 +289,7 @@ export const Solver: React.FC<SolverProps> = ({
         setSavedPhysicsParameters={setSavedPhysicsParameters}
         savedPhysicsParameters={savedPhysicsParameters}
         cameraPosition={cameraPosition}
+        setResetFocus={toggleResetFocus}
       />
       <div className="absolute left-[2%] top-[60px] flex flex-col items-center gap-0">
         <button

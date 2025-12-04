@@ -6,6 +6,14 @@ export interface Dataset {
   borderWidth?: number;
   pointRadius?: number;
   pointHoverRadius?: number;
+  fill?: boolean;
+  tension?: number;
+  pointHoverBackgroundColor?: string;
+  pointHoverBorderColor?: string;
+  pointHoverBorderWidth?: number;
+  segment?: {
+    borderColor?: (ctx: any) => string;
+  };
 }
 
 export interface GraphsData {

@@ -73,6 +73,7 @@ interface SolverSettingsProps {
   setSavedPhysicsParameters: Function;
   savedPhysicsParameters: boolean;
   cameraPosition: THREE.Vector3;
+  setResetFocus: Function;
 }
 
 export const SolverSettings: React.FC<SolverSettingsProps> = ({
@@ -86,6 +87,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
   setSavedPhysicsParameters,
   savedPhysicsParameters,
   cameraPosition,
+  setResetFocus,
 }) => {
   const theme = useSelector(ThemeSelector);
   const dispatch = useDispatch();
@@ -231,6 +233,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
               cameraPosition={cameraPosition}
               savedPhysicsParameters={savedPhysicsParameters}
               setSavedPhysicsParameters={setSavedPhysicsParameters}
+              setResetFocus={setResetFocus}
             />
           ) : (
             <CollapsePortsElecticField
@@ -238,6 +241,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
               savedPhysicsParameters={savedPhysicsParameters}
               setSavedPhysicsParameters={setSavedPhysicsParameters}
               setGraphData={setgraphData}
+              setResetFocus={setResetFocus}
             />
           ),
       });
@@ -514,12 +518,14 @@ interface CollapsePortsMatrixProps {
   setSavedPhysicsParameters: Function;
   savedPhysicsParameters: boolean;
   cameraPosition: THREE.Vector3;
+  setResetFocus: Function;
 }
 
 const CollapsePortsMatrix: React.FC<CollapsePortsMatrixProps> = ({
   setSavedPhysicsParameters,
   savedPhysicsParameters,
   cameraPosition,
+  setResetFocus,
 }) => {
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
@@ -536,6 +542,7 @@ const CollapsePortsMatrix: React.FC<CollapsePortsMatrixProps> = ({
         <CreatePorts
           selectedProject={selectedProject as Project}
           cameraPosition={cameraPosition}
+          setResetFocus={setResetFocus}
         />
       </div>
       <PhysicsLeftPanelTab />
@@ -648,6 +655,7 @@ interface CollapsePortsElecticFieldProps {
   savedPhysicsParameters: boolean;
   cameraPosition: THREE.Vector3;
   setGraphData: SetGraphData;
+  setResetFocus: Function;
 }
 
 const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
@@ -655,6 +663,7 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
   savedPhysicsParameters,
   cameraPosition,
   setGraphData,
+  setResetFocus,
 }) => {
   const theme = useSelector(ThemeSelector);
   const selectedProject = useSelector(selectedProjectSelector);
@@ -669,6 +678,7 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
         <CreatePorts
           selectedProject={selectedProject as Project}
           cameraPosition={cameraPosition}
+          setResetFocus={setResetFocus}
         />
       </div>
       <PhysicsLeftPanelTab />

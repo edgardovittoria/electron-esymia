@@ -33,19 +33,12 @@ export const Navbar: React.FC<NavbarProps> = ({ setShowCad }) => {
         <div className="flex items-center gap-6">
           {/* Logo Section */}
           <div className="flex items-center gap-2 select-none">
-            {/* <div className={`p-1.5 rounded-lg ${theme === 'light' ? 'bg-blue-100 text-blue-600' : 'bg-blue-500/20 text-blue-400'}`}>
+            <div className={`p-1.5 rounded-lg ${theme === 'light' ? 'bg-blue-100 text-blue-600' : 'bg-blue-500/20 text-blue-400'}`}>
               <MdViewInAr size={20} />
             </div>
             <span className={`text-lg font-bold tracking-tight ${theme === 'light' ? 'text-gray-800' : 'text-gray-100'}`}>
               CADmIA
-            </span> */}
-            <div className="relative p-[2px] rounded-2xl bg-gradient-to-tr from-blue-500 via-purple-500 to-emerald-500 animate-gradient-shadow">
-              <img
-                src={theme === 'light' ? logo : logo_light}
-                className={`h-10 w-auto rounded-2xl py-1 px-4 object-contain ${theme === 'light' ? 'bg-white' : 'bg-black'}`}
-                alt="logo"
-              />
-            </div>
+            </span>
           </div>
 
           {/* Menu Items */}

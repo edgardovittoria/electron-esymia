@@ -172,6 +172,7 @@ export const CadmiaCanvas: React.FC<CadmiaCanvasProps> = ({
               <SelectedObjectHighlighter />
               <FaceSelectionHandler />
               <SelectedFacesHighlighter />
+              <SelectedFacesHighlighter />
               <MeasurementHandler />
             </Provider>
           </Canvas>
@@ -194,6 +195,8 @@ const CommonObjectsActions: FC<{ children: ReactNode }> = ({ children }) => {
 };
 
 const MeshEdgesOnly: FC<{ entity: ComponentEntity }> = ({ entity }) => {
+  const entityWithZeroOpacity = useMemo(() => setOpacityRecursively(entity, 0.0), [entity]);
+
   return (
     <mesh
       key={entity.keyComponent}
@@ -202,8 +205,7 @@ const MeshEdgesOnly: FC<{ entity: ComponentEntity }> = ({ entity }) => {
       rotation={entity.transformationParams.rotation}
       scale={entity.transformationParams.scale}
     >
-      <FactoryShapes entity={{ ...entity, opacity: 0.0 }} />
-      <Edges />
+      <FactoryShapes entity={entityWithZeroOpacity} borderVisible={true} />
     </mesh>
   );
 };
@@ -677,3 +679,13 @@ const SelectedFacesHighlighter: FC = () => {
     </group>
   );
 }
+function setOpacityRecursively(entity: ComponentEntity, arg1: number): any {
+  const newEntity = { ...entity, opacity: arg1 };
+  if (newEntity.type === 'GROUP' && (newEntity as any).children) {
+    (newEntity as any).children = (newEntity as any).children.map((child: ComponentEntity) =>
+      setOpacityRecursively(child, arg1)
+    );
+  }
+  return newEntity;
+}
+

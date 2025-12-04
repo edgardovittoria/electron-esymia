@@ -9,6 +9,7 @@ import { useCadmiaModalityManager } from '../cadmiaModality/useCadmiaModalityMan
 import { componentseSelector, selectedComponentSelector } from '../../../../cad_library';
 import { SelectAllCheckBox } from './components/selectAllCheckBox';
 import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
+import noComponentsIcon from '../../../../../../assets/noComponents.png'
 
 interface ObjectsDetailsProps { }
 
@@ -24,50 +25,56 @@ export const ObjectsDetails: React.FC<ObjectsDetailsProps> = () => {
         ${objectsDetailsOptsBasedOnModality.elementsVisibility.transformations ? 'h-[60vh]' : 'h-fit max-h-[80vh]'}
         ${theme === 'light' ? 'bg-white/90 border-gray-200 text-gray-900' : 'bg-black/80 border-white/10 text-white'}`}
     >
-      <div className={`h-full overflow-y-auto pr-1 scrollbar-thin ${theme === 'light' ? 'scrollbar-thumb-gray-300' : 'scrollbar-thumb-gray-600'}`}>
-        {objectsDetailsOptsBasedOnModality.elementsVisibility.selectAll && <SelectAllCheckBox label='Select all: ' />}
-        <Outliner
-          components={canvasComponents}
-          selectedComponent={selectedComponent}
-        />
-        {selectedComponent && (
-          <div className="text-left flex flex-col gap-4 mt-4">
-            {objectsDetailsOptsBasedOnModality.elementsVisibility
-              .transformations && (
-                <div className={`p-3 rounded-lg border ${theme === 'light' ? 'bg-gray-50 border-gray-100' : 'bg-white/5 border-white/5'}`}>
-                  <h6 className={`text-xs font-bold uppercase tracking-wider mb-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
-                    Transformation Params
-                  </h6>
-                  <Transformations
-                    transformationParams={selectedComponent.transformationParams}
-                  />
-                </div>
-              )}
-            {objectsDetailsOptsBasedOnModality.elementsVisibility
-              .geometryParams && (
-                <div className={`p-3 rounded-lg border ${theme === 'light' ? 'bg-gray-50 border-gray-100' : 'bg-white/5 border-white/5'}`}>
-                  <h6 className={`text-xs font-bold uppercase tracking-wider mb-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
-                    Geometry Params
-                  </h6>
-                  <GeometryParams entity={selectedComponent} />
-                </div>
-              )}
+      {canvasComponents.length > 0 ?
+        <div className={`h-full overflow-y-auto pr-1 scrollbar-thin ${theme === 'light' ? 'scrollbar-thumb-gray-300' : 'scrollbar-thumb-gray-600'}`}>
+          {objectsDetailsOptsBasedOnModality.elementsVisibility.selectAll && <SelectAllCheckBox label='Select all: ' />}
+          <Outliner
+            components={canvasComponents}
+            selectedComponent={selectedComponent}
+          />
+          {selectedComponent && (
+            <div className="text-left flex flex-col gap-4 mt-4">
+              {objectsDetailsOptsBasedOnModality.elementsVisibility
+                .transformations && (
+                  <div className={`p-3 rounded-lg border ${theme === 'light' ? 'bg-gray-50 border-gray-100' : 'bg-white/5 border-white/5'}`}>
+                    <h6 className={`text-xs font-bold uppercase tracking-wider mb-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                      Transformation Params
+                    </h6>
+                    <Transformations
+                      transformationParams={selectedComponent.transformationParams}
+                    />
+                  </div>
+                )}
+              {objectsDetailsOptsBasedOnModality.elementsVisibility
+                .geometryParams && (
+                  <div className={`p-3 rounded-lg border ${theme === 'light' ? 'bg-gray-50 border-gray-100' : 'bg-white/5 border-white/5'}`}>
+                    <h6 className={`text-xs font-bold uppercase tracking-wider mb-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                      Geometry Params
+                    </h6>
+                    <GeometryParams entity={selectedComponent} />
+                  </div>
+                )}
 
-            <div className={`p-3 rounded-lg border ${theme === 'light' ? 'bg-gray-50 border-gray-100' : 'bg-white/5 border-white/5'}`}>
-              <MaterialSelection defaultMaterial={selectedComponent.material} />
-            </div>
-
-            {objectsDetailsOptsBasedOnModality.elementsVisibility.borders && (
               <div className={`p-3 rounded-lg border ${theme === 'light' ? 'bg-gray-50 border-gray-100' : 'bg-white/5 border-white/5'}`}>
-                <h6 className={`text-xs font-bold uppercase tracking-wider mb-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
-                  Visualization
-                </h6>
-                <BordersMeshOption />
+                <MaterialSelection defaultMaterial={selectedComponent.material} />
               </div>
-            )}
-          </div>
-        )}
-      </div>
+
+              {objectsDetailsOptsBasedOnModality.elementsVisibility.borders && (
+                <div className={`p-3 rounded-lg border ${theme === 'light' ? 'bg-gray-50 border-gray-100' : 'bg-white/5 border-white/5'}`}>
+                  <h6 className={`text-xs font-bold uppercase tracking-wider mb-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                    Visualization
+                  </h6>
+                  <BordersMeshOption />
+                </div>
+              )}
+            </div>
+          )}
+        </div> :
+        <div className='h-full w-full flex items-center justify-center'>
+          <img src={noComponentsIcon} alt="No models" />
+        </div>
+      }
+
     </div>
   );
 };

@@ -1,24 +1,14 @@
-import React, { FC, Fragment, useEffect, useState } from 'react';
-import { Item, Menu, Separator, useContextMenu } from 'react-contexify';
+import React, { useEffect, useState } from 'react';
+import { Item, Menu, useContextMenu } from 'react-contexify';
 import { ActionCreators } from 'redux-undo';
 import { GiCubeforce } from 'react-icons/gi';
 import { useDispatch, useSelector } from 'react-redux';
-import { BiSolidRename, BiSolidShare, BiSolidTrash } from 'react-icons/bi';
-import toast from 'react-hot-toast';
-import { Dialog, Transition } from '@headlessui/react/dist';
+import { BiSolidRename, BiSolidTrash } from 'react-icons/bi';
 import { deleteFileS3, openModel } from '../../../aws/crud';
-import {
-  deleteFaunadbModel,
-  updateModelInFauna,
-} from '../../../faunaDB/functions';
-import { selectModel, updateModel } from '../../../store/modelSlice';
+import { selectModel } from '../../../store/modelSlice';
 import RenameModal from './modal/RenameModal';
-import { SearchUserAndShare } from './searchUserAndShare/searchUserAndShare';
-import { useFaunaQuery } from '../../../../esymia/faunadb/hook/useFaunaQuery';
 import { resetState } from '../../../../cad_library';
-import { getSimulationProjectsByOwner } from '../../../../esymia/faunadb/projectsFolderAPIs';
 import { useAuth0 } from '@auth0/auth0-react';
-import { DynamoProject } from '../../../../esymia/model/DynamoModels';
 import { ThemeSelector } from '../../../../esymia/store/tabsAndMenuItemsSlice';
 import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
 import { getSimulationProjectsByUserEmailDynamoDB } from '../../../../dynamoDB/projectsFolderApi';

@@ -6,7 +6,9 @@ export type OperationType =
     | 'UNION' | 'SUBTRACTION' | 'INTERSECTION'
     | 'GROUP' | 'UNGROUP' | 'CENTER_SELECTION'
     | 'DELETE'
-    | 'LINEAR_PATTERN' | 'ATTACH';
+    | 'LINEAR_PATTERN' | 'ATTACH'
+    | 'IMPORT_STL' | 'IMPORT_PROJECT' | 'IMPORT_RIS'
+    | 'ASSIGN_MATERIAL';
 
 export interface HistoryNode {
     id: string; // UUID

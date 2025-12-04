@@ -18,6 +18,7 @@ import {
 import { componentseSelector, Material, removeComponent, removeComponentMaterial, selectComponent, selectedComponentSelector, setComponentMaterial, setComponentsOpacity } from '../../../../cad_library';
 import { addNode } from '../../../store/historySlice';
 import uniqid from 'uniqid';
+import { v4 as uuidv4 } from 'uuid';
 
 export const useCadmiaModalityManager = () => {
   const modality = useSelector(cadmiaModalitySelector);
@@ -214,17 +215,47 @@ export const useCadmiaModalityManager = () => {
           : true,
     },
     material: {
-      setMaterial: (material: Material) =>
-        modality !== 'MultipleSelection'
-          ? dispatch(
+      setMaterial: (material: Material) => {
+        if (modality !== 'MultipleSelection') {
+          dispatch(
             setComponentMaterial({
               key: selectedComponent.keyComponent,
               material: material,
             }),
-          )
-          : multipleSelectionEntityKeys.forEach((key) =>
+          );
+          // Add history node for material assignment
+          dispatch(addNode({
+            id: uuidv4(),
+            name: `Assign Material: ${material.name}`,
+            type: 'ASSIGN_MATERIAL',
+            params: {
+              material: material
+            },
+            timestamp: Date.now(),
+            outputKey: selectedComponent.keyComponent,
+            inputKeys: [selectedComponent.keyComponent],
+            suppressed: false
+          }));
+        } else {
+          multipleSelectionEntityKeys.forEach((key) =>
             dispatch(setComponentMaterial({ key: key, material: material })),
-          ),
+          );
+          // Add history node for multiple material assignment
+          dispatch(addNode({
+            id: uuidv4(),
+            name: `Assign Material: ${material.name} (${multipleSelectionEntityKeys.length} items)`,
+            type: 'ASSIGN_MATERIAL',
+            params: {
+              material: material,
+              count: multipleSelectionEntityKeys.length
+            },
+            timestamp: Date.now(),
+            outputKey: multipleSelectionEntityKeys[0],
+            inputKeys: [...multipleSelectionEntityKeys],
+            suppressed: false
+          }));
+        }
+      },
       unsetMaterial: () =>
         modality !== 'MultipleSelection'
           ? dispatch(

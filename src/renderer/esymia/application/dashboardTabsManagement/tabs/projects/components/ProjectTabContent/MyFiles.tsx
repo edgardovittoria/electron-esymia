@@ -196,10 +196,10 @@ const MyFiles: React.FC<MyFilesProps> = ({
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full opacity-60">
+            <div className="flex flex-col items-center justify-center h-full">
               <img
                 src={theme === 'light' ? noProjectsIcon2 : noProjectsIcon2}
-                className="w-1/5 mb-6 opacity-80"
+                className="w-1/5 mb-6"
                 alt="No Projects Icon"
               />
               <p className={`text-lg mb-6 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No projects found in this folder</p>

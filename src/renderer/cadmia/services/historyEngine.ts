@@ -300,6 +300,112 @@ export const recalculateCanvas = (history: HistoryState): CanvasState => {
                 }
                 break;
             }
+
+            case 'IMPORT_PROJECT': {
+                const { components: projectComponents } = node.params;
+                if (projectComponents && Array.isArray(projectComponents)) {
+                    // Replace current components with project components
+                    components = projectComponents.map(c => ({ ...c }));
+
+                    // Update numberOfGeneratedKey
+                    const maxKey = Math.max(...components.map(c => c.keyComponent));
+                    if (maxKey > numberOfGeneratedKey) {
+                        numberOfGeneratedKey = maxKey;
+                    }
+                }
+                break;
+            }
+
+            case 'IMPORT_STL': {
+                const { fileName, geometryAttributes, transformationParams } = node.params;
+                if (geometryAttributes) {
+                    const entity: ComponentEntity = {
+                        type: 'BUFFER',
+                        name: fileName || 'Imported STL',
+                        keyComponent: node.outputKey,
+                        orbitEnabled: true,
+                        transformationParams: transformationParams || { position: [0, 0, 0], rotation: [0, 0, 0], scale: [1, 1, 1] },
+                        previousTransformationParams: transformationParams || { position: [0, 0, 0], rotation: [0, 0, 0], scale: [1, 1, 1] },
+                        geometryAttributes: geometryAttributes,
+                        transparency: true,
+                        opacity: 1,
+                        historyId: node.id
+                    };
+                    components.push(entity);
+                }
+                break;
+            }
+
+            case 'IMPORT_RIS': {
+                const { boxData } = node.params;
+                if (boxData && Array.isArray(boxData)) {
+                    // We need to reconstruct the cubes. 
+                    // Since we don't have access to dispatch here, we can't use getRisCube directly if it uses dispatch.
+                    // But getRisCube mainly creates an object.
+                    // Let's manually create the cube entities based on boxData.
+                    // boxData is array of [xMin, xMax, yMin, yMax, zMin, zMax]
+
+                    // We need to know the keys. The node.outputKey is the FIRST key.
+                    // We can assume sequential keys were generated.
+                    let currentKey = node.outputKey;
+
+                    boxData.forEach((box: number[]) => {
+                        const [xMin, xMax, yMin, yMax, zMin, zMax] = box;
+                        const width = Math.abs(xMax - xMin);
+                        const height = Math.abs(yMax - yMin);
+                        const depth = Math.abs(zMax - zMin);
+                        const position = [
+                            xMin + width / 2,
+                            yMin + height / 2,
+                            zMin + depth / 2
+                        ];
+
+                        const entity: ComponentEntity = {
+                            type: 'CUBE',
+                            name: 'RIS_CUBE',
+                            keyComponent: currentKey,
+                            orbitEnabled: true,
+                            transformationParams: { position: position as [number, number, number], rotation: [0, 0, 0], scale: [1, 1, 1] },
+                            previousTransformationParams: { position: position as [number, number, number], rotation: [0, 0, 0], scale: [1, 1, 1] },
+                            geometryAttributes: {
+                                width,
+                                height,
+                                depth,
+                                widthSegments: 1,
+                                heightSegments: 1,
+                                depthSegments: 1
+                            } as CubeGeometryAttributes,
+                            transparency: true,
+                            opacity: 1,
+                            historyId: node.id
+                        };
+                        components.push(entity);
+                        currentKey++;
+                    });
+
+                    // Update max key if needed
+                    if (currentKey - 1 > numberOfGeneratedKey) {
+                        numberOfGeneratedKey = currentKey - 1;
+                    }
+                }
+                break;
+            }
+
+            case 'ASSIGN_MATERIAL': {
+                const { material } = node.params;
+                if (material) {
+                    node.inputKeys.forEach(key => {
+                        const componentIndex = components.findIndex(c => c.keyComponent === key);
+                        if (componentIndex !== -1) {
+                            components[componentIndex] = {
+                                ...components[componentIndex],
+                                material: material
+                            };
+                        }
+                    });
+                }
+                break;
+            }
         }
     }
 

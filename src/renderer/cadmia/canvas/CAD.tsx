@@ -14,6 +14,7 @@ import { LoadingSpinnerSelector } from '../store/modelSlice';
 import { ImSpinner } from 'react-icons/im';
 import { SetUserInfo } from '../../cad_library';
 import { ThemeSelector } from '../../esymia/store/tabsAndMenuItemsSlice';
+import LoadingSpinner from '../../shared/LoadingSpinner';
 
 export interface CanvasProps {
   setShowCad: (v: boolean) => void;
@@ -34,7 +35,7 @@ const CAD: React.FC<CanvasProps> = ({ setShowCad }) => {
   return (
     <div className="relative w-full h-[calc(100%-5vh)]">
       {loadingSpinner &&
-        <ImSpinner className={`animate-spin w-10 h-10 absolute top-1/2 left-1/2 z-50 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`} />
+        <LoadingSpinner text='Loading...' />
       }
       <div className={`h-full w-full transition-opacity duration-300 ${loadingSpinner ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
         <SetUserInfo />

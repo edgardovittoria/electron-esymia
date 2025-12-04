@@ -14,10 +14,11 @@ import { ThemeSelector } from '../../../../../../store/tabsAndMenuItemsSlice';
 
 interface SelectPortsProps {
     selectedProject: Project,
-    cameraPosition: Vector3
+    cameraPosition: Vector3,
+    setResetFocus: Function
 }
 
-export const CreatePorts: React.FC<SelectPortsProps> = ({ selectedProject, cameraPosition }) => {
+export const CreatePorts: React.FC<SelectPortsProps> = ({ selectedProject, cameraPosition, setResetFocus }) => {
 
     const dispatch = useDispatch()
     const theme = useSelector(ThemeSelector)
@@ -29,8 +30,8 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({ selectedProject, camer
                     data-testid="addPort"
                     disabled={selectedProject.simulation?.status === 'Completed'}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-300 ${theme === 'light'
-                            ? 'bg-white/80 border-gray-200 text-gray-700 hover:bg-white hover:border-blue-500 hover:text-blue-600 hover:shadow-md'
-                            : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-blue-400 hover:text-blue-400'
+                        ? 'bg-white/80 border-gray-200 text-gray-700 hover:bg-white hover:border-blue-500 hover:text-blue-600 hover:shadow-md'
+                        : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-blue-400 hover:text-blue-400'
                         }`}
                 >
                     <AiOutlineThunderbolt size={20} />
@@ -54,10 +55,11 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({ selectedProject, camer
                                     <button
                                         data-testid="port"
                                         className={`${active
-                                                ? (theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-white/10 text-blue-400')
-                                                : (theme === 'light' ? 'text-gray-900' : 'text-gray-200')
+                                            ? (theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-white/10 text-blue-400')
+                                            : (theme === 'light' ? 'text-gray-900' : 'text-gray-200')
                                             } group flex w-full items-center rounded-lg px-3 py-2 text-sm transition-colors`}
                                         onClick={() => {
+                                            setResetFocus()
                                             let port = getDefaultPort(generateTerminationName(selectedProject.ports, 'port'), cameraPosition)
                                             dispatch(addPorts(port))
                                             dispatch(selectPort(port.name))
@@ -72,10 +74,11 @@ export const CreatePorts: React.FC<SelectPortsProps> = ({ selectedProject, camer
                                     <button
                                         data-testid="lumped"
                                         className={`${active
-                                                ? (theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-white/10 text-blue-400')
-                                                : (theme === 'light' ? 'text-gray-900' : 'text-gray-200')
+                                            ? (theme === 'light' ? 'bg-blue-50 text-blue-600' : 'bg-white/10 text-blue-400')
+                                            : (theme === 'light' ? 'text-gray-900' : 'text-gray-200')
                                             } group flex w-full items-center rounded-lg px-3 py-2 text-sm transition-colors`}
                                         onClick={() => {
+                                            setResetFocus()
                                             let lumped = getDefaultLumped(generateTerminationName(selectedProject.ports, 'lumped'), cameraPosition)
                                             dispatch(addPorts(lumped))
                                             dispatch(selectPort(lumped.name))

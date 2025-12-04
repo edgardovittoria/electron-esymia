@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
-import { Canvas, ThreeEvent, useThree } from '@react-three/fiber';
+import { Canvas, ThreeEvent, useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   OrbitControls,
@@ -43,6 +43,7 @@ import {
   ComponentEntity,
   FactoryShapes,
   TransformationParams,
+  SphereGeometryAttributes,
 } from '../../../../../../cad_library';
 import { ThemeSelector } from '../../../../../store/tabsAndMenuItemsSlice';
 import {
@@ -326,16 +327,16 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
       ) : (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <div
-            className={`flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border shadow-2xl backdrop-blur-xl ${theme === 'light'
+            className={`flex flex - col items - center justify - center gap - 4 p - 8 rounded - 2xl border shadow - 2xl backdrop - blur - xl ${theme === 'light'
               ? 'bg-white/60 border-white/40 text-gray-600'
               : 'bg-black/40 border-white/10 text-gray-300'
-              }`}
+              } `}
           >
             <div
-              className={`p-4 rounded-full ${theme === 'light'
+              className={`p - 4 rounded - full ${theme === 'light'
                 ? 'bg-blue-50 text-blue-500'
                 : 'bg-white/5 text-blue-400'
-                }`}
+                } `}
             >
               <MdOutlineKeyboardReturn size={32} />
             </div>
@@ -349,6 +350,30 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
   );
 };
 
+const PortSphere: FC<{
+  name: string;
+  position: [number, number, number];
+  entity: ComponentEntity;
+  onClick: () => void;
+  color: string;
+}> = ({ name, position, entity, onClick, color }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  return (
+    <mesh
+      ref={meshRef}
+      name={name}
+      position={position}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+    >
+      <FactoryShapes entity={entity} color={color} />
+    </mesh>
+  );
+};
+
 const PhysicsPortsDrawer: FC = () => {
   const size = useSelector(boundingBoxDimensionSelector);
   const selectedProject = useSelector(selectedProjectSelector);
@@ -359,12 +384,13 @@ const PhysicsPortsDrawer: FC = () => {
     inputOrOutput: 'in' | 'out',
   ) => {
     let entity = {
-      type: 'CIRCLE',
+      type: 'SPHERE',
       keyComponent: 0,
       geometryAttributes: {
-        radius: (size as number) / 100,
-        segments: 20,
-      } as CircleGeometryAttributes,
+        radius: (size as number) / 300,
+        widthSegments: 32,
+        heightSegments: 32,
+      } as SphereGeometryAttributes,
       name:
         inputOrOutput === 'in'
           ? 'inputPort' + port.name
@@ -394,24 +420,21 @@ const PhysicsPortsDrawer: FC = () => {
         if (port.category === 'port' || port.category === 'lumped') {
           return (
             <group key={index}>
-              <mesh
+              <PortSphere
                 name={'inputPort' + port.name}
                 position={port.inputElement}
                 onClick={() => dispatch(selectPort(port.name))}
-              >
-                <FactoryShapes
-                  entity={componentEntityFrom(port, 'in')}
-                  color="#00ff00"
-                />
-              </mesh>
+                entity={componentEntityFrom(port, 'in')}
+                color="#00ff00"
+              />
 
-              <mesh
+              <PortSphere
                 name={'outputPort' + port.name}
                 position={port.outputElement}
                 onClick={() => dispatch(selectPort(port.name))}
-              >
-                <FactoryShapes entity={componentEntityFrom(port, 'out')} />
-              </mesh>
+                entity={componentEntityFrom(port, 'out')}
+                color="#ea17d8"
+              />
               <Line
                 points={[port.inputElement, port.outputElement]}
                 color={
@@ -424,27 +447,6 @@ const PhysicsPortsDrawer: FC = () => {
             </group>
           );
         }
-        // return (
-        //   <group
-        //     key={port.name}
-        //     name={port.name}
-        //     onClick={() => dispatch(selectPort(port.name))}
-        //     position={(port as Probe).groupPosition}
-        //   >
-        //     {(port as Probe).elements.map((element, index) => {
-        //       return (
-        //         <mesh
-        //           key={index}
-        //           position={element.transformationParams.position}
-        //           scale={element.transformationParams.scale}
-        //           rotation={element.transformationParams.rotation}
-        //         >
-        //           <FactoryShapes entity={element} color="orange" />
-        //         </mesh>
-        //       );
-        //     })}
-        //   </group>
-        // );
       })}
     </>
   );
@@ -472,16 +474,6 @@ const PhysicsPortsControlsDrawer: FC<{ setSavedPortParameters: Function }> = ({
                 setSavedPortParameters={setSavedPortParameters}
               />
             )}
-          {/* {selectedPort && selectedPort.category === 'probe' && (
-            <ProbeControls
-              selectedProbe={selectedPort as Probe}
-              updateProbePosition={(obj: {
-                type: 'first' | 'last';
-                position: [number, number, number];
-              }) => dispatch(updatePortPosition(obj))}
-              setSavedPortParameters={setSavedPortParameters}
-            />
-          )} */}
         </>
       ) : (
         <>

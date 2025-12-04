@@ -68,17 +68,15 @@ export const CanvasSlice = createSlice({
             setLastActionType(state, action.type)
             let componentsToChange = state.components.filter(component => action.payload.keys.includes(component.keyComponent))
             componentsToChange.map(component => {
-                if (component.type === "GROUP" && component.children) {
-                    component.children.map(child => child.opacity = action.payload.opacity)
-                } else {
-                    component.opacity = action.payload.opacity
-                }
+                setOpacityRecursively(component, action.payload.opacity)
             })
         },
         setComponentsTransparency(state: CanvasState, action: PayloadAction<{ keys: number[], transparency: boolean }>) {
             setLastActionType(state, action.type)
             let componentsToChange = state.components.filter(component => action.payload.keys.includes(component.keyComponent))
-            componentsToChange.map(component => component.transparency = action.payload.transparency)
+            componentsToChange.map(component => {
+                setTransparencyRecursively(component, action.payload.transparency)
+            })
         },
         updateName(state: CanvasState, action: PayloadAction<{ key: number, name: string }>) {
             setLastActionType(state, action.type)
@@ -170,5 +168,23 @@ const removeMaterialRecursively = (component: ComponentEntity) => {
         component.children.forEach(child => removeMaterialRecursively(child));
     } else {
         component.material = undefined;
+    }
+}
+
+const setOpacityRecursively = (component: ComponentEntity, opacity: number) => {
+    if (component.type === 'GROUP' && component.children) {
+        component.opacity = opacity;
+        component.children.forEach(child => setOpacityRecursively(child, opacity));
+    } else {
+        component.opacity = opacity;
+    }
+}
+
+const setTransparencyRecursively = (component: ComponentEntity, transparency: boolean) => {
+    if (component.type === 'GROUP' && component.children) {
+        component.transparency = transparency;
+        component.children.forEach(child => setTransparencyRecursively(child, transparency));
+    } else {
+        component.transparency = transparency;
     }
 }
