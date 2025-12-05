@@ -73,7 +73,8 @@ export const LinearArrayModal: React.FC<LinearArrayModalProps> = ({ isOpen, onCl
                 type: 'LINEAR_PATTERN',
                 params: {
                     count,
-                    offset: [offsetX, offsetY, offsetZ]
+                    offset: [offsetX, offsetY, offsetZ],
+                    generatedKeys
                 },
                 timestamp: Date.now(),
                 outputKey: 0, // Multiple outputs, handled by re-execution or params

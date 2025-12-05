@@ -160,6 +160,16 @@ export const MiscToolbar: React.FC<MiscToolbarProps> = ({ adaptGridsToScene }) =
                   keyComponent: newKey,
                 } as ComponentEntity;
                 dispatch(addComponent(clonedEntity));
+                dispatch(addNode({
+                  id: uniqid(),
+                  name: `Clone ${selectedComponent.name}`,
+                  type: 'CLONE',
+                  params: {},
+                  timestamp: Date.now(),
+                  outputKey: newKey,
+                  inputKeys: [selectedComponent.keyComponent],
+                  suppressed: false
+                }));
               }}
             />
             <div className={toolbarsHintStyle}>

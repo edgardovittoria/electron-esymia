@@ -73,6 +73,7 @@ export const ImportModelFromDBModal: FC<{
                     importActionParams.unit = model.unit;
                     importActionParams.modelS3 = selectedModel?.components;
                     importActionParams.bricks = selectedModel?.bricks
+                    importActionParams.projectName = selectedModel?.name;
                     importAction(importActionParams);
                 });
             } catch (exception) {

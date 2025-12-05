@@ -8,7 +8,7 @@ export type OperationType =
     | 'DELETE'
     | 'LINEAR_PATTERN' | 'ATTACH'
     | 'IMPORT_STL' | 'IMPORT_PROJECT' | 'IMPORT_RIS'
-    | 'ASSIGN_MATERIAL';
+    | 'ASSIGN_MATERIAL' | 'CLONE';
 
 export interface HistoryNode {
     id: string; // UUID

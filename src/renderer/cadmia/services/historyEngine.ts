@@ -264,9 +264,15 @@ export const recalculateCanvas = (history: HistoryState): CanvasState => {
                 const entity = components.find(c => c.keyComponent === node.inputKeys[0]);
                 if (!entity) continue;
 
-                const { count, offset } = node.params;
+                const { count, offset, generatedKeys } = node.params;
                 let currentKeyCount = numberOfGeneratedKey;
+                let keyIndex = 0;
                 const getNewKey = () => {
+                    if (generatedKeys && generatedKeys[keyIndex] !== undefined) {
+                        const key = generatedKeys[keyIndex];
+                        keyIndex++;
+                        return key;
+                    }
                     currentKeyCount++;
                     return currentKeyCount;
                 };
@@ -403,6 +409,21 @@ export const recalculateCanvas = (history: HistoryState): CanvasState => {
                             };
                         }
                     });
+                }
+                break;
+            }
+
+            case 'CLONE': {
+                const originalKey = node.inputKeys[0];
+                const originalComponent = components.find(c => c.keyComponent === originalKey);
+                if (originalComponent) {
+                    const clonedComponent: ComponentEntity = {
+                        ...originalComponent,
+                        keyComponent: node.outputKey,
+                        name: node.name, // The name is already set in the node (e.g. "Clone Cube1")
+                        historyId: node.id
+                    };
+                    components.push(clonedComponent);
                 }
                 break;
             }

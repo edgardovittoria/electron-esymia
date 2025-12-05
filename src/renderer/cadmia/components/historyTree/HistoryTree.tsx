@@ -12,7 +12,7 @@ import {
 } from '../../store/historySlice';
 import { resetState } from '../../../cad_library';
 import { ThemeSelector } from '../../../esymia/store/tabsAndMenuItemsSlice';
-import { TbCube, TbSphere, TbCylinder, TbCone, TbCircleDotted, TbTransform, TbLayersUnion, TbLayersSubtract, TbLayersIntersect, TbArrowBackUp, TbArrowForwardUp, TbTrash, TbGridDots, TbMagnet, TbFileImport, TbFolderOpen, TbPalette } from 'react-icons/tb';
+import { TbCube, TbSphere, TbCylinder, TbCone, TbCircleDotted, TbTransform, TbLayersUnion, TbLayersSubtract, TbLayersIntersect, TbArrowBackUp, TbArrowForwardUp, TbTrash, TbGridDots, TbMagnet, TbFileImport, TbFolderOpen, TbPalette, TbCopy } from 'react-icons/tb';
 import noHistoryIcon from '../../../../../assets/noHystory.png';
 
 export const HistoryTree: React.FC = () => {
@@ -60,6 +60,7 @@ export const HistoryTree: React.FC = () => {
             case 'IMPORT_PROJECT': return <TbFolderOpen />;
             case 'IMPORT_RIS': return <TbFileImport />;
             case 'ASSIGN_MATERIAL': return <TbPalette />;
+            case 'CLONE': return <TbCopy />;
             default: return null;
         }
     };

@@ -6,7 +6,7 @@ import {
 } from './useAddToTheSceneANewShape';
 import { shapesToolbarVisibilitySelector } from './shapesToolbarSlice';
 import { iconForA } from './shapes';
-import { toolbarIconsHeight, toolbarIconsWidth, toolbarsHintStyle } from '../../../../../config/styles';
+import { toolbarsHintStyle } from '../../../../../config/styles';
 import { setModality, cadmiaModalitySelector } from '../../../cadmiaModality/cadmiaModalitySlice';
 import { useCadmiaModalityManager } from '../../../cadmiaModality/useCadmiaModalityManager';
 import { ThemeSelector } from '../../../../../../esymia/store/tabsAndMenuItemsSlice';
@@ -31,6 +31,7 @@ export const ShapesToolbar: React.FC = () => {
                 let newComp = addToTheSceneANew(shape);
                 setOpacityNormalMode(newComp.keyComponent)
               }}
+              id={shape}
               key={shape}
             >
               <div className="transform transition-transform duration-200">

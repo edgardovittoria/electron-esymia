@@ -319,6 +319,24 @@ export const FileItem: React.FC<FileItemProps> = () => {
           importAction={(importActionParams: ImportActionParamsObject) => {
             dispatch(importStateCanvas(importActionParams));
             dispatch(setUnit(importActionParams.unit));
+
+            // Add history node for Load Project
+            if (importActionParams.projectName) {
+              const { addNode } = require('../../../../../store/historySlice');
+              dispatch(addNode({
+                id: uuidv4(),
+                name: `Load Project: ${importActionParams.projectName}`,
+                type: 'IMPORT_PROJECT',
+                params: {
+                  fileName: importActionParams.projectName,
+                  components: importActionParams.canvas.components
+                },
+                timestamp: Date.now(),
+                outputKey: importActionParams.canvas.numberOfGeneratedKey, // Or max key
+                inputKeys: [],
+                suppressed: false
+              }));
+            }
           }}
           importActionParams={
             {

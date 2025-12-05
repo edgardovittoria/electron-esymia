@@ -24,13 +24,26 @@ export const SaveRisModelWithNameModal: FC<{ showModalSave: Function }> = ({
   const { execQuery2 } = useDynamoDBQuery();
   const dispatch = useDispatch();
 
-  const flattenComponents = (components: ComponentEntity[]): ComponentEntity[] => {
+  const flattenComponents = (components: ComponentEntity[], parentPosition: [number, number, number] = [0, 0, 0]): ComponentEntity[] => {
     let flatList: ComponentEntity[] = [];
     components.forEach((component) => {
+      const currentPos = component.transformationParams.position;
+      const absolutePos: [number, number, number] = [
+        currentPos[0] + parentPosition[0],
+        currentPos[1] + parentPosition[1],
+        currentPos[2] + parentPosition[2]
+      ];
+
       if (component.type === 'GROUP' && component.children) {
-        flatList = [...flatList, ...flattenComponents(component.children)];
+        flatList = [...flatList, ...flattenComponents(component.children, absolutePos)];
       } else {
-        flatList.push(component);
+        flatList.push({
+          ...component,
+          transformationParams: {
+            ...component.transformationParams,
+            position: absolutePos
+          }
+        });
       }
     });
     return flatList;
@@ -38,6 +51,7 @@ export const SaveRisModelWithNameModal: FC<{ showModalSave: Function }> = ({
 
   const saveModel = async () => {
     const componentsToSave = flattenComponents(canvas.components);
+    console.log(componentsToSave);
     const model = JSON.stringify({ components: componentsToSave, unit });
     const blobFile = new Blob([model]);
     const modelFile = new File([blobFile], `${name}_model_cadmia.json`, {

@@ -6,4 +6,5 @@ export type ImportActionParamsObject = {
     unit: string;
     modelS3?: string;
     bricks?: string;
+    projectName?: string;
 };
