@@ -5,6 +5,7 @@ import {
   SelectedFolderSelector,
   selectedProjectSelector,
   selectPort,
+  selectProject,
   updateSimulation,
 } from '../../../../store/projectSlice';
 import { ChartVisualizationMode } from './ChartVisualizationMode';

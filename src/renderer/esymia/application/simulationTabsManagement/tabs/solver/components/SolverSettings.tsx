@@ -323,7 +323,7 @@ export const SolverSettings: React.FC<SolverSettingsProps> = ({
       {/* Pannello principale */}
       {sidebarItemSelected === 'Solver' && (
         <div
-          className={`flex-col absolute left-[6%] xl:left-[5%] top-0 w-[400px] xl:w-[700px] rounded-2xl pb-5 shadow-2xl backdrop-blur-md border transition-all duration-300 max-h-[calc(100vh-300px)] overflow-hidden ${theme === 'light'
+          className={`flex-col z-50 absolute left-[6%] xl:left-[5%] top-0 w-[400px] xl:w-[750px] rounded-2xl pb-5 shadow-2xl backdrop-blur-md border transition-all duration-300 max-h-[calc(100vh-300px)] overflow-hidden ${theme === 'light'
             ? 'bg-white/90 border-white/40'
             : 'bg-black/60 border-white/10 text-gray-200'
             }`}
@@ -537,6 +537,7 @@ const CollapsePortsMatrix: React.FC<CollapsePortsMatrixProps> = ({
       <div className="flex flex-row items-center gap-4 mb-4">
         <PortImportFromCSV />
         <LumpedImportFromCSV />
+        <ExportPhisicsToCSV />
       </div>
       <div className="flex flex-row items-center gap-4 mb-4">
         <CreatePorts
@@ -675,12 +676,13 @@ const CollapsePortsElecticField: React.FC<CollapsePortsElecticFieldProps> = ({
       <div className="flex flex-row items-center gap-4 mb-4">
         <PortImportFromCSV />
         <LumpedImportFromCSV />
-        <CreatePorts
-          selectedProject={selectedProject as Project}
-          cameraPosition={cameraPosition}
-          setResetFocus={setResetFocus}
-        />
+        <ExportPhisicsToCSV />
       </div>
+      <CreatePorts
+        selectedProject={selectedProject as Project}
+        cameraPosition={cameraPosition}
+        setResetFocus={setResetFocus}
+      />
       <PhysicsLeftPanelTab />
       {selectedPort?.category === 'lumped' ? (
         <PortManagement selectedPort={selectedPort}>
@@ -957,6 +959,7 @@ interface SimulationSuggestionsProps {
 
 import { MdErrorOutline } from 'react-icons/md';
 import { IoMdWarning } from 'react-icons/io';
+import { ExportPhisicsToCSV } from '../../physics/ImportExportPhysicsSetup';
 
 const SimulationSuggestions: React.FC<SimulationSuggestionsProps> = ({
   simulationType,

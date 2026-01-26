@@ -86,12 +86,28 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
 
   return (
     <>
-      {cloning && <ImSpinner className={`animate-spin w-8 h-8 absolute top-1/2 right-1/2 z-100 ${isDark ? 'text-white' : 'text-gray-900'}`} />}
+      {/* Loading Spinner */}
+      {cloning && (
+        <div className="fixed inset-0 flex items-center justify-center z-[10000] bg-black/50 backdrop-blur-sm">
+          <div className="relative">
+            <ImSpinner className={`animate-spin w-12 h-12 ${isDark ? 'text-white' : 'text-gray-900'}`} />
+            <div
+              className="absolute inset-0 animate-ping"
+              style={{
+                background: 'radial-gradient(circle, rgba(34, 197, 94, 0.4), transparent)',
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Project Card */}
       <div
-        className={`relative group rounded-2xl transition-all duration-300 hover:cursor-pointer hover:shadow-xl hover:-translate-y-1 p-[2px] border border-gray-200 ${isDark
-          ? 'shadow-green-900/20'
-          : 'shadow-green-500/20'
-          }`}
+        className={`
+          group relative rounded-2xl transition-all duration-300 cursor-pointer
+          hover:shadow-2xl hover:-translate-y-2 active:scale-95
+          ${isDark ? 'shadow-black/40' : 'shadow-gray-300/50'}
+        `}
         key={project.name}
         data-testid={project.name}
         data-tip={project.name}
@@ -102,47 +118,185 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
           }
           dispatch(addProjectTab(project));
         }}
-        style={{ opacity: isDragging ? 0.5 : 1 }}
+        style={{
+          opacity: isDragging ? 0.5 : 1,
+        }}
         onContextMenu={handleContextMenu}
       >
-        <div className={`flex flex-col h-full w-full rounded-2xl overflow-hidden backdrop-blur-md ${isDark ? 'bg-black' : 'bg-white'}`}>
+        {/* Gradient Border Effect */}
+        <div
+          className={`
+            absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300
+            ${isDark
+              ? 'bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-pink-500/30'
+              : 'bg-gradient-to-br from-blue-400/40 via-purple-400/40 to-pink-400/40'
+            }
+          `}
+          style={{ padding: '2px', zIndex: -1 }}
+        />
+
+        {/* Card Content */}
+        <div
+          className={`
+            relative flex flex-col h-full w-full rounded-2xl overflow-hidden backdrop-blur-md
+            border transition-all duration-300
+            ${isDark
+              ? 'bg-gradient-to-br from-gray-900 to-black border-white/10 group-hover:border-white/20'
+              : 'bg-gradient-to-br from-white to-gray-50 border-gray-200 group-hover:border-gray-300'
+            }
+          `}
+          style={{
+            boxShadow: isDark
+              ? '0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+              : '0 10px 40px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+          }}
+        >
+          {/* Shared Badge */}
           {project.shared && (
-            <div className={`absolute top-3 right-3 z-10 px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-full border shadow-sm ${isDark
-              ? 'bg-black/60 text-green-400 border-green-500/50 backdrop-blur-md'
-              : 'bg-white/80 text-green-600 border-green-200 backdrop-blur-md'
-              }`}>
+            <div
+              className={`
+                absolute top-3 right-3 z-10 px-3 py-1 text-[10px] uppercase tracking-wider font-bold
+                rounded-full border backdrop-blur-md transition-all duration-300
+                group-hover:scale-110
+                ${isDark
+                  ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 border-green-500/50'
+                  : 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-300'
+                }
+              `}
+              style={{
+                boxShadow: isDark
+                  ? '0 4px 12px rgba(34, 197, 94, 0.3)'
+                  : '0 4px 12px rgba(34, 197, 94, 0.2)',
+              }}
+            >
               Shared
             </div>
           )}
 
-          <div className={`relative flex-1 flex items-center justify-center p-6 transition-colors duration-300 ${isDark ? 'bg-white/5' : 'bg-gray-50'}`}>
-            <div className="aspect-video w-full flex items-center justify-center">
+          {/* Project Image Section */}
+          <div
+            className={`
+              relative flex-1 flex items-center justify-center p-8 transition-all duration-300
+              ${isDark ? 'bg-white/5' : 'bg-gray-50'}
+              group-hover:bg-gradient-to-br
+              ${isDark
+                ? 'group-hover:from-blue-500/10 group-hover:to-purple-500/10'
+                : 'group-hover:from-blue-50 group-hover:to-purple-50'
+              }
+            `}
+          >
+            {/* Decorative Glow */}
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background: isDark
+                  ? 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15), transparent 70%)'
+                  : 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1), transparent 70%)',
+              }}
+            />
+
+            <div className="relative aspect-video w-full flex items-center justify-center">
               <img
-                className="w-full h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-full object-contain drop-shadow-2xl group-hover:scale-110 transition-transform duration-500"
                 alt="project_screenshot"
                 src={projectIcon}
               />
             </div>
           </div>
 
-          <div className={`p-3 border-t ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-white'}`}>
-            <h5
-              className={`text-center font-semibold truncate text-sm ${isDark ? 'text-gray-200' : 'text-gray-700'}`}
-              role="Handle"
-              ref={dragPreview}
-            >
-              {project.name}
-            </h5>
+          {/* Project Info Section */}
+          <div
+            className={`
+              relative p-5 border-t transition-all duration-300
+              ${isDark
+                ? 'border-white/10 bg-gradient-to-b from-white/5 to-transparent'
+                : 'border-gray-200 bg-gradient-to-b from-white to-gray-50'
+              }
+            `}
+          >
+            {/* Accent Line */}
+            <div
+              className={`
+                absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-0 group-hover:w-20 transition-all duration-300
+                ${isDark
+                  ? 'bg-gradient-to-r from-transparent via-blue-400 to-transparent'
+                  : 'bg-gradient-to-r from-transparent via-blue-500 to-transparent'
+                }
+              `}
+            />
+
+            {/* Project Name with Icon */}
+            <div className="flex items-center justify-center gap-2 mb-1" role="Handle" ref={dragPreview}>
+              {/* Project Icon */}
+              <div
+                className={`
+                  flex items-center justify-center w-7 h-7 rounded-lg
+                  transition-all duration-300 group-hover:scale-110 group-hover:rotate-6
+                  ${isDark
+                    ? 'bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30'
+                    : 'bg-gradient-to-br from-blue-100 to-purple-100 border border-blue-200'
+                  }
+                `}
+                style={{
+                  boxShadow: isDark
+                    ? '0 2px 8px rgba(59, 130, 246, 0.2)'
+                    : '0 2px 8px rgba(59, 130, 246, 0.15)',
+                }}
+              >
+                <svg
+                  className={`w-4 h-4 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+
+              {/* Project Name */}
+              <h5
+                className={`
+                  text-center font-bold truncate text-sm transition-all duration-300
+                  group-hover:text-transparent group-hover:bg-clip-text 
+                  group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-500
+                  ${isDark ? 'text-gray-200' : 'text-gray-900'}
+                `}
+              >
+                {project.name}
+              </h5>
+            </div>
+
+            {/* Project Label */}
+            <p className={`text-center text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+              Project
+            </p>
           </div>
+
+          {/* Hover Overlay Effect */}
+          <div
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+            style={{
+              background: isDark
+                ? 'radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1), transparent 50%)'
+                : 'radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.05), transparent 50%)',
+            }}
+          />
         </div>
       </div>
+
+      {/* Context Menu */}
       {project.ownerEmail === user.email && (
         <Menu
           id={project.name}
           theme={theme}
           className={`!z-[9999] rounded-2xl border shadow-2xl backdrop-blur-xl p-2 min-w-[220px] ${isDark
-            ? "bg-black/80 border-white/10"
-            : "bg-white/90 border-white/40"
+            ? "bg-black/90 border-white/10"
+            : "bg-white/95 border-white/40"
             }`}
           style={{ zIndex: 9999 }}
         >
@@ -254,6 +408,8 @@ export const DraggableProjectCard: React.FC<DraggableProjectCardProps> = ({
           </Item>
         </Menu>
       )}
+
+      {/* Modals */}
       {showRename && (
         <RenameProject
           projectToRename={project}

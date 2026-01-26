@@ -10,6 +10,7 @@ import {
 import {
   closeProjectTab,
   projectsTabsSelector,
+  resetItemToResultsView,
   selectTab,
   setShowCreateNewProjectModal,
   tabSelectedSelector,
@@ -68,6 +69,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({
               dispatch(selectTab('DASHBOARD'));
               dispatch(selectProject(undefined));
               dispatch(unsetSolverResults());
+              dispatch(resetItemToResultsView())
             }}
           >
             <MdOutlineDashboard size={18} />
@@ -88,6 +90,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({
                   dispatch(selectTab(projectTab.id as string));
                   dispatch(selectProject(projectTab.id));
                   dispatch(unsetSolverResults());
+                  dispatch(resetItemToResultsView())
                 }}
               >
                 <span className="font-medium text-sm truncate max-w-[100px]">{projectTab.name}</span>
@@ -99,6 +102,7 @@ export const TabsContainer: React.FC<TabsContainerProps> = ({
                     dispatch(closeProjectTab(projectTab.id as string));
                     dispatch(selectProject(undefined));
                     dispatch(unsetSolverResults());
+                    dispatch(resetItemToResultsView())
                   }}
                 >
                   <FaTimes size={10} />

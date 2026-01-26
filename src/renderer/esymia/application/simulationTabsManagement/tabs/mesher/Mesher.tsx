@@ -279,12 +279,12 @@ export const Mesher: React.FC<MesherProps> = ({
           )}
         </button>
       </div>
-      <div className="absolute left-1/2 -translate-x-1/2 gap-4 top-4 flex flex-row items-center p-2 rounded-2xl backdrop-blur-md border transition-all duration-300 shadow-lg bg-white/10 border-white/20">
+      <div className="absolute left-1/2 -translate-x-1/2 gap-2 top-4 flex flex-row items-center p-1 rounded-2xl backdrop-blur-md border transition-all duration-300 shadow-lg bg-white/10 border-white/20">
         <ResetFocusButton toggleResetFocus={toggleResetFocus} />
-        <div className={`w-px h-8 ${theme === 'light' ? 'bg-gray-300/50' : 'bg-white/10'}`} />
+        <div className={`w-px h-6 ${theme === 'light' ? 'bg-gray-300/50' : 'bg-white/10'}`} />
         <OriginaProportionsButton />
         <AlteredProportionsButton threshold={3} />
-        <div className={`w-px h-8 ${theme === 'light' ? 'bg-gray-300/50' : 'bg-white/10'}`} />
+        <div className={`w-px h-6 ${theme === 'light' ? 'bg-gray-300/50' : 'bg-white/10'}`} />
         <NormalMeshVisualizationButton />
         <LightMeshVisualizationButton />
       </div>
@@ -318,7 +318,7 @@ const NormalMeshVisualizationButton: FC<{}> = () => {
       }
     >
       <button
-        className={`p-3 rounded-xl transition-all duration-300 ${meshVisualization !== 'normal'
+        className={`p-2 rounded-xl transition-all duration-300 ${meshVisualization !== 'normal'
           ? `${theme === 'light'
             ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
             : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
@@ -330,7 +330,7 @@ const NormalMeshVisualizationButton: FC<{}> = () => {
           }`}
         onClick={() => dispatch(setMeshVisualization('normal'))}
       >
-        <LiaWeightHangingSolid className="h-6 w-6" />
+        <LiaWeightHangingSolid className="h-5 w-5" />
       </button>
     </div>
   );
@@ -348,7 +348,7 @@ const LightMeshVisualizationButton: FC<{}> = () => {
       }
     >
       <button
-        className={`p-3 rounded-xl transition-all duration-300 ${meshVisualization !== 'light'
+        className={`p-2 rounded-xl transition-all duration-300 ${meshVisualization !== 'light'
           ? `${theme === 'light'
             ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
             : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
@@ -360,7 +360,7 @@ const LightMeshVisualizationButton: FC<{}> = () => {
           }`}
         onClick={() => dispatch(setMeshVisualization('light'))}
       >
-        <LiaFeatherSolid className="h-6 w-6" />
+        <LiaFeatherSolid className="h-5 w-5" />
       </button>
     </div>
   );

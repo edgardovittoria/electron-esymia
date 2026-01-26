@@ -273,9 +273,21 @@ export const MiscToolbar: React.FC<MiscToolbarProps> = ({ adaptGridsToScene }) =
                   const center = getCenterOfEntities(entitiesToGroup);
                   const newKey = getNewKeys(numberOfGeneratedKey, dispatch)[0];
 
+                  // Calculate next group name index
+                  let maxIndex = 0;
+                  const regex = /^Group (\d+)$/;
+                  components.forEach(c => {
+                    const match = c.name.match(regex);
+                    if (match) {
+                      const index = parseInt(match[1], 10);
+                      if (index > maxIndex) maxIndex = index;
+                    }
+                  });
+                  const groupName = `Group ${maxIndex + 1}`;
+
                   const groupEntity: ComponentEntity = {
                     type: 'GROUP',
-                    name: `GROUP_${newKey}`,
+                    name: groupName,
                     keyComponent: newKey,
                     orbitEnabled: true,
                     transformationParams: {
@@ -315,7 +327,7 @@ export const MiscToolbar: React.FC<MiscToolbarProps> = ({ adaptGridsToScene }) =
 
                   dispatch(addNode({
                     id: uniqid(),
-                    name: `Group ${newKey}`,
+                    name: groupName,
                     type: 'GROUP',
                     params: {},
                     timestamp: Date.now(),

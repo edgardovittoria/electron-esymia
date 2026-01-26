@@ -15,13 +15,13 @@ export const ResetFocusButton: FC<{
       }
     >
       <button
-        className={`p-3 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 ${theme === 'light'
+        className={`p-2 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 ${theme === 'light'
           ? 'bg-white/80 text-gray-700 hover:bg-white hover:text-green-600 hover:shadow-green-500/20'
           : 'bg-black/40 text-gray-300 border border-white/10 hover:bg-black/60 hover:text-green-400 hover:border-green-500/30'
           }`}
         onClick={() => toggleResetFocus()}
       >
-        <TbZoomReset className='h-6 w-6' />
+        <TbZoomReset className='h-5 w-5' />
       </button>
     </div>
   );

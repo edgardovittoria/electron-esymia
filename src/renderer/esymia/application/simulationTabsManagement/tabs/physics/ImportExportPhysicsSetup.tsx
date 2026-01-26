@@ -130,16 +130,14 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
   const theme = useSelector(ThemeSelector)
   let ports = selectedProject?.ports.filter(p => p.category === 'port') as Port[]
   let lumped = selectedProject?.ports.filter(p => p.category === 'lumped') as TempLumped[]
-  let probe = selectedProject?.ports.filter(p => p.category === 'probe') as Probe[]
   let frequencies = (selectedProject?.frequencies !== undefined) ? selectedProject.frequencies : []
   let scatteringValue = (selectedProject?.scatteringValue !== undefined) ? selectedProject.scatteringValue : 0
   return (
     <button
-      className={
-        className
-          ? className
-          : `rounded ${theme === 'light' ? 'bg-white text-textColor' : 'bg-bgColorDark2 text-textColorDark'} capitalize px-3 flex flex-row gap-2 items-center h-8 max-h-8`
-      }
+      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl border transition-all duration-300 cursor-pointer ${theme === 'light'
+        ? 'bg-white/80 border-gray-200 text-gray-700 hover:bg-white hover:border-blue-500 hover:text-blue-600 hover:shadow-md'
+        : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-blue-400 hover:text-blue-400'
+        } ${selectedProject?.ports.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
       onClick={() => {
         const zip = new JSZip();
         if (ports.length > 0) {
@@ -187,7 +185,7 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
           let results = [
             ['Frequencies'],
             ...frequencies.map((freq) => [
-             freq
+              freq
             ])
           ]
             .map((e) => e.join(','))
@@ -201,7 +199,7 @@ export const ExportPhisicsToCSV: FC<ExportPhysicsToCSVProps> = ({
       }}
     >
       <BsFiletypeCsv style={{ width: '20px', height: '20px' }} />
-      <span className='text-sm'>Export physics</span>
+      <span className='text-sm'>Export Terminations & Freq</span>
     </button>
   );
 };

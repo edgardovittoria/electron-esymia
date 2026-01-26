@@ -140,10 +140,15 @@ export const DroppableAndDraggableFolder: React.FC<
   return (
     <>
       <div
-        className={`flex items-center p-3 rounded-xl transition-all duration-300 border ${isDark
-          ? 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-green-500/50 text-gray-200'
-          : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-green-400 text-gray-700'
-          } hover:cursor-pointer hover:shadow-md group`}
+        className={`
+          group relative flex items-center p-4 rounded-xl 
+          transition-all duration-300 cursor-pointer
+          ${isDark
+            ? 'bg-gradient-to-br from-white/5 to-white/10 border border-white/10 hover:border-yellow-500/50 text-gray-200'
+            : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200 hover:border-yellow-400 text-gray-700'
+          }
+          hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]
+        `}
         ref={(ref) => {
           drag(drop(ref));
         }}
@@ -152,31 +157,82 @@ export const DroppableAndDraggableFolder: React.FC<
         data-testid={folder.name}
         role="Dustbin"
         style={{
-          backgroundColor: isOver ? (isDark ? 'rgba(34, 197, 94, 0.2)' : '#e6f7ed') : undefined,
+          backgroundColor: isOver
+            ? (isDark ? 'rgba(34, 197, 94, 0.15)' : 'rgba(34, 197, 94, 0.08)')
+            : undefined,
           opacity: isDragging ? 0.5 : 1,
+          boxShadow: isDark
+            ? isOver
+              ? '0 10px 30px rgba(34, 197, 94, 0.3), 0 0 20px rgba(34, 197, 94, 0.2)'
+              : '0 4px 15px rgba(0, 0, 0, 0.3)'
+            : isOver
+              ? '0 10px 30px rgba(34, 197, 94, 0.2), 0 0 15px rgba(34, 197, 94, 0.15)'
+              : '0 4px 15px rgba(0, 0, 0, 0.08)',
         }}
         onDoubleClick={() => {
           setPath([...path, folder]);
           dispatch(selectFolder(folder.id as string));
         }}
       >
-        <div className={`p-2 rounded-lg mr-3 ${isDark ? 'bg-white/10 text-green-400' : 'bg-green-100 text-green-600'}`}>
-          <IoMdFolder className="w-5 h-5" />
+        {/* Folder Icon with Gradient Background */}
+        <div
+          className={`
+            relative p-3 rounded-lg mr-3 transition-all duration-300
+            group-hover:scale-110 group-hover:rotate-3
+            ${isDark
+              ? 'bg-gradient-to-br from-yellow-500/20 to-amber-500/20 text-yellow-400'
+              : 'bg-gradient-to-br from-yellow-100 to-amber-100 text-yellow-600'
+            }
+          `}
+          style={{
+            boxShadow: isDark
+              ? '0 4px 12px rgba(251, 191, 36, 0.2)'
+              : '0 4px 12px rgba(251, 191, 36, 0.15)',
+          }}
+        >
+          <IoMdFolder className="w-6 h-6 transition-transform duration-300" />
+
+          {/* Glow effect */}
+          <div
+            className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            style={{
+              background: isDark
+                ? 'radial-gradient(circle at center, rgba(251, 191, 36, 0.3), transparent)'
+                : 'radial-gradient(circle at center, rgba(251, 191, 36, 0.2), transparent)',
+              filter: 'blur(8px)',
+            }}
+          />
         </div>
 
+        {/* Folder Name */}
         <div className="tooltip tooltip-right flex-1 min-w-0" data-tip={folder.name}>
-          <span className="font-medium text-sm truncate block">
+          <span className="font-semibold text-sm truncate block group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-yellow-500 group-hover:to-amber-500 transition-all duration-300">
             {folder.name}
           </span>
         </div>
 
+        {/* Hover Indicator */}
+        <div
+          className={`
+            absolute top-0 right-0 w-2 h-2 rounded-full m-2
+            opacity-0 group-hover:opacity-100 transition-all duration-300
+            ${isDark ? 'bg-yellow-400' : 'bg-yellow-500'}
+          `}
+          style={{
+            boxShadow: isDark
+              ? '0 0 10px rgba(251, 191, 36, 0.6)'
+              : '0 0 10px rgba(251, 191, 36, 0.5)',
+          }}
+        />
+
+        {/* Context Menu */}
         {folder.ownerEmail === user.email && (
           <Menu
             id={folder.name}
             theme={theme}
             className={`!z-[9999] rounded-2xl border shadow-2xl backdrop-blur-xl p-2 min-w-[220px] ${isDark
-              ? "bg-black/80 border-white/10"
-              : "bg-white/90 border-white/40"
+              ? "bg-black/90 border-white/10"
+              : "bg-white/95 border-white/40"
               }`}
             style={{ zIndex: 9999 }}
           >
@@ -229,7 +285,6 @@ export const DroppableAndDraggableFolder: React.FC<
             <Item
               onClick={(p) => {
                 p.event.stopPropagation();
-                // dispatch(setFolderToRename(folder.faunaDocumentId))
                 setShowRename(true);
                 hideAll();
               }}
@@ -240,18 +295,6 @@ export const DroppableAndDraggableFolder: React.FC<
                 <span className="font-medium text-sm">Rename</span>
               </div>
             </Item>
-            {/* <Separator /> */}
-            {/* <Item
-              onClick={(p) => {
-                p.event.stopPropagation();
-                setShowSearchUser(true);
-                hideAll();
-              }}
-              className='hover:text-white  text-primaryColor'
-            >
-              <BiShareAlt className="mr-4 w-[20px] h-[20px]" />
-              Share
-            </Item> */}
             <div className={`h-px my-1 mx-2 ${isDark ? 'bg-white/10' : 'bg-gray-200/60'}`} />
             <Item
               onClick={(p) => {
@@ -276,22 +319,21 @@ export const DroppableAndDraggableFolder: React.FC<
             </Item>
           </Menu>
         )}
-      </div >
+      </div>
+
+      {/* Modals */}
       {showRename && (
         <RenameFolder
           folderToRename={folder}
           handleClose={() => setShowRename(false)}
         />
-      )
-      }
-      {
-        showSearchUser && (
-          <SearchUserAndShare
-            setShowSearchUser={setShowSearchUser}
-            folderToShare={folder}
-          />
-        )
-      }
+      )}
+      {showSearchUser && (
+        <SearchUserAndShare
+          setShowSearchUser={setShowSearchUser}
+          folderToShare={folder}
+        />
+      )}
     </>
   );
 };

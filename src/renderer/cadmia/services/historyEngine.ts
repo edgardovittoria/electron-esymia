@@ -10,7 +10,8 @@ import {
     SphereGeometryAttributes,
     CylinderGeometryAttributes,
     ConeGeometryAttributes,
-    TorusGeometryAttributes
+    TorusGeometryAttributes,
+    ungroupEntity
 } from "../../cad_library";
 import { generateLinearArray, getCenterOfEntities } from "../../cad_library/components/auxiliaryFunctionsUsingThree/patterningUtilities";
 
@@ -178,7 +179,13 @@ export const recalculateCanvas = (history: HistoryState): CanvasState => {
             }
 
             case 'GROUP': {
-                const elementsToGroup = node.inputKeys.map(key => components.find(c => c.keyComponent === key)).filter(c => c !== undefined) as ComponentEntity[];
+                // Deduplicate input keys to avoid processing duplicates
+                const uniqueInputKeys = Array.from(new Set(node.inputKeys));
+
+                const elementsToGroup = uniqueInputKeys
+                    .map(key => components.find(c => c.keyComponent === key))
+                    .filter(c => c !== undefined) as ComponentEntity[];
+
                 if (elementsToGroup.length === 0) continue;
 
                 const center = getCenterOfEntities(elementsToGroup);
@@ -210,8 +217,14 @@ export const recalculateCanvas = (history: HistoryState): CanvasState => {
                     historyId: node.id
                 } as any;
 
-                // Remove elements
-                components = components.filter(c => !node.inputKeys.includes(c.keyComponent));
+                // Remove elements - Use the Set of keys from the ACTUAL found elements to ensure exact removal
+                const keysToRemove = new Set(elementsToGroup.map(c => c.keyComponent));
+                components = components.filter(c => !keysToRemove.has(c.keyComponent));
+
+                // Safety check: Remove any existing component with the same key as the new group
+                // This prevents "duplicate key" issues if the history state was corrupted or duplicates exist
+                components = components.filter(c => c.keyComponent !== groupEntity.keyComponent);
+
                 components.push(groupEntity);
                 break;
             }
@@ -224,12 +237,11 @@ export const recalculateCanvas = (history: HistoryState): CanvasState => {
                 // Remove group
                 components = components.filter(c => c.keyComponent !== groupKey);
 
-                // Add children back
-                // We might need to apply the group's transform to children if they were transformed relative to group.
-                // The ungroupEntity function in cad_library does this.
-                // I should probably import ungroupEntity logic or replicate it.
-                // For now, simply adding children back.
-                components.push(...group.children);
+                // Add children back using ungroupEntity logic which handles full transformation composition
+                if (group.children) {
+                    const restoredChildren = ungroupEntity(group);
+                    components.push(...restoredChildren);
+                }
                 break;
             }
 

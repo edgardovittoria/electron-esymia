@@ -139,6 +139,7 @@ export const lengthPastStateSelector = (state: { canvas: CanvasState }) => 0 // 
 export const lengthFutureStateSelector = (state: { canvas: CanvasState }) => 0 // Mocked, use historySlice instead
 export const lastActionTypeSelector = (state: { canvas: CanvasState }) => state.canvas.lastActionType;
 export const numberOfGeneratedKeySelector = (state: { canvas: CanvasState }) => state.canvas.numberOfGeneratedKey;
+export const canvasComponentsSelector = (state: { canvas: CanvasState }) => state.canvas.components;
 
 export const findComponentByKey = (components: ComponentEntity[], key: number) => components.filter(component => component.keyComponent === key)[0]
 const setSelectedComponent = (state: CanvasState, keyComponentToSelect: number) => state.selectedComponentKey = keyComponentToSelect

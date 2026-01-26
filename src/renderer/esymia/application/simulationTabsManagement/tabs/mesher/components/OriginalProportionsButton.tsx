@@ -14,13 +14,13 @@ export const OriginaProportionsButton: FC<{}> = () => {
       }
     >
       <button
-        className={`p-3 rounded-xl transition-all duration-300 ${theme === 'light'
+        className={`p-2 rounded-xl transition-all duration-300 ${theme === 'light'
           ? 'bg-transparent text-gray-500 hover:text-blue-600 hover:bg-blue-50'
           : 'bg-transparent text-gray-400 hover:text-blue-400 hover:bg-white/5'
           }`}
         onClick={() => dispatch(resetScalingViewParamsOfMesh())}
       >
-        <LuAxis3D className='h-6 w-6' />
+        <LuAxis3D className='h-5 w-5' />
       </button>
     </div>
   );

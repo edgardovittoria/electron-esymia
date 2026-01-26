@@ -76,7 +76,7 @@ const Dashboard: React.FC<DashboardProps> = ({ showCad, setShowCad }) => {
                   dispatch(ActionCreators.clearHistory());
                   setShowCad(true);
                 }}
-                disabled={models.length === 3}
+              //disabled={models.length === 3}
               >
                 <div className="p-4 rounded-full bg-transparent group-hover:scale-110 transition-transform duration-300">
                   <AiOutlineAppstoreAdd size={48} />

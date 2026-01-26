@@ -176,7 +176,7 @@ const createWindow = async () => {
  */
 
 app.on('window-all-closed', () => {
-  if(getOs() === 'windows'){
+  if (getOs() === 'windows') {
     nodeChildProcess.spawn('cmd.exe', [
       '/c',
       getDockerPath('BROKER_STOP.bat')
@@ -386,17 +386,17 @@ ipcMain.handle('deleteFile', (e, args) => {
 
 ipcMain.handle('createFolder', (e, args) => {
   let path = app.getPath('home');
-  mkdir(path + '/' + args[0], null, () => {});
+  mkdir(path + '/' + args[0], null, () => { });
 });
 
 ipcMain.handle('deleteFolder', (e, args) => {
   let path = app.getPath('home');
-  rmdir(path + '/' + args[0], () => {});
+  rmdir(path + '/' + args[0], () => { });
 });
 
 ipcMain.on('runBroker', (e, args) => {
   let scriptBroker;
-  if(getOs() === 'windows'){
+  if (getOs() === 'windows') {
     scriptBroker = nodeChildProcess.spawn('cmd.exe', [
       '/c',
       getDockerPath('BROKER.bat')

@@ -56,6 +56,54 @@ export const exportToSTLFormat = (components: ComponentEntity[]) => {
   document.body.removeChild(link);
 };
 
+export const isRisCompatible = (entity: ComponentEntity): boolean => {
+  if (entity.type === 'CUBE') {
+    return true;
+  }
+  if (entity.type === 'GROUP') {
+    return entity.children ? entity.children.every((child) => isRisCompatible(child)) : true;
+  }
+  return false;
+};
+
+const getBricksFromEntity = (entity: ComponentEntity, parentPosition: number[] = [0, 0, 0]): number[][] => {
+  const { position } = entity.transformationParams;
+  const currentGlobalPosition = [
+    parentPosition[0] + position[0],
+    parentPosition[1] + position[1],
+    parentPosition[2] + position[2],
+  ];
+
+  if (entity.type === 'CUBE') {
+    const { scale } = entity.transformationParams;
+    const halfScale = [scale[0] / 2, scale[1] / 2, scale[2] / 2];
+    return [[
+      currentGlobalPosition[0] - halfScale[0],
+      currentGlobalPosition[0] + halfScale[0],
+      currentGlobalPosition[1] - halfScale[1],
+      currentGlobalPosition[1] + halfScale[1],
+      currentGlobalPosition[2] - halfScale[2],
+      currentGlobalPosition[2] + halfScale[2],
+    ]];
+  }
+  if (entity.type === 'GROUP' && entity.children) {
+    return entity.children.flatMap((child) => getBricksFromEntity(child, currentGlobalPosition));
+  }
+  return [];
+};
+
+export const exportToRisFormat = (components: ComponentEntity[]) => {
+  const bricks = components.flatMap((c) => getBricksFromEntity(c));
+  const link = document.createElement('a');
+  link.href = `data:text/plain;charset=utf-8,${encodeURIComponent(
+    JSON.stringify(bricks, null, 2),
+  )}`;
+  link.download = 'geometry.ris.txt';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 export const FileItem: React.FC<FileItemProps> = () => {
   const dispatch = useDispatch();
   const numberOfGeneratedKey = useSelector(numberOfGeneratedKeySelector);
@@ -184,7 +232,8 @@ export const FileItem: React.FC<FileItemProps> = () => {
                       <button
                         className={`p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}
                         onClick={() => setModalRisSave(true)}
-                        disabled={(process.env.APP_VERSION === 'demo' && models.length === 3)}
+                        disabled={(process.env.APP_VERSION === 'demo' && models.length === 3) || !entities.every(isRisCompatible) || entities.length === 0}
+                        title={!entities.every(isRisCompatible) ? "RIS format only supports Cube geometries" : ""}
                       >
                         <div className="flex w-full items-center justify-between">
                           <div className="flex items-center gap-3">
@@ -301,6 +350,22 @@ export const FileItem: React.FC<FileItemProps> = () => {
                           <span>Export STL Format</span>
                         </div>
                         <span className={navbarShortcutStyle}>Ctrl + Alt + S</span>
+                      </div>
+                    </span>
+                    <span
+                      className={`p-2 flex items-center rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed ${theme === 'light' ? 'text-gray-700 hover:bg-black/5' : 'text-gray-200 hover:bg-white/10'}`}
+                      onClick={() => {
+                        if (!((process.env.APP_VERSION === 'demo' && models.length === 3) || !entities.every(isRisCompatible) || entities.length === 0)) {
+                          exportToRisFormat(entities);
+                        }
+                      }}
+                      title={!entities.every(isRisCompatible) ? "RIS format only supports Cube geometries" : ""}
+                    >
+                      <div className="flex w-full items-center justify-between cursor-pointer">
+                        <div className={`flex items-center gap-3 ${(process.env.APP_VERSION === 'demo' && models.length === 3) || !entities.every(isRisCompatible) || entities.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                          <ArrowUpTrayIcon className="h-5 w-5" />
+                          <span>Export Ris Format</span>
+                        </div>
                       </div>
                     </span>
                   </div>

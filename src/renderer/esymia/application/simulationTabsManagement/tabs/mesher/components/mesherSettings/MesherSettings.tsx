@@ -383,19 +383,20 @@ export const MesherSettings: FC<MesherSettingsProps> = ({
 
             {/* Error Message */}
             {suggestedQuantumError.active && selectedProject.maxFrequency && (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-medium text-center">
+              <>
                 {(selectedProject?.meshData.type !== 'Ris' &&
                   process.env.MESHER_RIS_MODE === 'backend') ||
                   (selectedProject?.meshData.type === 'Ris' &&
                     process.env.MESHER_RIS_MODE === 'backend') ||
                   (selectedProject?.meshData.type === 'Standard' && (
-                    <>
+                    <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-medium text-center">
                       {suggestedQuantumError.type === 'Mesher Not Active'
                         ? 'Mesher Down: start mesher or wait until started!'
-                        : 'Unable to suggest quantum: max frequency not set'}
-                    </>
+                        : 'Unable to suggest quantum: max frequency not set'
+                      }
+                    </div>
                   ))}
-              </div>
+              </>
             )}
 
             {/* Results Button */}
