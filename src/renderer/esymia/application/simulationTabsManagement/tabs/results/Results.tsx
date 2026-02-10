@@ -107,7 +107,7 @@ export const Results: React.FC<ResultsProps> = ({
     ) {
       if (
         !(selectedProject.simulation.results as SolverOutput).matrix_S &&
-        selectedProject.simulation.simulationType === 'Matrix' && solverStatus === "ready"
+        (selectedProject.simulation.simulationType === 'Matrix' || selectedProject.simulation.simulationType === 'Matrix_ACA') && solverStatus === "ready"
       ) {
         dispatch(setSpinnerSolverResults(true));
         axios
@@ -386,7 +386,7 @@ export const Results: React.FC<ResultsProps> = ({
           selectedProject.simulation &&
           (resultsView.length > 0 || solverResults.length > 0) ? (
           <>
-            {selectedProject.simulation.simulationType === 'Matrix' ? (
+            {(selectedProject.simulation.simulationType === 'Matrix' || selectedProject.simulation.simulationType === 'Matrix_ACA') ? (
               <>
                 <ChartVisualizationMode
                   chartVisualizationMode={chartVisualizationMode}

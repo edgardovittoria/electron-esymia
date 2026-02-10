@@ -57,7 +57,7 @@ export const ProjectSlice = createSlice({
     selectedFolder: undefined
   } as ProjectState,
   reducers: {
-    setHomePat(state: ProjectState, action: PayloadAction<string>){
+    setHomePat(state: ProjectState, action: PayloadAction<string>) {
       state.homePath = action.payload
     },
     addProject(state: ProjectState, action: PayloadAction<Project>) {
@@ -108,7 +108,7 @@ export const ProjectSlice = createSlice({
       let selectedFolder = folderByID(state, project?.parentFolder);
       if (project && selectedFolder) {
         project.name = action.payload.name;
-        if(project.simulation && project.simulation.name){
+        if (project.simulation && project.simulation.name) {
           project.simulation.name = `${action.payload.name} - sim`
         }
         selectedFolder.projectList = selectedFolder.projectList.filter(p => p.id !== project?.id);
@@ -164,7 +164,7 @@ export const ProjectSlice = createSlice({
         selectedProject.modelUnit = action.payload;
       }
     },
-    updateSimulation(state: ProjectState, action: PayloadAction<{associatedProject: string, value: Simulation | undefined}>) {
+    updateSimulation(state: ProjectState, action: PayloadAction<{ associatedProject: string, value: Simulation | undefined }>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.associatedProject);
       if (selectedProject) selectedProject.simulation = action.payload.value;
     },
@@ -260,19 +260,19 @@ export const ProjectSlice = createSlice({
         selectedProject.screenshot = action.payload;
       }
     },
-    setMesh(state: ProjectState, action: PayloadAction<{ mesh:string, projectToUpdate: string }>) {
+    setMesh(state: ProjectState, action: PayloadAction<{ mesh: string, projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.mesh = action.payload.mesh;
     },
-    setExternalGrids(state: ProjectState, action: PayloadAction<{ extGrids:string, projectToUpdate: string }>) {
+    setExternalGrids(state: ProjectState, action: PayloadAction<{ extGrids: string, projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.externalGrids = action.payload.extGrids;
     },
-    setSurface(state: ProjectState, action: PayloadAction<{ surface:string, projectToUpdate: string }>) {
+    setSurface(state: ProjectState, action: PayloadAction<{ surface: string, projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.surface = action.payload.surface;
     },
-    setPathToExternalGridsNotFound(state: ProjectState, action: PayloadAction<{ status:boolean, projectToUpdate: string }>){
+    setPathToExternalGridsNotFound(state: ProjectState, action: PayloadAction<{ status: boolean, projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.pathToExternalGridsNotFound = action.payload.status;
     },
@@ -288,7 +288,7 @@ export const ProjectSlice = createSlice({
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.ASize = action.payload.ASize;
     },
-    setMeshValidTopology(state: ProjectState, action: PayloadAction<{ status:boolean, projectToUpdate: string }>) {
+    setMeshValidTopology(state: ProjectState, action: PayloadAction<{ status: boolean, projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.validTopology = action.payload.status;
     },
@@ -296,7 +296,7 @@ export const ProjectSlice = createSlice({
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.previousMeshStatus = action.payload.status;
     },
-    setMeshApproved(state: ProjectState, action: PayloadAction<{ approved:boolean, projectToUpdate: string }>) {
+    setMeshApproved(state: ProjectState, action: PayloadAction<{ approved: boolean, projectToUpdate: string }>) {
       let project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), action.payload.projectToUpdate);
       if (project) project.meshData.meshApproved = action.payload.approved;
     },
@@ -346,23 +346,23 @@ export const ProjectSlice = createSlice({
     },
     addInterestFrequencyIndex(state: ProjectState, action: PayloadAction<number>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
-      if(selectedProject){
+      if (selectedProject) {
         if (selectedProject.interestFrequenciesIndexes && selectedProject.interestFrequenciesIndexes.filter(i => i == action.payload).length === 0) {
           selectedProject.interestFrequenciesIndexes?.push(action.payload)
-        }else{
+        } else {
           selectedProject.interestFrequenciesIndexes = [action.payload]
         }
       }
     },
     removeInterestFrequencyIndex(state: ProjectState, action: PayloadAction<number>) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
-      if(selectedProject){
+      if (selectedProject) {
         selectedProject.interestFrequenciesIndexes = selectedProject.interestFrequenciesIndexes?.filter(i => i !== action.payload)
       }
     },
     resetInterestFrequencyIndex(state: ProjectState) {
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
-      if(selectedProject){
+      if (selectedProject) {
         selectedProject.interestFrequenciesIndexes = undefined
       }
     },
@@ -394,6 +394,12 @@ export const ProjectSlice = createSlice({
       let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
       if (selectedProject) {
         selectedProject.maxFrequency = action.payload;
+      }
+    },
+    setAcaSelectedPorts(state: ProjectState, action: PayloadAction<number[]>) {
+      let selectedProject = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects, state.sharedElements]), state.selectedProject);
+      if (selectedProject) {
+        selectedProject.acaSelectedPorts = action.payload;
       }
     },
   },
@@ -478,7 +484,8 @@ export const {
   setPlaneWaveParametres,
   unsetPlaneWaveParametres,
   setMaxFrequency,
-  setPortSignal
+  setPortSignal,
+  setAcaSelectedPorts
 } = ProjectSlice.actions;
 
 const selectTabEffects = (state: ProjectState, tab: string) => {
@@ -539,7 +546,7 @@ export const activeSimulationsSelector = (state: { projects: ProjectState }) => 
   let activeSimulations: { simulation: Simulation, freqNumber: number, project: Project }[] = [];
   takeAllProjectsIn(state.projects.projects).forEach(p => {
     if (p.simulation && (p.simulation.status === 'Queued' || p.simulation.status === "Running")) {
-      activeSimulations.push({ simulation: p.simulation, freqNumber: p.frequencies?.length as number, project: p});
+      activeSimulations.push({ simulation: p.simulation, freqNumber: p.frequencies?.length as number, project: p });
     }
   });
   takeAllProjectsIn(state.projects.sharedElements).forEach(p => {
@@ -551,7 +558,7 @@ export const activeSimulationsSelector = (state: { projects: ProjectState }) => 
 };
 
 export const activeMeshingSelector = (state: { projects: ProjectState }) => {
-  let activeMeshing: { selectedProject: Project, allMaterials: Material[], quantum: [number, number, number], meshStatus: "Not Generated" | "Generated"}[] = [];
+  let activeMeshing: { selectedProject: Project, allMaterials: Material[], quantum: [number, number, number], meshStatus: "Not Generated" | "Generated" }[] = [];
   takeAllProjectsIn(state.projects.projects).forEach(p => {
     let allMaterials: Material[] = [];
     if (p?.model?.components) {
@@ -598,3 +605,10 @@ export const findSuggestedQuantum = (folders: Folder[], projectID: string) => {
 export const lambdaFactorSelector = (state: {
   projects: ProjectState
 }) => (findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject) as Project).meshData.lambdaFactor;
+
+export const acaSelectedPortsSelector = (state: {
+  projects: ProjectState
+}) => {
+  const project = findProjectByFaunaID(takeAllProjectsInArrayOf([state.projects.projects, state.projects.sharedElements]), state.projects.selectedProject);
+  return project?.acaSelectedPorts ?? [];
+};

@@ -4,34 +4,9 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { readdir } from 'fs';
 import { removeAllListeners } from 'process';
 
-export type Channels =
-  | 'ipc-example'
-  | 'api:call'
-  | 'api:response'
-  | 'fauna:getFoldersByOwner'
-  | 'fauna:getSimulationProjectsByOwner'
-  | 'logout'
-  | 'runMesher'
-  | 'runSolver'
-  | 'haltMesher'
-  | 'haltSolver'
-  | 'getInstallationDir'
-  | 'directoryContents'
-  | 'saveFile'
-  | 'deleteFile'
-  | 'createFolder'
-  | 'deleteFolder'
-  | 'readFile'
-  | 'runBroker'
-  | 'exportTouchstone'
-  | 'getMac'
-  | 'meshingComputation'
-  | 'solvingComputation'
-  | 'checkLogout'
-  | 'computeMeshRis'
-  | 'stopMeshing'
-  | 'closeApp'
-  ;
+import { IpcChannels } from '../shared/ipc-types';
+
+export type Channels = `${IpcChannels}`;
 
 const electronHandler = {
   ipcRenderer: {

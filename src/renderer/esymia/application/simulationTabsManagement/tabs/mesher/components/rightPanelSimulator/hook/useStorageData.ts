@@ -1,9 +1,5 @@
 import {
-  CellSize,
-  CellsNumber,
-  ExternalGridsObject,
   Folder,
-  OriginPoint,
   Project,
 } from '../../../../../../../model/esymiaModels';
 import { deleteFileS3 } from '../../../../../../../aws/mesherAPIs';
@@ -11,22 +7,15 @@ import {
   addProject,
   removeProject,
   selectedProjectSelector,
-  setPathToExternalGridsNotFound,
 } from '../../../../../../../store/projectSlice';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  deleteFile,
-  readLocalFile,
-} from '../../../../../../../../fileSystemAPIs/fileSystemAPIs';
 import { s3 } from '../../../../../../../aws/s3Config';
 import {
   addProjectTab,
   closeProjectTab,
   setAWSExternalGridsData,
 } from '../../../../../../../store/tabsAndMenuItemsSlice';
-import { Brick } from '../components/createGridsExternals';
-import { publishMessage } from '../../../../../../../../middleware/stompMiddleware';
 import { CanvasState } from '../../../../../../../../cad_library';
 import { UsersState } from '../../../../../../../../cad_library/components/store/users/usersSlice';
 import { GetObjectRequest } from 'aws-sdk/clients/s3';
@@ -37,75 +26,12 @@ import {
   addIDInProjectListInDynamoDB,
 } from '../../../../../../../../dynamoDB/projectsFolderApi';
 import axios from 'axios';
-import { modelS3 } from '../../../../../../../../../../cypress/e2e/staticData/staticData';
+import pako from 'pako';
 
 export const useStorageData = () => {
   const dispatch = useDispatch();
   const selectedProject = useSelector(selectedProjectSelector) as Project;
   const { execQuery2 } = useDynamoDBQuery();
-
-  const externalGridsDecode = (extGridsJson: any) => {
-    let gridsPairs: [string, Brick[]][] = [];
-    Object.entries(extGridsJson.externalGrids).forEach((material) =>
-      gridsPairs.push([
-        material[0],
-        (material[1] as string).split('A').map((brString) => {
-          let coords = brString.split('-').map((c) => parseInt(c));
-          return { x: coords[0], y: coords[1], z: coords[2] } as Brick;
-        }),
-      ]),
-    );
-    let externalGrids = Object.fromEntries(gridsPairs);
-    let cellSizeCoords = (extGridsJson.cell_size as string)
-      .split('-')
-      .map((c) => parseFloat(c) / 1000);
-    let cell_size = {
-      cell_size_x: cellSizeCoords[0],
-      cell_size_y: cellSizeCoords[1],
-      cell_size_z: cellSizeCoords[2],
-    } as CellSize;
-    let nCellsCoords = (extGridsJson.n_cells as string)
-      .split('-')
-      .map((c) => parseFloat(c));
-    let n_cells = {
-      n_cells_x: nCellsCoords[0],
-      n_cells_y: nCellsCoords[1],
-      n_cells_z: nCellsCoords[2],
-    } as CellsNumber;
-    let originCoords = (extGridsJson.origin as string)
-      .split('-')
-      .map((c) => parseFloat(c));
-    let origin = {
-      origin_x: originCoords[0],
-      origin_y: originCoords[1],
-      origin_z: originCoords[2],
-    } as OriginPoint;
-    return {
-      cell_size: cell_size,
-      externalGrids: externalGrids,
-      n_cells: n_cells,
-      origin: origin,
-    } as ExternalGridsObject;
-  };
-
-  const loadDataFromLocal = (
-    setSpinner: (v: boolean) => void,
-    setExternalGrids: Function,
-  ) => {
-    readLocalFile(
-      selectedProject.meshData.externalGrids as string,
-      selectedProject.id as string,
-    ).then((res) => {
-      setExternalGrids(externalGridsDecode(JSON.parse(res)));
-      dispatch(
-        setPathToExternalGridsNotFound({
-          status: false,
-          projectToUpdate: selectedProject.id as string,
-        }),
-      );
-      setSpinner(false);
-    });
-  };
 
   const loadGridsFromS3 = (mesherBackend: boolean) => {
     if (mesherBackend) {
@@ -131,9 +57,28 @@ export const useStorageData = () => {
       s3.getObject(params, (err, data) => {
         if (err) {
           console.log(err);
+          return;
         }
-        const res = JSON.parse(data.Body?.toString() as string);
-        dispatch(setAWSExternalGridsData(res));
+        try {
+          // Check if the file is gzipped by looking at the key extension
+          const isGzipped = (selectedProject.meshData.surface as string).endsWith('.gz');
+          let jsonString: string;
+
+          if (isGzipped && data.Body) {
+            // Decompress gzipped data
+            const uint8Array = new Uint8Array(data.Body as ArrayBuffer);
+            const decompressed = pako.inflate(uint8Array, { to: 'string' });
+            jsonString = decompressed;
+          } else {
+            // Plain JSON
+            jsonString = data.Body?.toString() as string;
+          }
+
+          const res = JSON.parse(jsonString);
+          dispatch(setAWSExternalGridsData(res));
+        } catch (parseError) {
+          console.error('Error parsing mesh data:', parseError);
+        }
       });
     }
   };
@@ -151,12 +96,6 @@ export const useStorageData = () => {
       deleteFileS3(project?.meshData.surface as string).catch((err) =>
         console.log(err),
       );
-  };
-
-  const deleteMeshDataLocal = (project: Project) => {
-    project?.meshData.mesh && deleteFile(project.meshData.mesh);
-    project?.meshData.externalGrids &&
-      deleteFile(project.meshData.externalGrids);
   };
 
   const deleteResultsOnline = (project: Project) => {
@@ -181,19 +120,6 @@ export const useStorageData = () => {
     deleteResultsOnline(project);
     deletePortsOnline(project);
     deleteModelOnline(project)
-    dispatch(removeProject(project.id as string));
-    dispatch(closeProjectTab(project.id as string));
-    execQuery2(
-      deleteSimulationProjectFromDynamoDB,
-      project.id,
-      project.parentFolder,
-      selectedFolder,
-      dispatch,
-    );
-  };
-
-  const deleteProjectLocal = (project: Project, selectedFolder: Folder) => {
-    deleteMeshDataLocal(project);
     dispatch(removeProject(project.id as string));
     dispatch(closeProjectTab(project.id as string));
     execQuery2(
@@ -235,11 +161,10 @@ export const useStorageData = () => {
     s3.copyObject({
       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
       CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-      Key: `${
-        project.meshData.type === 'Standard'
-          ? `${clonedProject.id}_mesh.json.gz`
-          : `${clonedProject.id}_mesh.json.gz`
-      }`,
+      Key: `${project.meshData.type === 'Standard'
+        ? `${clonedProject.id}_mesh.json.gz`
+        : `${clonedProject.id}_mesh.json.gz`
+        }`,
     })
       .promise()
       .then((mesh) => {
@@ -268,11 +193,10 @@ export const useStorageData = () => {
                     ...clonedProject,
                     meshData: {
                       ...clonedProject.meshData,
-                      mesh: `${
-                        clonedProject.meshData.type === 'Standard'
-                          ? `${clonedProject.id}_mesh.json.gz`
-                          : `${clonedProject.id}_mesh.json.gz`
-                      }`,
+                      mesh: `${clonedProject.meshData.type === 'Standard'
+                        ? `${clonedProject.id}_mesh.json.gz`
+                        : `${clonedProject.id}_mesh.json.gz`
+                        }`,
                       externalGrids:
                         clonedProject.meshData.type === 'Standard'
                           ? `${clonedProject.id}_grids.json.gz`
@@ -316,11 +240,10 @@ export const useStorageData = () => {
                 ...clonedProject,
                 meshData: {
                   ...clonedProject.meshData,
-                  mesh: `${
-                    clonedProject.meshData.type === 'Standard'
-                      ? `${clonedProject.id}_mesh.json.gz`
-                      : `${clonedProject.id}_mesh.json.gz`
-                  }`,
+                  mesh: `${clonedProject.meshData.type === 'Standard'
+                    ? `${clonedProject.id}_mesh.json.gz`
+                    : `${clonedProject.id}_mesh.json.gz`
+                    }`,
                   externalGrids:
                     clonedProject.meshData.type === 'Standard'
                       ? `${clonedProject.id}_grids.json.gz`
@@ -368,11 +291,10 @@ export const useStorageData = () => {
     s3.copyObject({
       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
       CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-      Key: `${
-        project.meshData.type === 'Standard'
-          ? `${clonedProject.id}_mesh.json.gz`
-          : `${clonedProject.id}_mesh.json.gz`
-      }`,
+      Key: `${project.meshData.type === 'Standard'
+        ? `${clonedProject.id}_mesh.json.gz`
+        : `${clonedProject.id}_mesh.json.gz`
+        }`,
     })
       .promise()
       .then((mesh) => {
@@ -401,11 +323,10 @@ export const useStorageData = () => {
                     ...clonedProject,
                     meshData: {
                       ...project.meshData,
-                      mesh: `${
-                        project.meshData.type === 'Standard'
-                          ? `${clonedProject.id}_mesh.json.gz`
-                          : `${clonedProject.id}_mesh.json.gz`
-                      }`,
+                      mesh: `${project.meshData.type === 'Standard'
+                        ? `${clonedProject.id}_mesh.json.gz`
+                        : `${clonedProject.id}_mesh.json.gz`
+                        }`,
                       externalGrids:
                         project.meshData.type === 'Standard'
                           ? `${clonedProject.id}_grids.json.gz`
@@ -448,11 +369,10 @@ export const useStorageData = () => {
                 ...clonedProject,
                 meshData: {
                   ...project.meshData,
-                  mesh: `${
-                    project.meshData.type === 'Standard'
-                      ? `${clonedProject.id}_mesh.json.gz`
-                      : `${clonedProject.id}_mesh.json.gz`
-                  }`,
+                  mesh: `${project.meshData.type === 'Standard'
+                    ? `${clonedProject.id}_mesh.json.gz`
+                    : `${clonedProject.id}_mesh.json.gz`
+                    }`,
                   externalGrids:
                     project.meshData.type === 'Standard'
                       ? `${clonedProject.id}_grids.json.gz`
@@ -681,11 +601,10 @@ export const useStorageData = () => {
     s3.copyObject({
       Bucket: process.env.REACT_APP_AWS_BUCKET_NAME as string,
       CopySource: `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.mesh}`,
-      Key: `${
-        project.meshData.type === 'Standard'
-          ? `${clonedProject.id}_mesh.json.gz`
-          : `${clonedProject.id}_mesh.json.gz`
-      }`,
+      Key: `${project.meshData.type === 'Standard'
+        ? `${clonedProject.id}_mesh.json.gz`
+        : `${clonedProject.id}_mesh.json.gz`
+        }`,
     })
       .promise()
       .then((mesh) => {
@@ -695,11 +614,10 @@ export const useStorageData = () => {
             project.meshData.type === 'Standard'
               ? `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.externalGrids}`
               : `/${process.env.REACT_APP_AWS_BUCKET_NAME}/${project.meshData.surface}`,
-          Key: `${
-            project.meshData.type === 'Standard'
-              ? `${clonedProject.id}_grids.json.gz`
-              : `${clonedProject.id}_surface.json.gz`
-          }`,
+          Key: `${project.meshData.type === 'Standard'
+            ? `${clonedProject.id}_grids.json.gz`
+            : `${clonedProject.id}_surface.json.gz`
+            }`,
         })
           .promise()
           .then((grids) => {
@@ -865,7 +783,7 @@ export const useStorageData = () => {
                 } else {
                   execQuery2(
                     createOrUpdateProjectInDynamoDB,
-                    {...clonedProject, modelS3: `${clonedProject.id}_model.json`},
+                    { ...clonedProject, modelS3: `${clonedProject.id}_model.json` },
                     dispatch,
                   ).then(() => {
                     setShowSearchUser(false);

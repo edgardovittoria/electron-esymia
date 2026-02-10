@@ -67,7 +67,7 @@ interface CanvasSolverProps {
   setCameraPosition: Function;
   surfaceAdvices: boolean;
   setSurfaceAdvices: Function;
-  simulationType: 'Matrix' | 'Electric Fields' | 'Both';
+  simulationType: 'Matrix' | 'Matrix_ACA' | 'Electric Fields' | 'Both';
   viewMesh: boolean;
 }
 
@@ -327,13 +327,13 @@ export const CanvasSolver: React.FC<CanvasSolverProps> = ({
       ) : (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <div
-            className={`flex flex - col items - center justify - center gap - 4 p - 8 rounded - 2xl border shadow - 2xl backdrop - blur - xl ${theme === 'light'
+            className={`flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border shadow-2xl backdrop-blur-xl ${theme === 'light'
               ? 'bg-white/60 border-white/40 text-gray-600'
               : 'bg-black/40 border-white/10 text-gray-300'
               } `}
           >
             <div
-              className={`p - 4 rounded - full ${theme === 'light'
+              className={`p-4 rounded-full ${theme === 'light'
                 ? 'bg-blue-50 text-blue-500'
                 : 'bg-white/5 text-blue-400'
                 } `}

@@ -54,54 +54,64 @@ export default function App() {
     };
   }, []);
 
-  if (window.electron && window.electron.ipcRenderer) {
-    window.electron.ipcRenderer.on('runBroker', (arg) => {
-      const response = arg as {
-        type: string;
-        message?: string;
-        success?: boolean;
-        exitCode?: number;
-      };
-      if (response.type === 'status') {
-        if (!response.success) {
-          if (response.exitCode === 10) {
-            setDockerInstallationBox(true);
+  useEffect(() => {
+    if (window.electron && window.electron.ipcRenderer) {
+      const removeListener = window.electron.ipcRenderer.on('runBroker', (arg) => {
+        const response = arg as {
+          type: string;
+          message?: string;
+          success?: boolean;
+          exitCode?: number;
+        };
+        if (response.type === 'status') {
+          if (!response.success) {
+            if (response.exitCode === 10) {
+              setDockerInstallationBox(true);
+            } else {
+              console.error(
+                'Errore generico script Docker. Codice:',
+                response.exitCode,
+              );
+            }
           } else {
-            console.error(
-              'Errore generico script Docker. Codice:',
-              response.exitCode,
+            console.log(response.message);
+          }
+        }
+      });
+      return () => {
+        if (removeListener) removeListener();
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (window.electron && window.electron.ipcRenderer) {
+      const removeListener = window.electron.ipcRenderer.on('checkLogout', (arg) => {
+        if ((arg as string) == 'allowed') {
+          if (mesherStatus != 'idle') {
+            dispatch(
+              publishMessage({
+                queue: 'management',
+                body: { message: 'stop' },
+              }),
             );
           }
-        } else {
-          console.log(response.message);
+          if (solverStatus != 'idle') {
+            dispatch(
+              publishMessage({
+                queue: 'management_solver',
+                body: { message: 'stop' },
+              }),
+            );
+          }
+          setLogout(true);
         }
-      }
-    });
-  }
-
-  if (window.electron && window.electron.ipcRenderer) {
-    window.electron.ipcRenderer.on('checkLogout', (arg) => {
-      if ((arg as string) == 'allowed') {
-        if (mesherStatus != 'idle') {
-          dispatch(
-            publishMessage({
-              queue: 'management',
-              body: { message: 'stop' },
-            }),
-          );
-        }
-        if (solverStatus != 'idle') {
-          dispatch(
-            publishMessage({
-              queue: 'management_solver',
-              body: { message: 'stop' },
-            }),
-          );
-        }
-        setLogout(true);
-      }
-    });
-  }
+      });
+      return () => {
+        if (removeListener) removeListener();
+      };
+    }
+  }, [mesherStatus, solverStatus, dispatch]);
 
   useEffect(() => {
     if (logout && window.electron && window.electron.ipcRenderer) {

@@ -62,6 +62,142 @@ export interface SimulationStatusProps {
   }[];
 }
 
+/* ─── Inline keyframes injected once ─── */
+const injectKeyframes = (() => {
+  let injected = false;
+  return () => {
+    if (injected) return;
+    injected = true;
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 8px rgba(34,197,94,0.3); }
+        50% { box-shadow: 0 0 16px rgba(34,197,94,0.6); }
+      }
+      @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(0.8); }
+      }
+      @keyframes slide-in-progress {
+        from { transform: scaleX(0); }
+        to { transform: scaleX(1); }
+      }
+    `;
+    document.head.appendChild(style);
+  };
+})();
+
+/* ─── Helper: format seconds to mm:ss ─── */
+const formatTime = (seconds: number): string => {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+};
+
+/* ─── Custom animated progress bar ─── */
+const ProgressBar: React.FC<{
+  value: number;
+  max: number;
+  variant: 'success' | 'primary' | 'info';
+  isDark: boolean;
+  animate?: boolean;
+}> = ({ value, max, variant, isDark, animate = false }) => {
+  const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+  const isComplete = pct >= 100;
+
+  const gradients: Record<string, string> = {
+    success: 'linear-gradient(90deg, #22c55e, #4ade80, #22c55e)',
+    primary: 'linear-gradient(90deg, #6366f1, #818cf8, #6366f1)',
+    info: 'linear-gradient(90deg, #06b6d4, #22d3ee, #06b6d4)',
+  };
+
+  return (
+    <div
+      className={`relative w-full h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'
+        }`}
+    >
+      <div
+        className="h-full rounded-full transition-all duration-700 ease-out"
+        style={{
+          width: `${pct}%`,
+          background: gradients[variant],
+          backgroundSize: animate && !isComplete ? '200% 100%' : undefined,
+          animation: animate && !isComplete ? 'shimmer 2s linear infinite' : undefined,
+          boxShadow: isComplete
+            ? `0 0 10px ${variant === 'success' ? 'rgba(34,197,94,0.5)' : variant === 'info' ? 'rgba(6,182,212,0.5)' : 'rgba(99,102,241,0.5)'}`
+            : undefined,
+        }}
+      />
+    </div>
+  );
+};
+
+/* ─── Step indicator dot ─── */
+const StepDot: React.FC<{
+  status: 'done' | 'active' | 'pending';
+  isDark: boolean;
+}> = ({ status, isDark }) => {
+  if (status === 'done') {
+    return <AiOutlineCheckCircle className="text-green-500 flex-shrink-0" size={18} />;
+  }
+  if (status === 'active') {
+    return (
+      <div
+        className="w-2.5 h-2.5 rounded-full bg-indigo-500 flex-shrink-0"
+        style={{ animation: 'pulse-dot 1.5s ease-in-out infinite' }}
+      />
+    );
+  }
+  return (
+    <div
+      className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${isDark ? 'bg-white/15' : 'bg-gray-300'
+        }`}
+    />
+  );
+};
+
+/* ─── Pipeline step row ─── */
+const PipelineStep: React.FC<{
+  label: string;
+  status: 'done' | 'active' | 'pending';
+  isDark: boolean;
+  children?: React.ReactNode;
+}> = ({ label, status, isDark, children }) => (
+  <div className="flex flex-col gap-1.5">
+    <div className="flex items-center gap-2.5">
+      <StepDot status={status} isDark={isDark} />
+      <span
+        className={`text-xs font-semibold uppercase tracking-wider ${status === 'done'
+          ? 'text-green-500'
+          : status === 'active'
+            ? isDark
+              ? 'text-white'
+              : 'text-gray-900'
+            : isDark
+              ? 'text-white/30'
+              : 'text-gray-400'
+          }`}
+      >
+        {label}
+      </span>
+      {status === 'active' && (
+        <ImSpinner
+          className={`w-3 h-3 animate-spin ${isDark ? 'text-indigo-400' : 'text-indigo-600'
+            }`}
+        />
+      )}
+    </div>
+    {children}
+  </div>
+);
+
+/* ══════════════════════════════════════════════════════════════════
+   MAIN COMPONENT
+   ══════════════════════════════════════════════════════════════════ */
 const SimulationStatus: React.FC<SimulationStatusProps> = ({
   feedbackSimulationVisible,
   setFeedbackSimulationVisible,
@@ -77,6 +213,10 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
   const [queuedSimulations, setqueuedSimulations] = useState<
     { simulation: Simulation; freqNumber: number; project: Project }[]
   >([]);
+
+  useEffect(() => {
+    injectKeyframes();
+  }, []);
 
   useEffect(() => {
     if (window.electron && window.electron.ipcRenderer) {
@@ -134,29 +274,79 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
     }
   }, [activeSimulations.length]);
 
+  const totalActive =
+    (runningSimulation ? 1 : 0) + queuedSimulations.length;
+
   return (
     <div
-      className={`absolute right-10 w-1/3 bottom-16 flex flex-col justify-center items-center glass-panel ${isDark ? 'glass-panel-dark' : 'glass-panel-light'
-        } p-4 rounded-2xl shadow-2xl transition-all duration-300 backdrop-blur-md border ${isDark ? 'border-white/10' : 'border-white/40'
-        } ${!feedbackSimulationVisible && 'hidden'}`}
+      className={`absolute right-10 bottom-16 flex flex-col items-stretch transition-all duration-300 ${!feedbackSimulationVisible && 'hidden'
+        }`}
+      style={{
+        width: 'min(620px, 40vw)',
+        borderRadius: '16px',
+        background: isDark
+          ? 'linear-gradient(145deg, rgba(30,30,40,0.92), rgba(18,18,28,0.96))'
+          : 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(245,247,250,0.98))',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+        border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)',
+        boxShadow: isDark
+          ? '0 24px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset'
+          : '0 24px 48px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.7) inset',
+      }}
     >
-      <div className="flex flex-row justify-between w-full items-center mb-3">
-        <h5 className={`font-semibold text-lg ${isDark ? 'text-white' : 'text-gray-800'}`}>Simulation Status</h5>
+      {/* ─── Header ─── */}
+      <div className="flex items-center justify-between px-5 pt-4 pb-3">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"
+            style={{ animation: totalActive > 0 ? 'pulse-dot 2s ease-in-out infinite' : undefined }}
+          />
+          <h5
+            className={`font-bold text-base tracking-tight ${isDark ? 'text-white' : 'text-gray-900'
+              }`}
+          >
+            Simulation Status
+          </h5>
+          {totalActive > 0 && (
+            <span
+              className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full ${isDark
+                ? 'bg-indigo-500/25 text-indigo-300'
+                : 'bg-indigo-100 text-indigo-700'
+                }`}
+            >
+              {totalActive}
+            </span>
+          )}
+        </div>
         <button
           onClick={() => setFeedbackSimulationVisible(false)}
-          className={`p-1.5 rounded-full transition-colors duration-200 ${isDark ? 'hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-black/5 text-gray-500 hover:text-black'
+          className={`p-1.5 rounded-lg transition-all duration-200 ${isDark
+            ? 'hover:bg-white/10 text-gray-500 hover:text-white'
+            : 'hover:bg-black/5 text-gray-400 hover:text-gray-700'
             }`}
         >
-          <TiArrowMinimise size={20} />
+          <TiArrowMinimise size={18} />
         </button>
       </div>
-      <div className={`w-full h-px mb-4 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
 
-      <div className="max-h-[600px] overflow-y-auto w-full pr-1 custom-scrollbar flex flex-col gap-3">
+      {/* ─── Divider ─── */}
+      <div
+        className="mx-5"
+        style={{
+          height: '1px',
+          background: isDark
+            ? 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)'
+            : 'linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent)',
+        }}
+      />
+
+      {/* ─── Body ─── */}
+      <div className="flex flex-col gap-2.5 p-4 max-h-[550px] overflow-y-auto custom-scrollbar">
         {runningSimulation && (
           <SimulationStatusItem
-            key={runningSimulation.simulation.name}
-            name={runningSimulation.simulation.name}
+            key={runningSimulation.simulation.name ?? 'unnamed'}
+            name={runningSimulation.simulation.name ?? 'Unnamed Simulation'}
             frequenciesNumber={runningSimulation.freqNumber}
             associatedProject={runningSimulation.project}
             simulation={runningSimulation.simulation}
@@ -165,14 +355,19 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
         )}
         {queuedSimulations.map((qs) => (
           <QueuedSimulationStatusItem
-            name={qs.simulation.name}
+            key={qs.simulation.associatedProject}
+            name={qs.simulation.name ?? 'Unnamed Simulation'}
             associatedProject={qs.simulation.associatedProject}
             setqueuedSimulations={setqueuedSimulations}
           />
         ))}
         {!runningSimulation && queuedSimulations.length === 0 && (
-          <div className={`text-center py-8 text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-            No active simulations
+          <div
+            className={`flex flex-col items-center justify-center py-10 gap-2 ${isDark ? 'text-gray-600' : 'text-gray-400'
+              }`}
+          >
+            <div className="text-3xl opacity-50">⏸</div>
+            <span className="text-sm font-medium">No active simulations</span>
           </div>
         )}
       </div>
@@ -182,6 +377,9 @@ const SimulationStatus: React.FC<SimulationStatusProps> = ({
 
 export default SimulationStatus;
 
+/* ══════════════════════════════════════════════════════════════════
+   RUNNING SIMULATION ITEM
+   ══════════════════════════════════════════════════════════════════ */
 const SimulationStatusItem: React.FC<{
   name: string;
   frequenciesNumber: number;
@@ -281,8 +479,6 @@ const SimulationStatusItem: React.FC<{
             project?.model?.components as ComponentEntity[],
           ),
           frequencies: frequencyArray,
-          /* signals: signalsValuesArray,
-          powerPort: project && project.signal?.powerPort, */
           unit: project.modelUnit,
           ports_scattering_value: project.scatteringValue,
         },
@@ -327,6 +523,21 @@ const SimulationStatusItem: React.FC<{
               ...objectToSendToSolver,
               simulationType: associatedProject.simulation?.simulationType,
               mesher: 'ris',
+            })
+            .catch((e) => {
+              dispatch(
+                setMessageInfoModal('Something went wrong! Check Solver status.'),
+              );
+              dispatch(setIsAlertInfoModal(false));
+              dispatch(setShowInfoModal(true));
+            });
+        } else if (associatedProject.simulation?.simulationType === 'Matrix_ACA') {
+          axios
+            .post('http://127.0.0.1:8001/solve', {
+              ...objectToSendToSolver,
+              simulationType: associatedProject.simulation?.simulationType,
+              mesher: 'ris',
+              acaSelectedPorts: associatedProject.acaSelectedPorts ?? [],
             })
             .catch((e) => {
               dispatch(
@@ -411,197 +622,197 @@ const SimulationStatusItem: React.FC<{
       return () => clearInterval(interval);
     }, [estimatedTime?.portIndex]);
 
+    /* ─── Determine step states ─── */
+    const pDone = computingP?.done ?? false;
+    const lpDone = computingLpx?.done ?? false;
+
+    const isMatrixOrACA =
+      simulation?.simulationType === 'Matrix' ||
+      simulation?.simulationType === 'Matrix_ACA';
+    const isElectricFields = simulation?.simulationType === 'Electric Fields';
+
+    const totalFreqs = isMatrixOrACA
+      ? frequenciesNumber
+      : (associatedProject?.interestFrequenciesIndexes?.length ?? 0);
+    const currentFreq = iterations?.freqNumber ?? 0;
+    const iterDone = currentFreq >= totalFreqs && totalFreqs > 0;
+
+    const pStatus: 'done' | 'active' | 'pending' = pDone ? 'done' : 'active';
+    const lpStatus: 'done' | 'active' | 'pending' = lpDone
+      ? 'done'
+      : pDone
+        ? 'active'
+        : 'pending';
+    const iterStatus: 'done' | 'active' | 'pending' = iterDone
+      ? 'done'
+      : lpDone
+        ? 'active'
+        : 'pending';
+
     return (
-      <div className="w-full px-1">
+      <div className="w-full">
         <div className="mx-auto w-full rounded-2xl">
           <Disclosure defaultOpen>
             {({ open }) => (
-              <div className={`rounded-xl overflow-hidden border transition-all duration-300 ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/50'
-                }`}>
+              <div
+                className="rounded-xl overflow-hidden transition-all duration-300"
+                style={{
+                  border: isDark
+                    ? '1px solid rgba(255,255,255,0.06)'
+                    : '1px solid rgba(0,0,0,0.06)',
+                  background: isDark
+                    ? 'rgba(255,255,255,0.03)'
+                    : 'rgba(255,255,255,0.6)',
+                }}
+              >
                 <DisclosureButton
-                  className={`flex w-full justify-between items-center px-4 py-3 text-left text-sm font-medium focus:outline-none transition-colors duration-200 ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-white/60 text-gray-700'
+                  className={`flex w-full justify-between items-center px-4 py-3 text-left text-sm font-medium focus:outline-none transition-colors duration-200 ${isDark
+                    ? 'hover:bg-white/5 text-gray-200'
+                    : 'hover:bg-white/80 text-gray-700'
                     }`}
                 >
-                  <span className="font-semibold">{name}</span>
-                  <div className="flex items-center gap-3">
-                    <div className={`flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold border ${isDark
-                      ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                      : 'bg-green-100 text-green-700 border-green-200'
-                      }`}>
-                      <ImSpinner className="animate-spin" />
-                      <span>Solving</span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="font-semibold truncate">{name}</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 flex-shrink-0">
+                    {/* Elapsed time badge */}
+                    <span
+                      className={`flex items-center gap-1.5 text-[11px] font-mono tabular-nums ${isDark ? 'text-gray-500' : 'text-gray-400'
+                        }`}
+                    >
+                      <PiClockCountdownBold className="w-3.5 h-3.5" />
+                      {formatTime(elapsedTime)}
+                    </span>
+
+                    {/* Status badge */}
+                    <div
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
+                      style={{
+                        background: isDark
+                          ? 'rgba(34,197,94,0.15)'
+                          : 'rgba(34,197,94,0.1)',
+                        color: isDark ? '#4ade80' : '#16a34a',
+                        border: isDark
+                          ? '1px solid rgba(34,197,94,0.2)'
+                          : '1px solid rgba(34,197,94,0.2)',
+                        animation: 'pulse-glow 3s ease-in-out infinite',
+                      }}
+                    >
+                      <ImSpinner className="animate-spin w-3 h-3" />
+                      Solving
                     </div>
+
                     <MdKeyboardArrowUp
-                      className={`${open ? 'rotate-180 transform' : ''} h-5 w-5 transition-transform duration-200 ${isDark ? 'text-gray-400' : 'text-gray-500'
-                        } `}
+                      className={`${open ? '' : 'rotate-180'} h-4 w-4 transition-transform duration-300 ${isDark ? 'text-gray-500' : 'text-gray-400'
+                        }`}
                     />
                   </div>
                 </DisclosureButton>
-                <DisclosurePanel className={`px-4 pb-4 pt-2 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+
+                <DisclosurePanel
+                  className={`px-4 pb-4 pt-1 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'
+                    }`}
+                >
+                  {/* ─── Pipeline steps ─── */}
                   <div
-                    className={`p-4 w-full border rounded-xl flex flex-col gap-4 ${isDark
-                      ? 'border-white/10 bg-black/20'
-                      : 'border-gray-200 bg-white/50'
-                      }`}
+                    className="flex flex-col gap-4 p-4 rounded-xl"
+                    style={{
+                      background: isDark
+                        ? 'rgba(0,0,0,0.25)'
+                        : 'rgba(0,0,0,0.02)',
+                      border: isDark
+                        ? '1px solid rgba(255,255,255,0.04)'
+                        : '1px solid rgba(0,0,0,0.04)',
+                    }}
                   >
-                    <div className="flex flex-col gap-2">
-                      <div className="flex flex-row items-center gap-2">
-                        <span className="text-xs font-medium uppercase tracking-wider opacity-70">Computing P</span>
-                        {!computingP && (
-                          <ImSpinner className={`w-3 h-3 animate-spin ${isDark ? 'text-white' : 'text-black'}`} />
-                        )}
-                      </div>
+                    {/* Step 1: Computing P */}
+                    <PipelineStep label="Computing P" status={pStatus} isDark={isDark}>
+                      <ProgressBar
+                        value={pDone ? 1 : 0}
+                        max={1}
+                        variant={pDone ? 'success' : 'primary'}
+                        isDark={isDark}
+                        animate={!pDone}
+                      />
+                    </PipelineStep>
 
-                      <div className="flex flex-row justify-between items-center w-full">
-                        {computingP && computingP.done ? (
-                          <div className="flex flex-row w-full justify-between items-center">
-                            <progress
-                              className={`progress w-full mr-4 ${isDark ? 'progress-success' : 'progress-success'}`}
-                              value={1}
-                              max={1}
-                            />
-                            <AiOutlineCheckCircle
-                              size="20px"
-                              className="text-green-500"
-                            />
-                          </div>
-                        ) : (
-                          <progress
-                            className={`progress w-full ${isDark ? 'progress-primary' : 'progress-primary'}`}
-                            value={0}
-                            max={1}
-                          />
-                        )}
-                      </div>
-                    </div>
+                    {/* Step 2: Computing Lp */}
+                    <PipelineStep label="Computing Lp" status={lpStatus} isDark={isDark}>
+                      <ProgressBar
+                        value={lpDone ? 1 : 0}
+                        max={1}
+                        variant={lpDone ? 'success' : 'primary'}
+                        isDark={isDark}
+                        animate={pDone && !lpDone}
+                      />
+                    </PipelineStep>
 
-                    <div className="flex flex-col gap-2">
-                      <div className="flex flex-row items-center gap-2">
-                        <span className="text-xs font-medium uppercase tracking-wider opacity-70">Computing Lp</span>
-                        {computingP && computingP.done && !computingLpx && (
-                          <ImSpinner className={`w-3 h-3 animate-spin ${isDark ? 'text-white' : 'text-black'}`} />
-                        )}
-                      </div>
-                      <div className="flex flex-row justify-between items-center w-full">
-                        {computingLpx && computingLpx.done ? (
-                          <div className="flex flex-row justify-between items-center w-full">
-                            <progress
-                              className={`progress w-full mr-4 ${isDark ? 'progress-success' : 'progress-success'}`}
-                              value={1}
-                              max={1}
-                            />
-                            <AiOutlineCheckCircle
-                              size="20px"
-                              className="text-green-500"
-                            />
-                          </div>
-                        ) : (
-                          <progress
-                            className={`progress w-full ${isDark ? 'progress-primary' : 'progress-primary'}`}
-                            value={0}
-                            max={1}
-                          />
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <div className="flex flex-row items-center gap-2">
-                        <span className="flex flex-row items-center gap-2 text-xs font-medium uppercase tracking-wider opacity-70">
-                          Doing Iterations:{' '}
-                          {simulation?.simulationType === 'Matrix' ? (
-                            <div className="flex flex-row gap-2 items-center normal-case">
-                              <span className="font-semibold text-sm">
-                                freq {iterations ? iterations.freqNumber : 0}/
-                                {frequenciesNumber}
-                              </span>
-                              {computingLpx &&
-                                computingLpx.done &&
-                                ((iterations &&
-                                  iterations.freqNumber < frequenciesNumber) ||
-                                  !iterations) && (
-                                  <ImSpinner className={`w-3 h-3 animate-spin ${isDark ? 'text-white' : 'text-black'}`} />
-                                )}
-                            </div>
-                          ) : (
-                            <div className="flex flex-row gap-2 items-center normal-case">
-                              <span className="font-semibold text-sm">
-                                freq {iterations ? iterations.freqNumber : 0}/
-                                {
-                                  associatedProject?.interestFrequenciesIndexes
-                                    ?.length
-                                }
-                              </span>
-                              {computingLpx &&
-                                computingLpx.done &&
-                                ((associatedProject?.interestFrequenciesIndexes &&
-                                  iterations &&
-                                  iterations.freqNumber <
-                                  associatedProject?.interestFrequenciesIndexes
-                                    ?.length) ||
-                                  !iterations) && (
-                                  <ImSpinner className={`w-3 h-3 animate-spin ${isDark ? 'text-white' : 'text-black'}`} />
-                                )}
-                            </div>
-                          )}
+                    {/* Step 3: Iterations */}
+                    <PipelineStep label="Iterations" status={iterStatus} isDark={isDark}>
+                      <div className="flex items-center gap-2">
+                        <ProgressBar
+                          value={currentFreq}
+                          max={totalFreqs}
+                          variant={iterDone ? 'success' : 'info'}
+                          isDark={isDark}
+                          animate={lpDone && !iterDone}
+                        />
+                        <span
+                          className={`text-xs font-mono tabular-nums flex-shrink-0 ${isDark ? 'text-gray-500' : 'text-gray-400'
+                            }`}
+                        >
+                          {currentFreq}/{totalFreqs}
                         </span>
                       </div>
-                      <progress
-                        className={`progress w-full ${isDark ? 'progress-info' : 'progress-info'}`}
-                        value={iterations ? iterations.freqNumber : 0}
-                        max={
-                          simulation?.simulationType === 'Matrix'
-                            ? frequenciesNumber
-                            : associatedProject?.interestFrequenciesIndexes
-                              ?.length
-                        }
-                      />
-                      {simulation?.simulationType === 'Electric Fields' && (
-                        <div className="flex flex-col gap-2 mt-2">
-                          <div className="flex flex-row items-center gap-2">
-                            <span className="text-xs font-medium uppercase tracking-wider opacity-70">
-                              Computing Results:{' '}
-                              <span className="normal-case font-semibold">
-                                {electricFieldsResultsStep
-                                  ? electricFieldsResultsStep.name
-                                  : 'hc'}
-                              </span>
-                            </span>
-                            {iterations &&
-                              associatedProject?.interestFrequenciesIndexes &&
-                              iterations.freqNumber <=
-                              associatedProject?.interestFrequenciesIndexes
-                                ?.length && (
-                                <ImSpinner className={`w-3 h-3 animate-spin ${isDark ? 'text-white' : 'text-black'}`} />
-                              )}
-                          </div>
+                    </PipelineStep>
 
-                          <div className="flex flex-row justify-between items-center w-full">
-                            {electricFieldsResultsStep ? (
-                              <div className="flex flex-row justify-between items-center w-full">
-                                <progress
-                                  className={`progress w-full mr-4 ${isDark ? 'progress-info' : 'progress-info'}`}
-                                  value={electricFieldsResultsStep.step}
-                                  max={7}
-                                />
-                              </div>
-                            ) : (
-                              <progress
-                                className={`progress w-full ${isDark ? 'progress-primary' : 'progress-primary'}`}
-                                value={0}
-                                max={1}
-                              />
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    {/* Step 4: Electric Fields results (conditional) */}
+                    {isElectricFields && (
+                      <PipelineStep
+                        label={`Results: ${electricFieldsResultsStep?.name ?? 'hc'}`}
+                        status={
+                          iterations &&
+                            associatedProject?.interestFrequenciesIndexes &&
+                            iterations.freqNumber <=
+                            associatedProject?.interestFrequenciesIndexes?.length
+                            ? 'active'
+                            : 'pending'
+                        }
+                        isDark={isDark}
+                      >
+                        <ProgressBar
+                          value={electricFieldsResultsStep?.step ?? 0}
+                          max={7}
+                          variant="info"
+                          isDark={isDark}
+                          animate={!!electricFieldsResultsStep}
+                        />
+                      </PipelineStep>
+                    )}
                   </div>
+
+                  {/* ─── Stop button ─── */}
                   <button
-                    className={`w-full py-2 rounded-lg text-sm font-semibold shadow-md transition-all duration-200 transform active:scale-95 mt-4 ${isDark
-                      ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
-                      : 'bg-red-100 text-red-600 border border-red-200 hover:bg-red-200'
-                      }`}
+                    className="w-full mt-3 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 transform active:scale-[0.97]"
+                    style={{
+                      background: isDark
+                        ? 'rgba(239,68,68,0.12)'
+                        : 'rgba(239,68,68,0.08)',
+                      color: isDark ? '#f87171' : '#dc2626',
+                      border: isDark
+                        ? '1px solid rgba(239,68,68,0.2)'
+                        : '1px solid rgba(239,68,68,0.2)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = isDark
+                        ? 'rgba(239,68,68,0.25)'
+                        : 'rgba(239,68,68,0.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = isDark
+                        ? 'rgba(239,68,68,0.12)'
+                        : 'rgba(239,68,68,0.08)';
+                    }}
                     onClick={() => {
                       dispatch(
                         setMessageInfoModal(
@@ -623,6 +834,9 @@ const SimulationStatusItem: React.FC<{
     );
   };
 
+/* ══════════════════════════════════════════════════════════════════
+   QUEUED SIMULATION ITEM
+   ══════════════════════════════════════════════════════════════════ */
 export interface QueuedSimulationStatusItemProps {
   name: string;
   associatedProject: string;
@@ -647,38 +861,62 @@ const QueuedSimulationStatusItem: React.FC<QueuedSimulationStatusItemProps> = ({
   const isDark = theme !== 'light';
 
   return (
-    <div className={`flex w-full justify-between items-center rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200 ${isDark
-      ? 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
-      : 'border-gray-200 bg-white/50 text-gray-700 hover:bg-white/80'
-      }`}>
-      <span className="font-semibold">{name}</span>
-      <div className={`flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold border ${isDark
-        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-        : 'bg-amber-100 text-amber-700 border-amber-200'
-        }`}>
-        <PiClockCountdownBold className="w-3.5 h-3.5" />
-        <span>Queued</span>
-      </div>
-      <button
-        className={`p-1.5 rounded-full transition-colors duration-200 ${isDark ? 'hover:bg-red-500/20 text-red-400' : 'hover:bg-red-100 text-red-500'
+    <div
+      className="flex w-full justify-between items-center rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200"
+      style={{
+        border: isDark
+          ? '1px solid rgba(255,255,255,0.06)'
+          : '1px solid rgba(0,0,0,0.06)',
+        background: isDark
+          ? 'rgba(255,255,255,0.03)'
+          : 'rgba(255,255,255,0.6)',
+      }}
+    >
+      <span
+        className={`font-semibold truncate mr-3 ${isDark ? 'text-gray-300' : 'text-gray-700'
           }`}
-        title="Remove queued simulation"
-        onClick={() => {
-          setqueuedSimulations((prev) =>
-            prev.filter(
-              (item) => item.simulation.associatedProject !== associatedProject,
-            ),
-          );
-          dispatch(
-            updateSimulation({
-              associatedProject: associatedProject,
-              value: undefined,
-            }),
-          );
-        }}
       >
-        <TbTrashXFilled className="w-5 h-5" />
-      </button>
+        {name}
+      </span>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <div
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
+          style={{
+            background: isDark
+              ? 'rgba(245,158,11,0.15)'
+              : 'rgba(245,158,11,0.1)',
+            color: isDark ? '#fbbf24' : '#d97706',
+            border: isDark
+              ? '1px solid rgba(245,158,11,0.2)'
+              : '1px solid rgba(245,158,11,0.2)',
+          }}
+        >
+          <PiClockCountdownBold className="w-3.5 h-3.5" />
+          Queued
+        </div>
+        <button
+          className={`p-1.5 rounded-lg transition-all duration-200 ${isDark
+            ? 'hover:bg-red-500/15 text-gray-500 hover:text-red-400'
+            : 'hover:bg-red-50 text-gray-400 hover:text-red-500'
+            }`}
+          title="Remove queued simulation"
+          onClick={() => {
+            setqueuedSimulations((prev) =>
+              prev.filter(
+                (item) => item.simulation.associatedProject !== associatedProject,
+              ),
+            );
+            dispatch(
+              updateSimulation({
+                associatedProject: associatedProject,
+                value: undefined,
+              }),
+            );
+          }}
+        >
+          <TbTrashXFilled className="w-4.5 h-4.5" />
+        </button>
+      </div>
     </div>
   );
 };

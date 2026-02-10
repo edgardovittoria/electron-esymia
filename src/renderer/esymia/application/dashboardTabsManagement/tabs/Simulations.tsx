@@ -246,11 +246,11 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
                   setSimulations((prev) => {
                     const simToSort = [...prev];
                     simToSort.sort((sim1, sim2) => {
-                      if (item === 'Name') return sim1.name.localeCompare(sim2.name);
-                      if (item === 'Started Date') return parseInt(sim1.started) - parseInt(sim2.started);
+                      if (item === 'Name') return (sim1.name ?? '').localeCompare(sim2.name ?? '');
+                      if (item === 'Started Date') return parseInt(sim1.started ?? '0') - parseInt(sim2.started ?? '0');
                       if (item === 'Simulation Time') {
-                        const time1 = parseInt(sim1.ended) - parseInt(sim1.started);
-                        const time2 = parseInt(sim2.ended) - parseInt(sim2.started);
+                        const time1 = parseInt(sim1.ended ?? '0') - parseInt(sim1.started ?? '0');
+                        const time2 = parseInt(sim2.ended ?? '0') - parseInt(sim2.started ?? '0');
                         return time1 - time2;
                       }
                       return 0;
@@ -297,13 +297,13 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
             <tbody>
               {simulations.map((simulation, index) => {
                 const statusIcon = factoryStatusIcon(simulation.status);
-                const started = new Date(parseInt(simulation.started));
-                const ended = new Date(parseInt(simulation.ended));
+                const started = new Date(parseInt(simulation.started ?? '0'));
+                const ended = new Date(parseInt(simulation.ended ?? '0'));
                 const isEven = index % 2 === 0;
 
                 return (
                   <tr
-                    key={`${simulation.name}_${index}`}
+                    key={`${simulation.name ?? 'unnamed'}_${index}`}
                     className={`
                       group transition-all duration-300 border-b
                       ${isDark
@@ -355,7 +355,7 @@ export const Simulations: React.FC<SimulationsProps> = ({ maxH }) => {
                               ${isDark ? 'text-gray-200' : 'text-gray-900'}
                             `}
                           >
-                            {simulation.name}
+                            {simulation.name ?? 'Unnamed Simulation'}
                           </span>
                           <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                             Simulation

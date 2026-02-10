@@ -26,17 +26,52 @@ const ServerGUI: React.FC<ServerGUIProps> = ({ index }) => {
 
   const dispatch = useDispatch()
 
-  if (window.electron && window.electron.ipcRenderer) {
-    window.electron.ipcRenderer.on('runMesher', (arg) => {
-      setSpinnerMesher(false)
-      setMesherLogs([...mesherLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
-    });
+  useEffect(() => {
+    if (window.electron && window.electron.ipcRenderer) {
+      const removeMesherListener = window.electron.ipcRenderer.on('runMesher', (arg: any) => {
+        const response = arg as { type: string; data: string; exitCode?: number };
+        if (response.type === 'exit') {
+          setSpinnerMesher(false);
+          if (response.exitCode !== 0 && response.exitCode !== undefined) {
+            setMesherLogs((prev) => [...prev, `Process exited with code ${response.exitCode}: ${response.data}`]);
+          }
+        } else {
+          setSpinnerMesher(false); // Stop spinner on first log
+          setMesherLogs((prev) => [
+            ...prev,
+            response.data.replace(
+              /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+              '',
+            ),
+          ]);
+        }
+      });
 
-    window.electron.ipcRenderer.on('runSolver', (arg) => {
-      setSpinnerSolver(false)
-      setSolverLogs([...solverLogs, (arg as string).replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')])
-    });
-  }
+      const removeSolverListener = window.electron.ipcRenderer.on('runSolver', (arg: any) => {
+        const response = arg as { type: string; data: string; exitCode?: number };
+        if (response.type === 'exit') {
+          setSpinnerSolver(false);
+          if (response.exitCode !== 0 && response.exitCode !== undefined) {
+            setSolverLogs((prev) => [...prev, `Process exited with code ${response.exitCode}: ${response.data}`]);
+          }
+        } else {
+          setSpinnerSolver(false); // Stop spinner on first log
+          setSolverLogs((prev) => [
+            ...prev,
+            response.data.replace(
+              /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+              '',
+            ),
+          ]);
+        }
+      });
+
+      return () => {
+        if (removeMesherListener) removeMesherListener();
+        if (removeSolverListener) removeSolverListener();
+      };
+    }
+  }, []);
 
 
   useEffect(() => {

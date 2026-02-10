@@ -81,7 +81,7 @@ export const Solver: React.FC<SolverProps> = ({
   >(undefined);
   const [savedPhysicsParameters, setSavedPhysicsParameters] = useState(true);
   const [simulationType, setsimulationType] = useState<
-    'Matrix' | 'Electric Fields'
+    'Matrix' | 'Matrix_ACA' | 'Electric Fields'
   >(
     selectedProject?.simulation
       ? selectedProject.simulation.simulationType

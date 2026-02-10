@@ -19,6 +19,7 @@ export type sharingInfoUser = {
 };
 
 export type Project = {
+  acaSelectedPorts: number[];
   storage: 'local' | 'online';
   name: string;
   description: string;
@@ -115,9 +116,9 @@ export type MeshData = {
 };
 
 export type Simulation = {
-  name: string;
-  started: string;
-  ended: string;
+  name?: string;
+  started?: string;
+  ended?: string;
   status: 'Queued' | 'Running' | 'Completed' | 'Failed';
   results: SolverOutput | SolverOutputElectricFields;
   resultS3?: string;
@@ -128,7 +129,7 @@ export type Simulation = {
     outerIteration: number;
     convergenceThreshold: number;
   };
-  simulationType: 'Matrix' | 'Electric Fields';
+  simulationType: 'Matrix' | 'Matrix_ACA' | 'Electric Fields';
 };
 
 export type SolverOutput = {

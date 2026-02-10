@@ -46,6 +46,146 @@ import { uploadFileS3 } from '../../../../../../../aws/mesherAPIs';
 import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
 import axios from 'axios';
+import pako from 'pako';
+
+/* ─── Inline keyframes (injected once) ─── */
+const injectKeyframes = (() => {
+  let injected = false;
+  return () => {
+    if (injected) return;
+    injected = true;
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 8px rgba(6,182,212,0.3); }
+        50% { box-shadow: 0 0 16px rgba(6,182,212,0.6); }
+      }
+      @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(0.8); }
+      }
+    `;
+    document.head.appendChild(style);
+  };
+})();
+
+/* ─── Format seconds to mm:ss ─── */
+const formatTime = (seconds: number): string => {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+};
+
+/* ─── Custom animated progress bar ─── */
+const ProgressBar: React.FC<{
+  value: number;
+  max: number;
+  variant: 'success' | 'primary' | 'info';
+  isDark: boolean;
+  animate?: boolean;
+  indeterminate?: boolean;
+}> = ({ value, max, variant, isDark, animate = false, indeterminate = false }) => {
+  const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+  const isComplete = pct >= 100;
+
+  const gradients: Record<string, string> = {
+    success: 'linear-gradient(90deg, #22c55e, #4ade80, #22c55e)',
+    primary: 'linear-gradient(90deg, #6366f1, #818cf8, #6366f1)',
+    info: 'linear-gradient(90deg, #06b6d4, #22d3ee, #06b6d4)',
+  };
+
+  if (indeterminate) {
+    return (
+      <div
+        className={`relative w-full h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}
+      >
+        <div
+          className="h-full rounded-full"
+          style={{
+            width: '0%',
+            background: gradients[variant],
+            backgroundSize: '200% 100%',
+            animation: 'shimmer 1.5s linear infinite',
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`relative w-full h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}
+    >
+      <div
+        className="h-full rounded-full transition-all duration-700 ease-out"
+        style={{
+          width: `${pct}%`,
+          background: gradients[variant],
+          backgroundSize: animate && !isComplete ? '200% 100%' : undefined,
+          animation: animate && !isComplete ? 'shimmer 2s linear infinite' : undefined,
+          boxShadow: isComplete
+            ? `0 0 10px ${variant === 'success' ? 'rgba(34,197,94,0.5)' : variant === 'info' ? 'rgba(6,182,212,0.5)' : 'rgba(99,102,241,0.5)'}`
+            : undefined,
+        }}
+      />
+    </div>
+  );
+};
+
+/* ─── Step indicator dot ─── */
+const StepDot: React.FC<{
+  status: 'done' | 'active' | 'pending';
+  isDark: boolean;
+}> = ({ status, isDark }) => {
+  if (status === 'done') {
+    return <AiOutlineCheckCircle className="text-green-500 flex-shrink-0" size={18} />;
+  }
+  if (status === 'active') {
+    return (
+      <div
+        className="w-2.5 h-2.5 rounded-full bg-cyan-500 flex-shrink-0"
+        style={{ animation: 'pulse-dot 1.5s ease-in-out infinite' }}
+      />
+    );
+  }
+  return (
+    <div
+      className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${isDark ? 'bg-white/15' : 'bg-gray-300'}`}
+    />
+  );
+};
+
+/* ─── Pipeline step row ─── */
+const PipelineStep: React.FC<{
+  label: string;
+  status: 'done' | 'active' | 'pending';
+  isDark: boolean;
+  children?: React.ReactNode;
+}> = ({ label, status, isDark, children }) => (
+  <div className="flex flex-col gap-1.5">
+    <div className="flex items-center gap-2.5">
+      <StepDot status={status} isDark={isDark} />
+      <span
+        className={`text-xs font-semibold uppercase tracking-wider ${status === 'done'
+          ? 'text-green-500'
+          : status === 'active'
+            ? isDark ? 'text-white' : 'text-gray-900'
+            : isDark ? 'text-white/30' : 'text-gray-400'
+          }`}
+      >
+        {label}
+      </span>
+      {status === 'active' && (
+        <ImSpinner className={`w-3 h-3 animate-spin ${isDark ? 'text-cyan-400' : 'text-cyan-600'}`} />
+      )}
+    </div>
+    {children}
+  </div>
+);
 
 export interface MeshingStatusProps {
   feedbackMeshingVisible: boolean;
@@ -58,6 +198,9 @@ export interface MeshingStatusProps {
   }[];
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   MAIN COMPONENT
+   ══════════════════════════════════════════════════════════════════ */
 const MeshingStatus: React.FC<MeshingStatusProps> = ({
   feedbackMeshingVisible,
   setFeedbackMeshingVisible,
@@ -85,6 +228,10 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
       meshStatus: 'Not Generated' | 'Generated';
     }[]
   >([]);
+
+  useEffect(() => {
+    injectKeyframes();
+  }, []);
 
   useEffect(() => {
     if (window.electron && window.electron.ipcRenderer) {
@@ -137,25 +284,70 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
     }
   }, [activeMeshing.length]);
 
+  const totalActive = (runningMesh ? 1 : 0) + queuedMesh.length;
+
   return (
     <div
-      className={`absolute right-10 w-1/4 bottom-10 flex flex-col justify-center items-center glass-panel ${isDark ? 'glass-panel-dark' : 'glass-panel-light'
-        } p-4 rounded-2xl shadow-2xl transition-all duration-300 backdrop-blur-md border ${isDark ? 'border-white/10' : 'border-white/40'
-        } ${!feedbackMeshingVisible && 'hidden'}`}
+      className={`absolute right-10 bottom-10 flex flex-col items-stretch transition-all duration-300 ${!feedbackMeshingVisible && 'hidden'}`}
+      style={{
+        width: 'min(620px, 40vw)',
+        borderRadius: '16px',
+        background: isDark
+          ? 'linear-gradient(145deg, rgba(30,30,40,0.92), rgba(18,18,28,0.96))'
+          : 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(245,247,250,0.98))',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+        border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)',
+        boxShadow: isDark
+          ? '0 24px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset'
+          : '0 24px 48px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.7) inset',
+      }}
     >
-      <div className="flex flex-row justify-between w-full items-center mb-3">
-        <h5 className={`font-semibold text-lg ${isDark ? 'text-white' : 'text-gray-800'}`}>Meshing Status</h5>
+      {/* ─── Header ─── */}
+      <div className="flex items-center justify-between px-5 pt-4 pb-3">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-2 h-2 rounded-full bg-cyan-500 flex-shrink-0"
+            style={{ animation: totalActive > 0 ? 'pulse-dot 2s ease-in-out infinite' : undefined }}
+          />
+          <h5 className={`font-bold text-base tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            Meshing Status
+          </h5>
+          {totalActive > 0 && (
+            <span
+              className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full ${isDark
+                ? 'bg-cyan-500/25 text-cyan-300'
+                : 'bg-cyan-100 text-cyan-700'
+                }`}
+            >
+              {totalActive}
+            </span>
+          )}
+        </div>
         <button
           onClick={() => setFeedbackMeshingVisible(false)}
-          className={`p-1.5 rounded-full transition-colors duration-200 ${isDark ? 'hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-black/5 text-gray-500 hover:text-black'
+          className={`p-1.5 rounded-lg transition-all duration-200 ${isDark
+            ? 'hover:bg-white/10 text-gray-500 hover:text-white'
+            : 'hover:bg-black/5 text-gray-400 hover:text-gray-700'
             }`}
         >
-          <TiArrowMinimise size={20} />
+          <TiArrowMinimise size={18} />
         </button>
       </div>
-      <div className={`w-full h-px mb-4 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
 
-      <div className="max-h-[600px] overflow-y-auto w-full pr-1 custom-scrollbar flex flex-col gap-3">
+      {/* ─── Divider ─── */}
+      <div
+        className="mx-5"
+        style={{
+          height: '1px',
+          background: isDark
+            ? 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)'
+            : 'linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent)',
+        }}
+      />
+
+      {/* ─── Body ─── */}
+      <div className="flex flex-col gap-2.5 p-4 max-h-[550px] overflow-y-auto custom-scrollbar">
         {runningMesh && (
           <MeshingStatusItem
             selectedProject={runningMesh.selectedProject}
@@ -166,13 +358,17 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
         )}
         {queuedMesh.map((qm) => (
           <QueuedMeshingStatusItem
+            key={qm.selectedProject.id}
             project={qm}
             setqueuedMeshing={setqueuedMesh}
           />
         ))}
         {!runningMesh && queuedMesh.length === 0 && (
-          <div className={`text-center py-8 text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-            No active meshing tasks
+          <div
+            className={`flex flex-col items-center justify-center py-10 gap-2 ${isDark ? 'text-gray-600' : 'text-gray-400'}`}
+          >
+            <div className="text-3xl opacity-50">⏸</div>
+            <span className="text-sm font-medium">No active meshing tasks</span>
           </div>
         )}
       </div>
@@ -182,6 +378,9 @@ const MeshingStatus: React.FC<MeshingStatusProps> = ({
 
 export default MeshingStatus;
 
+/* ══════════════════════════════════════════════════════════════════
+   RUNNING MESHING ITEM
+   ══════════════════════════════════════════════════════════════════ */
 export interface MeshingStatusItemProps {
   selectedProject: Project;
   allMaterials: Material[];
@@ -209,6 +408,15 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   const theme = useSelector(ThemeSelector);
   const isDark = theme !== 'light';
 
+  const [elapsedTime, setElapsedTime] = useState(0);
+  useEffect(() => {
+    setElapsedTime(0);
+    const interval = setInterval(() => {
+      setElapsedTime((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const getEscalFrom = (unit?: string) => {
     let escal = 1.0;
     if (unit !== undefined) {
@@ -223,6 +431,7 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   };
 
   useEffect(() => {
+    let removeListener: (() => void) | undefined;
     if (selectedProject.meshData.type === 'Standard') {
       const components = selectedProject?.model
         ?.components as ComponentEntity[];
@@ -272,78 +481,97 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
         s3.getObject(params, (err, data) => {
           if (err) {
             console.log(err);
+            return;
           }
-          const res = JSON.parse(data.Body?.toString() as string);
-          window.electron.ipcRenderer.sendMessage('computeMeshRis', [
-            selectedProject.meshData.lambdaFactor as number,
-            selectedProject.maxFrequency ? selectedProject.maxFrequency : 10e9,
-            res.bricks,
-            selectedProject.id as string,
-            getEscalFrom(selectedProject.modelUnit),
-          ]);
-        });
-        window.electron.ipcRenderer.on('computeMeshRis', (arg: any) => {
-          if (arg === 'meshingStep1') {
-            dispatch(
-              setMeshingProgress({
-                meshingStep: 1,
-                id: selectedProject.id as string,
-              }),
-            );
-          } else if (arg === 'meshingStep2') {
-            dispatch(
-              setMeshingProgress({
-                meshingStep: 2,
-                id: selectedProject.id as string,
-              }),
-            );
-          } else {
-            const { mesh, superfici } = arg;
-            const meshToUploadToS3 = JSON.stringify(mesh);
-            const blobFileMesh = new Blob([meshToUploadToS3]);
-            const meshFile = new File(
-              [blobFileMesh],
-              `${selectedProject.id}_mesh.json`,
-            );
-            const surfacesToUploadToS3 = JSON.stringify(superfici);
-            const blobFileSurfaces = new Blob([surfacesToUploadToS3]);
-            const surfacesFile = new File(
-              [blobFileSurfaces],
-              `${selectedProject.id}_surface.json`,
-            );
-            uploadFileS3(meshFile).then((resMesh) => {
-              console.log('mesh uploaded :', resMesh);
-              if (resMesh) {
-                uploadFileS3(surfacesFile).then((resSurface) => {
-                  console.log('surfaces uploaded :', resSurface);
-                  dispatch(
-                    setMesherResults({
-                      id: selectedProject.id as string,
-                      gridsPath: '',
-                      meshPath: resMesh.key,
-                      surfacePath: resSurface ? resSurface.key : '',
-                      isStopped: false,
-                      isValid: { valid: true },
-                      validTopology: true,
-                      error: undefined,
-                      ASize: mesh.ASize,
-                    }),
-                  );
-                  dispatch(
-                    setMeshASize({
-                      ASize: mesh.ASize,
-                      projectToUpdate: selectedProject.id as string,
-                    }),
-                  );
-                });
-              }
-            });
+          try {
+            const isGzipped = (selectedProject.bricks as string).endsWith('.gz');
+            let jsonString: string;
+
+            if (isGzipped && data.Body) {
+              const uint8Array = new Uint8Array(data.Body as ArrayBuffer);
+              const decompressed = pako.inflate(uint8Array, { to: 'string' });
+              jsonString = decompressed;
+            } else {
+              jsonString = data.Body?.toString() as string;
+            }
+
+            const res = JSON.parse(jsonString);
+            window.electron.ipcRenderer.sendMessage('computeMeshRis', [
+              selectedProject.meshData.lambdaFactor as number,
+              selectedProject.maxFrequency ? selectedProject.maxFrequency : 10e9,
+              res.bricks,
+              selectedProject.id as string,
+              getEscalFrom(selectedProject.modelUnit),
+            ]);
+          } catch (parseError) {
+            console.error('Error parsing bricks data:', parseError);
           }
         });
+        removeListener = window.electron.ipcRenderer.on(
+          'computeMeshRis',
+          (arg: any) => {
+            if (arg === 'meshingStep1') {
+              dispatch(
+                setMeshingProgress({
+                  meshingStep: 1,
+                  id: selectedProject.id as string,
+                }),
+              );
+            } else if (arg === 'meshingStep2') {
+              dispatch(
+                setMeshingProgress({
+                  meshingStep: 2,
+                  id: selectedProject.id as string,
+                }),
+              );
+            } else {
+              const { mesh, superfici } = arg;
+              const meshToUploadToS3 = JSON.stringify(mesh);
+              const blobFileMesh = new Blob([meshToUploadToS3]);
+              const meshFile = new File(
+                [blobFileMesh],
+                `${selectedProject.id}_mesh.json`,
+              );
+              const surfacesToUploadToS3 = JSON.stringify(superfici);
+              const blobFileSurfaces = new Blob([surfacesToUploadToS3]);
+              const surfacesFile = new File(
+                [blobFileSurfaces],
+                `${selectedProject.id}_surface.json`,
+              );
+              uploadFileS3(meshFile).then((resMesh) => {
+                console.log('mesh uploaded :', resMesh);
+                if (resMesh) {
+                  uploadFileS3(surfacesFile).then((resSurface) => {
+                    console.log('surfaces uploaded :', resSurface);
+                    dispatch(
+                      setMesherResults({
+                        id: selectedProject.id as string,
+                        gridsPath: '',
+                        meshPath: resMesh.key,
+                        surfacePath: resSurface ? resSurface.key : '',
+                        isStopped: false,
+                        isValid: { valid: true },
+                        validTopology: true,
+                        error: undefined,
+                        ASize: mesh.ASize,
+                      }),
+                    );
+                    dispatch(
+                      setMeshASize({
+                        ASize: mesh.ASize,
+                        projectToUpdate: selectedProject.id as string,
+                      }),
+                    );
+                  });
+                }
+              });
+            }
+          },
+        );
       }
     }
     return () => {
-      window.electron.ipcRenderer.removeAllListeners('computeMeshRis');
+      if (removeListener) removeListener();
     };
   }, []);
 
@@ -529,182 +757,219 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
     }
   }, [isAlertConfirmed]);
 
+  /* ─── Determine step states ─── */
+  const isStandard = selectedProject.meshData.type === 'Standard';
+
+  const meshingMax = isStandard ? 4 : 2;
+  const meshingValue = meshingStep?.meshingStep ?? 0;
+  const meshingDone = meshingValue >= meshingMax;
+
+  const checkDone = gridsCreationValue !== undefined;
+  const checkActive = meshingDone && !checkDone;
+
+  const gridsDone = compress !== undefined;
+  const gridsActive = checkDone && !gridsDone;
+
+  const loadingDone = compress !== undefined && !compress;
+  const loadingActive = gridsDone && !loadingDone;
+
+  const meshStatus: 'done' | 'active' | 'pending' = meshingDone ? 'done' : meshingStep ? 'active' : 'active';
+
+  const checkStatus: 'done' | 'active' | 'pending' = checkDone
+    ? 'done'
+    : checkActive
+      ? 'active'
+      : 'pending';
+
+  const gridsStatus: 'done' | 'active' | 'pending' = gridsDone
+    ? 'done'
+    : gridsActive
+      ? 'active'
+      : 'pending';
+
+  const loadingStatus: 'done' | 'active' | 'pending' = loadingDone
+    ? 'done'
+    : loadingActive
+      ? 'active'
+      : 'pending';
+
+  // For RIS type, simplified pipeline
+  const risMeshStatus: 'done' | 'active' | 'pending' = meshingDone ? 'done' : 'active';
+  const risLoadingStatus: 'done' | 'active' | 'pending' = loadingDone
+    ? 'done'
+    : meshingDone
+      ? 'active'
+      : 'pending';
+
+  console.log(meshingValue)
+
   return (
     <Disclosure defaultOpen>
       {({ open }) => (
-        <div className={`rounded-xl overflow-hidden border transition-all duration-300 ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-white/50'
-          }`}>
+        <div
+          className="rounded-xl overflow-hidden transition-all duration-300"
+          style={{
+            border: isDark
+              ? '1px solid rgba(255,255,255,0.06)'
+              : '1px solid rgba(0,0,0,0.06)',
+            background: isDark
+              ? 'rgba(255,255,255,0.03)'
+              : 'rgba(255,255,255,0.6)',
+          }}
+        >
           <Disclosure.Button
-            className={`flex w-full justify-between items-center px-4 py-3 text-left text-sm font-medium focus:outline-none transition-colors duration-200 ${isDark ? 'hover:bg-white/10 text-gray-200' : 'hover:bg-white/60 text-gray-700'
+            className={`flex w-full justify-between items-center px-4 py-3 text-left text-sm font-medium focus:outline-none transition-colors duration-200 ${isDark
+              ? 'hover:bg-white/5 text-gray-200'
+              : 'hover:bg-white/80 text-gray-700'
               }`}
           >
-            <span className="font-semibold">{selectedProject.name}</span>
-            <div className="flex items-center gap-3">
-              <div className={`flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold border ${isDark
-                ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                : 'bg-green-100 text-green-700 border-green-200'
-                }`}>
-                <ImSpinner className="animate-spin" />
-                <span>Generating</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="font-semibold truncate">{selectedProject.name}</span>
+            </div>
+            <div className="flex items-center gap-2.5 flex-shrink-0">
+              {/* Elapsed time badge */}
+              <span
+                className={`flex items-center gap-1.5 text-[11px] font-mono tabular-nums ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
+              >
+                <PiClockCountdownBold className="w-3.5 h-3.5" />
+                {formatTime(elapsedTime)}
+              </span>
+
+              {/* Status badge */}
+              <div
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
+                style={{
+                  background: isDark ? 'rgba(6,182,212,0.15)' : 'rgba(6,182,212,0.1)',
+                  color: isDark ? '#22d3ee' : '#0891b2',
+                  border: isDark
+                    ? '1px solid rgba(6,182,212,0.2)'
+                    : '1px solid rgba(6,182,212,0.2)',
+                  animation: 'pulse-glow 3s ease-in-out infinite',
+                }}
+              >
+                <ImSpinner className="animate-spin w-3 h-3" />
+                Generating
               </div>
+
               <MdKeyboardArrowUp
-                className={`${open ? 'rotate-180 transform' : ''} h-5 w-5 transition-transform duration-200 ${isDark ? 'text-gray-400' : 'text-gray-500'
-                  } `}
+                className={`${open ? '' : 'rotate-180'} h-4 w-4 transition-transform duration-300 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
               />
             </div>
           </Disclosure.Button>
-          <Disclosure.Panel className={`px-4 pb-4 pt-2 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+
+          <Disclosure.Panel className={`px-4 pb-4 pt-1 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             {selectedProject.meshData.meshGenerated === 'Generating' ? (
-              <div
-                className={`flex flex-col gap-4 items-center justify-center w-full`}
-              >
+              <div className="relative">
                 {stopSpinner && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-10 rounded-xl">
                     <ImSpinner className={`animate-spin w-8 h-8 ${isDark ? 'text-white' : 'text-black'}`} />
                   </div>
                 )}
+
+                {/* ─── Pipeline steps ─── */}
                 <div
-                  className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'
-                    }`}
+                  className={`flex flex-col gap-4 p-4 rounded-xl ${stopSpinner ? 'opacity-40' : 'opacity-100'}`}
+                  style={{
+                    background: isDark ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.02)',
+                    border: isDark
+                      ? '1px solid rgba(255,255,255,0.04)'
+                      : '1px solid rgba(0,0,0,0.04)',
+                  }}
                 >
-                  <span className="text-xs font-medium uppercase tracking-wider opacity-70">Meshing</span>
-                  <div className="flex flex-row justify-between items-center w-full">
+                  {/* Step 1: Meshing */}
+                  <PipelineStep label="Meshing" status={isStandard ? meshStatus : risMeshStatus} isDark={isDark}>
                     {meshingStep ? (
-                      <>
-                        {(selectedProject.meshData.type === 'Standard' &&
-                          meshingStep.meshingStep === 4) ||
-                          (selectedProject.meshData.type === 'Ris' &&
-                            meshingStep.meshingStep === 2) ? (
-                          <div className="flex flex-row w-full justify-between items-center">
-                            <progress
-                              className={`progress w-full mr-4 ${isDark ? 'progress-success' : 'progress-success'}`}
-                              value={1}
-                              max={1}
-                            />
-                            <AiOutlineCheckCircle
-                              size="20px"
-                              className="text-green-500"
-                            />
-                          </div>
-                        ) : (
-                          <progress
-                            className={`progress w-full ${isDark ? 'progress-info' : 'progress-info'}`}
-                            value={meshingStep.meshingStep}
-                            max={
-                              selectedProject.meshData.type === 'Standard'
-                                ? 4
-                                : 2
-                            }
+                      <ProgressBar
+                        value={meshingValue ? meshingValue : 0}
+                        max={meshingMax}
+                        variant={meshingDone ? 'success' : 'info'}
+                        isDark={isDark}
+                        animate={!meshingDone}
+                      />
+                    ) : (
+                      <ProgressBar value={0} max={1} variant="primary" isDark={isDark} indeterminate />
+                    )}
+                  </PipelineStep>
+
+                  {/* Standard-only steps */}
+                  {isStandard && (
+                    <>
+                      {/* Step 2: Check mesh validity */}
+                      <PipelineStep label="Check mesh validity" status={checkStatus} isDark={isDark}>
+                        {checkProgressValue && checkProgressLength && checkProgressLength.length > 0 ? (
+                          <ProgressBar
+                            value={checkProgressValue.index}
+                            max={checkProgressLength.length}
+                            variant={checkDone ? 'success' : 'info'}
+                            isDark={isDark}
+                            animate={!checkDone}
                           />
-                        )}
-                      </>
-                    ) : (
-                      <progress className={`progress w-full ${isDark ? 'progress-primary' : 'progress-primary'}`} />
-                    )}
-                  </div>
-                </div>
-                {selectedProject.meshData.type === 'Standard' && (
-                  <>
-                    <div
-                      className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'
-                        }`}
-                    >
-                      <span className="text-xs font-medium uppercase tracking-wider opacity-70">Check mesh validity</span>
-                      <div className="flex flex-row justify-between items-center w-full">
-                        {checkProgressValue &&
-                          checkProgressLength &&
-                          checkProgressLength.length > 0 ? (
-                          <div className="flex flex-row w-full justify-between items-center">
-                            <progress
-                              className={`progress w-full mr-4 ${isDark ? 'progress-info' : 'progress-info'}`}
-                              value={checkProgressValue.index}
-                              max={checkProgressLength.length}
-                            />
-                            {gridsCreationValue !== undefined && (
-                              <AiOutlineCheckCircle
-                                size="20px"
-                                className="text-green-500"
-                              />
-                            )}
-                          </div>
                         ) : (
-                          <progress className={`progress w-full ${isDark ? 'progress-primary' : 'progress-primary'}`} />
+                          <ProgressBar value={0} max={1} variant="primary" isDark={isDark} indeterminate={checkActive} />
                         )}
-                      </div>
-                    </div>
-                    <div
-                      className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'
-                        }`}
-                    >
-                      <span className="text-xs font-medium uppercase tracking-wider opacity-70">Grids creation</span>
-                      <div className="flex flex-row justify-between items-center w-full">
+                      </PipelineStep>
+
+                      {/* Step 3: Grids creation */}
+                      <PipelineStep label="Grids creation" status={gridsStatus} isDark={isDark}>
                         {gridsCreationLength && gridsCreationValue ? (
-                          <>
-                            {compress !== undefined ? (
-                              <div className="flex flex-row w-full justify-between items-center">
-                                <progress
-                                  className={`progress w-full mr-4 ${isDark ? 'progress-success' : 'progress-success'}`}
-                                  value={1}
-                                  max={1}
-                                />
-                                <AiOutlineCheckCircle
-                                  size="20px"
-                                  className="text-green-500"
-                                />
-                              </div>
-                            ) : (
-                              <progress
-                                className={`progress w-full ${isDark ? 'progress-info' : 'progress-info'}`}
-                                max={gridsCreationLength.gridsCreationLength}
-                                value={gridsCreationValue.gridsCreationValue}
-                              />
-                            )}
-                          </>
+                          <ProgressBar
+                            value={gridsDone ? 1 : gridsCreationValue.gridsCreationValue}
+                            max={gridsDone ? 1 : gridsCreationLength.gridsCreationLength}
+                            variant={gridsDone ? 'success' : 'info'}
+                            isDark={isDark}
+                            animate={!gridsDone}
+                          />
                         ) : (
-                          <progress className={`progress w-full ${isDark ? 'progress-primary' : 'progress-primary'}`} />
+                          <ProgressBar value={0} max={1} variant="primary" isDark={isDark} indeterminate={gridsActive} />
                         )}
-                      </div>
-                    </div>
-                  </>
-                )}
-                <div
-                  className={`flex flex-col gap-2 w-full ${stopSpinner ? 'opacity-40' : 'opacity-100'
-                    }`}
-                >
-                  <span className="text-xs font-medium uppercase tracking-wider opacity-70">Loading Data</span>
-                  <div className="flex flex-row justify-between items-center w-full">
+                      </PipelineStep>
+                    </>
+                  )}
+
+                  {/* Loading Data step */}
+                  <PipelineStep label="Loading Data" status={isStandard ? loadingStatus : risLoadingStatus} isDark={isDark}>
                     {compress !== undefined ? (
-                      <>
-                        {!compress ? (
-                          <div className="flex flex-row w-full justify-between items-center">
-                            <progress
-                              className={`progress w-full mr-4 ${isDark ? 'progress-success' : 'progress-success'}`}
-                              value={1}
-                              max={1}
-                            />
-                            <AiOutlineCheckCircle
-                              size="20px"
-                              className="text-green-500"
-                            />
-                          </div>
-                        ) : (
-                          <progress className={`progress w-full ${isDark ? 'progress-primary' : 'progress-primary'}`} />
-                        )}
-                      </>
+                      <ProgressBar
+                        value={!compress ? 1 : 0}
+                        max={1}
+                        variant={!compress ? 'success' : 'primary'}
+                        isDark={isDark}
+                        animate={!!compress}
+                      />
                     ) : (
-                      <progress className={`progress w-full ${isDark ? 'progress-primary' : 'progress-primary'}`} />
+                      <ProgressBar
+                        value={0}
+                        max={1}
+                        variant="primary"
+                        isDark={isDark}
+                        indeterminate={isStandard ? loadingActive : meshingDone}
+                      />
                     )}
-                  </div>
+                  </PipelineStep>
                 </div>
+
+                {/* ─── Stop button ─── */}
                 <button
-                  className={`w-full py-2 rounded-lg text-sm font-semibold shadow-md transition-all duration-200 transform active:scale-95 mt-2 ${isDark
-                    ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
-                    : 'bg-red-100 text-red-600 border border-red-200 hover:bg-red-200'
-                    }`}
+                  className="w-full mt-3 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 transform active:scale-[0.97]"
+                  style={{
+                    background: isDark ? 'rgba(239,68,68,0.12)' : 'rgba(239,68,68,0.08)',
+                    color: isDark ? '#f87171' : '#dc2626',
+                    border: isDark
+                      ? '1px solid rgba(239,68,68,0.2)'
+                      : '1px solid rgba(239,68,68,0.2)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = isDark
+                      ? 'rgba(239,68,68,0.25)'
+                      : 'rgba(239,68,68,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = isDark
+                      ? 'rgba(239,68,68,0.12)'
+                      : 'rgba(239,68,68,0.08)';
+                  }}
                   onClick={() => {
-                    dispatch(
-                      setMessageInfoModal('Are you sure to stop the meshing?'),
-                    );
+                    dispatch(setMessageInfoModal('Are you sure to stop the meshing?'));
                     dispatch(setIsAlertInfoModal(false));
                     dispatch(setShowInfoModal(true));
                     setStopSpinner(true);
@@ -725,6 +990,9 @@ const MeshingStatusItem: React.FC<MeshingStatusItemProps> = ({
   );
 };
 
+/* ══════════════════════════════════════════════════════════════════
+   QUEUED MESHING ITEM
+   ══════════════════════════════════════════════════════════════════ */
 export interface QueuedMeshingStatusItemProps {
   project: {
     selectedProject: Project;
@@ -753,38 +1021,57 @@ const QueuedMeshingStatusItem: React.FC<QueuedMeshingStatusItemProps> = ({
   const isDark = theme !== 'light';
 
   return (
-    <div className={`flex w-full justify-between items-center rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200 ${isDark
-      ? 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
-      : 'border-gray-200 bg-white/50 text-gray-700 hover:bg-white/80'
-      }`}>
-      <span className="font-semibold">{project.selectedProject.name}</span>
-      <div className={`flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold border ${isDark
-        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-        : 'bg-amber-100 text-amber-700 border-amber-200'
-        }`}>
-        <PiClockCountdownBold className="w-3.5 h-3.5" />
-        <span>Queued</span>
+    <div
+      className="flex w-full justify-between items-center rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200"
+      style={{
+        border: isDark
+          ? '1px solid rgba(255,255,255,0.06)'
+          : '1px solid rgba(0,0,0,0.06)',
+        background: isDark
+          ? 'rgba(255,255,255,0.03)'
+          : 'rgba(255,255,255,0.6)',
+      }}
+    >
+      <span className={`font-semibold truncate mr-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+        {project.selectedProject.name}
+      </span>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <div
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
+          style={{
+            background: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.1)',
+            color: isDark ? '#fbbf24' : '#d97706',
+            border: isDark
+              ? '1px solid rgba(245,158,11,0.2)'
+              : '1px solid rgba(245,158,11,0.2)',
+          }}
+        >
+          <PiClockCountdownBold className="w-3.5 h-3.5" />
+          Queued
+        </div>
+        <button
+          className={`p-1.5 rounded-lg transition-all duration-200 ${isDark
+            ? 'hover:bg-red-500/15 text-gray-500 hover:text-red-400'
+            : 'hover:bg-red-50 text-gray-400 hover:text-red-500'
+            }`}
+          title="Remove queued meshing"
+          onClick={() => {
+            setqueuedMeshing((prev) =>
+              prev.filter(
+                (item) => item.selectedProject.id !== project.selectedProject.id,
+              ),
+            );
+            dispatch(
+              setMeshGenerated({
+                status: project.meshStatus,
+                projectToUpdate: project.selectedProject.id as string,
+              }),
+            );
+          }}
+        >
+          <TbTrashXFilled className="w-4.5 h-4.5" />
+        </button>
       </div>
-      <button
-        className={`p-1.5 rounded-full transition-colors duration-200 ${isDark ? 'hover:bg-red-500/20 text-red-400' : 'hover:bg-red-100 text-red-500'
-          }`}
-        title="Remove queued meshing"
-        onClick={() => {
-          setqueuedMeshing((prev) =>
-            prev.filter(
-              (item) => item.selectedProject.id !== project.selectedProject.id,
-            ),
-          );
-          dispatch(
-            setMeshGenerated({
-              status: project.meshStatus,
-              projectToUpdate: project.selectedProject.id as string,
-            }),
-          );
-        }}
-      >
-        <TbTrashXFilled className="w-5 h-5" />
-      </button>
     </div>
   );
 };

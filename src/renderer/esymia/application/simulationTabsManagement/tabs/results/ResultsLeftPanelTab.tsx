@@ -37,7 +37,7 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
             <div className={`p-3 rounded-xl backdrop-blur-md border shadow-sm ${theme === 'light' ? 'bg-white border-gray-200/50' : 'bg-white border-white/10'}`}>
               <span className="text-sm font-bold block mb-1 opacity-70">Simulation Name</span>
               <span className="text-base font-semibold block truncate">
-                {selectedProject.simulation.name}
+                {selectedProject.simulation.name ?? 'Unnamed Simulation'}
               </span>
             </div>
 
@@ -50,19 +50,19 @@ export const ResultsLeftPanelTab: React.FC<ResultsLeftPanelTabProps> = ({
                   <div className="w-full flex justify-between text-sm">
                     <span className="opacity-70">Started:</span>
                     <span className="font-semibold">
-                      {new Date(parseInt(selectedProject.simulation.started)).toLocaleString()}
+                      {new Date(parseInt(selectedProject.simulation.started ?? '0')).toLocaleString()}
                     </span>
                   </div>
                   <div className="w-full flex justify-between text-sm">
                     <span className="opacity-70">Ended:</span>
                     <span className="font-semibold">
-                      {new Date(parseInt(selectedProject.simulation.ended)).toLocaleString()}
+                      {new Date(parseInt(selectedProject.simulation.ended ?? '0')).toLocaleString()}
                     </span>
                   </div>
                   <div className="w-full flex justify-between text-sm border-t pt-2 mt-1 border-gray-200/20">
                     <span className="opacity-70">Duration:</span>
                     <span className="font-semibold">
-                      {msToTime((new Date(parseInt(selectedProject.simulation.ended)).getTime() - new Date(parseInt(selectedProject.simulation.started)).getTime()))}
+                      {msToTime((new Date(parseInt(selectedProject.simulation.ended ?? '0')).getTime() - new Date(parseInt(selectedProject.simulation.started ?? '0')).getTime()))}
                     </span>
                   </div>
                 </div>
