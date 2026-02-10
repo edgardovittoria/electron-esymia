@@ -1,30 +1,30 @@
 import {
   Folder,
   Project,
-} from '../../../../../../../model/esymiaModels';
-import { deleteFileS3 } from '../../../../../../../aws/mesherAPIs';
+} from '../../../model/esymiaModels';
+import { deleteFileS3 } from '../../../aws/mesherAPIs';
 import {
   addProject,
   removeProject,
   selectedProjectSelector,
-} from '../../../../../../../store/projectSlice';
+} from '../../../store/projectSlice';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import { s3 } from '../../../../../../../aws/s3Config';
+import { s3 } from '../../../aws/s3Config';
 import {
   addProjectTab,
   closeProjectTab,
   setAWSExternalGridsData,
-} from '../../../../../../../store/tabsAndMenuItemsSlice';
-import { CanvasState } from '../../../../../../../../cad_library';
-import { UsersState } from '../../../../../../../../cad_library/components/store/users/usersSlice';
+} from '../../../store/tabsAndMenuItemsSlice';
+import { CanvasState } from '../../../../cad_library';
+import { UsersState } from '../../../../cad_library/components/store/users/usersSlice';
 import { GetObjectRequest } from 'aws-sdk/clients/s3';
-import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
+import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
 import {
   deleteSimulationProjectFromDynamoDB,
   createOrUpdateProjectInDynamoDB,
   addIDInProjectListInDynamoDB,
-} from '../../../../../../../../dynamoDB/projectsFolderApi';
+} from '../../../../dynamoDB/projectsFolderApi';
 import axios from 'axios';
 import pako from 'pako';
 

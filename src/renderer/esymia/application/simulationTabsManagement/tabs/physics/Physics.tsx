@@ -43,7 +43,6 @@ import { GiAtom, GiRadialBalance } from 'react-icons/gi';
 import { GrClone, GrStatusInfo } from 'react-icons/gr';
 import { RiListIndefinite } from 'react-icons/ri';
 import { ImSpinner } from 'react-icons/im';
-import { useStorageData } from '../mesher/components/rightPanelSimulator/hook/useStorageData';
 import {
   FrequenciesImportFromCSV,
   LumpedImportFromCSV,
@@ -56,6 +55,7 @@ import { ThemeSelector } from '../../../../store/tabsAndMenuItemsSlice';
 import { TbWavesElectricity } from 'react-icons/tb';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
+import { useStorageData } from '../../hook/useStorageData';
 
 interface PhysicsProps {
   selectedTabLeftPanel: string | undefined;
@@ -154,10 +154,10 @@ export const Physics: React.FC<PhysicsProps> = ({
         <div className="gap-2 flex flex-row">
           {selectedProject?.model.components && (
             <>
-              <CreatePorts
+              {/* <CreatePorts
                 selectedProject={selectedProject}
                 cameraPosition={cameraPosition}
-              />
+              /> */}
               <SurfaceAdvicesButton
                 surfaceAdvices={surfaceAdvices}
                 setSurfaceAdvices={setSurfaceAdvices}

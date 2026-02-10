@@ -14,12 +14,12 @@ import {
   selectedProjectSelector,
   setMeshApproved,
 } from '../../../../../store/projectSlice';
-import { useStorageData } from '../../mesher/components/rightPanelSimulator/hook/useStorageData';
 import { ImSpinner } from 'react-icons/im';
 import { Folder, Project } from '../../../../../model/esymiaModels';
 import { deleteFileS3 } from '../../../../../aws/mesherAPIs';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../../dynamoDB/projectsFolderApi';
 import { Dispatch } from '@reduxjs/toolkit';
+import { useStorageData } from '../../../hook/useStorageData';
 
 interface SaveProjectResultsModalProps {
   toggleEditInputsSlider: Function
@@ -102,8 +102,8 @@ export const SaveProjectResultsModal: React.FC<
               >
                 <Dialog.Panel
                   className={`w-full max-w-md transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-2xl transition-all backdrop-blur-md border ${theme === 'light'
-                      ? 'bg-white/90 border-white/40 text-gray-800'
-                      : 'bg-black/60 border-white/10 text-gray-200'
+                    ? 'bg-white/90 border-white/40 text-gray-800'
+                    : 'bg-black/60 border-white/10 text-gray-200'
                     }`}
                 >
                   <Dialog.Title
@@ -120,8 +120,8 @@ export const SaveProjectResultsModal: React.FC<
                         type="text"
                         data-testid="projectName"
                         className={`w-full p-3 rounded-xl outline-none transition-all ${theme === 'light'
-                            ? 'bg-gray-100 border border-transparent focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
-                            : 'bg-white/5 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
+                          ? 'bg-gray-100 border border-transparent focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                          : 'bg-white/5 border border-white/10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-white'
                           }`}
                         placeholder="Project's Name"
                         value={projectName}
@@ -134,8 +134,8 @@ export const SaveProjectResultsModal: React.FC<
                     <button
                       type="button"
                       className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${theme === 'light'
-                          ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                          : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
                         }`}
                       onClick={() => {
                         toggleEditInputsSlider()
@@ -157,8 +157,8 @@ export const SaveProjectResultsModal: React.FC<
                     <button
                       type="button"
                       className={`px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all duration-300 ${theme === 'light'
-                          ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'
-                          : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/30'
+                        ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'
+                        : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/30'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                       disabled={(process.env.APP_VERSION === 'demo' && selectedFolder?.projectList.length === 3)}
                       onClick={() => {

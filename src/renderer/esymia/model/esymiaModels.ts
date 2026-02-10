@@ -19,7 +19,7 @@ export type sharingInfoUser = {
 };
 
 export type Project = {
-  acaSelectedPorts: number[];
+  acaSelectedPorts?: number[];
   storage: 'local' | 'online';
   name: string;
   description: string;

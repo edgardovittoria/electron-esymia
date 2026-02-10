@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Physics } from './tabs/physics/Physics';
 import { Results } from './tabs/results/Results';
 import { Solver } from './tabs/solver/Solver';
 import { Modeler } from './tabs/modeler/Modeler';
 import { selectedMenuItemSelector } from '../../store/tabsAndMenuItemsSlice';
 import { useWindowInnerWidth } from '../../hook/useWindowInnerWidth';
-import { resultsLeftPanelTitle } from '../config/panelTitles';
 import { Mesher } from './tabs/mesher/Mesher';
 
-interface SimulationTabsContentFactoryProps {}
+interface SimulationTabsContentFactoryProps { }
 
 export const SimulationTabsContentFactory: React.FC<
   SimulationTabsContentFactoryProps
@@ -17,7 +15,7 @@ export const SimulationTabsContentFactory: React.FC<
   const [selectedTabLeftPanel, setSelectedTabLeftPanel] = useState<string | undefined>(undefined);
   const menuItemSelected = useSelector(selectedMenuItemSelector);
 
-  const {windowInnerWidth, windowInnerHeight} = useWindowInnerWidth();
+  const { windowInnerWidth, windowInnerHeight } = useWindowInnerWidth();
 
   if (windowInnerWidth < 1280 || windowInnerHeight < 800) {
     return (

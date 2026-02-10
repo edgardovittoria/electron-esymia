@@ -21,7 +21,6 @@ import {
 import { resultsLeftPanelTitle } from '../../../config/panelTitles';
 import { Dataset, pairs } from './sharedElements';
 import { AiOutlineBarChart } from 'react-icons/ai';
-import { useStorageData } from '../mesher/components/rightPanelSimulator/hook/useStorageData';
 import { GrClone } from 'react-icons/gr';
 import { ImSpinner } from 'react-icons/im';
 import { BsFiletypeCsv } from 'react-icons/bs';
@@ -47,6 +46,7 @@ import {
 import { ChartListElectricFields } from './chartListElectricFields/ChartListElectricFields';
 import { SolverStatusSelector } from '../../../../store/pluginsSlice';
 import axios from 'axios';
+import { useStorageData } from '../../hook/useStorageData';
 
 interface ResultsProps {
   selectedTabLeftPanel: string | undefined;

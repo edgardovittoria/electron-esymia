@@ -3,7 +3,7 @@ import { MyInstancedMesh } from './components/MyInstancedMesh';
 import { ExternalGridsObject, Project } from '../../../../../../model/esymiaModels';
 import { useSelector } from 'react-redux';
 import { meshGeneratedSelector, selectedProjectSelector } from '../../../../../../store/projectSlice';
-import { Brick } from '../rightPanelSimulator/components/createGridsExternals';
+import { Brick } from '../utils/createGridsExternals';
 import { ComponentEntity, Material } from '../../../../../../../cad_library';
 
 interface MeshedElementProps {

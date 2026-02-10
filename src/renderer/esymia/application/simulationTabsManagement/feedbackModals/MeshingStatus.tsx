@@ -21,7 +21,7 @@ import {
   setMessageInfoModal,
   setShowInfoModal,
   ThemeSelector,
-} from '../../../../../../../store/tabsAndMenuItemsSlice';
+} from '../../../store/tabsAndMenuItemsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   setExternalGrids,
@@ -30,21 +30,21 @@ import {
   setMeshGenerated,
   setMeshValidTopology,
   setSurface,
-} from '../../../../../../../store/projectSlice';
-import { Project } from '../../../../../../../model/esymiaModels';
-import { generateSTLListFromComponents } from './rightPanelFunctions';
+} from '../../../store/projectSlice';
+import { Project } from '../../../model/esymiaModels';
+import { generateSTLListFromComponents } from '../tabs/mesher/components/utils/generateSTLListFromComponents';
 import { TiArrowMinimise } from 'react-icons/ti';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
-import { publishMessage } from '../../../../../../../../middleware/stompMiddleware';
+import { publishMessage } from '../../../../middleware/stompMiddleware';
 import { Disclosure } from '@headlessui/react';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 import { PiClockCountdownBold } from 'react-icons/pi';
 import { TbTrashXFilled } from 'react-icons/tb';
-import { ComponentEntity, Material } from '../../../../../../../../cad_library';
-import { s3 } from '../../../../../../../aws/s3Config';
-import { uploadFileS3 } from '../../../../../../../aws/mesherAPIs';
-import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
-import { createOrUpdateProjectInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
+import { ComponentEntity, Material } from '../../../../cad_library';
+import { s3 } from '../../../aws/s3Config';
+import { uploadFileS3 } from '../../../aws/mesherAPIs';
+import { useDynamoDBQuery } from '../../../../dynamoDB/hook/useDynamoDBQuery';
+import { createOrUpdateProjectInDynamoDB } from '../../../../dynamoDB/projectsFolderApi';
 import axios from 'axios';
 import pako from 'pako';
 

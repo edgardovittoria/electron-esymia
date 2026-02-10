@@ -4,8 +4,8 @@ import Esymia from './esymia/Esymia';
 import Cadmia from './cadmia/Cadmia';
 import Home from './home/Home';
 import { useAuth0 } from '@auth0/auth0-react';
-import SimulationStatus from './esymia/application/simulationTabsManagement/tabs/mesher/components/rightPanelSimulator/components/SimulationStatus';
-import MeshingStatus from './esymia/application/simulationTabsManagement/tabs/mesher/components/rightPanelSimulator/components/MeshingStatus';
+import SimulationStatus from './esymia/application/simulationTabsManagement/feedbackModals/SimulationStatus';
+import MeshingStatus from './esymia/application/simulationTabsManagement/feedbackModals/MeshingStatus';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   activeMeshingSelector,

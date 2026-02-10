@@ -36,10 +36,10 @@ import StatusBar from '../../sharedElements/StatusBar';
 import { AlteredProportionsButton } from './components/AlteredProportionsButton';
 import { CanvasSolver } from '../solver/components/CanvasSolver';
 import { OriginaProportionsButton } from './components/OriginalProportionsButton';
-import { Brick } from './components/rightPanelSimulator/components/createGridsExternals';
-import { useStorageData } from './components/rightPanelSimulator/hook/useStorageData';
+import { Brick } from './components/utils/createGridsExternals';
 import { MesherSettings } from './components/mesherSettings/MesherSettings';
 import { CanvasMesher } from './components/CanvasMesher';
+import { useStorageData } from '../../hook/useStorageData';
 
 interface MesherProps {
   selectedTabLeftPanel: string | undefined;

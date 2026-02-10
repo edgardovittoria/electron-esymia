@@ -18,7 +18,6 @@ import StatusBar from '../../sharedElements/StatusBar';
 import { CanvasSolver } from './components/CanvasSolver';
 import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
 import { ImSpinner } from 'react-icons/im';
-import { useStorageData } from '../mesher/components/rightPanelSimulator/hook/useStorageData';
 import {
   AWSExternalGridsDataSelector,
   meshVisualizationSelector,
@@ -28,7 +27,7 @@ import {
 } from '../../../../store/tabsAndMenuItemsSlice';
 import { LiaFeatherSolid, LiaWeightHangingSolid } from 'react-icons/lia';
 import { BiHide, BiShow } from 'react-icons/bi';
-import { Brick } from '../mesher/components/rightPanelSimulator/components/createGridsExternals';
+import { Brick } from '../mesher/components/utils/createGridsExternals';
 import { GrClone, GrStatusInfo } from 'react-icons/gr';
 import { ComponentEntity, Material } from '../../../../../cad_library';
 import { MesherStatusSelector } from '../../../../store/pluginsSlice';
@@ -43,6 +42,7 @@ import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery'
 import { TiArrowMinimise } from 'react-icons/ti';
 import { LuClipboardList } from 'react-icons/lu';
 import { SolverSettings } from './components/SolverSettings';
+import { useStorageData } from '../../hook/useStorageData';
 
 interface SolverProps {
   selectedTab?: string;

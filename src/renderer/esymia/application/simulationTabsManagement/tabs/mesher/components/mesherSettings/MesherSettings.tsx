@@ -22,7 +22,7 @@ import {
 } from '../../../../../../store/tabsAndMenuItemsSlice';
 import { ComponentEntity, Material } from '../../../../../../../cad_library';
 import { MesherStatusSelector } from '../../../../../../store/pluginsSlice';
-import { generateSTLListFromComponents } from '../rightPanelSimulator/components/rightPanelFunctions';
+import { generateSTLListFromComponents } from '../utils/generateSTLListFromComponents';
 import {
   ExternalGridsObject,
   Project,

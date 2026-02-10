@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaCheck, FaPauseCircle, FaSortAlphaDown } from 'react-icons/fa';
+import { FaCheck, FaSortAlphaDown } from 'react-icons/fa';
 import { TiDelete } from 'react-icons/ti';
 import { MdWatchLater } from 'react-icons/md';
 import { AiOutlineBarChart } from 'react-icons/ai';
@@ -23,7 +23,6 @@ import noresultfoundDark from '../../../../../../assets/noresultfoundDark.png';
 import { ImSpinner } from 'react-icons/im';
 import { setPortsFromS3 } from '../../simulationTabsManagement/tabs/physics/Physics';
 import { IoCheckmark, IoFilterSharp } from 'react-icons/io5';
-import { CheckBadgeIcon } from '@heroicons/react/20/solid';
 
 interface SimulationsProps {
   maxH: string;

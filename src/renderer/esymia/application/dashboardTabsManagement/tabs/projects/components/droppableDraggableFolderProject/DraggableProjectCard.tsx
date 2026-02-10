@@ -24,14 +24,12 @@ import {
 import { Folder, Project } from '../../../../../../model/esymiaModels';
 import { setModelInfoFromS3 } from '../../../shared/utilFunctions';
 import projectIcon from '../../../../../../../../../assets/projectIcon.png';
-import {
-  useStorageData
-} from '../../../../../simulationTabsManagement/tabs/mesher/components/rightPanelSimulator/hook/useStorageData';
 import { GrClone } from 'react-icons/gr';
 import { ImSpinner } from 'react-icons/im';
 import { usersStateSelector } from '../../../../../../../cad_library';
 import { useDynamoDBQuery } from '../../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { moveProjectInDynamoDB } from '../../../../../../../dynamoDB/projectsFolderApi';
+import { useStorageData } from '../../../../../simulationTabsManagement/hook/useStorageData';
 
 interface DraggableProjectCardProps {
   project: Project;

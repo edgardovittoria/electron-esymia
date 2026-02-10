@@ -10,10 +10,10 @@ import {
 } from '../../../../../../../model/esymiaModels';
 import toast from 'react-hot-toast';
 import { UsersState, usersStateSelector } from '../../../../../../../../cad_library';
-import { useStorageData } from '../../../../../../simulationTabsManagement/tabs/mesher/components/rightPanelSimulator/hook/useStorageData';
 import { useDynamoDBQuery } from '../../../../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { recursiveUpdateSharingInfoFolderInDynamoDB } from '../../../../../../../../dynamoDB/projectsFolderApi';
 import { ThemeSelector } from '../../../../../../../store/tabsAndMenuItemsSlice';
+import { useStorageData } from '../../../../../../simulationTabsManagement/hook/useStorageData';
 
 
 interface SearchUserAndShareProps {

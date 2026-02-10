@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { BackSide, FrontSide, InstancedMesh, Object3D } from 'three';
 import { CellSize, OriginPoint, Project } from '../../../../../../../model/esymiaModels';
 import { useSelector } from 'react-redux';
-import { Brick } from '../../rightPanelSimulator/components/createGridsExternals';
+import { Brick } from '../../utils/createGridsExternals';
 import { meshVisualizationSelector, scalingViewParamsOfMeshSelector } from '../../../../../../../store/tabsAndMenuItemsSlice';
 import { EdgesMaterial } from './EdgesMaterial';
 import { Edges, Wireframe } from '@react-three/drei';
@@ -27,7 +27,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
   let tempObject = new Object3D();
   const selectedProject = useSelector(selectedProjectSelector);
   const meshVisualization = useSelector(meshVisualizationSelector)
-  const [modelTranslationOffset, setModelTranslationOffset] = useState<THREE.Vector3>(new THREE.Vector3(0,0,0));
+  const [modelTranslationOffset, setModelTranslationOffset] = useState<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
 
   let boxDims: [number, number, number] = [
     cellSize.cell_size_x * 1000 * scalingViewParams.x,
@@ -59,14 +59,14 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
         edgeRef.current.setMatrixAt(id, tempObject.matrix);
       });
 
-      if(meshVisualization === 'normal'){
+      if (meshVisualization === 'normal') {
         meshRef.current.instanceMatrix.needsUpdate = true;
       }
       edgeRef.current.instanceMatrix.needsUpdate = true;
       // edgeRef.current.geometry = meshRef.current.geometry
       // edgeRef.current.instanceMatrix = meshRef.current.instanceMatrix;
     }
-    if(meshVisualization === 'light' && selectedProject){
+    if (meshVisualization === 'light' && selectedProject) {
       const boundingbox = calculateModelBoundingBox(selectedProject)
       setModelTranslationOffset(boundingbox.min)
     }
@@ -79,9 +79,9 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
     <>
       {meshVisualization === 'normal' ?
         <instancedMesh ref={meshRef} frustumCulled={false} args={[null as any, null as any, bricks.length]}>
-        <boxGeometry args={boxDims}/>
-        <meshPhongMaterial color={material && material.color} side={FrontSide}/>
-      </instancedMesh> :
+          <boxGeometry args={boxDims} />
+          <meshPhongMaterial color={material && material.color} side={FrontSide} />
+        </instancedMesh> :
         <>
           {selectedProject && selectedProject.model.components.map((component: ComponentEntity) => {
             return (
@@ -92,9 +92,9 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
                 }}
                 key={uniqid()}
                 position={new THREE.Vector3(
-                  (component.transformationParams.position[0] - modelTranslationOffset.x +(cellSize.cell_size_x*1000)/2)*scalingViewParams.x,
-                  (component.transformationParams.position[1] - modelTranslationOffset.y +(cellSize.cell_size_y*1000)/2)*scalingViewParams.y,
-                  (component.transformationParams.position[2] - modelTranslationOffset.z +(cellSize.cell_size_z*1000/2))*scalingViewParams.z,
+                  (component.transformationParams.position[0] - modelTranslationOffset.x + (cellSize.cell_size_x * 1000) / 2) * scalingViewParams.x,
+                  (component.transformationParams.position[1] - modelTranslationOffset.y + (cellSize.cell_size_y * 1000) / 2) * scalingViewParams.y,
+                  (component.transformationParams.position[2] - modelTranslationOffset.z + (cellSize.cell_size_z * 1000 / 2)) * scalingViewParams.z,
                 )}
                 rotation={component.transformationParams.rotation}
                 scale={new THREE.Vector3(
@@ -112,7 +112,7 @@ export const MyInstancedMesh: React.FC<InstancedMeshProps> = ({ material, bricks
       <instancedMesh ref={edgeRef} frustumCulled={false} args={[null as any, null as any, bricks.length]}>
         <boxGeometry args={boxDims} />
         <EdgesMaterial boxDims={boxDims} smoothness={meanBoxDims * 0.01} thickness={meanBoxDims * 0.03}
-                       polygonOffsetFactor={-0.2} color='black' />
+          polygonOffsetFactor={-0.2} color='black' />
       </instancedMesh>
     </>
   )

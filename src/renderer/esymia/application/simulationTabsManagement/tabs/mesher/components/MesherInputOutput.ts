@@ -1,4 +1,4 @@
-import { Brick } from './rightPanelSimulator/components/createGridsExternals';
+import { Brick } from './utils/createGridsExternals';
 
 export type MesherOutput = {
     n_materials: number,

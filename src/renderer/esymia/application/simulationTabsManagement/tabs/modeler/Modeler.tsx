@@ -7,7 +7,6 @@ import { modelerLeftPanelTitle } from '../../../config/panelTitles';
 import { GiAtomicSlashes, GiCubeforce } from 'react-icons/gi';
 import { useEffect, useState } from 'react';
 import { GrClone } from 'react-icons/gr';
-import { useStorageData } from '../mesher/components/rightPanelSimulator/hook/useStorageData';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   importModel,
@@ -26,6 +25,7 @@ import { ResetFocusButton } from '../../sharedElements/ResetFocusButton';
 import { useDynamoDBQuery } from '../../../../../dynamoDB/hook/useDynamoDBQuery';
 import { createOrUpdateProjectInDynamoDB } from '../../../../../dynamoDB/projectsFolderApi';
 import { s3 } from '../../../../../cadmia/aws/s3Config';
+import { useStorageData } from '../../hook/useStorageData';
 
 
 interface ModelerProps {

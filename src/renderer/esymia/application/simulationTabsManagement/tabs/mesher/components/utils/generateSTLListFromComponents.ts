@@ -1,4 +1,4 @@
-import { ComponentEntity, exportToSTL, Material } from '../../../../../../../../cad_library';
+import { ComponentEntity, exportToSTL, Material } from '../../../../../../../cad_library';
 
 export function generateSTLListFromComponents(
   materialList: Material[],
@@ -7,9 +7,9 @@ export function generateSTLListFromComponents(
   const filteredComponents: ComponentEntity[][] = [];
   materialList.forEach((m) => {
     components &&
-    filteredComponents.push(
-      components.filter((c) => c.material?.name === m.name)
-    );
+      filteredComponents.push(
+        components.filter((c) => c.material?.name === m.name)
+      );
   });
 
   const STLList: { material: { name: string, conductivity: number }; STL: string }[] = [];
